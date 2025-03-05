@@ -1,0 +1,48 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35825.156 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoodCalcHub.AppHost", "FoodCalcHub.AppHost\FoodCalcHub.AppHost.csproj", "{F5690852-D56B-486F-9371-655522B7D2EA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoodCalcHub.ServiceDefaults", "FoodCalcHub.ServiceDefaults\FoodCalcHub.ServiceDefaults.csproj", "{262B40F1-1A0B-A503-775F-F7D5C67A4C3D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoodCalcHub.ApiService", "FoodCalcHub.ApiService\FoodCalcHub.ApiService.csproj", "{B9C6AC09-177D-32B8-431D-E194B14A230A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoodCalcHub.Web", "FoodCalcHub.Web\FoodCalcHub.Web.csproj", "{632F2473-ED1C-5AEE-00CE-5C2AC8B5C457}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoodCalcHub.Tests", "FoodCalcHub.Tests\FoodCalcHub.Tests.csproj", "{1C6612A3-8C5A-8F94-843D-70612308380E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F5690852-D56B-486F-9371-655522B7D2EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5690852-D56B-486F-9371-655522B7D2EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5690852-D56B-486F-9371-655522B7D2EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5690852-D56B-486F-9371-655522B7D2EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{262B40F1-1A0B-A503-775F-F7D5C67A4C3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{262B40F1-1A0B-A503-775F-F7D5C67A4C3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{262B40F1-1A0B-A503-775F-F7D5C67A4C3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{262B40F1-1A0B-A503-775F-F7D5C67A4C3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9C6AC09-177D-32B8-431D-E194B14A230A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9C6AC09-177D-32B8-431D-E194B14A230A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9C6AC09-177D-32B8-431D-E194B14A230A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9C6AC09-177D-32B8-431D-E194B14A230A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{632F2473-ED1C-5AEE-00CE-5C2AC8B5C457}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{632F2473-ED1C-5AEE-00CE-5C2AC8B5C457}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{632F2473-ED1C-5AEE-00CE-5C2AC8B5C457}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{632F2473-ED1C-5AEE-00CE-5C2AC8B5C457}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C6612A3-8C5A-8F94-843D-70612308380E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C6612A3-8C5A-8F94-843D-70612308380E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C6612A3-8C5A-8F94-843D-70612308380E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C6612A3-8C5A-8F94-843D-70612308380E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BCFCD3BA-0FB6-4CD1-AE18-2AE45DB0973E}
+	EndGlobalSection
+EndGlobal
