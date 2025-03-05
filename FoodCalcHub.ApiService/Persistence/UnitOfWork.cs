@@ -4,10 +4,11 @@ namespace FoodCalcHub.ApiService.Persistence;
 
 public class UnitOfWork(ApplicationDbContext context, IReceptRepository receptRepository, IIngredientRepository ingredientRepository) : IUnitOfWork
 {
-    public IReceptRepository ReceptRepository { get; }
-    public IIngredientRepository IngredientRepository { get; }
+	public IReceptRepository ReceptRepository => receptRepository;
 
-    public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+	public IIngredientRepository IngredientRepository => ingredientRepository;
+
+	public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         return await context.SaveChangesAsync(cancellationToken);
     }

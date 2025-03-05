@@ -1,16 +1,18 @@
-﻿using FoodCalcHub.ApiService.Entities;
+﻿using ErrorOr;
+
+using FoodCalcHub.ApiService.Entities;
 using FoodCalcHub.ApiService.Persistence;
 using MediatR;
 
 
 namespace FoodCalcHub.ApiService.Features.Recepts.Commands.UpdateRecept;
-public class UpdateReceptCommandHandler(IUnitOfWork unitOfWork) : IRequestHandler<UpdateReceptCommand, Recept>
+public class UpdateReceptCommandHandler(IUnitOfWork unitOfWork, ILogger<UpdateReceptCommandHandler> logger) : IRequestHandler<UpdateReceptCommand, ErrorOr<Recept>>
 {
-    public async Task<Recept> Handle(UpdateReceptCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<Recept>> Handle(UpdateReceptCommand request, CancellationToken cancellationToken)
     {
         try
         {
-            Recept recept = await unitOfWork.ReceptRepository.GetByIdAsync(request.Recept.Id, cancellationToken);
+            Recept? recept = await unitOfWork.ReceptRepository.GetByIdAsync(request.Recept.Id, cancellationToken);
 
             if (recept == null)
             {
@@ -26,7 +28,8 @@ public class UpdateReceptCommandHandler(IUnitOfWork unitOfWork) : IRequestHandle
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to update recept", ex);
+            logger.LogError(ex, "Failed to update recept");
+            return Error.Failure("Failed to update recept");
         }
     }
 }

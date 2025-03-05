@@ -1,16 +1,17 @@
-﻿using FoodCalcHub.ApiService.Entities;
-using FoodCalcHub.ApiService.Features.Recepts.Commands.UpdateRecept;
+﻿using ErrorOr;
+
+using FoodCalcHub.ApiService.Entities;
 using FoodCalcHub.ApiService.Persistence;
 using MediatR;
 
 namespace FoodCalcHub.ApiService.Features.Recepts.Commands.AddIngredientToRecept;
-public class AddIngredientToReceptCommandHandler(IUnitOfWork unitOfWork) : IRequestHandler<AddIngredientToReceptCommand, Recept>
+public class AddIngredientToReceptCommandHandler(IUnitOfWork unitOfWork, ILogger<AddIngredientToReceptCommandHandler> logger) : IRequestHandler<AddIngredientToReceptCommand, ErrorOr<Recept>>
 {
-    public async Task<Recept> Handle(AddIngredientToReceptCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<Recept>> Handle(AddIngredientToReceptCommand request, CancellationToken cancellationToken)
     {
         try
         {
-            Recept recept = await unitOfWork.ReceptRepository.GetByIdAsync(request.ReceptId, cancellationToken);
+            Recept? recept = await unitOfWork.ReceptRepository.GetByIdAsync(request.ReceptId, cancellationToken);
 
             if (recept == null)
             {
@@ -19,13 +20,14 @@ public class AddIngredientToReceptCommandHandler(IUnitOfWork unitOfWork) : IRequ
 
             recept.Ingredients.Add(request.Ingredient);
 
-            await unitOfWork.SaveChangesAsync();
+            await unitOfWork.SaveChangesAsync(cancellationToken);
 
             return recept;
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to update recept", ex);
+            logger.LogError(ex, "Failed to add ingredient to recept");
+            return Error.Failure("Failed to update recept");
         }
     }
 }

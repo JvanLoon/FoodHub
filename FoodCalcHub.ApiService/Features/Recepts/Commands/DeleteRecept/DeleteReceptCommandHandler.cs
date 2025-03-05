@@ -1,20 +1,23 @@
-﻿using FoodCalcHub.ApiService.Persistence;
+﻿using ErrorOr;
+
+using FoodCalcHub.ApiService.Persistence;
 using MediatR;
 
 namespace FoodCalcHub.ApiService.Features.Recepts.Commands.DeleteRecept;
-public class DeleteReceptCommandHandler(IUnitOfWork unitOfWork) : IRequestHandler<DeleteReceptCommand, Guid>
+public class DeleteReceptCommandHandler(IUnitOfWork unitOfWork, ILogger<DeleteReceptCommandHandler> logger) : IRequestHandler<DeleteReceptCommand, ErrorOr<bool>>
 {
-    public async Task<Guid> Handle(DeleteReceptCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<bool>> Handle(DeleteReceptCommand request, CancellationToken cancellationToken)
     {
         try
         {
             await unitOfWork.ReceptRepository.DeleteAsync(request.Id, cancellationToken);
 
-            return request.Id;
+            return true;
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to delete recept", ex);
+            logger.LogError(ex, "Failed to delete recept");
+            return Error.Failure("Failed to delete recept");
         }
     }
 }

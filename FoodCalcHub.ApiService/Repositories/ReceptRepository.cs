@@ -6,7 +6,7 @@ namespace FoodCalcHub.ApiService.Repositories;
 
 public class ReceptRepository(ApplicationDbContext context) : IReceptRepository
 {
-    public async Task<IEnumerable<Recept>> GetAllAsync(CancellationToken cancellationToken)
+    public async Task<List<Recept>> GetAllAsync(CancellationToken cancellationToken)
     {
         return await context.Recepts.ToListAsync();
     }

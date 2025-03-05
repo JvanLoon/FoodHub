@@ -17,7 +17,7 @@ public class ReceptController(IMediator mediator) : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Recept>>> GetRecepts()
     {
-        IEnumerable<Recept> recepts = await mediator.Send(new GetAllReceptsQuery());
+        var recepts = await mediator.Send(new GetAllReceptsQuery());
 
         return Ok(recepts);
     }
@@ -25,7 +25,7 @@ public class ReceptController(IMediator mediator) : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<Recept>> GetRecept(Guid id)
     {
-        Recept result = await mediator.Send(new GetReceptByIdQuery(id));
+        var result = await mediator.Send(new GetReceptByIdQuery(id));
 
         if (result == null)
         {
@@ -36,26 +36,26 @@ public class ReceptController(IMediator mediator) : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<Recept>> AddRecept(Recept recept)
+    public async Task<IActionResult> AddRecept(Recept recept)
     {
-        Recept result = await mediator.Send(new AddReceptCommand(recept));
+        var result = await mediator.Send(new AddReceptCommand(recept));
 
-        if (result == null)
+        if (result.IsError)
         {
-            return BadRequest();
+            return BadRequest(result.FirstError);
         }
 
-        return CreatedAtAction(nameof(AddRecept), new { id = result.Id }, result);
+        return Ok();
     }
 
     [HttpPut]
     public async Task<IActionResult> UpdateRecept(Recept recept)
     {
-        Recept result = await mediator.Send(new UpdateReceptCommand(recept));
+        var result = await mediator.Send(new UpdateReceptCommand(recept));
 
-        if (result == null)
+        if (result.IsError)
         {
-            return BadRequest();
+            return BadRequest(result.FirstError);
         }
 
         return NoContent();
@@ -64,16 +64,26 @@ public class ReceptController(IMediator mediator) : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteRecept(Guid id)
     {
-        Guid result = await mediator.Send(new DeleteReceptCommand(id));
+        var result = await mediator.Send(new DeleteReceptCommand(id));
+
+        if (result.IsError)
+        {
+            return BadRequest(result.FirstError);
+        }
 
         return NoContent();
     }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> AddIngridientToRecept(Guid receptId, Ingredient ingredient)
-    {
-        Recept result = await mediator.Send(new AddIngredientToReceptCommand(receptId, ingredient));
+    //[HttpPut("{id}")]
+    //public async Task<IActionResult> AddIngridientToRecept(Guid receptId, Ingredient ingredient)
+    //{
+    //    var result = await mediator.Send(new AddIngredientToReceptCommand(receptId, ingredient));
 
-        return NoContent();
-    }
+    //    if (result.IsError)
+    //    {
+    //        return BadRequest(result.FirstError);
+    //    }
+
+    //    return NoContent();
+    //}
 }
