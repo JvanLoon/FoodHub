@@ -11,5 +11,10 @@
         <InputText id="name" class="form-control" @bind-Value="_recept.Name" />
     </div>
 
+    @if (!string.IsNullOrEmpty(_errorMessage))
+    {
+        <div class="alert alert-danger">@_errorMessage</div>
+    }
+
     <button type="submit" class="btn btn-primary">Add Recept</button>
 </EditForm>

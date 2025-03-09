@@ -1,6 +1,10 @@
 using FoodCalc.Web;
 using FoodCalc.Web.Components;
 
+using FoodHub.Persistence.Persistence;
+using FoodHub.Persistence.Repositories.Interface;
+using FoodHub.Persistence.Repositories;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add service defaults & Aspire client integrations.

@@ -75,10 +75,10 @@ public static class Extensions
 
 	public static IServiceCollection AddCustomServices(this IServiceCollection services)
 	{
-		services.AddScoped<IReceptRepository, ReceptRepository>();
-		services.AddScoped<IIngredientRepository, IngredientRepository>();
+		services.AddTransient<IReceptRepository, ReceptRepository>();
+		services.AddTransient<IIngredientRepository, IngredientRepository>();
 
-		services.AddScoped<IUnitOfWork, UnitOfWork>();
+		services.AddTransient<IUnitOfWork, UnitOfWork>();
 
 		return services;
 	}

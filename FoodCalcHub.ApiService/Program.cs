@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using FoodCalc.Features.Recepts.Commands.AddRecept;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddCustomServices();
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
+
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<AddReceptCommandHandler>());
+
 
 // Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();

@@ -19,9 +19,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FoodCalc.Feature\FoodCalc.Feature.csproj" />
     <ProjectReference Include="..\FoodCalcHub.ServiceDefaults\FoodCalcHub.ServiceDefaults.csproj" />
     <ProjectReference Include="..\FoodHub.Persistence\FoodHub.Persistence.csproj" />
-    <ProjectReference Include="..\FoodCalcHub.Features\FoodCalc.Features.csproj" />
   </ItemGroup>
 
 </Project>

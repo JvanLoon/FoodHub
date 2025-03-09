@@ -1,10 +1,10 @@
 ﻿using FoodHub.Persistence.Entities;
-using FoodCalc.ApiService.Features.Recepts.Commands.AddIngredientToRecept;
-using FoodCalc.ApiService.Features.Recepts.Commands.AddRecept;
-using FoodCalc.ApiService.Features.Recepts.Commands.DeleteRecept;
-using FoodCalc.ApiService.Features.Recepts.Commands.UpdateRecept;
-using FoodCalc.ApiService.Features.Recepts.Queries.GetAllRecepts;
-using FoodCalc.ApiService.Features.Recepts.Queries.GetById;
+using FoodCalc.Features.Recepts.Commands.AddIngredientToRecept;
+using FoodCalc.Features.Recepts.Commands.AddRecept;
+using FoodCalc.Features.Recepts.Commands.DeleteRecept;
+using FoodCalc.Features.Recepts.Commands.UpdateRecept;
+using FoodCalc.Features.Recepts.Queries.GetAllRecepts;
+using FoodCalc.Features.Recepts.Queries.GetById;
 
 using MediatR;
 
@@ -38,7 +38,7 @@ public class ReceptController(IMediator mediator) : ControllerBase
 	}
 
 	[HttpPost]
-	public async Task<IActionResult> AddRecept(Recept recept)
+	public async Task<IActionResult> AddRecept([FromBody] Recept recept)
 	{
 		var result = await mediator.Send(new AddReceptCommand(recept));
 

@@ -8,19 +8,28 @@ public partial class CreateRecept
 	[Inject]
 	public IHttpClientFactory HttpClientFactory { get; set; }
 
-	private Recept _recept = new();
+	private Recept _recept;
+	private string _errorMessage;
 
-    private async Task HandleValidSubmit()
-    {
-		var client = HttpClientFactory.CreateClient("FoodCalcApi");
-		var response = await client.PostAsJsonAsync("api/recept", _recept);
-        if (response.IsSuccessStatusCode)
-        {
-            // Handle success (e.g., navigate to a different page or show a success message)
-        }
-        else
-        {
-            // Handle error (e.g., show an error message)
-        }
-    }
+	private async Task HandleValidSubmit()
+	{
+		try
+		{
+			var client = HttpClientFactory.CreateClient("FoodCalcApi");
+			var response = await client.PostAsJsonAsync("api/recept", _recept);
+			if (!response.IsSuccessStatusCode)
+			{
+				_errorMessage = "Something went wrong: " + response.Content + " " + response.StatusCode;
+			}
+			else
+			{
+				_errorMessage = null;
+				// Handle successful submission (e.g., navigate to another page)
+			}
+		}
+		catch (Exception ex)
+		{
+			_errorMessage = $"An unexpected error occurred: {ex.Message}";
+		}
+	}
 }
