@@ -27,8 +27,6 @@ if (!app.Environment.IsDevelopment())
 	app.UseHsts();
 }
 
-app.MapBlazorHub();
-
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
