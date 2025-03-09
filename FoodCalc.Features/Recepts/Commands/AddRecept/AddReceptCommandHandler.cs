@@ -4,7 +4,7 @@ using FoodHub.Persistence.Entities;
 using FoodHub.Persistence.Persistence;
 using Microsoft.Extensions.Logging;
 
-namespace FoodCalc.ApiService.Features.Recepts.Commands.AddRecept;
+namespace FoodCalc.Features.Recepts.Commands.AddRecept;
 public class AddReceptCommandHandler(IUnitOfWork unitOfWork, ILogger<AddReceptCommandHandler> logger) : IRequestHandler<AddReceptCommand, ErrorOr<Recept>>
 {
     public async Task<ErrorOr<Recept>> Handle(AddReceptCommand request, CancellationToken cancellationToken)

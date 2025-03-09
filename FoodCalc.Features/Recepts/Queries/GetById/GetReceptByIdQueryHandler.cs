@@ -5,7 +5,7 @@ using FoodHub.Persistence.Repositories.Interface;
 
 using Microsoft.Extensions.Logging;
 
-namespace FoodCalc.ApiService.Features.Recepts.Queries.GetById;
+namespace FoodCalc.Features.Recepts.Queries.GetById;
 public class GetReceptByIdQueryHandler(IReceptRepository receptRepository, ILogger<GetReceptByIdQueryHandler> logger)
 {
     public async Task<ErrorOr<Recept>> Handle(GetReceptByIdQuery request, CancellationToken cancellationToken)

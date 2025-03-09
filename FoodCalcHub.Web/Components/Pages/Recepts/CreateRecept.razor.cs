@@ -1,13 +1,19 @@
 ﻿using FoodHub.Persistence.Entities;
 
+using Microsoft.AspNetCore.Components;
+
 namespace FoodCalc.Web.Components.Pages.Recepts;
 public partial class CreateRecept
 {
-    private Recept _recept;
+	[Inject]
+	public IHttpClientFactory HttpClientFactory { get; set; }
+
+	private Recept _recept = new();
 
     private async Task HandleValidSubmit()
     {
-        var response = await Http.PostAsJsonAsync("api/recepts", _recept);
+		var client = HttpClientFactory.CreateClient("FoodCalcApi");
+		var response = await client.PostAsJsonAsync("api/recept", _recept);
         if (response.IsSuccessStatusCode)
         {
             // Handle success (e.g., navigate to a different page or show a success message)

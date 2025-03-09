@@ -5,10 +5,7 @@
 
 <h3>Add Recept</h3>
 
-<EditForm Model="_recept" OnValidSubmit="HandleValidSubmit">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-
+<EditForm FormName="CreateRecept" Model="_recept" OnValidSubmit="HandleValidSubmit">
     <div class="mb-3">
         <label for="name" class="form-label">Name</label>
         <InputText id="name" class="form-control" @bind-Value="_recept.Name" />

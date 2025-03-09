@@ -10,11 +10,16 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Use the custom service registration method
 builder.Services.AddCustomServices();
 
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
+
 // Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();
 
 // Add services to the container.
 builder.Services.AddProblemDetails();
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
@@ -25,6 +30,8 @@ app.UseExceptionHandler();
 if (app.Environment.IsDevelopment())
 {
 	app.UseDeveloperExceptionPage();
+	app.UseSwagger();
+	app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
@@ -32,5 +39,7 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.MapDefaultEndpoints();
+//app.UseAuthorization();
+app.MapControllers();
 
 app.Run();

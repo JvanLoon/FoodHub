@@ -13,11 +13,15 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="7.3.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="7.3.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="7.3.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\FoodCalcHub.ServiceDefaults\FoodCalcHub.ServiceDefaults.csproj" />
     <ProjectReference Include="..\FoodHub.Persistence\FoodHub.Persistence.csproj" />
+    <ProjectReference Include="..\FoodCalcHub.Features\FoodCalc.Features.csproj" />
   </ItemGroup>
 
 </Project>

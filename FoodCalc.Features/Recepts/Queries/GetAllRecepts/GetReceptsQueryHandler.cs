@@ -1,12 +1,12 @@
 ﻿using ErrorOr;
+using MediatR;
 
 using FoodHub.Persistence.Entities;
 using FoodHub.Persistence.Persistence;
 using Microsoft.Extensions.Logging;
 
-using MediatR;
 
-namespace FoodCalc.ApiService.Features.Recepts.Queries.GetAllRecepts;
+namespace FoodCalc.Features.Recepts.Queries.GetAllRecepts;
 public class GetReceptsQueryHandler(IUnitOfWork unitOfWork, ILogger<GetReceptsQueryHandler> logger) : IRequestHandler<GetAllReceptsQuery, ErrorOr<List<Recept>>>
 {
 	public async Task<ErrorOr<List<Recept>>> Handle(GetAllReceptsQuery request, CancellationToken cancellationToken)

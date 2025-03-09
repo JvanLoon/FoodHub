@@ -1,12 +1,12 @@
 ﻿using ErrorOr;
+using MediatR;
 
 using FoodHub.Persistence.Entities;
 using FoodHub.Persistence.Persistence;
-using MediatR;
 
 using Microsoft.Extensions.Logging;
 
-namespace FoodCalc.ApiService.Features.Recepts.Commands.AddIngredientToRecept;
+namespace FoodCalc.Features.Recepts.Commands.AddIngredientToRecept;
 public class AddIngredientToReceptCommandHandler(IUnitOfWork unitOfWork, ILogger<AddIngredientToReceptCommandHandler> logger) : IRequestHandler<AddIngredientToReceptCommand, ErrorOr<Recept>>
 {
     public async Task<ErrorOr<Recept>> Handle(AddIngredientToReceptCommand request, CancellationToken cancellationToken)

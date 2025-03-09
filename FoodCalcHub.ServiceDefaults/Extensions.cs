@@ -23,8 +23,6 @@ public static class Extensions
 {
 	public static TBuilder AddServiceDefaults<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
 	{
-		builder.ConfigureOpenTelemetry();
-
 		builder.AddDefaultHealthChecks();
 
 		builder.Services.AddServiceDiscovery();
@@ -43,54 +41,6 @@ public static class Extensions
 		// {
 		//     options.AllowedSchemes = ["https"];
 		// });
-
-		return builder;
-	}
-
-	public static TBuilder ConfigureOpenTelemetry<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
-	{
-		builder.Logging.AddOpenTelemetry(logging =>
-		{
-			logging.IncludeFormattedMessage = true;
-			logging.IncludeScopes = true;
-		});
-
-		builder.Services.AddOpenTelemetry()
-			.WithMetrics(metrics =>
-			{
-				metrics.AddAspNetCoreInstrumentation()
-					.AddHttpClientInstrumentation()
-					.AddRuntimeInstrumentation();
-			})
-			.WithTracing(tracing =>
-			{
-				tracing.AddSource(builder.Environment.ApplicationName)
-					.AddAspNetCoreInstrumentation()
-					// Uncomment the following line to enable gRPC instrumentation (requires the OpenTelemetry.Instrumentation.GrpcNetClient package)
-					//.AddGrpcClientInstrumentation()
-					.AddHttpClientInstrumentation();
-			});
-
-		builder.AddOpenTelemetryExporters();
-
-		return builder;
-	}
-
-	private static TBuilder AddOpenTelemetryExporters<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
-	{
-		var useOtlpExporter = !string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]);
-
-		if (useOtlpExporter)
-		{
-			builder.Services.AddOpenTelemetry().UseOtlpExporter();
-		}
-
-		// Uncomment the following lines to enable the Azure Monitor exporter (requires the Azure.Monitor.OpenTelemetry.AspNetCore package)
-		//if (!string.IsNullOrEmpty(builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]))
-		//{
-		//    builder.Services.AddOpenTelemetry()
-		//       .UseAzureMonitor();
-		//}
 
 		return builder;
 	}
@@ -125,13 +75,10 @@ public static class Extensions
 
 	public static IServiceCollection AddCustomServices(this IServiceCollection services)
 	{
-		services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
-
 		services.AddScoped<IReceptRepository, ReceptRepository>();
 		services.AddScoped<IIngredientRepository, IngredientRepository>();
 
-		// Register IUnitOfWork
-		services.AddScoped<IUnitOfWork, UnitOfWork>(); // Add this line
+		services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 		return services;
 	}

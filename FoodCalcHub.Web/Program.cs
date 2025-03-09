@@ -1,8 +1,6 @@
 using FoodCalc.Web;
 using FoodCalc.Web.Components;
 
-using Microsoft.EntityFrameworkCore;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add service defaults & Aspire client integrations.
@@ -13,6 +11,13 @@ builder.Services.AddRazorComponents()
 	.AddInteractiveServerComponents();
 
 builder.Services.AddOutputCache();
+
+builder.Services.AddHttpClient("FoodCalcApi", client =>
+{
+    // This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.
+    // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
+    client.BaseAddress = new Uri("https://localhost:7428");
+});
 
 var app = builder.Build();
 

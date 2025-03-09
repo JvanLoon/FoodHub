@@ -14,6 +14,7 @@
   <ItemGroup>
     <ProjectReference Include="..\FoodCalcHub.ApiService\FoodCalc.ApiService.csproj" />
     <ProjectReference Include="..\FoodCalcHub.Web\FoodCalc.Web.csproj" />
+    <ProjectReference Include="..\FoodCalcHub.Features\FoodCalc.Features.csproj" /> <!-- Added reference to the new features project -->
   </ItemGroup>
 
   <ItemGroup>
