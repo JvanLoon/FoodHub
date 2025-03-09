@@ -1,0 +1,57 @@
+﻿@page "/recepts/add"
+@inject IHttpClientFactory Http
+@using FoodHub.Persistence.Entities;
+
+<PageTitle>Add Recept</PageTitle>
+
+<h3>Add Recept</h3>
+
+<EditForm FormName="CreateReceptUiThing" Model="_recept" OnValidSubmit="HandleValidSubmit">
+    <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <InputText id="name" class="form-control" @bind-Value="_recept.Name" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Add Recept</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(_errorMessage))
+{
+    <div class="alert alert-danger">@_errorMessage</div>
+}
+
+@code{
+    public Recept _recept = new Recept { Name = ""};
+    public string _errorMessage = "";
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            var response = await Http.CreateClient("FoodCalcApi").PostAsJsonAsync("api/recept", _recept);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _errorMessage = "Something went wrong: " + response.Content + " " + response.StatusCode + " " + response.RequestMessage;
+            }
+            else
+            {
+                _errorMessage = "";
+                // Handle successful submission (e.g., navigate to another page)
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"An unexpected error occurred: {ex.Message}";
+        }
+    }
+
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     //Simulate data loading
+    //     await Task.Delay(500); 
+    //     _recept = new Recept { Name = "Test Name" 
+    //     //Force UI update
+    //     StateHasChanged(); 
+    // }
+}

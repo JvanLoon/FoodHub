@@ -8,21 +8,15 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsAspireHost>true</IsAspireHost>
-    <UserSecretsId>31a0c3cc-a498-4c09-a93d-13ca095014e8</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FoodCalcHub.ApiService\FoodCalc.ApiService.csproj" />
-    <ProjectReference Include="..\FoodCalcHub.Web\FoodCalc.Web.csproj" />
-    <ProjectReference Include="..\FoodCalc.Feature\FoodCalc.Feature.csproj" /> <!-- Added reference to the new features project -->
+    <ProjectReference Include="..\FoodCalc.ApiService\FoodCalc.ApiService.csproj" />
+    <ProjectReference Include="..\FoodCalc.Web\FoodCalc.Web.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.AppHost" Version="9.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.2">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
   </ItemGroup>
 
 </Project>

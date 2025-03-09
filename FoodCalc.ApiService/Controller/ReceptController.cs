@@ -40,6 +40,8 @@ public class ReceptController(IMediator mediator) : ControllerBase
 	[HttpPost]
 	public async Task<IActionResult> AddRecept([FromBody] Recept recept)
 	{
+		Console.WriteLine($"Received Recept: {recept.Name}");
+
 		var result = await mediator.Send(new AddReceptCommand(recept));
 
 		if (result.IsError)

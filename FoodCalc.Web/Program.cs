@@ -1,9 +1,4 @@
-using FoodCalc.Web;
 using FoodCalc.Web.Components;
-
-using FoodHub.Persistence.Persistence;
-using FoodHub.Persistence.Repositories.Interface;
-using FoodHub.Persistence.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,9 +13,9 @@ builder.Services.AddOutputCache();
 
 builder.Services.AddHttpClient("FoodCalcApi", client =>
 {
-    // This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.
-    // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
-    client.BaseAddress = new Uri("https://localhost:7428");
+	// This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.
+	// Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
+	client.BaseAddress = new Uri("https://localhost:7428");
 });
 
 var app = builder.Build();
@@ -31,6 +26,8 @@ if (!app.Environment.IsDevelopment())
 	// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 	app.UseHsts();
 }
+
+app.MapBlazorHub();
 
 app.UseHttpsRedirection();
 

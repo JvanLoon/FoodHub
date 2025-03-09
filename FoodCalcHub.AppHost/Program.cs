@@ -7,6 +7,8 @@ builder.AddProject<Projects.FoodCalc_Web>("webfrontend")
     .WithReference(apiService)
     .WaitFor(apiService);
 
+//builder.AddBlazorWebApp("blazor", "FoodCalc.Web");
+
 //builder.AddProject<Projects.FoodCalc_Feature>("features")
 //	.WithReference(apiService);
 
