@@ -183,6 +183,9 @@ csharp_style_prefer_not_pattern = true:suggestion
 csharp_style_prefer_extended_property_pattern = true:suggestion
 dotnet_style_qualification_for_method = false:warning
 dotnet_style_qualification_for_event = false:warning
+csharp_style_prefer_top_level_statements = true:silent
+csharp_style_prefer_primary_constructors = true:suggestion
+csharp_prefer_system_threading_lock = true:suggestion
 
 
 [*.{csproj,props}]
