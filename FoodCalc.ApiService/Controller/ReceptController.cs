@@ -21,7 +21,7 @@ public class ReceptController(IMediator mediator) : ControllerBase
 	{
 		var recepts = await mediator.Send(new GetAllReceptsQuery());
 
-		return Ok(recepts);
+		return Ok(recepts.Value);
 	}
 
 	[HttpGet("{id}")]
@@ -29,18 +29,23 @@ public class ReceptController(IMediator mediator) : ControllerBase
 	{
 		var result = await mediator.Send(new GetReceptByIdQuery(id));
 
-		if (result == null)
+		if (result.IsError)
 		{
-			return NotFound();
+			return NotFound(result.FirstError);
 		}
 
-		return Ok(result);
+		return Ok(result.Value);
 	}
 
 	[HttpPost]
-	public async Task<IActionResult> AddRecept([FromBody] Recept recept)
+	public async Task<IActionResult> AddRecept([FromBody]Recept recept)
 	{
 		Console.WriteLine($"Received Recept: {recept.Name}");
+
+		if (string.IsNullOrEmpty(recept.Name))
+		{
+			return BadRequest("No name provided");
+		}
 
 		var result = await mediator.Send(new AddReceptCommand(recept));
 

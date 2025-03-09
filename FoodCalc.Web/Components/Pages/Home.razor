@@ -1,7 +1,62 @@
 ﻿@page "/"
+@inject HttpClient httpClient
+@using FoodHub.Persistence.Entities
 
 <PageTitle>Home</PageTitle>
 
 <h1>Hello, world!</h1>
 
 Welcome to your new app.
+
+<p>Use this site to learn more about Blazor!</p>
+
+
+
+@if (string.IsNullOrEmpty(_errormessage))
+{
+    <table>
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>name</th>
+                <th>ingriedients</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Recept recept in Recepts)
+            {
+                <tr>
+                    <td>@recept.Id</td>
+                    <td>@recept.Name</td>
+                    <td>@recept.Ingredients?.Count()</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>@_errormessage</p>
+}
+
+
+@code{
+    private string _errormessage = string.Empty;
+    List<Recept> Recepts = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Recepts = await httpClient.GetFromJsonAsync<List<Recept>>("api/recept");
+
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            _errormessage = ex.Message;
+            StateHasChanged();
+            throw ex;
+        }
+    }
+}

@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 
 namespace FoodCalc.Features.Recepts.Queries.GetAllRecepts;
-public class GetReceptsQueryHandler(IUnitOfWork unitOfWork, ILogger<GetReceptsQueryHandler> logger) : IRequestHandler<GetAllReceptsQuery, ErrorOr<List<Recept>>>
+public class GetAllReceptsQueryHandler(IUnitOfWork unitOfWork, ILogger<GetAllReceptsQueryHandler> logger) : IRequestHandler<GetAllReceptsQuery, ErrorOr<List<Recept>>>
 {
 	public async Task<ErrorOr<List<Recept>>> Handle(GetAllReceptsQuery request, CancellationToken cancellationToken)
 	{

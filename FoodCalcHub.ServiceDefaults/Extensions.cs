@@ -6,13 +6,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Microsoft.Extensions.Logging;
-
-using OpenTelemetry;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Trace;
-
-using System.Reflection;
 
 namespace Microsoft.Extensions.Hosting;
 
@@ -30,7 +23,7 @@ public static class Extensions
 		builder.Services.ConfigureHttpClientDefaults(http =>
 		{
 			// Turn on resilience by default
-			http.AddStandardResilienceHandler();
+			//http.AddStandardResilienceHandler();
 
 			// Turn on service discovery by default
 			http.AddServiceDiscovery();
@@ -79,6 +72,23 @@ public static class Extensions
 		services.AddTransient<IIngredientRepository, IngredientRepository>();
 
 		services.AddTransient<IUnitOfWork, UnitOfWork>();
+
+		return services;
+	}
+
+	public static IServiceCollection AddApplicationMediatR(this IServiceCollection services)
+	{
+		// Get all the loaded assemblies
+		var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+
+		// Register handlers from any assembly that contains a MediatR handler
+		services.AddMediatR(cfg =>
+		{
+			foreach (var assembly in assemblies)
+			{
+				cfg.RegisterServicesFromAssembly(assembly);
+			}
+		});
 
 		return services;
 	}

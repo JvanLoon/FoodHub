@@ -1,8 +1,21 @@
 using Microsoft.EntityFrameworkCore;
-using FoodCalc.Features.Recepts.Commands.AddRecept;
+using System.Text.Json;
+using Microsoft.AspNetCore.Http.Json;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add services to the container.
+builder.Services.AddProblemDetails();
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+builder.Services.Configure<JsonOptions>(options =>
+{
+	options.SerializerOptions.IncludeFields = false;
+	//options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+});
 
 // Add services to the container.
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -11,22 +24,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Use the custom service registration method
 builder.Services.AddCustomServices();
 
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
-
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<AddReceptCommandHandler>());
-
-
-// Add service defaults & Aspire client integrations.
-builder.AddServiceDefaults();
-
-// Add services to the container.
-builder.Services.AddProblemDetails();
-builder.Services.AddControllers().AddJsonOptions(options =>
-{
-	options.JsonSerializerOptions.PropertyNamingPolicy = null; // Ensure property names are not camel-cased
-}); ;
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddApplicationMediatR();
 
 var app = builder.Build();
 
@@ -44,9 +42,6 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-
-app.MapDefaultEndpoints();
-//app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
