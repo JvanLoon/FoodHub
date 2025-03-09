@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FoodCalcHub.AppHost\FoodCalcHub.AppHost.csproj" />
+    <ProjectReference Include="..\FoodCalcHub.AppHost\FoodHub.AppHost.csproj" />
   </ItemGroup>
 
   <ItemGroup>

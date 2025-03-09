@@ -6,7 +6,7 @@ public class WebTests
     public async Task GetWebResourceRootReturnsOkStatusCode()
     {
         // Arrange
-        var appHost = await DistributedApplicationTestingBuilder.CreateAsync<Projects.FoodCalcHub_AppHost>();
+        var appHost = await DistributedApplicationTestingBuilder.CreateAsync<Projects.FoodHub_AppHost>();
         appHost.Services.ConfigureHttpClientDefaults(clientBuilder =>
         {
             clientBuilder.AddStandardResilienceHandler();

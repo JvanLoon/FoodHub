@@ -1,14 +1,11 @@
-using FoodCalcHub.ApiService.Repositories.Interface;
-using FoodCalcHub.ApiService.Repositories;
 using Microsoft.EntityFrameworkCore;
-using FoodCalcHub.ApiService.Extentions;
-using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 // Add services to the container.
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+	options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Use the custom service registration method
 builder.Services.AddCustomServices();
@@ -27,7 +24,7 @@ app.UseExceptionHandler();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseDeveloperExceptionPage();
+	app.UseDeveloperExceptionPage();
 }
 
 app.UseHttpsRedirection();

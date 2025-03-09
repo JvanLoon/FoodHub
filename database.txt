@@ -1,0 +1,5 @@
+Add-Migration -Project FoodHub.Persistence -StartupProject FoodCalc.ApiService -Name 
+
+Remove-Migration -Project FoodHub.Persistence -StartupProject FoodCalc.ApiService
+
+Update-Database -Context ApplicationDbContext -Project FoodHub.Persistence -StartupProject FoodCalc.ApiService

@@ -1,0 +1,18 @@
+﻿@page "/recepts/add"
+@inject HttpClient Http
+
+<PageTitle>Add Recept</PageTitle>
+
+<h3>Add Recept</h3>
+
+<EditForm Model="_recept" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <InputText id="name" class="form-control" @bind-Value="_recept.Name" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Add Recept</button>
+</EditForm>
