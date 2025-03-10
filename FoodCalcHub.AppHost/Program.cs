@@ -10,9 +10,4 @@ builder.AddProject<Projects.FoodCalc_Web>("webfrontend")
 //builder.AddProject<Projects.FoodCalc_Feature>("features")
 //	.WithReference(apiService);
 
-builder.AddProject<Projects.test123>("test123");
-
-//builder.AddProject<Projects.FoodCalc_Feature>("features")
-//	.WithReference(apiService);
-
 builder.Build().Run();

@@ -1,6 +1,6 @@
 ﻿@page "/recepts/add"
 @using FoodCalc.Web.Services
-@using FoodHub.Persistence.Entities;
+@using FoodHub.Persistence.Entities
 @inject ReceptService ReceptService
 
 <PageTitle>Add Recept</PageTitle>
@@ -15,7 +15,7 @@
             <InputText @bind-Value=recept.Name id="Name" class="form-control" />
         </div>
 
-        <button type="submit" class="btn btn-primary" value="Save" />
+        <button type="submit" class="btn btn-primary">Save</button>
     </EditForm>
 }
 else
@@ -36,23 +36,14 @@ else
     {
         try
         {
-            Console.WriteLine($"Current name value: {recept.Name}");
-
-            var i = new Ingredient(Guid.NewGuid(), "test ing", "1");
-            recept.Ingredients.Add(i);
-
             HttpResponseMessage response = await ReceptService.SaveNewRecept(recept);
-
-            //HttpResponseMessage response = await httpClient.PostAsJsonAsync("api/recept", recept);
 
             if (response.IsSuccessStatusCode)
             {
-                Console.WriteLine("Data sent successfully!");
                 _errorMessage = "";
             }
             else
             {
-                Console.WriteLine($"Error: {response.StatusCode}");
                 _errorMessage = "Something went wrong: " + response.Content + " " + response.StatusCode + " " + response.Headers;
             }
         }
@@ -61,30 +52,10 @@ else
             _errorMessage = $"An unexpected error occurred: {ex.Message}";
             throw ex;
         }
-
-        StateHasChanged(); // Force UI refresh
+        finally
+        {
+            StateHasChanged(); // Force UI refresh
+            
+        }
     }
-
-    // protected override async Task OnInitializedAsync()
-    // {
-    //     try
-    //     {
-    //         //Make an API call to fetch the data for the recept
-    //         var response = await httpClient.GetFromJsonAsync<Recept>("api/recept/3FA85F64-5717-4562-B3FC-2C963F66AFA6"); Example endpoint
-    //         if (response != null)
-    //         {
-    //             recept = response;
-    //         }
-    //         else
-    //         {
-    //             _errorMessage = "Failed to load recept data.";
-    //         }
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         _errorMessage = $"Error loading recept data: {ex.Message}";
-    //     }
-
-    //     StateHasChanged();
-    // }
 }

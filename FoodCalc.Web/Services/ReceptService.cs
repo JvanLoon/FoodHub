@@ -6,7 +6,7 @@ namespace FoodCalc.Web.Services
 	{
 		public async Task<HttpResponseMessage> SaveNewRecept(Recept recept)
 		{
-			return await httpClient.PostAsJsonAsync("api/recepts", recept);
+			return await httpClient.PostAsJsonAsync("api/recept", recept);
 		}
 	}
 }
