@@ -14,7 +14,8 @@ public class ReceptIngredientConfigurator : IEntityTypeConfiguration<ReceptIngre
 
 		builder.HasOne(ri => ri.Ingredient)
 			.WithMany()
-			.HasForeignKey(ri => ri.IngredientId);
+			.HasForeignKey(ri => ri.IngredientId)
+			.OnDelete(DeleteBehavior.Cascade);
 
 		builder.HasKey(ri => new { ri.ReceptId, ri.IngredientId });
 
@@ -26,9 +27,5 @@ public class ReceptIngredientConfigurator : IEntityTypeConfiguration<ReceptIngre
 		//IngredientAmount may not be IngredientAmount.None
 		builder.ToTable(t => 
 			t.HasCheckConstraint("CK_ReceptIngredient_IngredientAmount", "IngredientAmount > 0"));
-
-		builder.HasOne(ri => ri.Recept)
-			.WithMany(r => r.ReceptIngredient)
-			.HasForeignKey(ri => ri.ReceptId);
 	}
 }

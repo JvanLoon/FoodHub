@@ -13,17 +13,17 @@ public class UpdateReceptCommandHandler(IUnitOfWork unitOfWork, ILogger<UpdateRe
 		{
 			Recept? recept = await unitOfWork.ReceptRepository.GetByIdAsync(request.Recept.Id, cancellationToken);
 
-			if (recept == null)
+			if (!string.IsNullOrWhiteSpace(request.Recept.Name))
 			{
-				throw new Exception($"Recept with id: {request.Recept.Id} not found");
+				recept.Name = request.Recept.Name;
 			}
-
-			recept.Name = request.Recept.Name;
 			recept.ReceptIngredient = request.Recept.ReceptIngredient;
+
+			await unitOfWork.ReceptRepository.UpdateAsync(recept, cancellationToken);
 
 			await unitOfWork.SaveChangesAsync(cancellationToken);
 
-			return recept;
+			return request.Recept;
 		}
 		catch (Exception ex)
 		{

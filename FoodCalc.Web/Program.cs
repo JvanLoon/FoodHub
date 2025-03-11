@@ -5,6 +5,8 @@ using FoodCalc.Web.Services;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
 
+using System.Text.Json.Serialization;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -29,6 +31,7 @@ builder.Services.AddScoped<ReceptService>();
 builder.Services.Configure<JsonOptions>(options =>
 {
 	options.SerializerOptions.IncludeFields = false;
+	//options.SerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
 	//options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 });
 

@@ -17,8 +17,7 @@ public class IngredientAmountTypeConfigurator : IEntityTypeConfiguration<Ingredi
 			.ValueGeneratedNever(); // Prevents auto-increment, uses enum value
 
 		builder.Property(e => e.Name)
-			.IsRequired()
-			.HasMaxLength(50);
+			.IsRequired();
 
 		// Seed data from enum
 		builder.HasData(

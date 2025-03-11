@@ -12,39 +12,39 @@
 <EditForm Model="receptIngredient" OnSubmit="@UpdateRecept">
 	<div class="mb-3">
 		<label for="receptSelect" class="form-label">Select Recept</label>
-		<select id="receptSelect" @bind="receptIngredient.ReceptId" class="form-select">
+        <InputSelect id="receptSelect" @bind-Value="receptId" class="form-select">
 			<option value="">Select a Recept</option>
 			@foreach (var recept in recepts)
 			{
 				<option value="@recept.Id">@recept.Name</option>
 			}
-		</select>
+		</InputSelect>
 	</div>
 
 	<div class="mb-3">
 		<label for="ingredientSelect" class="form-label">Select Ingredient</label>
-		<select id="ingredientSelect" @bind="receptIngredient.IngredientId" class="form-select">
+		<InputSelect id="ingredientSelect" @bind-Value="receptIngredient.IngredientId" class="form-select">
 			<option value="">Select an Ingredient</option>
 			@foreach (var ingredient in ingredients)
 			{
 				<option value="@ingredient.Id">@ingredient.Name</option>
 			}
-		</select>
+		</InputSelect>
 	</div>
 
 	<div class="mb-3">
 		<label for="amountInput" class="form-label">Amount</label>
-		<input type="number" id="amountInput" @bind="receptIngredient.Amount" class="form-control" />
+		<InputNumber id="amountInput" @bind-Value="receptIngredient.Amount" class="form-control" />
 	</div>
 
 	<div class="mb-3">
 		<label for="amountTypeSelect" class="form-label">Amount Type</label>
-		<select id="amountTypeSelect" @bind="receptIngredient.IngredientAmount" class="form-select">
+		<InputSelect id="amountTypeSelect" @bind-Value="receptIngredient.IngredientAmount" class="form-select">
 			@foreach (IngredientAmountType amountType in Enum.GetValues<IngredientAmountType>())
 			{
 				<option value="@amountType">@amountType</option>
 			}
-		</select>
+		</InputSelect>
 	</div>
 
 <button class="btn btn-primary">Update Recept</button>
@@ -72,6 +72,7 @@
     private bool IsError = false;
     private string _message = string.Empty;
     private Recept recept = new();
+    private Guid receptId = Guid.Empty;
     private ReceptIngredient receptIngredient = new();
     private List<Recept> recepts = new();
     private List<Ingredient> ingredients = new();
@@ -80,7 +81,7 @@
     {
         try
         {
-	        recepts = await receptService.GetReceptsAsync();
+            recepts = await receptService.GetAllReceptsAsync();
             ingredients = await receptService.GetIngredientsAsync();
         }
         catch (Exception ex)
@@ -94,7 +95,10 @@
     {
         try
         {
-            if (receptIngredient.IngredientAmount == IngredientAmountType.None || receptIngredient.IngredientId == Guid.Empty || receptIngredient.ReceptId == Guid.Empty || receptIngredient.Amount == 0)
+	        recept.Id = receptId;
+	        receptIngredient.ReceptId = receptId;
+
+            if (receptIngredient.IngredientAmount == IngredientAmountType.None || receptIngredient.IngredientId == Guid.Empty || receptIngredient.ReceptId == Guid.Empty || receptIngredient.Amount <= 0)
             {
                 ShowMessage("all 4 fields is required", true);
                 return;
@@ -106,7 +110,6 @@
 
             receptIngredient.IngredientAmount = IngredientAmountType.None;
             receptIngredient.IngredientId = Guid.Empty;
-            receptIngredient.ReceptId = Guid.Empty;
             receptIngredient.Amount = 0;
 
             //receptService.navigationManager.NavigateTo("/");

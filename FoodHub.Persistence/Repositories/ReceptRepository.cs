@@ -8,7 +8,7 @@ public class ReceptRepository(ApplicationDbContext context) : IReceptRepository
 {
     public async Task<List<Recept>> GetAllAsync(CancellationToken cancellationToken)
     {
-        return await context.Recepts.ToListAsync(cancellationToken);
+        return await context.Recepts.Include(r => r.ReceptIngredient).ToListAsync(cancellationToken);
     }
 
     public async Task<Recept?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
@@ -27,11 +27,6 @@ public class ReceptRepository(ApplicationDbContext context) : IReceptRepository
     public async Task UpdateAsync(Recept recept, CancellationToken cancellationToken)
     {
         context.Entry(recept).State = EntityState.Modified;
-
-		foreach (var ingredient in recept.ReceptIngredient)
-		{
-			context.Entry(ingredient).State = EntityState.Modified;
-		}
 
 		await context.SaveChangesAsync(cancellationToken);
     }

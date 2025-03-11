@@ -13,6 +13,7 @@ public class ReceptConfiguration : IEntityTypeConfiguration<Recept>
 
 		builder.HasMany(r => r.ReceptIngredient)
 			.WithOne()
+			.HasForeignKey(k => k.ReceptId)
 			.OnDelete(DeleteBehavior.Cascade);
 	}
 }

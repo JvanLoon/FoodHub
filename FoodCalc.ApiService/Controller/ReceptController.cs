@@ -17,7 +17,7 @@ public class ReceptController(IMediator mediator) : ControllerBase
 {
 	//var x = await mediator.Send(new ());
 	[HttpGet]
-	public async Task<ActionResult<IEnumerable<Recept>>> GetRecepts()
+	public async Task<ActionResult<IEnumerable<Recept>>> GetAllRecepts()
 	{
 		var recepts = await mediator.Send(new GetAllReceptsQuery());
 

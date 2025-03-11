@@ -7,7 +7,7 @@ namespace FoodCalc.Web.Services
 	{
 		public NavigationManager navigationManager { get; set; } = navigationManager;
 
-		public async Task<List<Recept>> GetReceptsAsync()
+		public async Task<List<Recept>> GetAllReceptsAsync()
 		{
 			var response = await httpClient.GetAsync("api/recept");
 			response.EnsureSuccessStatusCode();
