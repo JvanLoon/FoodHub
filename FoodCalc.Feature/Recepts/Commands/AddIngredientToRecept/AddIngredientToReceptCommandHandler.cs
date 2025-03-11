@@ -20,7 +20,7 @@ public class AddIngredientToReceptCommandHandler(IUnitOfWork unitOfWork, ILogger
                 throw new Exception($"Recept with id: {request.ReceptId} not found");
             }
 
-            recept.Ingredients.Add(request.Ingredient);
+            //recept.Ingredients.Add(request.Ingredient);
 
             await unitOfWork.SaveChangesAsync(cancellationToken);
 

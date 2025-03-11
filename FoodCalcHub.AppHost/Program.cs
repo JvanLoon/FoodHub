@@ -7,7 +7,7 @@ builder.AddProject<Projects.FoodCalc_Web>("webfrontend")
     .WithReference(apiService)
     .WaitFor(apiService);
 
+builder.Build().Run();
+
 //builder.AddProject<Projects.FoodCalc_Feature>("features")
 //	.WithReference(apiService);
-
-builder.Build().Run();

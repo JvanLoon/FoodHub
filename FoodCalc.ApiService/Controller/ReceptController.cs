@@ -1,13 +1,13 @@
 ﻿using FoodHub.Persistence.Entities;
-using FoodCalc.Features.Recepts.Commands.AddIngredientToRecept;
 using FoodCalc.Features.Recepts.Commands.AddRecept;
 using FoodCalc.Features.Recepts.Commands.DeleteRecept;
 using FoodCalc.Features.Recepts.Commands.UpdateRecept;
 using FoodCalc.Features.Recepts.Queries.GetAllRecepts;
 using FoodCalc.Features.Recepts.Queries.GetById;
+using FoodCalc.Feature.Ingredient.Commands.AddIngredient;
+using FoodCalc.Feature.Ingredient.Queries.GetAllIngredients;
 
 using MediatR;
-
 using Microsoft.AspNetCore.Mvc;
 
 namespace FoodCalc.ApiService.Controller;
@@ -58,7 +58,7 @@ public class ReceptController(IMediator mediator) : ControllerBase
 	}
 
 	[HttpPut]
-	public async Task<IActionResult> UpdateRecept(Recept recept)
+	public async Task<IActionResult> UpdateRecept([FromBody] Recept recept)
 	{
 		var result = await mediator.Send(new UpdateReceptCommand(recept));
 
@@ -83,16 +83,24 @@ public class ReceptController(IMediator mediator) : ControllerBase
 		return NoContent();
 	}
 
-	//[HttpPut("{id}")]
-	//public async Task<IActionResult> AddIngridientToRecept(Guid receptId, Ingredient ingredient)
-	//{
-	//    var result = await mediator.Send(new AddIngredientToReceptCommand(receptId, ingredient));
+	[HttpGet("ingredients")]
+	public async Task<ActionResult<IEnumerable<Recept>>> GetIngredients()
+	{
+		var recepts = await mediator.Send(new GetAllIngredientsQuery());
 
-	//    if (result.IsError)
-	//    {
-	//        return BadRequest(result.FirstError);
-	//    }
+		return Ok(recepts.Value);
+	}
 
-	//    return NoContent();
-	//}
+	[HttpPost("ingredient")]
+	public async Task<IActionResult> AddIngredient([FromBody]Ingredient ingredient)
+	{
+		var result = await mediator.Send(new AddIngredientCommand(ingredient));
+
+		if (result.IsError)
+		{
+			return BadRequest(result.FirstError);
+		}
+
+		return NoContent();
+	}
 }

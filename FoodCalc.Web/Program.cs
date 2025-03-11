@@ -14,7 +14,6 @@ builder.Services.AddRazorComponents()
 builder.Services.AddOutputCache();
 
 builder.Services.AddServerSideBlazor();
-builder.Services.AddScoped<ReceptService>();
 
 //builder.Services.AddHttpClient("FoodCalcApi", client =>
 //{
@@ -25,26 +24,19 @@ builder.Services.AddScoped<ReceptService>();
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7428") });
 
+builder.Services.AddScoped<ReceptService>();
+
 builder.Services.Configure<JsonOptions>(options =>
 {
 	options.SerializerOptions.IncludeFields = false;
 	//options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 });
 
-builder.Services.AddCustomServices();
-
-builder.Services.AddApplicationMediatR();
-
-// Register ApplicationDbContext
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-	options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
 	app.UseExceptionHandler("/Error", createScopeForErrors: true);
-	// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 	app.UseHsts();
 }
 

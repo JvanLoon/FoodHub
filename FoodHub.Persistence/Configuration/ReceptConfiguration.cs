@@ -10,6 +10,9 @@ public class ReceptConfiguration : IEntityTypeConfiguration<Recept>
 		builder.HasKey(r => r.Id);
 		builder.HasIndex(r => r.Name).IsUnique();
 		builder.Property(r => r.Name).IsRequired();
-		builder.HasMany(r => r.Ingredients).WithOne().OnDelete(DeleteBehavior.Cascade);
+
+		builder.HasMany(r => r.ReceptIngredient)
+			.WithOne()
+			.OnDelete(DeleteBehavior.Cascade);
 	}
 }

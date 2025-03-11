@@ -7,7 +7,8 @@ public class ApplicationDbContext : DbContext
 
     // Define your DbSets here
     public DbSet<Recept> Recepts { get; set; }
-    public DbSet<Ingredient> Ingredients { get; set; }
+    public DbSet<ReceptIngredient> ReceptIngredients { get; set; }
+	public DbSet<Ingredient> Ingredients { get; set; }
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{

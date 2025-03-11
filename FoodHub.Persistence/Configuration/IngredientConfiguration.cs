@@ -9,7 +9,6 @@ public class IngredientConfiguration : IEntityTypeConfiguration<Ingredient>
 	{
 		builder.HasKey(i => i.Id);
 		builder.Property(i => i.Name).IsRequired();
-		builder.Property(i => i.Amount).IsRequired();
-		builder.Property(i => i.Prio).HasDefaultValue(0);
+
 	}
 }

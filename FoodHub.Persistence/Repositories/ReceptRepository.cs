@@ -8,34 +8,41 @@ public class ReceptRepository(ApplicationDbContext context) : IReceptRepository
 {
     public async Task<List<Recept>> GetAllAsync(CancellationToken cancellationToken)
     {
-        return await context.Recepts.ToListAsync();
+        return await context.Recepts.ToListAsync(cancellationToken);
     }
 
     public async Task<Recept?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return await context.Recepts.FindAsync(id);
+		return await context.Recepts.SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
     }
 
     public async Task<Recept> AddAsync(Recept recept, CancellationToken cancellationToken)
     {
         context.Recepts.Add(recept);
-        await context.SaveChangesAsync();
+
+		await context.SaveChangesAsync(cancellationToken);
         return recept;
     }
 
     public async Task UpdateAsync(Recept recept, CancellationToken cancellationToken)
     {
         context.Entry(recept).State = EntityState.Modified;
-        await context.SaveChangesAsync();
+
+		foreach (var ingredient in recept.ReceptIngredient)
+		{
+			context.Entry(ingredient).State = EntityState.Modified;
+		}
+
+		await context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
     {
-        var recept = await context.Recepts.FindAsync(id);
+        Recept? recept = await context.Recepts.SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
         if (recept != null)
         {
             context.Recepts.Remove(recept);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
         }
     }
 }
