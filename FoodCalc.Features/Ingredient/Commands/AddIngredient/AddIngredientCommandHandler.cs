@@ -3,9 +3,9 @@ using MediatR;
 using FoodHub.Persistence.Persistence;
 using Microsoft.Extensions.Logging;
 
-namespace FoodCalc.Feature.Ingredient.Commands.AddIngredient
+namespace FoodCalc.Features.Ingredient.Commands.AddIngredient
 {
-	internal class AddIngredientCommandHandler(IUnitOfWork unitOfWork, ILogger<AddIngredientCommandHandler> logger)
+	public class AddIngredientCommandHandler(IUnitOfWork unitOfWork, ILogger<AddIngredientCommandHandler> logger)
 		: IRequestHandler<AddIngredientCommand, ErrorOr<Success>>
 	{
 		public async Task<ErrorOr<Success>> Handle(AddIngredientCommand request, CancellationToken cancellationToken)

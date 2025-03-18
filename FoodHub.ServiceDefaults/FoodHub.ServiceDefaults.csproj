@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FoodCalc.Features\FoodCalc.Features.csproj" />
     <ProjectReference Include="..\FoodHub.Persistence\FoodHub.Persistence.csproj" />
   </ItemGroup>
 

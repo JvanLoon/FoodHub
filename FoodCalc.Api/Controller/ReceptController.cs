@@ -4,7 +4,7 @@ using FoodCalc.Features.Recepts.Commands.DeleteRecept;
 using FoodCalc.Features.Recepts.Commands.UpdateRecept;
 using FoodCalc.Features.Recepts.Queries.GetAllRecepts;
 using FoodCalc.Features.Recepts.Queries.GetById;
-using FoodCalc.Feature.Ingredient.Commands.AddIngredient;
+using FoodCalc.Features.Ingredient.Commands.AddIngredient;
 using FoodCalc.Feature.Ingredient.Queries.GetAllIngredients;
 
 using MediatR;
