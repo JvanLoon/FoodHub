@@ -1,28 +1,18 @@
-using FoodCalc.Web;
+using FoodCalc.Client.Services;
 using FoodCalc.Web.Components;
-using FoodCalc.Web.Services;
 
 using Microsoft.AspNetCore.Http.Json;
-using Microsoft.EntityFrameworkCore;
-
-using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add service defaults & Aspire client integrations.
+builder.AddServiceDefaults();
+
 // Add services to the container.
 builder.Services.AddRazorComponents()
-	.AddInteractiveServerComponents();
+    .AddInteractiveServerComponents();
 
 builder.Services.AddOutputCache();
-
-builder.Services.AddServerSideBlazor();
-
-//builder.Services.AddHttpClient("FoodCalcApi", client =>
-//{
-//	// This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.
-//	// Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
-//	client.BaseAddress = new Uri("https://localhost:7428");
-//});
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7428") });
 
@@ -39,15 +29,20 @@ var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
-	app.UseExceptionHandler("/Error", createScopeForErrors: true);
-	app.UseHsts();
+    app.UseExceptionHandler("/Error", createScopeForErrors: true);
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAntiforgery();
 
+app.UseOutputCache();
+
 app.MapRazorComponents<App>()
-	.AddInteractiveServerRenderMode();
+    .AddInteractiveServerRenderMode();
+
+app.MapDefaultEndpoints();
 
 app.Run();

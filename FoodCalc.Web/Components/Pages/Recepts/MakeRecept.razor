@@ -1,5 +1,5 @@
 ﻿@page "/recepts/make"
-@using FoodCalc.Web.Services
+@using FoodCalc.Client.Services
 @using FoodHub.Persistence.Entities
 @using Microsoft.Extensions.Logging
 
@@ -10,44 +10,44 @@
 <PageTitle>Make Recept</PageTitle>
 
 <EditForm Model="receptIngredient" OnSubmit="@UpdateRecept">
-	<div class="mb-3">
-		<label for="receptSelect" class="form-label">Select Recept</label>
+    <div class="mb-3">
+        <label for="receptSelect" class="form-label">Select Recept</label>
         <InputSelect id="receptSelect" @bind-Value="receptId" class="form-select">
-			<option value="">Select a Recept</option>
-			@foreach (var recept in recepts)
-			{
-				<option value="@recept.Id">@recept.Name</option>
-			}
-		</InputSelect>
-	</div>
+            <option value="">Select a Recept</option>
+            @foreach (var recept in recepts)
+            {
+                <option value="@recept.Id">@recept.Name</option>
+            }
+        </InputSelect>
+    </div>
 
-	<div class="mb-3">
-		<label for="ingredientSelect" class="form-label">Select Ingredient</label>
-		<InputSelect id="ingredientSelect" @bind-Value="receptIngredient.IngredientId" class="form-select">
-			<option value="">Select an Ingredient</option>
-			@foreach (var ingredient in ingredients)
-			{
-				<option value="@ingredient.Id">@ingredient.Name</option>
-			}
-		</InputSelect>
-	</div>
+    <div class="mb-3">
+        <label for="ingredientSelect" class="form-label">Select Ingredient</label>
+        <InputSelect id="ingredientSelect" @bind-Value="receptIngredient.IngredientId" class="form-select">
+            <option value="">Select an Ingredient</option>
+            @foreach (var ingredient in ingredients)
+            {
+                <option value="@ingredient.Id">@ingredient.Name</option>
+            }
+        </InputSelect>
+    </div>
 
-	<div class="mb-3">
-		<label for="amountInput" class="form-label">Amount</label>
-		<InputNumber id="amountInput" @bind-Value="receptIngredient.Amount" class="form-control" />
-	</div>
+    <div class="mb-3">
+        <label for="amountInput" class="form-label">Amount</label>
+        <InputNumber id="amountInput" @bind-Value="receptIngredient.Amount" class="form-control" />
+    </div>
 
-	<div class="mb-3">
-		<label for="amountTypeSelect" class="form-label">Amount Type</label>
-		<InputSelect id="amountTypeSelect" @bind-Value="receptIngredient.IngredientAmount" class="form-select">
-			@foreach (IngredientAmountType amountType in Enum.GetValues<IngredientAmountType>())
-			{
-				<option value="@amountType">@amountType</option>
-			}
-		</InputSelect>
-	</div>
+    <div class="mb-3">
+        <label for="amountTypeSelect" class="form-label">Amount Type</label>
+        <InputSelect id="amountTypeSelect" @bind-Value="receptIngredient.IngredientAmount" class="form-select">
+            @foreach (IngredientAmountType amountType in Enum.GetValues<IngredientAmountType>())
+            {
+                <option value="@amountType">@amountType</option>
+            }
+        </InputSelect>
+    </div>
 
-<button class="btn btn-primary">Update Recept</button>
+    <button class="btn btn-primary">Update Recept</button>
 </EditForm>
 
 
@@ -95,8 +95,8 @@
     {
         try
         {
-	        recept.Id = receptId;
-	        receptIngredient.ReceptId = receptId;
+            recept.Id = receptId;
+            receptIngredient.ReceptId = receptId;
 
             if (receptIngredient.IngredientAmount == IngredientAmountType.None || receptIngredient.IngredientId == Guid.Empty || receptIngredient.ReceptId == Guid.Empty || receptIngredient.Amount <= 0)
             {
@@ -105,6 +105,10 @@
             }
 
             recept.ReceptIngredient.Add(receptIngredient);
+
+            recept.ReceptIngredient = recept.ReceptIngredient
+	            .DistinctBy(ri => new { ri.Amount, ri.IngredientId, ri.ReceptId })
+	            .ToList();
 
             await receptService.UpdateRecept(recept);
 

@@ -17,6 +17,7 @@ public class UpdateReceptCommandHandler(IUnitOfWork unitOfWork, ILogger<UpdateRe
 			{
 				recept.Name = request.Recept.Name;
 			}
+			
 			recept.ReceptIngredient = request.Recept.ReceptIngredient;
 
 			await unitOfWork.ReceptRepository.UpdateAsync(recept, cancellationToken);

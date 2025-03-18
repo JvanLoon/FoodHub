@@ -1,6 +1,6 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-var apiService = builder.AddProject<Projects.FoodCalc_ApiService>("apiservice");
+var apiService = builder.AddProject<Projects.FoodCalc_Api>("apiservice");
 
 builder.AddProject<Projects.FoodCalc_Web>("webfrontend")
     .WithExternalHttpEndpoints()
@@ -8,6 +8,3 @@ builder.AddProject<Projects.FoodCalc_Web>("webfrontend")
     .WaitFor(apiService);
 
 builder.Build().Run();
-
-//builder.AddProject<Projects.FoodCalc_Feature>("features")
-//	.WithReference(apiService);

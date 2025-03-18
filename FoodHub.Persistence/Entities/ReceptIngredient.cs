@@ -3,6 +3,7 @@
 namespace FoodHub.Persistence.Entities;
 public class ReceptIngredient
 {
+	public Guid Id { get; set; } = Guid.NewGuid(); // New surrogate key
 	public Guid ReceptId { get; set; }
 	[JsonIgnore]
 	public virtual Recept Recept { get; set; }

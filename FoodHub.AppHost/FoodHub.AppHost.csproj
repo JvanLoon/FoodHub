@@ -8,10 +8,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsAspireHost>true</IsAspireHost>
+    <UserSecretsId>382ccfcb-46a7-49aa-8f50-3fb531a6e6cc</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FoodCalc.ApiService\FoodCalc.ApiService.csproj" />
+    <ProjectReference Include="..\FoodCalc.Api\FoodCalc.Api.csproj" />
     <ProjectReference Include="..\FoodCalc.Web\FoodCalc.Web.csproj" />
   </ItemGroup>
 

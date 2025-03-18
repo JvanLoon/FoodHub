@@ -17,7 +17,7 @@ public class ReceptIngredientConfigurator : IEntityTypeConfiguration<ReceptIngre
 			.HasForeignKey(ri => ri.IngredientId)
 			.OnDelete(DeleteBehavior.Cascade);
 
-		builder.HasKey(ri => new { ri.ReceptId, ri.IngredientId });
+		builder.HasKey(ri => ri.Id);
 
 		builder.Property(ri => ri.Amount).IsRequired();
 		builder.ToTable(t =>

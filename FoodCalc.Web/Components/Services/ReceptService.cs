@@ -1,7 +1,9 @@
-﻿using FoodHub.Persistence.Entities;
+﻿using System.Net.Http.Json;
+
+using FoodHub.Persistence.Entities;
 using Microsoft.AspNetCore.Components;
 
-namespace FoodCalc.Web.Services
+namespace FoodCalc.Client.Services
 {
 	public class ReceptService(HttpClient httpClient, NavigationManager navigationManager)
 	{

@@ -28,6 +28,11 @@ public class ReceptRepository(ApplicationDbContext context) : IReceptRepository
     {
         context.Entry(recept).State = EntityState.Modified;
 
+        foreach (ReceptIngredient receptIngredient in recept.ReceptIngredient)
+        {
+	        context.Entry(receptIngredient).State = EntityState.Modified;
+        }
+
 		await context.SaveChangesAsync(cancellationToken);
     }
 
