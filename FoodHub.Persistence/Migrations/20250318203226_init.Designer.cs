@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FoodHub.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250318202943_init")]
+    [Migration("20250318203226_init")]
     partial class init
     {
         /// <inheritdoc />
