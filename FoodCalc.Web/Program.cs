@@ -1,5 +1,5 @@
-using FoodCalc.Client.Services;
 using FoodCalc.Web.Components;
+using FoodCalc.Web.Components.Services;
 
 using Microsoft.AspNetCore.Http.Json;
 
@@ -17,6 +17,7 @@ builder.Services.AddOutputCache();
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7426") });
 
 builder.Services.AddScoped<ReceptService>();
+builder.Services.AddScoped<IngredientService>();
 
 builder.Services.Configure<JsonOptions>(options =>
 {

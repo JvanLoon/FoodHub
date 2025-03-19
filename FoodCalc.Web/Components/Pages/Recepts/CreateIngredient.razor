@@ -1,9 +1,9 @@
 ﻿@page "/ingredient/add"
-@using FoodCalc.Client.Services
+@using FoodCalc.Web.Components.Services
 @using FoodHub.Persistence.Entities
 @using Microsoft.Extensions.Logging
 
-@inject ReceptService receptService
+@inject IngredientService ingredientService
 @inject ILogger<CreateRecept> logger
 
 <h3>Add Ingredient To Recept</h3>
@@ -48,7 +48,7 @@
                 return;
             }
 
-            await receptService.AddIngredient(ingredient);
+            await ingredientService.AddIngredientAsync(ingredient);
 
             ingredient = new(Guid.NewGuid(), "");
 

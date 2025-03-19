@@ -7,5 +7,8 @@ public interface IReceptRepository
     Task<Recept?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
     Task<Recept> AddAsync(Recept recept, CancellationToken cancellationToken);
     Task UpdateAsync(Recept recept, CancellationToken cancellationToken);
-    Task DeleteAsync(Guid id, CancellationToken cancellationToken);
+	Task DeleteAsync(Guid id, CancellationToken cancellationToken);
+
+	Task AddReceptIngredientAsync(ReceptIngredient receptIngredient, CancellationToken cancellationToken);
+	Task DeleteReceptIngredientAsync(Guid receptIngredientId, CancellationToken cancellationToken);
 }

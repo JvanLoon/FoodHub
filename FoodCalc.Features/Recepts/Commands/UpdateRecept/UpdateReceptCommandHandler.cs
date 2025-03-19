@@ -11,17 +11,22 @@ public class UpdateReceptCommandHandler(IUnitOfWork unitOfWork, ILogger<UpdateRe
 	{
 		try
 		{
-			Recept? recept = await unitOfWork.ReceptRepository.GetByIdAsync(request.Recept.Id, cancellationToken);
+			Recept recept = await unitOfWork.ReceptRepository.GetByIdAsync(request.Recept.Id, cancellationToken) ??
+							throw new Exception($"recept by id:{request.Recept.Id} not found.");
 
 			if (!string.IsNullOrWhiteSpace(request.Recept.Name))
 			{
 				recept.Name = request.Recept.Name;
 			}
-			
-			recept.ReceptIngredient = request.Recept.ReceptIngredient;
+
+			recept.ReceptIngredient.Clear();
+
+			foreach (ReceptIngredient ingredient in request.Recept.ReceptIngredient)
+			{
+				recept.ReceptIngredient.Add(ingredient);
+			}
 
 			await unitOfWork.ReceptRepository.UpdateAsync(recept, cancellationToken);
-
 			await unitOfWork.SaveChangesAsync(cancellationToken);
 
 			return request.Recept;
@@ -29,7 +34,7 @@ public class UpdateReceptCommandHandler(IUnitOfWork unitOfWork, ILogger<UpdateRe
 		catch (Exception ex)
 		{
 			logger.LogError(ex, "Failed to update recept");
-			return Error.Failure("Failed to update recept");
+			return Error.Failure("Failed to update recept", ex.Message);
 		}
 	}
 }

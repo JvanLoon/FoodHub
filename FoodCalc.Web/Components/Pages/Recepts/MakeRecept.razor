@@ -1,9 +1,10 @@
 ﻿@page "/recepts/make"
-@using FoodCalc.Client.Services
+@using FoodCalc.Web.Components.Services
 @using FoodHub.Persistence.Entities
 @using Microsoft.Extensions.Logging
 
 @inject ReceptService receptService
+@inject IngredientService IngredientService
 @inject ILogger<CreateRecept> logger
 
 
@@ -71,7 +72,6 @@
     private bool showMessage = false;
     private bool IsError = false;
     private string _message = string.Empty;
-    private Recept recept = new();
     private Guid receptId = Guid.Empty;
     private ReceptIngredient receptIngredient = new();
     private List<Recept> recepts = new();
@@ -82,7 +82,7 @@
         try
         {
             recepts = await receptService.GetAllReceptsAsync();
-            ingredients = await receptService.GetIngredientsAsync();
+            ingredients = await IngredientService.GetAllIngredientsAsync();
         }
         catch (Exception ex)
         {
@@ -95,22 +95,9 @@
     {
         try
         {
-            recept.Id = receptId;
             receptIngredient.ReceptId = receptId;
 
-            if (receptIngredient.IngredientAmount == IngredientAmountType.None || receptIngredient.IngredientId == Guid.Empty || receptIngredient.ReceptId == Guid.Empty || receptIngredient.Amount <= 0)
-            {
-                ShowMessage("all 4 fields is required", true);
-                return;
-            }
-
-            recept.ReceptIngredient.Add(receptIngredient);
-
-            recept.ReceptIngredient = recept.ReceptIngredient
-	            .DistinctBy(ri => new { ri.Amount, ri.IngredientId, ri.ReceptId })
-	            .ToList();
-
-            await receptService.UpdateRecept(recept);
+            await receptService.AddIngredient(receptIngredient);
 
             receptIngredient.IngredientAmount = IngredientAmountType.None;
             receptIngredient.IngredientId = Guid.Empty;

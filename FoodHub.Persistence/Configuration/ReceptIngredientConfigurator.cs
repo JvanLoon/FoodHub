@@ -8,6 +8,9 @@ public class ReceptIngredientConfigurator : IEntityTypeConfiguration<ReceptIngre
 {
 	public void Configure(EntityTypeBuilder<ReceptIngredient> builder)
 	{
+		builder.Navigation(n => n.Ingredient).AutoInclude();
+		builder.Navigation(n => n.Recept).AutoInclude();
+
 		builder.HasOne(ri => ri.Recept)
 			.WithMany(r => r.ReceptIngredient)
 			.HasForeignKey(ri => ri.ReceptId);

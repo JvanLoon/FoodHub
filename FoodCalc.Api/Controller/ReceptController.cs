@@ -1,13 +1,18 @@
-﻿using FoodHub.Persistence.Entities;
+﻿using ErrorOr;
+
+using FoodCalc.Feature.Ingredient.Queries.GetAllIngredients;
+using FoodCalc.Features.Ingredient.Commands.AddIngredient;
+using FoodCalc.Features.Recepts.Commands.AddIngredientToRecept;
 using FoodCalc.Features.Recepts.Commands.AddRecept;
 using FoodCalc.Features.Recepts.Commands.DeleteRecept;
 using FoodCalc.Features.Recepts.Commands.UpdateRecept;
 using FoodCalc.Features.Recepts.Queries.GetAllRecepts;
 using FoodCalc.Features.Recepts.Queries.GetById;
-using FoodCalc.Features.Ingredient.Commands.AddIngredient;
-using FoodCalc.Feature.Ingredient.Queries.GetAllIngredients;
+
+using FoodHub.Persistence.Entities;
 
 using MediatR;
+
 using Microsoft.AspNetCore.Mvc;
 
 namespace FoodCalc.ApiService.Controller;
@@ -15,13 +20,14 @@ namespace FoodCalc.ApiService.Controller;
 [Route("api/[controller]")]
 public class ReceptController(IMediator mediator) : ControllerBase
 {
-	//var x = await mediator.Send(new ());
 	[HttpGet]
 	public async Task<ActionResult<IEnumerable<Recept>>> GetAllRecepts()
 	{
-		var recepts = await mediator.Send(new GetAllReceptsQuery());
+		var result = await mediator.Send(new GetAllReceptsQuery());
 
-		return Ok(recepts.Value);
+		return result.Match(
+			Ok,
+			errors => Problem(errors.First().Description));
 	}
 
 	[HttpGet("{id}")]
@@ -29,12 +35,9 @@ public class ReceptController(IMediator mediator) : ControllerBase
 	{
 		var result = await mediator.Send(new GetReceptByIdQuery(id));
 
-		if (result.IsError)
-		{
-			return NotFound(result.FirstError);
-		}
-
-		return Ok(result.Value);
+		return result.Match(
+			Ok,
+			errors => Problem(errors.First().Description));
 	}
 
 	[HttpPost]
@@ -49,12 +52,9 @@ public class ReceptController(IMediator mediator) : ControllerBase
 
 		var result = await mediator.Send(new AddReceptCommand(recept));
 
-		if (result.IsError)
-		{
-			return BadRequest(result.FirstError);
-		}
-
-		return Ok();
+		return result.Match(
+			Ok,
+			errors => Problem(errors.First().Description));
 	}
 
 	[HttpPut]
@@ -62,12 +62,9 @@ public class ReceptController(IMediator mediator) : ControllerBase
 	{
 		var result = await mediator.Send(new UpdateReceptCommand(recept));
 
-		if (result.IsError)
-		{
-			return BadRequest(result.FirstError);
-		}
-
-		return NoContent();
+		return result.Match(
+			Ok,
+			errors => Problem(errors.First().Description));
 	}
 
 	[HttpDelete("{id}")]
@@ -75,32 +72,19 @@ public class ReceptController(IMediator mediator) : ControllerBase
 	{
 		var result = await mediator.Send(new DeleteReceptCommand(id));
 
-		if (result.IsError)
-		{
-			return BadRequest(result.FirstError);
-		}
-
-		return NoContent();
-	}
-
-	[HttpGet("ingredients")]
-	public async Task<ActionResult<IEnumerable<Recept>>> GetIngredients()
-	{
-		var recepts = await mediator.Send(new GetAllIngredientsQuery());
-
-		return Ok(recepts.Value);
+		return result.Match(
+		success => Ok(success),
+		errors => Problem(errors.First().Description));
 	}
 
 	[HttpPost("ingredient")]
-	public async Task<IActionResult> AddIngredient([FromBody]Ingredient ingredient)
+
+	public async Task<IActionResult> AddIngredientToRecept([FromBody]ReceptIngredient receptIngredient)
 	{
-		var result = await mediator.Send(new AddIngredientCommand(ingredient));
-
-		if (result.IsError)
-		{
-			return BadRequest(result.FirstError);
-		}
-
-		return NoContent();
+		var result = await mediator.Send(new AddIngredientToReceptCommand(receptIngredient));
+		return result.Match(
+			Ok,
+			errors => Problem(errors.First().Description));
 	}
+
 }

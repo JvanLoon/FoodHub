@@ -7,29 +7,20 @@ using FoodHub.Persistence.Persistence;
 using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Features.Recepts.Commands.AddIngredientToRecept;
-public class AddIngredientToReceptCommandHandler(IUnitOfWork unitOfWork, ILogger<AddIngredientToReceptCommandHandler> logger) : IRequestHandler<AddIngredientToReceptCommand, ErrorOr<Recept>>
+public class AddIngredientToReceptCommandHandler(IUnitOfWork unitOfWork, ILogger<AddIngredientToReceptCommandHandler> logger) : IRequestHandler<AddIngredientToReceptCommand, ErrorOr<ReceptIngredient>>
 {
-    public async Task<ErrorOr<Recept>> Handle(AddIngredientToReceptCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<ReceptIngredient>> Handle(AddIngredientToReceptCommand request, CancellationToken cancellationToken)
     {
-        try
-        {
-            Recept? recept = await unitOfWork.ReceptRepository.GetByIdAsync(request.ReceptId, cancellationToken);
+		try
+	    {
+		    await unitOfWork.ReceptRepository.AddReceptIngredientAsync(request.ReceptIngredient, cancellationToken);
 
-            if (recept == null)
-            {
-                throw new Exception($"Recept with id: {request.ReceptId} not found");
-            }
-
-            //recept.Ingredients.Add(request.Ingredient);
-
-            await unitOfWork.SaveChangesAsync(cancellationToken);
-
-            return recept;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to add ingredient to recept");
-            return Error.Failure("Failed to update recept");
-        }
-    }
+			return request.ReceptIngredient;
+		}
+	    catch (Exception ex)
+	    {
+		    logger.LogError(ex, "Failed to add ingredient to recept");
+		    return Error.Failure("Failed to update recept");
+	    }
+	}
 }

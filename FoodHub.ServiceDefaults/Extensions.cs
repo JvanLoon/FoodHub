@@ -134,20 +134,20 @@ public static class Extensions
         return services;
     }
 
-    public static IServiceCollection AddApplicationMediatR(this IServiceCollection services)
-    {
-        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetAllReceptsQueryHandler).Assembly));
-        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetReceptByIdQueryHandler).Assembly));
-        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(AddReceptCommandHandler).Assembly));
-        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(UpdateReceptCommandHandler).Assembly));
-        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DeleteReceptCommandHandler).Assembly));
-        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetAllIngredientsQueryHandler).Assembly));
-        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(AddIngredientCommandHandler).Assembly));
+  //  public static IServiceCollection AddApplicationMediatR(this IServiceCollection services)
+  //  {
+  //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetAllReceptsQueryHandler).Assembly));
+  //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetReceptByIdQueryHandler).Assembly));
+  //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(AddReceptCommandHandler).Assembly));
+  //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(UpdateReceptCommandHandler).Assembly));
+  //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DeleteReceptCommandHandler).Assembly));
+  //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetAllIngredientsQueryHandler).Assembly));
+  //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(AddIngredientCommandHandler).Assembly));
 
-        //services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof().Assembly));
+  //      //services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof().Assembly));
 
-        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(AddIngredientToReceptCommandHandler).Assembly));
+  //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(AddIngredientToReceptCommandHandler).Assembly));
 
-		return services;
-    }
+		//return services;
+  //  }
 }

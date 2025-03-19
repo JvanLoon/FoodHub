@@ -10,6 +10,7 @@ public class ReceptConfiguration : IEntityTypeConfiguration<Recept>
 		builder.HasKey(r => r.Id);
 		builder.HasIndex(r => r.Name).IsUnique();
 		builder.Property(r => r.Name).IsRequired();
+		builder.Navigation(p => p.ReceptIngredient).AutoInclude();
 
 		builder.HasMany(r => r.ReceptIngredient)
 			.WithOne()

@@ -24,7 +24,7 @@ public class IngredientRepository(ApplicationDbContext context) : IIngredientRep
 
     public async Task UpdateAsync(Ingredient ingredient, CancellationToken cancellationToken)
     {
-        context.Entry(ingredient).State = EntityState.Modified;
+        //context.Entry(ingredient).State = EntityState.Modified;
         await context.SaveChangesAsync(cancellationToken);
     }
 

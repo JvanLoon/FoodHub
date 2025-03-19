@@ -3,7 +3,7 @@
 using FoodHub.Persistence.Entities;
 using Microsoft.AspNetCore.Components;
 
-namespace FoodCalc.Client.Services
+namespace FoodCalc.Web.Components.Services
 {
 	public class ReceptService(HttpClient httpClient, NavigationManager navigationManager)
 	{
@@ -37,7 +37,7 @@ namespace FoodCalc.Client.Services
 			return await response.Content.ReadFromJsonAsync<List<Ingredient>>();
 		}
 
-		public async Task<HttpResponseMessage> AddIngredient(Ingredient ingredient)
+		public async Task<HttpResponseMessage> AddIngredient(ReceptIngredient ingredient)
 		{
 			var response = await httpClient.PostAsJsonAsync("api/recept/ingredient", ingredient);
 			response.EnsureSuccessStatusCode();

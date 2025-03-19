@@ -6,15 +6,15 @@ using Microsoft.Extensions.Logging;
 namespace FoodCalc.Features.Ingredient.Commands.AddIngredient
 {
 	public class AddIngredientCommandHandler(IUnitOfWork unitOfWork, ILogger<AddIngredientCommandHandler> logger)
-		: IRequestHandler<AddIngredientCommand, ErrorOr<Success>>
+		: IRequestHandler<AddIngredientCommand, ErrorOr<FoodHub.Persistence.Entities.Ingredient>>
 	{
-		public async Task<ErrorOr<Success>> Handle(AddIngredientCommand request, CancellationToken cancellationToken)
+		public async Task<ErrorOr<FoodHub.Persistence.Entities.Ingredient>> Handle(AddIngredientCommand request, CancellationToken cancellationToken)
 		{
 			try
 			{
 				await unitOfWork.IngredientRepository.AddAsync(request.Ingredient, cancellationToken);
 
-				return Result.Success;
+				return request.Ingredient;
 			}
 			catch (Exception ex)
 			{
