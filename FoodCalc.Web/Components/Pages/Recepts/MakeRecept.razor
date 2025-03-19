@@ -13,7 +13,7 @@
 <EditForm Model="receptIngredient" OnSubmit="@UpdateRecept">
     <div class="mb-3">
         <label for="receptSelect" class="form-label">Select Recept</label>
-        <InputSelect id="receptSelect" @bind-Value="receptId" class="form-select">
+        <InputSelect id="receptSelect" @bind-Value="receptIngredient.ReceptId" class="form-select">
             <option value="">Select a Recept</option>
             @foreach (var recept in recepts)
             {
@@ -72,10 +72,11 @@
     private bool showMessage = false;
     private bool IsError = false;
     private string _message = string.Empty;
-    private Guid receptId = Guid.Empty;
-    private ReceptIngredient receptIngredient = new();
+    
     private List<Recept> recepts = new();
     private List<Ingredient> ingredients = new();
+
+    private ReceptIngredient receptIngredient = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -95,8 +96,6 @@
     {
         try
         {
-            receptIngredient.ReceptId = receptId;
-
             await receptService.AddIngredient(receptIngredient);
 
             receptIngredient.IngredientAmount = IngredientAmountType.None;
