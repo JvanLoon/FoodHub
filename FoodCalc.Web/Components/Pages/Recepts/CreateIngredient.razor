@@ -36,7 +36,7 @@
     private bool IsError = false;
     private string _message = string.Empty;
 
-    private Ingredient ingredient = new(Guid.NewGuid(), "");
+    private Ingredient ingredient = new();
 
     async Task AddIngredient()
     {
@@ -50,7 +50,11 @@
 
             await ingredientService.AddIngredientAsync(ingredient);
 
-            ingredient = new(Guid.NewGuid(), "");
+            ingredient = new Ingredient
+            {
+	            Id = Guid.NewGuid(),
+                Name = string.Empty
+            };
 
             await ShowMessage("Ingredient added", false);
             //receptService.navigationManager.NavigateTo("/");

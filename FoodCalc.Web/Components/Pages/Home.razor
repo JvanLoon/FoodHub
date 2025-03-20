@@ -11,31 +11,35 @@ Welcome to your new app.
 
 <p>Use this site to learn more about Blazor!</p>
 
+<div class="container-fluid ps-3">
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        @foreach (Recept recept in Recepts)
+        {
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">@recept.Name</h5>
+                        <p class="card-text">Description: @recept.Name</p>
+                        <p class="card-text">Created: @recept.CreatedDate</p>
+                        <p class="card-text">Modified: @recept.ModifiedDate</p>
+                        <p class="card-text">Ingredients:</p>
+                        <ul>
+                            @if (recept.ReceptIngredient != null)
+                            {
+                                foreach (ReceptIngredient ingredient in recept.ReceptIngredient)
+                                {
+                                    <li>@ingredient.Ingredient.Name - @ingredient.Amount @nameof(ingredient.IngredientAmount)</li>
+                                }
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
 
-
-@if (string.IsNullOrEmpty(_errormessage))
-{
-    <table>
-        <thead>
-            <tr>
-                <th>id</th>
-                <th>name</th>
-                <th>ingriedients</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (Recept recept in Recepts)
-            {
-                <tr>
-                    <td>@recept.Id</td>
-                    <td>@recept.Name</td>
-                    <td>@recept.ReceptIngredient?.Count()</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-else
+@if (!string.IsNullOrEmpty(_errormessage))
 {
     <p>@_errormessage</p>
 }
@@ -50,7 +54,6 @@ else
         try
         {
             Recepts = await receptService.GetAllReceptsAsync();
-
             StateHasChanged();
         }
         catch (Exception ex)

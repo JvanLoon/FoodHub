@@ -14,7 +14,11 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddOutputCache();
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7426") });
+//builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7426") });
+
+var apiBaseAddress = builder.Configuration["API:BaseAddress"] ?? "https://localhost:7426";
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(apiBaseAddress) });
+
 
 builder.Services.AddScoped<ReceptService>();
 builder.Services.AddScoped<IngredientService>();

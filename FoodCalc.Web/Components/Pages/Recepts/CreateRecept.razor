@@ -12,10 +12,10 @@
 <h3>Add Recept</h3>
 
 
-<EditForm Model="recept" OnSubmit="@SubmitData">
+<EditForm Model="recept" OnSubmit="@SubmitData" FormName="addReceptForm">
     <div class="mb-3">
         <label for="Name" class="form-label">Name</label>
-        <InputText @bind-value=recept.Name id="Name" class="form-control" />
+        <InputText @bind-Value=recept.Name id="Name" class="form-control" />
     </div>
 
     <button type="submit" class="btn btn-primary">Save</button>
@@ -50,10 +50,12 @@
     {
         try
         {
-            await receptService.AddRecept(recept);
-            await ShowMessage($"Recept {recept.Name} added", false);
+            receptService.AddRecept(recept);
+
+            recept.Id = Guid.NewGuid();
             recept.Name = string.Empty;
 
+            await ShowMessage($"Recept {recept.Name} added", false);
             //receptService.navigationManager.NavigateTo("/");
         }
         catch (Exception ex)

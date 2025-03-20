@@ -8,6 +8,17 @@ public class ReceptIngredientConfigurator : IEntityTypeConfiguration<ReceptIngre
 {
 	public void Configure(EntityTypeBuilder<ReceptIngredient> builder)
 	{
+		builder.HasKey(ri => ri.Id);
+
+		builder.Property(ri => ri.Amount).IsRequired();
+		builder.ToTable(t =>
+			t.HasCheckConstraint("CK_ReceptIngredient_Amount", "Amount > 0"));
+
+		builder.Property(ri => ri.IngredientAmount).IsRequired();
+		//IngredientAmount may not be IngredientAmount.None
+		builder.ToTable(t => 
+			t.HasCheckConstraint("CK_ReceptIngredient_IngredientAmount", "IngredientAmount > 0"));
+
 		builder.Navigation(n => n.Ingredient).AutoInclude();
 		builder.Navigation(n => n.Recept).AutoInclude();
 
@@ -19,16 +30,5 @@ public class ReceptIngredientConfigurator : IEntityTypeConfiguration<ReceptIngre
 			.WithMany()
 			.HasForeignKey(ri => ri.IngredientId)
 			.OnDelete(DeleteBehavior.Cascade);
-
-		builder.HasKey(ri => ri.Id);
-
-		builder.Property(ri => ri.Amount).IsRequired();
-		builder.ToTable(t =>
-			t.HasCheckConstraint("CK_ReceptIngredient_Amount", "Amount > 0"));
-
-		builder.Property(ri => ri.IngredientAmount).IsRequired();
-		//IngredientAmount may not be IngredientAmount.None
-		builder.ToTable(t => 
-			t.HasCheckConstraint("CK_ReceptIngredient_IngredientAmount", "IngredientAmount > 0"));
 	}
 }

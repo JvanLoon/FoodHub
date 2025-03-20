@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FoodHub.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250320210339_CreatedAndModified")]
+    partial class CreatedAndModified
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -39,7 +42,7 @@ namespace FoodHub.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Ingredients", (string)null);
+                    b.ToTable("Ingredients");
                 });
 
             modelBuilder.Entity("FoodHub.Persistence.Entities.Recept", b =>
@@ -63,7 +66,7 @@ namespace FoodHub.Persistence.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Recepts", (string)null);
+                    b.ToTable("Recepts");
                 });
 
             modelBuilder.Entity("FoodHub.Persistence.Entities.ReceptIngredient", b =>
@@ -96,7 +99,7 @@ namespace FoodHub.Persistence.Migrations
 
                     b.HasIndex("ReceptId");
 
-                    b.ToTable("ReceptIngredients", null, t =>
+                    b.ToTable("ReceptIngredients", t =>
                         {
                             t.HasCheckConstraint("CK_ReceptIngredient_Amount", "Amount > 0");
 
