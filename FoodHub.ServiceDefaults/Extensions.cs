@@ -126,7 +126,7 @@ public static class Extensions
 
     public static IServiceCollection AddCustomServices(this IServiceCollection services)
     {
-        services.AddTransient<IReceptRepository, ReceptRepository>();
+        services.AddTransient<IRecipeRepository, RecipeRepository>();
         services.AddTransient<IIngredientRepository, IngredientRepository>();
 
         services.AddTransient<IUnitOfWork, UnitOfWork>();
@@ -136,9 +136,9 @@ public static class Extensions
 
   //  public static IServiceCollection AddApplicationMediatR(this IServiceCollection services)
   //  {
-  //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetAllReceptsQueryHandler).Assembly));
-  //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetReceptByIdQueryHandler).Assembly));
-  //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(AddReceptCommandHandler).Assembly));
+  //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetAllRecipesQueryHandler).Assembly));
+  //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetRecipeByIdQueryHandler).Assembly));
+  //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(AddRecipeCommandHandler).Assembly));
   //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(UpdateReceptCommandHandler).Assembly));
   //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DeleteReceptCommandHandler).Assembly));
   //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetAllIngredientsQueryHandler).Assembly));
@@ -146,7 +146,7 @@ public static class Extensions
 
   //      //services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof().Assembly));
 
-  //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(AddIngredientToReceptCommandHandler).Assembly));
+  //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(AddIngredientToRecipeCommandHandler).Assembly));
 
 		//return services;
   //  }

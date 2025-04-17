@@ -1,0 +1,133 @@
+﻿@page "/recepts/make"
+@using FoodCalc.Web.Components.Services
+@using FoodHub.Persistence.Entities
+@using Microsoft.Extensions.Logging
+
+@inject RecipeService receptService
+@inject IngredientService IngredientService
+@inject ILogger<CreateRecipe> logger
+
+
+<PageTitle>Make Recept</PageTitle>
+
+<EditForm Model="receptIngredient" OnSubmit="@UpdateRecept">
+    <div class="mb-3">
+        <label for="receptSelect" class="form-label">Select Recept</label>
+        <InputSelect id="receptSelect" @bind-Value="receptIngredient.RecipeId" class="form-select">
+            <option value="">Select a Recept</option>
+            @foreach (var recept in recepts)
+            {
+                <option value="@recept.Id">@recept.Name</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="mb-3">
+        <label for="ingredientSelect" class="form-label">Select Ingredient</label>
+        <InputSelect id="ingredientSelect" @bind-Value="receptIngredient.IngredientId" class="form-select">
+            <option value="">Select an Ingredient</option>
+            @foreach (var ingredient in ingredients)
+            {
+                <option value="@ingredient.Id">@ingredient.Name</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="mb-3">
+        <label for="amountInput" class="form-label">Amount</label>
+        <InputNumber id="amountInput" @bind-Value="receptIngredient.Amount" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label for="amountTypeSelect" class="form-label">Amount Type</label>
+        <InputSelect id="amountTypeSelect" @bind-Value="receptIngredient.IngredientAmount" class="form-select">
+            @foreach (IngredientAmountType amountType in Enum.GetValues<IngredientAmountType>())
+            {
+                <option value="@amountType">@amountType</option>
+            }
+        </InputSelect>
+    </div>
+
+    <button class="btn btn-primary">Update Recept</button>
+</EditForm>
+
+
+@if (showMessage)
+{
+    @if (IsError)
+    {
+        <div class="alert alert-danger fade-out">
+            @_message
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-success fade-out">
+            @_message
+        </div>
+    }
+}
+
+@code{
+    private bool showMessage = false;
+    private bool IsError = false;
+    private string _message = string.Empty;
+    
+    private List<Recipe> recepts = new();
+    private List<Ingredient> ingredients = new();
+
+    private RecipeIngredient receptIngredient = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            recepts = await receptService.GetAllRecipesAsync();
+            ingredients = await IngredientService.GetAllIngredientsAsync();
+        }
+        catch (Exception ex)
+        {
+            ShowMessage("Failed to load data", true);
+            logger.LogError($"An error occurred while loading data: {ex.Message}");
+        }
+    }
+
+    async Task UpdateRecept()
+    {
+        try
+        {
+            await receptService.AddIngredient(receptIngredient);
+
+            receptIngredient.IngredientAmount = IngredientAmountType.None;
+            receptIngredient.IngredientId = Guid.Empty;
+            receptIngredient.Amount = 0;
+
+            //receptService.navigationManager.NavigateTo("/");
+        }
+        catch (Exception ex)
+        {
+            ShowMessage("Something went wrong", true);
+            logger.LogError($"An unexpected error occurred: {ex.Message}");
+        }
+        finally
+        {
+            StateHasChanged();
+        }
+    }
+
+    async Task ShowMessage(string message, bool isError, int timeInMs = 2000)
+    {
+        _message = message;
+        IsError = isError;
+
+        showMessage = true;
+        StateHasChanged();
+
+        await Task.Delay(timeInMs);
+
+        showMessage = false;
+        _message = string.Empty;
+        IsError = false;
+        StateHasChanged();
+    }
+}

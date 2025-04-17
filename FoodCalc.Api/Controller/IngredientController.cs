@@ -21,7 +21,7 @@ namespace FoodCalc.ApiService.Controller;
 public class IngredientController(IMediator mediator) : ControllerBase
 {
 	[HttpGet]
-	public async Task<ActionResult<IEnumerable<Recept>>> GetAllIngredients()
+	public async Task<ActionResult<IEnumerable<Recipe>>> GetAllIngredients()
 	{
 		var result = await mediator.Send(new GetAllIngredientsQuery());
 
@@ -31,9 +31,9 @@ public class IngredientController(IMediator mediator) : ControllerBase
 	}
 
 	//[HttpGet("{id}")]
-	//public async Task<ActionResult<Recept>> GetIngredient(Guid id)
+	//public async Task<ActionResult<Recipe>> GetIngredient(Guid id)
 	//{
-	//	var result = await mediator.Send(new GetReceptByIdQuery(id));
+	//	var result = await mediator.Send(new GetRecipeByIdQuery(id));
 
 	//	return result.Match(
 	//		Ok,
@@ -56,7 +56,7 @@ public class IngredientController(IMediator mediator) : ControllerBase
 	}
 
 	//[HttpPut]
-	//public async Task<IActionResult> UpdateRecept([FromBody] Recept recept)
+	//public async Task<IActionResult> UpdateRecipe([FromBody] Recipe recept)
 	//{
 	//	var result = await mediator.Send(new UpdateReceptCommand(recept));
 
@@ -66,7 +66,7 @@ public class IngredientController(IMediator mediator) : ControllerBase
 	//}
 
 	//[HttpDelete("{id}")]
-	//public async Task<IActionResult> DeleteRecept(Guid id)
+	//public async Task<IActionResult> DeleteRecipe(Guid id)
 	//{
 	//	var result = await mediator.Send(new DeleteReceptCommand(id));
 
@@ -76,7 +76,7 @@ public class IngredientController(IMediator mediator) : ControllerBase
 	//}
 
 	//[HttpGet("ingredients")]
-	//public async Task<ActionResult<IEnumerable<Recept>>> GetIngredients()
+	//public async Task<ActionResult<IEnumerable<Recipe>>> GetIngredients()
 	//{
 	//	var result = await mediator.Send(new GetAllIngredientsQuery());
 

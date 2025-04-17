@@ -1,37 +1,38 @@
-﻿@page "/"
-@inject ReceptService receptService
-@using FoodCalc.Web.Components.Services
+﻿@using FoodCalc.Web.Components.Services
 @using FoodHub.Persistence.Entities
+
+@page "/"
+
+@inject RecipeService receptService
+@inject NavigationManager NavigationManager
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>list of recipes</h1>
 
-Welcome to your new app.
-
-<p>Use this site to learn more about Blazor!</p>
 
 <div class="container-fluid ps-3">
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-        @foreach (Recept recept in Recepts)
+        @foreach (Recipe recept in Recepts)
         {
             <div class="col">
                 <div class="card h-100">
                     <div class="card-body">
                         <h5 class="card-title">@recept.Name</h5>
                         <p class="card-text">Description: @recept.Name</p>
-                        <p class="card-text">Created: @recept.CreatedDate</p>
-                        <p class="card-text">Modified: @recept.ModifiedDate</p>
+                        @* <p class="card-text">Created: @recept.CreatedDate</p> *@
+                        @* <p class="card-text">Modified: @recept.ModifiedDate</p> *@
                         <p class="card-text">Ingredients:</p>
                         <ul>
-                            @if (recept.ReceptIngredient != null)
+                            @if (recept.RecipeIngredient != null)
                             {
-                                foreach (ReceptIngredient ingredient in recept.ReceptIngredient)
+                                foreach (RecipeIngredient ingredient in recept.RecipeIngredient)
                                 {
                                     <li>@ingredient.Ingredient.Name - @ingredient.Amount @nameof(ingredient.IngredientAmount)</li>
                                 }
                             }
                         </ul>
+                        <button class="btn btn-primary" @onclick="() => EditRecept(recept.Id)">Edit</button>
                     </div>
                 </div>
             </div>
@@ -47,13 +48,13 @@ Welcome to your new app.
 
 @code{
     private string _errormessage = string.Empty;
-    List<Recept> Recepts = new();
+    List<Recipe> Recepts = new();
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            Recepts = await receptService.GetAllReceptsAsync();
+            Recepts = await receptService.GetAllRecipesAsync();
             StateHasChanged();
         }
         catch (Exception ex)
@@ -62,5 +63,10 @@ Welcome to your new app.
             StateHasChanged();
             throw ex;
         }
+    }
+
+    private void EditRecept(Guid receptId)
+    {
+        NavigationManager.NavigateTo($"/recepts/edit/{receptId}");
     }
 }

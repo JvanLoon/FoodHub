@@ -2,9 +2,9 @@
 
 namespace FoodHub.Persistence.Persistence;
 
-public class UnitOfWork(ApplicationDbContext context, IReceptRepository receptRepository, IIngredientRepository ingredientRepository) : IUnitOfWork
+public class UnitOfWork(ApplicationDbContext context, IRecipeRepository recipeRepository, IIngredientRepository ingredientRepository) : IUnitOfWork
 {
-	public IReceptRepository ReceptRepository => receptRepository;
+	public IRecipeRepository RecipeRepository => recipeRepository;
 
 	public IIngredientRepository IngredientRepository => ingredientRepository;
 

@@ -39,7 +39,7 @@ namespace FoodHub.Persistence.Migrations
                     b.ToTable("Ingredients");
                 });
 
-            modelBuilder.Entity("FoodHub.Persistence.Entities.Recept", b =>
+            modelBuilder.Entity("FoodHub.Persistence.Entities.Recipe", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -54,10 +54,10 @@ namespace FoodHub.Persistence.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Recepts");
+                    b.ToTable("Recipes");
                 });
 
-            modelBuilder.Entity("FoodHub.Persistence.Entities.ReceptIngredient", b =>
+            modelBuilder.Entity("FoodHub.Persistence.Entities.RecipeIngredient", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -72,16 +72,16 @@ namespace FoodHub.Persistence.Migrations
                     b.Property<Guid>("IngredientId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ReceptId")
+                    b.Property<Guid>("RecipeId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
                     b.HasIndex("IngredientId");
 
-                    b.HasIndex("ReceptId");
+                    b.HasIndex("RecipeId");
 
-                    b.ToTable("ReceptIngredients", t =>
+                    b.ToTable("RecipeIngredients", t =>
                         {
                             t.HasCheckConstraint("CK_ReceptIngredient_Amount", "Amount > 0");
 
@@ -89,7 +89,7 @@ namespace FoodHub.Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("FoodHub.Persistence.Entities.ReceptIngredient", b =>
+            modelBuilder.Entity("FoodHub.Persistence.Entities.RecipeIngredient", b =>
                 {
                     b.HasOne("FoodHub.Persistence.Entities.Ingredient", "Ingredient")
                         .WithMany()
@@ -97,20 +97,20 @@ namespace FoodHub.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FoodHub.Persistence.Entities.Recept", "Recept")
-                        .WithMany("ReceptIngredient")
-                        .HasForeignKey("ReceptId")
+                    b.HasOne("FoodHub.Persistence.Entities.Recipe", "Recipe")
+                        .WithMany("RecipeIngredient")
+                        .HasForeignKey("RecipeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Ingredient");
 
-                    b.Navigation("Recept");
+                    b.Navigation("Recipe");
                 });
 
-            modelBuilder.Entity("FoodHub.Persistence.Entities.Recept", b =>
+            modelBuilder.Entity("FoodHub.Persistence.Entities.Recipe", b =>
                 {
-                    b.Navigation("ReceptIngredient");
+                    b.Navigation("RecipeIngredient");
                 });
 #pragma warning restore 612, 618
         }

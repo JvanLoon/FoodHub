@@ -24,7 +24,7 @@ namespace FoodHub.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Recepts",
+                name: "Recipes",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -36,7 +36,7 @@ namespace FoodHub.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ReceptIngredients",
+                name: "RecipeIngredients",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -59,24 +59,24 @@ namespace FoodHub.Persistence.Migrations
                     table.ForeignKey(
                         name: "FK_ReceptIngredients_Recepts_ReceptId",
                         column: x => x.ReceptId,
-                        principalTable: "Recepts",
+                        principalTable: "Recipes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_ReceptIngredients_IngredientId",
-                table: "ReceptIngredients",
+                table: "RecipeIngredients",
                 column: "IngredientId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ReceptIngredients_ReceptId",
-                table: "ReceptIngredients",
-                column: "ReceptId");
+                table: "RecipeIngredients",
+                column: "RecipeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Recepts_Name",
-                table: "Recepts",
+                table: "Recipes",
                 column: "Name",
                 unique: true);
         }
@@ -85,13 +85,13 @@ namespace FoodHub.Persistence.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ReceptIngredients");
+                name: "RecipeIngredients");
 
             migrationBuilder.DropTable(
                 name: "Ingredients");
 
             migrationBuilder.DropTable(
-                name: "Recepts");
+                name: "Recipes");
         }
     }
 }

@@ -13,28 +13,28 @@ namespace FoodHub.Persistence.Migrations
         {
             migrationBuilder.AddColumn<DateTime>(
                 name: "CreatedDate",
-                table: "Recepts",
+                table: "Recipes",
                 type: "datetime2",
                 nullable: false,
                 defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc));
 
             migrationBuilder.AddColumn<DateTime>(
                 name: "ModifiedDate",
-                table: "Recepts",
+                table: "Recipes",
                 type: "datetime2",
                 nullable: false,
                 defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc));
 
             migrationBuilder.AddColumn<DateTime>(
                 name: "CreatedDate",
-                table: "ReceptIngredients",
+                table: "RecipeIngredients",
                 type: "datetime2",
                 nullable: false,
                 defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc));
 
             migrationBuilder.AddColumn<DateTime>(
                 name: "ModifiedDate",
-                table: "ReceptIngredients",
+                table: "RecipeIngredients",
                 type: "datetime2",
                 nullable: false,
                 defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc));
@@ -59,19 +59,19 @@ namespace FoodHub.Persistence.Migrations
         {
             migrationBuilder.DropColumn(
                 name: "CreatedDate",
-                table: "Recepts");
+                table: "Recipes");
 
             migrationBuilder.DropColumn(
                 name: "ModifiedDate",
-                table: "Recepts");
+                table: "Recipes");
 
             migrationBuilder.DropColumn(
                 name: "CreatedDate",
-                table: "ReceptIngredients");
+                table: "RecipeIngredients");
 
             migrationBuilder.DropColumn(
                 name: "ModifiedDate",
-                table: "ReceptIngredients");
+                table: "RecipeIngredients");
 
             migrationBuilder.DropColumn(
                 name: "CreatedDate",

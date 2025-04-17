@@ -20,7 +20,7 @@ var apiBaseAddress = builder.Configuration["API:BaseAddress"] ?? "https://localh
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(apiBaseAddress) });
 
 
-builder.Services.AddScoped<ReceptService>();
+builder.Services.AddScoped<RecipeService>();
 builder.Services.AddScoped<IngredientService>();
 
 builder.Services.Configure<JsonOptions>(options =>

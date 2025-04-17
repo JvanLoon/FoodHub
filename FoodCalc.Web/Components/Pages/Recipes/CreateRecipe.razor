@@ -1,0 +1,87 @@
+﻿@page "/recepts/add"
+@using FoodCalc.Web.Components.Services
+@using FoodHub.Persistence.Entities
+@using Microsoft.Extensions.Logging
+
+@inject RecipeService recipeService
+@inject ILogger<CreateRecipe> logger
+
+
+<PageTitle>Add Recipe</PageTitle>
+
+<h3>Add Recipe</h3>
+
+
+<EditForm Model="recept" OnSubmit="@SubmitData" FormName="addRecipeForm">
+    <div class="mb-3">
+        <label for="Name" class="form-label">Name</label>
+        <InputText @bind-Value=recept.Name id="Name" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+</EditForm>
+
+
+@if (showMessage)
+{
+    @if (IsError)
+    {
+        <div class="alert alert-danger fade-out">
+            @_message
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-success fade-out">
+            @_message
+        </div>
+    }
+}
+
+
+@code{
+    private bool showMessage = false;
+    private bool IsError = false;
+    private string _message = string.Empty;
+
+    private Recipe recept = new Recipe();
+
+    async Task SubmitData()
+    {
+        try
+        {
+            await recipeService.AddRecipe(recept);
+
+            recept.Id = Guid.NewGuid();
+            recept.Name = string.Empty;
+
+            await ShowMessage($"Recipe {recept.Name} added", false);
+            //recipeService.navigationManager.NavigateTo("/");
+        }
+        catch (Exception ex)
+        {
+            await ShowMessage("Something went wrong", true);
+            logger.LogError($"An unexpected error occurred: {ex.Message}");
+        }
+        finally
+        {
+            StateHasChanged();
+        }
+    }
+
+    async Task ShowMessage(string message, bool isError, int timeInMs = 2000)
+    {
+        _message = message;
+        IsError = isError;
+
+        showMessage = true;
+        StateHasChanged();
+
+        await Task.Delay(timeInMs);
+
+        showMessage = false;
+        _message = string.Empty;
+        IsError = false;
+        StateHasChanged();
+    }
+}

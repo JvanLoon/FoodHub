@@ -6,8 +6,8 @@ public class ApplicationDbContext : DbContext
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options){}
 
     // Define your DbSets here
-    public DbSet<Recept> Recepts { get; set; }
-    public DbSet<ReceptIngredient> ReceptIngredients { get; set; }
+    public DbSet<Recipe> Recipes { get; set; }
+    public DbSet<RecipeIngredient> RecipeIngredients { get; set; }
 	public DbSet<Ingredient> Ingredients { get; set; }
 
 	public override int SaveChanges()

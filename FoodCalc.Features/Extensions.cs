@@ -17,7 +17,7 @@ public static class Extensions
 {
 	public static IServiceCollection AddApplicationMediatR(this IServiceCollection services)
 	{
-		services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetAllReceptsQueryHandler).Assembly));
+		services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetAllRecipesQueryHandler).Assembly));
 
 		return services;
 	}
