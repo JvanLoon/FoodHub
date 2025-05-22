@@ -32,7 +32,7 @@ namespace FoodHub.Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Recepts", x => x.Id);
+                    table.PrimaryKey("PK_Recipes", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -40,42 +40,42 @@ namespace FoodHub.Persistence.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ReceptId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    RecipeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IngredientId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Amount = table.Column<int>(type: "int", nullable: false),
                     IngredientAmount = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ReceptIngredients", x => x.Id);
-                    table.CheckConstraint("CK_ReceptIngredient_Amount", "Amount > 0");
-                    table.CheckConstraint("CK_ReceptIngredient_IngredientAmount", "IngredientAmount > 0");
+                    table.PrimaryKey("PK_RecipeIngredients", x => x.Id);
+                    table.CheckConstraint("CK_RecipeIngredient_Amount", "Amount > 0");
+                    table.CheckConstraint("CK_RecipeIngredient_IngredientAmount", "IngredientAmount > 0");
                     table.ForeignKey(
-                        name: "FK_ReceptIngredients_Ingredients_IngredientId",
+                        name: "FK_RecipeIngredients_Ingredients_IngredientId",
                         column: x => x.IngredientId,
                         principalTable: "Ingredients",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ReceptIngredients_Recepts_ReceptId",
-                        column: x => x.ReceptId,
+                        name: "FK_RecipeIngredients_Recipes_RecipeId",
+                        column: x => x.RecipeId,
                         principalTable: "Recipes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ReceptIngredients_IngredientId",
+                name: "IX_RecipeIngredients_IngredientId",
                 table: "RecipeIngredients",
                 column: "IngredientId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ReceptIngredients_ReceptId",
+                name: "IX_RecipeIngredients_RecipeId",
                 table: "RecipeIngredients",
                 column: "RecipeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Recepts_Name",
+                name: "IX_Recipes_Name",
                 table: "Recipes",
                 column: "Name",
                 unique: true);
