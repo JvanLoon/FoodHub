@@ -28,11 +28,11 @@
                             {
                                 foreach (RecipeIngredient ingredient in recipe.RecipeIngredient)
                                 {
-                                    <li>@ingredient.Ingredient.Name - @ingredient.Amount @nameof(ingredient.IngredientAmount)</li>
+                                    <li>@ingredient.Ingredient.Name - @ingredient.Amount @ingredient.IngredientAmount.ToString()</li>
                                 }
                             }
                         </ul>
-                        <button class="btn btn-primary" @onclick="() => EditRecipe(recipe.Id)">Edit</button>
+                        @* <button class="btn btn-primary" @onclick="() => EditRecipe(recipe.Id)">Edit</button> *@
                     </div>
                 </div>
             </div>

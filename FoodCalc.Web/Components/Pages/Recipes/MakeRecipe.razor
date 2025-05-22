@@ -72,7 +72,7 @@
     private bool showMessage = false;
     private bool IsError = false;
     private string _message = string.Empty;
-    
+
     private List<Recipe> recipes = new();
     private List<Ingredient> ingredients = new();
 
@@ -98,6 +98,7 @@
         {
             await recipeService.AddIngredient(recipeIngredient);
 
+            recipeIngredient.Id = Guid.NewGuid();
             recipeIngredient.IngredientAmount = IngredientAmountType.None;
             recipeIngredient.IngredientId = Guid.Empty;
             recipeIngredient.Amount = 0;
