@@ -18,8 +18,8 @@ namespace FoodCalc.Features.Ingredient.Commands.AddIngredient
 			}
 			catch (Exception ex)
 			{
-				logger.LogError(ex, "Failed to add ingredient to recept");
-				return Error.Failure("Failed to update recept");
+				logger.LogError(ex, "Failed to add ingredient to recipe");
+				return Error.Failure("Failed to update recipe");
 			}
 		}
 	}

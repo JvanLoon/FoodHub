@@ -1,4 +1,4 @@
-﻿@page "/recepts/add"
+﻿@page "/recipes/add"
 @using FoodCalc.Web.Components.Services
 @using FoodHub.Persistence.Entities
 @using Microsoft.Extensions.Logging
@@ -12,10 +12,10 @@
 <h3>Add Recipe</h3>
 
 
-<EditForm Model="recept" OnSubmit="@SubmitData" FormName="addRecipeForm">
+<EditForm Model="recipe" OnSubmit="@SubmitData" FormName="addRecipeForm">
     <div class="mb-3">
         <label for="Name" class="form-label">Name</label>
-        <InputText @bind-Value=recept.Name id="Name" class="form-control" />
+        <InputText @bind-Value=recipe.Name id="Name" class="form-control" />
     </div>
 
     <button type="submit" class="btn btn-primary">Save</button>
@@ -44,18 +44,18 @@
     private bool IsError = false;
     private string _message = string.Empty;
 
-    private Recipe recept = new Recipe();
+    private Recipe recipe = new Recipe();
 
     async Task SubmitData()
     {
         try
         {
-            await recipeService.AddRecipe(recept);
+            await recipeService.AddRecipe(recipe);
 
-            recept.Id = Guid.NewGuid();
-            recept.Name = string.Empty;
+            recipe.Id = Guid.NewGuid();
+            recipe.Name = string.Empty;
 
-            await ShowMessage($"Recipe {recept.Name} added", false);
+            await ShowMessage($"Recipe {recipe.Name} added", false);
             //recipeService.navigationManager.NavigateTo("/");
         }
         catch (Exception ex)

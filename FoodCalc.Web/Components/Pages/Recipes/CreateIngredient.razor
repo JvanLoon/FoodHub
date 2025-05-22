@@ -6,7 +6,7 @@
 @inject IngredientService ingredientService
 @inject ILogger<CreateRecipe> logger
 
-<h3>Add Ingredient To Recept</h3>
+<h3>Add Ingredient To Recipe</h3>
 
 <div class="mb-3">
     <label for="ingredientName" class="form-label">Ingredient Name</label>
@@ -36,7 +36,7 @@
     private bool IsError = false;
     private string _message = string.Empty;
 
-    private Ingredient ingredient = new();
+    private Ingredient ingredient = new Ingredient { Name = "" };
 
     async Task AddIngredient()
     {
@@ -57,7 +57,7 @@
             };
 
             await ShowMessage("Ingredient added", false);
-            //receptService.navigationManager.NavigateTo("/");
+            //recipeService.navigationManager.NavigateTo("/");
         }
         catch (Exception ex)
         {

@@ -1,13 +1,5 @@
-﻿using ErrorOr;
-
-using FoodCalc.Feature.Ingredient.Queries.GetAllIngredients;
+﻿using FoodCalc.Feature.Ingredient.Queries.GetAllIngredients;
 using FoodCalc.Features.Ingredient.Commands.AddIngredient;
-using FoodCalc.Features.Recepts.Commands.AddIngredientToRecept;
-using FoodCalc.Features.Recepts.Commands.AddRecept;
-using FoodCalc.Features.Recepts.Commands.DeleteRecept;
-using FoodCalc.Features.Recepts.Commands.UpdateRecept;
-using FoodCalc.Features.Recepts.Queries.GetAllRecepts;
-using FoodCalc.Features.Recepts.Queries.GetById;
 
 using FoodHub.Persistence.Entities;
 
@@ -56,9 +48,9 @@ public class IngredientController(IMediator mediator) : ControllerBase
 	}
 
 	//[HttpPut]
-	//public async Task<IActionResult> UpdateRecipe([FromBody] Recipe recept)
+	//public async Task<IActionResult> UpdateRecipe([FromBody] Recipe recipe)
 	//{
-	//	var result = await mediator.Send(new UpdateReceptCommand(recept));
+	//	var result = await mediator.Send(new UpdateRecipeCommand(recipe));
 
 	//	return result.Match(
 	//		Ok,
@@ -68,7 +60,7 @@ public class IngredientController(IMediator mediator) : ControllerBase
 	//[HttpDelete("{id}")]
 	//public async Task<IActionResult> DeleteRecipe(Guid id)
 	//{
-	//	var result = await mediator.Send(new DeleteReceptCommand(id));
+	//	var result = await mediator.Send(new DeleteRecipeCommand(id));
 
 	//	return result.Match(
 	//	success => Ok(success),

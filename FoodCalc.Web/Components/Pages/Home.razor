@@ -3,7 +3,7 @@
 
 @page "/"
 
-@inject RecipeService receptService
+@inject RecipeService recipeService
 @inject NavigationManager NavigationManager
 
 <PageTitle>Home</PageTitle>
@@ -13,26 +13,26 @@
 
 <div class="container-fluid ps-3">
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-        @foreach (Recipe recept in Recepts)
+        @foreach (Recipe recipe in Recipes)
         {
             <div class="col">
                 <div class="card h-100">
                     <div class="card-body">
-                        <h5 class="card-title">@recept.Name</h5>
-                        <p class="card-text">Description: @recept.Name</p>
-                        @* <p class="card-text">Created: @recept.CreatedDate</p> *@
-                        @* <p class="card-text">Modified: @recept.ModifiedDate</p> *@
+                        <h5 class="card-title">@recipe.Name</h5>
+                        <p class="card-text">Description: @recipe.Name</p>
+                        @* <p class="card-text">Created: @recipe.CreatedDate</p> *@
+                        @* <p class="card-text">Modified: @recipe.ModifiedDate</p> *@
                         <p class="card-text">Ingredients:</p>
                         <ul>
-                            @if (recept.RecipeIngredient != null)
+                            @if (recipe.RecipeIngredient != null)
                             {
-                                foreach (RecipeIngredient ingredient in recept.RecipeIngredient)
+                                foreach (RecipeIngredient ingredient in recipe.RecipeIngredient)
                                 {
                                     <li>@ingredient.Ingredient.Name - @ingredient.Amount @nameof(ingredient.IngredientAmount)</li>
                                 }
                             }
                         </ul>
-                        <button class="btn btn-primary" @onclick="() => EditRecept(recept.Id)">Edit</button>
+                        <button class="btn btn-primary" @onclick="() => EditRecipe(recipe.Id)">Edit</button>
                     </div>
                 </div>
             </div>
@@ -48,13 +48,13 @@
 
 @code{
     private string _errormessage = string.Empty;
-    List<Recipe> Recepts = new();
+    List<Recipe> Recipes = new();
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            Recepts = await receptService.GetAllRecipesAsync();
+            Recipes = await recipeService.GetAllRecipesAsync();
             StateHasChanged();
         }
         catch (Exception ex)
@@ -65,8 +65,8 @@
         }
     }
 
-    private void EditRecept(Guid receptId)
+    private void EditRecipe(Guid recipeId)
     {
-        NavigationManager.NavigateTo($"/recepts/edit/{receptId}");
+        NavigationManager.NavigateTo($"/recipe/edit/{recipeId}");
     }
 }

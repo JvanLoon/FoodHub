@@ -6,16 +6,16 @@ using FoodHub.Persistence.Persistence;
 
 using Microsoft.Extensions.Logging;
 
-namespace FoodCalc.Features.Recepts.Commands.AddIngredientToRecept;
+namespace FoodCalc.Features.Recipes.Commands.AddIngredientToRecipe;
 public class AddIngredientToRecipeCommandHandler(IUnitOfWork unitOfWork, ILogger<AddIngredientToRecipeCommandHandler> logger) : IRequestHandler<AddIngredientToRecipeCommand, ErrorOr<RecipeIngredient>>
 {
     public async Task<ErrorOr<RecipeIngredient>> Handle(AddIngredientToRecipeCommand request, CancellationToken cancellationToken)
     {
 		try
 	    {
-		    await unitOfWork.RecipeRepository.AddReceptIngredientAsync(request.ReceptIngredient, cancellationToken);
+		    await unitOfWork.RecipeRepository.AddRecipeIngredientAsync(request.RecipeIngredient, cancellationToken);
 
-			return request.ReceptIngredient;
+			return request.RecipeIngredient;
 		}
 	    catch (Exception ex)
 	    {

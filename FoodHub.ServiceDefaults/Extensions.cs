@@ -1,12 +1,3 @@
-using FoodCalc.Feature.Ingredient.Queries.GetAllIngredients;
-using FoodCalc.Features.Ingredient.Commands.AddIngredient;
-using FoodCalc.Features.Recepts.Commands.AddIngredientToRecept;
-using FoodCalc.Features.Recepts.Commands.AddRecept;
-using FoodCalc.Features.Recepts.Commands.DeleteRecept;
-using FoodCalc.Features.Recepts.Commands.UpdateRecept;
-using FoodCalc.Features.Recepts.Queries.GetAllRecepts;
-using FoodCalc.Features.Recepts.Queries.GetById;
-
 using FoodHub.Persistence.Persistence;
 using FoodHub.Persistence.Repositories;
 using FoodHub.Persistence.Repositories.Interface;
@@ -16,7 +7,6 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.ServiceDiscovery;
 
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
@@ -139,8 +129,8 @@ public static class Extensions
   //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetAllRecipesQueryHandler).Assembly));
   //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetRecipeByIdQueryHandler).Assembly));
   //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(AddRecipeCommandHandler).Assembly));
-  //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(UpdateReceptCommandHandler).Assembly));
-  //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DeleteReceptCommandHandler).Assembly));
+  //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(UpdateRecipeCommandHandler).Assembly));
+  //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DeleteRecipeCommandHandler).Assembly));
   //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetAllIngredientsQueryHandler).Assembly));
   //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(AddIngredientCommandHandler).Assembly));
 

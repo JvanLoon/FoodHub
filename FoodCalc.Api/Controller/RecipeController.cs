@@ -1,13 +1,11 @@
 ﻿using ErrorOr;
 
-using FoodCalc.Feature.Ingredient.Queries.GetAllIngredients;
-using FoodCalc.Features.Ingredient.Commands.AddIngredient;
-using FoodCalc.Features.Recepts.Commands.AddIngredientToRecept;
-using FoodCalc.Features.Recepts.Commands.AddRecept;
-using FoodCalc.Features.Recepts.Commands.DeleteRecept;
-using FoodCalc.Features.Recepts.Commands.UpdateRecept;
-using FoodCalc.Features.Recepts.Queries.GetAllRecepts;
-using FoodCalc.Features.Recepts.Queries.GetById;
+using FoodCalc.Features.Recipes.Commands.AddIngredientToRecipe;
+using FoodCalc.Features.Recipes.Commands.AddRecipe;
+using FoodCalc.Features.Recipes.Commands.DeleteRecipe;
+using FoodCalc.Features.Recipes.Commands.UpdateRecipe;
+using FoodCalc.Features.Recipes.Queries.GetAllRecipes;
+using FoodCalc.Features.Recipes.Queries.GetById;
 
 using FoodHub.Persistence.Entities;
 
@@ -60,7 +58,7 @@ public class RecipeController(IMediator mediator) : ControllerBase
 	[HttpPut]
 	public async Task<IActionResult> UpdateRecipe([FromBody] Recipe recipe)
 	{
-		var result = await mediator.Send(new UpdateReceptCommand(recipe));
+		var result = await mediator.Send(new UpdateRecipeCommand(recipe));
 
 		return result.Match(
 			Ok,
@@ -70,7 +68,7 @@ public class RecipeController(IMediator mediator) : ControllerBase
 	[HttpDelete("{id}")]
 	public async Task<IActionResult> DeleteRecipe(Guid id)
 	{
-		var result = await mediator.Send(new DeleteReceptCommand(id));
+		var result = await mediator.Send(new DeleteRecipeCommand(id));
 
 		return result.Match(
 		success => Ok(success),

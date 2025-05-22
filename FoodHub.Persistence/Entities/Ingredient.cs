@@ -2,5 +2,11 @@
 public class Ingredient : BaseEntity
 {
 	public Guid Id { get; set; }
-	public string Name { get; set; }
+	public required string Name { get; set; }
+
+	public Ingredient() { }
+	public Ingredient(string name) 
+	{
+		Name = name;
+	}
 }

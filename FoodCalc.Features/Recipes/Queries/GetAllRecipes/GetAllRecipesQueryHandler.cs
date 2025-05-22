@@ -6,7 +6,7 @@ using FoodHub.Persistence.Persistence;
 using Microsoft.Extensions.Logging;
 
 
-namespace FoodCalc.Features.Recepts.Queries.GetAllRecepts;
+namespace FoodCalc.Features.Recipes.Queries.GetAllRecipes;
 public class GetAllRecipesQueryHandler(IUnitOfWork unitOfWork, ILogger<GetAllRecipesQueryHandler> logger) : IRequestHandler<GetAllRecipesQuery, ErrorOr<List<Recipe>>>
 {
 	public async Task<ErrorOr<List<Recipe>>> Handle(GetAllRecipesQuery request, CancellationToken cancellationToken)

@@ -1,4 +1,4 @@
-﻿using FoodCalc.Features.Recepts.Queries.GetAllRecepts;
+﻿using FoodCalc.Features.Recipes.Queries.GetAllRecipes;
 
 using Microsoft.Extensions.DependencyInjection;
 

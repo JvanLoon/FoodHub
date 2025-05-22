@@ -65,26 +65,37 @@ public class RecipeRepository(ApplicationDbContext context) : IRecipeRepository
 		await context.SaveChangesAsync(cancellationToken);
 	}
 
-	public async Task UpdateRecipeIngredientAsync(RecipeIngredient recipeIngredient, CancellationToken cancellationToken)
-	{
-		var existingEntity = await context.RecipeIngredients
-			.FirstOrDefaultAsync(ri => ri.Id == recipeIngredient.Id, cancellationToken);
+    public async Task UpdateRecipeIngredientAsync(RecipeIngredient recipeIngredient, CancellationToken cancellationToken)
+    {
+        // Ensure the entity is not null before calling Entry
+        if (recipeIngredient == null)
+        {
+            throw new ArgumentNullException(nameof(recipeIngredient));
+        }
 
-		// Entity exists, update it
-		context.Entry(existingEntity).CurrentValues.SetValues(recipeIngredient);
+        RecipeIngredient? existingEntity = await context.RecipeIngredients
+            .FirstOrDefaultAsync(ri => ri.Id == recipeIngredient.Id, cancellationToken);
 
-		await context.SaveChangesAsync(cancellationToken);
-	}
+        // Ensure the existing entity is not null before updating
+        if (existingEntity == null)
+        {
+            throw new InvalidOperationException($"RecipeIngredient with ID {recipeIngredient.Id} not found.");
+        }
 
-	public async Task DeleteRecipeIngredientAsync(Guid recipeIngredientId, CancellationToken cancellationToken)
-	{
-		RecipeIngredient recipeIngredient = 
-			await context.RecipeIngredients.SingleOrDefaultAsync(r => r.Id == recipeIngredientId, cancellationToken);
+        // Update the existing entity's values
+        context.Entry(existingEntity).CurrentValues.SetValues(recipeIngredient);
 
-		if (recipeIngredient != null)
-		{
-			context.RecipeIngredients.Remove(recipeIngredient);
-			await context.SaveChangesAsync(cancellationToken);
-		}
-	}
+        await context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task DeleteRecipeIngredientAsync(Guid recipeIngredientId, CancellationToken cancellationToken)
+    {
+        RecipeIngredient? recipeIngredient = await context.RecipeIngredients.SingleOrDefaultAsync(r => r.Id == recipeIngredientId, cancellationToken);
+
+        if (recipeIngredient != null)
+        {
+            context.RecipeIngredients.Remove(recipeIngredient);
+            await context.SaveChangesAsync(cancellationToken);
+        }
+    }
 }
