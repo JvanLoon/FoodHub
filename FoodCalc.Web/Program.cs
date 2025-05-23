@@ -23,6 +23,8 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(apiBaseA
 builder.Services.AddScoped<RecipeService>();
 builder.Services.AddScoped<IngredientService>();
 
+builder.Services.AddSingleton<AggregatedIngredientService>();
+
 builder.Services.Configure<JsonOptions>(options =>
 {
 	options.SerializerOptions.IncludeFields = false;

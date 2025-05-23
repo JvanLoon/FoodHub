@@ -19,7 +19,19 @@ public class RecipeRepository(ApplicationDbContext context) : IRecipeRepository
 		return await context.Recipes.SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
     }
 
-    public async Task<Recipe> AddAsync(Recipe recipe, CancellationToken cancellationToken)
+	public async Task<RecipeIngredient?> GetIngredientRecipeByRecipeId(Guid RecipeId, Guid IngredientRecipeId, CancellationToken cancellationToken)
+	{
+		Recipe? recipe = await context.Recipes.SingleOrDefaultAsync(r => r.Id == RecipeId, cancellationToken);
+
+		if (recipe == null)
+		{
+			throw new ArgumentNullException(nameof(recipe));
+		}
+
+		return recipe.RecipeIngredient.Where(re => re.Id == IngredientRecipeId).FirstOrDefault();
+	}
+
+	public async Task<Recipe> AddAsync(Recipe recipe, CancellationToken cancellationToken)
     {
         context.Recipes.Add(recipe);
 

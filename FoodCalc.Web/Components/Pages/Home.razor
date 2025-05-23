@@ -6,10 +6,17 @@
 @inject RecipeService recipeService
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
+@inject AggregatedIngredientService AggregatedIngredientService
 
 <PageTitle>Home</PageTitle>
 
 <h1>list of recipes</h1>
+
+<div class="mb-3">
+    <button class="btn btn-success" @onclick="OpenAggregatedIngredientsPage" disabled="@(!SelectedRecipeIds.Any())">
+        Get Ingredients from Selected Recipes
+    </button>
+</div>
 
 <div class="container-fluid ps-3">
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
@@ -19,6 +26,16 @@
                 <div class="card h-100 shadow-sm">
                     <img src="https://placehold.co/400x200?text=Recipe\nImage" class="card-img-top" alt="Recipe image">
                     <div class="card-body">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input"
+                            type="checkbox"
+                            id="select-@recipe.Id"
+                            @onchange="(e) => ToggleRecipeSelection(recipe.Id, e.Value as bool?)"
+                            checked="@SelectedRecipeIds.Contains(recipe.Id)" />
+                            <label class="form-check-label" for="select-@recipe.Id">
+                                Select
+                            </label>
+                        </div>
                         <h5 class="card-title">@recipe.Name</h5>
                         <p class="card-text mb-1"><strong>Ingredients:</strong></p>
                         <ul class="list-unstyled mb-0">
@@ -44,15 +61,22 @@
     </div>
 </div>
 
-@if (!string.IsNullOrEmpty(_errormessage))
+@if (showMessage)
 {
-    <p>@_errormessage</p>
+    <div class="alert @(IsError ? "alert-danger" : "alert-success")">
+        @_message
+    </div>
 }
 
 
 @code {
-    private string _errormessage = string.Empty;
     List<Recipe> Recipes = new();
+    private HashSet<Guid> SelectedRecipeIds = new();
+    private List<RecipeIngredient> AggregatedIngredients = new();
+
+    private bool showMessage = false;
+    private bool IsError = false;
+    private string _message = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -63,10 +87,61 @@
         }
         catch (Exception ex)
         {
-            _errormessage = ex.Message;
+            _message = ex.Message;
             StateHasChanged();
             throw ex;
         }
+    }
+
+    private async Task OpenAggregatedIngredientsPage()
+    {
+        AggregateIngredients();
+        AggregatedIngredientService.AggregatedIngredients = AggregatedIngredients;
+
+        // Open the new page in a new tab
+        await JS.InvokeVoidAsync("window.open", "/aggregated-ingredients", "_blank");
+        //clean list when new page is opened
+        AggregatedIngredients = new();
+    }
+
+    private void ToggleRecipeSelection(Guid recipeId, bool? isChecked)
+    {
+        if (isChecked == true)
+            SelectedRecipeIds.Add(recipeId);
+        else
+            SelectedRecipeIds.Remove(recipeId);
+    }
+
+    private void AggregateIngredients()
+    {
+        var ingredientDict = new Dictionary<(Guid IngredientId, IngredientAmountType AmountType), RecipeIngredient>();
+
+        foreach (var recipe in Recipes.Where(r => SelectedRecipeIds.Contains(r.Id)))
+        {
+            if (recipe.RecipeIngredient == null) continue;
+
+            foreach (var ri in recipe.RecipeIngredient)
+            {
+                var key = (ri.IngredientId, ri.IngredientAmount);
+                if (ingredientDict.TryGetValue(key, out var existing))
+                {
+                    existing.Amount += ri.Amount;
+                }
+                else
+                {
+                    // Clone to avoid mutating original
+                    ingredientDict[key] = new RecipeIngredient
+                    {
+                        Ingredient = ri.Ingredient,
+                        IngredientId = ri.IngredientId,
+                        IngredientAmount = ri.IngredientAmount,
+                        Amount = ri.Amount
+                    };
+                }
+            }
+        }
+
+        AggregatedIngredients = ingredientDict.Values.ToList();
     }
 
     private void EditRecipe(Guid recipeId)
@@ -88,8 +163,24 @@
         }
         catch (Exception ex)
         {
-            _errormessage = ex.Message;
+            _message = ex.Message;
             StateHasChanged();
         }
+    }
+
+    async Task ShowMessage(string message, bool isError, int timeInMs = 2000)
+    {
+        _message = message;
+        IsError = isError;
+
+        showMessage = true;
+        StateHasChanged();
+
+        await Task.Delay(timeInMs);
+
+        showMessage = false;
+        _message = string.Empty;
+        IsError = false;
+        StateHasChanged();
     }
 }

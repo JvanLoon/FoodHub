@@ -30,24 +30,24 @@
         <label for="ingredientSearch" class="form-label">Search Ingredient</label>
         <div class="input-group mb-2">
             <input id="ingredientSearch"
-                   class="form-control"
-                   type="text"
-                   placeholder="Type to search..."
-                   @bind="ingredientSearch"
-                   @bind:event="oninput"
-                   @onfocus="() => dropdownOpen = true"
-                   @onblur="OnDropdownBlur"
-                   autocomplete="off"
-                   @onkeydown="HandleIngredientSearchKeydown"
-                   @onkeydown:preventDefault="@(ingredientSearchFocused)" />
+            class="form-control"
+            type="text"
+            placeholder="Type to search..."
+            @bind="ingredientSearch"
+            @bind:event="oninput"
+            @onfocus="() => dropdownOpen = true"
+            @onblur="OnDropdownBlur"
+            autocomplete="off"
+            @onkeydown="HandleIngredientSearchKeydown"
+            @onkeydown:preventDefault="@(ingredientSearchFocused)" />
             <button class="btn btn-outline-success"
-                    type="button"
-                    title="Add new ingredient"
-                    @onclick="AddIngredient">
+            type="button"
+            title="Add new ingredient"
+            @onclick="AddIngredient">
                 +
             </button>
         </div>
-        
+
         <EditForm Model="recipeIngredient" OnValidSubmit="AddOrUpdateIngredient">
             <div class="mb-3">
                 <div class="dropdown" style="width:100%; position:relative;">

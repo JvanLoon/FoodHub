@@ -1,0 +1,21 @@
+﻿@page "/aggregated-ingredients"
+@layout FoodCalc.Web.Components.Layout.MinimalLayout
+@inject FoodCalc.Web.Components.Services.AggregatedIngredientService AggregatedIngredientService
+
+<h3>Aggregated Ingredients</h3>
+
+@if (AggregatedIngredientService.AggregatedIngredients.Any())
+{
+    <ul>
+        @foreach (var ingredient in AggregatedIngredientService.AggregatedIngredients)
+        {
+            <li>
+                @ingredient.Ingredient.Name: @ingredient.Amount @ingredient.IngredientAmount.ToString()
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>No ingredients to display.</p>
+}
