@@ -47,7 +47,9 @@
                            type="text"
                            placeholder="Type to search..."
                            @bind="ingredientSearch"
-                           @bind:event="oninput" />
+                           @bind:event="oninput"
+                           @onfocus="() => dropdownOpen = true"
+                           @onblur="OnDropdownBlur" />
                     <button class="btn btn-outline-success"
                             type="button"
                             title="Add new ingredient"
@@ -56,20 +58,23 @@
                     </button>
                 </div>
 
-                <label for="ingredientSelect" class="form-label mt-2">Select Ingredient</label>
-                <select id="ingredientSelect"
-                        class="form-select"
-                        @bind="recipeIngredient.IngredientId">
-                    <option value="@noIngredient">Select an Ingredient</option>
-                    @foreach (var ingredient in FilteredIngredients)
-                    {
-                        <option value="@ingredient.Id">@ingredient.Name</option>
-                    }
-                </select>
-                @if (!FilteredIngredients.Any())
-                {
-                    <div class="text-muted small mt-1">No ingredients found. Click + to add.</div>
-                }
+                <div class="dropdown" style="width:100%; position:relative;">
+                    <div class="dropdown-menu show"
+                         style="width:100%; max-height:200px; overflow-y:auto; display:@(dropdownOpen && FilteredIngredients.Any() ? "block" : "none"); position:absolute; z-index:1000;">
+                        @foreach (var ingredient in FilteredIngredients)
+                        {
+                            <button type="button"
+                                    class="dropdown-item @(recipeIngredient.IngredientId == ingredient.Id ? "active" : "")"
+                                    @onclick="() => SelectIngredient(ingredient)">
+                                @ingredient.Name
+                            </button>
+                        }
+                        @if (!FilteredIngredients.Any())
+                        {
+                            <div class="dropdown-item text-muted">No ingredients found. Click + to add.</div>
+                        }
+                    </div>
+                </div>
             </div>
 
             <div class="mb-3">
@@ -239,6 +244,23 @@
             ShowMessage("Failed to add ingredient", true);
             Logger.LogError($"Error adding ingredient: {ex.Message}");
         }
+    }
+
+    private bool dropdownOpen = false;
+
+    private void SelectIngredient(Ingredient ingredient)
+    {
+        recipeIngredient.IngredientId = ingredient.Id;
+        ingredientSearch = ingredient.Name;
+        dropdownOpen = false;
+    }
+
+    private async Task OnDropdownBlur()
+    {
+        // Delay to allow click event to register before closing dropdown
+        await Task.Delay(150);
+        dropdownOpen = false;
+        StateHasChanged();
     }
 
     private void CancelEditName()
