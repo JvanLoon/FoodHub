@@ -35,5 +35,5 @@ public class RecipeIngredientConfigurator : IEntityTypeConfiguration<RecipeIngre
             .WithMany()
             .HasForeignKey(ri => ri.IngredientId)
             .OnDelete(DeleteBehavior.Cascade);
-    }
+	}
 }

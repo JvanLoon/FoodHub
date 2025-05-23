@@ -122,21 +122,24 @@
 
             foreach (var ri in recipe.RecipeIngredient)
             {
-                var key = (ri.IngredientId, ri.IngredientAmount);
-                if (ingredientDict.TryGetValue(key, out var existing))
+                if (ri.Ingredient.ShouldBeAddedToShoppingCart)
                 {
-                    existing.Amount += ri.Amount;
-                }
-                else
-                {
-                    // Clone to avoid mutating original
-                    ingredientDict[key] = new RecipeIngredient
+                    var key = (ri.IngredientId, ri.IngredientAmount);
+                    if (ingredientDict.TryGetValue(key, out var existing))
                     {
-                        Ingredient = ri.Ingredient,
-                        IngredientId = ri.IngredientId,
-                        IngredientAmount = ri.IngredientAmount,
-                        Amount = ri.Amount
-                    };
+                        existing.Amount += ri.Amount;
+                    }
+                    else
+                    {
+                        // Clone to avoid mutating original
+                        ingredientDict[key] = new RecipeIngredient
+                        {
+                            Ingredient = ri.Ingredient,
+                            IngredientId = ri.IngredientId,
+                            IngredientAmount = ri.IngredientAmount,
+                            Amount = ri.Amount
+                        };
+                    }
                 }
             }
         }

@@ -1,0 +1,108 @@
+﻿@page "/ingredients"
+
+@using FoodCalc.Web.Components.Services
+@using FoodHub.Persistence.Entities
+@inject IngredientService IngredientService
+
+<h3>Ingredients</h3>
+
+@if (ingredients == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Should Be Added To Shopping Cart</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < ingredients.Count; i++)
+            {
+                var ingredient = ingredients[i];
+                var rowClass = i % 2 == 0 ? "table-row-even" : "table-row-odd";
+                <tr class="@rowClass">
+                    <td>@ingredient.Name</td>
+                    <td>
+                        <input type="checkbox"
+                        checked="@ingredient.ShouldBeAddedToShoppingCart"
+                        @onchange="(e) => OnCheckboxChanged(ingredient, e)" />
+                    </td>
+                    <td>
+                        <button class="btn btn-danger btn-sm"
+                        @onclick="() => DeleteIngredient(ingredient.Id)">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (showMessage)
+{
+    <div class="alert @(IsError ? "alert-danger" : "alert-success")">
+        @_message
+    </div>
+}
+
+@code {
+    private List<Ingredient> ingredients;
+
+    private bool showMessage = false;
+    private bool IsError = false;
+    private string _message = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ingredients = await IngredientService.GetAllIngredientsAsync();
+    }
+
+    private async Task OnCheckboxChanged(Ingredient ingredient, ChangeEventArgs e)
+    {
+        ingredient.ShouldBeAddedToShoppingCart = (bool)e.Value!;
+
+        // Save the change to the server
+        await IngredientService.UpdateIngredient(ingredient);
+
+        // Show a message indicating success
+        ShowMessage("Ingredient updated successfully!", false);
+    }
+
+    private async Task DeleteIngredient(Guid id)
+    {
+        var success = await IngredientService.DeleteIngredient(id);
+        if (success)
+        {
+            //ingredients = ingredients.Where(i => i.Id != id).ToList();
+            //reinitialize the list
+            await OnInitializedAsync();
+            ShowMessage("Ingredient deleted successfully!", false);
+        }
+        else
+        {
+            ShowMessage("Failed to delete ingredient.", true);
+        }
+    }
+
+    async Task ShowMessage(string message, bool isError, int timeInMs = 2000)
+    {
+        _message = message;
+        IsError = isError;
+
+        showMessage = true;
+        StateHasChanged();
+
+        await Task.Delay(timeInMs);
+
+        showMessage = false;
+        _message = string.Empty;
+        IsError = false;
+        StateHasChanged();
+    }
+}

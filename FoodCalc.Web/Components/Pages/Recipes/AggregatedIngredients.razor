@@ -1,16 +1,16 @@
 ﻿@page "/aggregated-ingredients"
 @layout FoodCalc.Web.Components.Layout.MinimalLayout
+@using FoodHub.Persistence.Entities;
 @inject FoodCalc.Web.Components.Services.AggregatedIngredientService AggregatedIngredientService
-
-<h3>Aggregated Ingredients</h3>
 
 @if (AggregatedIngredientService.AggregatedIngredients.Any())
 {
     <ul>
-        @foreach (var ingredient in AggregatedIngredientService.AggregatedIngredients)
+        @foreach (RecipeIngredient ingredient in AggregatedIngredientService.AggregatedIngredients.ToList())
         {
             <li>
                 @ingredient.Ingredient.Name: @ingredient.Amount @ingredient.IngredientAmount.ToString()
+                <button class="btn btn-sm btn-danger ms-2" @onclick="() => RemoveIngredient(ingredient)">Remove</button>
             </li>
         }
     </ul>
@@ -18,4 +18,12 @@
 else
 {
     <p>No ingredients to display.</p>
+}
+
+@code {
+    private void RemoveIngredient(RecipeIngredient ingredient)
+    {
+        AggregatedIngredientService.AggregatedIngredients.Remove(ingredient);
+        StateHasChanged();
+    }
 }

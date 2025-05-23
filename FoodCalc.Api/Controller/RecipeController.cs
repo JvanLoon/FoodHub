@@ -2,7 +2,7 @@
 
 using FoodCalc.Features.Recipes.Commands.AddIngredientToRecipe;
 using FoodCalc.Features.Recipes.Commands.AddRecipe;
-using FoodCalc.Features.Recipes.Commands.DeleteIngredientFromRecipe;
+using FoodCalc.Features.Ingredients.Commands.DeleteIngredientFromRecipe;
 using FoodCalc.Features.Recipes.Commands.DeleteRecipe;
 using FoodCalc.Features.Recipes.Commands.UpdateRecipe;
 using FoodCalc.Features.Recipes.Queries.GetAllRecipes;

@@ -30,20 +30,20 @@
         <label for="ingredientSearch" class="form-label">Search Ingredient</label>
         <div class="input-group mb-2">
             <input id="ingredientSearch"
-            class="form-control"
-            type="text"
-            placeholder="Type to search..."
-            @bind="ingredientSearch"
-            @bind:event="oninput"
-            @onfocus="() => dropdownOpen = true"
-            @onblur="OnDropdownBlur"
-            autocomplete="off"
-            @onkeydown="HandleIngredientSearchKeydown"
-            @onkeydown:preventDefault="@(ingredientSearchFocused)" />
+                   class="form-control"
+                   type="text"
+                   placeholder="Type to search..."
+                   @bind="ingredientSearch"
+                   @bind:event="oninput"
+                   @onfocus="() => dropdownOpen = true"
+                   @onblur="OnDropdownBlur"
+                   autocomplete="off"
+                   @onkeydown="HandleIngredientSearchKeydown"
+                   @onkeydown:preventDefault="@(ingredientSearchFocused)" />
             <button class="btn btn-outline-success"
-            type="button"
-            title="Add new ingredient"
-            @onclick="AddIngredient">
+                    type="button"
+                    title="Add new ingredient"
+                    @onclick="AddIngredient">
                 +
             </button>
         </div>
@@ -52,12 +52,12 @@
             <div class="mb-3">
                 <div class="dropdown" style="width:100%; position:relative;">
                     <div class="dropdown-menu show"
-                    style="width:100%; max-height:200px; overflow-y:auto; display:@(dropdownOpen && FilteredIngredients.Any() ? "block" : "none"); position:absolute; z-index:1000;">
+                         style="width:100%; max-height:200px; overflow-y:auto; display:@(dropdownOpen && FilteredIngredients.Any() ? "block" : "none"); position:absolute; z-index:1000;">
                         @foreach (var ingredient in FilteredIngredients)
                         {
                             <button type="button"
-                            class="dropdown-item @(recipeIngredient.IngredientId == ingredient.Id ? "active" : "")"
-                            @onclick="() => SelectIngredient(ingredient)">
+                                    class="dropdown-item @(recipeIngredient.IngredientId == ingredient.Id ? "active" : "")"
+                                    @onclick="() => SelectIngredient(ingredient)">
                                 @ingredient.Name
                             </button>
                         }

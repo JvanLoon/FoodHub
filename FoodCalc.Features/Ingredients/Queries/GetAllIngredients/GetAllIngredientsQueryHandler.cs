@@ -4,7 +4,7 @@ using FoodHub.Persistence.Persistence;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
-namespace FoodCalc.Feature.Ingredient.Queries.GetAllIngredients;
+namespace FoodCalc.Feature.Ingredients.Queries.GetAllIngredients;
 
 public class GetAllIngredientsQueryHandler(IUnitOfWork unitOfWork, ILogger<GetAllIngredientsQueryHandler> logger) : IRequestHandler<GetAllIngredientsQuery, ErrorOr<List<FoodHub.Persistence.Entities.Ingredient>>>
 {

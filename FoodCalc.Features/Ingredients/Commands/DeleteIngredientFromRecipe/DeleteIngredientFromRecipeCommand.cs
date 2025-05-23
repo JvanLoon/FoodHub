@@ -2,5 +2,5 @@
 
 using MediatR;
 
-namespace FoodCalc.Features.Recipes.Commands.DeleteIngredientFromRecipe;
+namespace FoodCalc.Features.Ingredients.Commands.DeleteIngredientFromRecipe;
 public record DeleteIngredientFromRecipeCommand(Guid Id) : IRequest<ErrorOr<bool>>;

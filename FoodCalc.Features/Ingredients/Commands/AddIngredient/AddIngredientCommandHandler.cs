@@ -3,7 +3,7 @@ using MediatR;
 using FoodHub.Persistence.Persistence;
 using Microsoft.Extensions.Logging;
 
-namespace FoodCalc.Features.Ingredient.Commands.AddIngredient
+namespace FoodCalc.Features.Ingredients.Commands.AddIngredient
 {
 	public class AddIngredientCommandHandler(IUnitOfWork unitOfWork, ILogger<AddIngredientCommandHandler> logger)
 		: IRequestHandler<AddIngredientCommand, ErrorOr<FoodHub.Persistence.Entities.Ingredient>>

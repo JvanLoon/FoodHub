@@ -19,6 +19,7 @@ public class AddIngredientToRecipeCommandHandler(IUnitOfWork unitOfWork, ILogger
 			{
 				recipeIngredient.Amount = request.RecipeIngredient.Amount;
 				recipeIngredient.IngredientAmount = request.RecipeIngredient.IngredientAmount;
+				//recipeIngredient.ShouldBeAddedToShoppingCart = request.RecipeIngredient.ShouldBeAddedToShoppingCart;
 
 				await unitOfWork.IngredientRepository.UpdateAsync(recipeIngredient.Ingredient, cancellationToken);
 			}

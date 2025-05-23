@@ -1,5 +1,9 @@
-﻿using FoodCalc.Feature.Ingredient.Queries.GetAllIngredients;
-using FoodCalc.Features.Ingredient.Commands.AddIngredient;
+﻿using FoodCalc.Feature.Ingredients.Queries.GetAllIngredients;
+using FoodCalc.Features.Ingredients.Commands.AddIngredient;
+using FoodCalc.Features.Ingredients.Commands.DeleteIngredient;
+using FoodCalc.Features.Ingredients.Commands.DeleteIngredientFromRecipe;
+using FoodCalc.Features.Ingredients.Commands.UpdateIngredient;
+using FoodCalc.Features.Recipes.Commands.AddIngredientToRecipe;
 
 using FoodHub.Persistence.Entities;
 
@@ -47,15 +51,25 @@ public class IngredientController(IMediator mediator) : ControllerBase
 			errors => Problem(errors.First().Description));
 	}
 
-	//[HttpPut]
-	//public async Task<IActionResult> UpdateRecipe([FromBody] Recipe recipe)
-	//{
-	//	var result = await mediator.Send(new UpdateRecipeNameCommand(recipe));
+	[HttpDelete("deleteingredient/{id}")]
+	public async Task<IActionResult> DeleteIngredient(Guid id)
+	{
+		var result = await mediator.Send(new DeleteIngredientCommand(id));
 
-	//	return result.Match(
-	//		Ok,
-	//		errors => Problem(errors.First().Description));
-	//}
+		return result.Match(
+		success => Ok(success),
+		errors => Problem(errors.First().Description));
+	}
+
+	[HttpPut]
+	public async Task<IActionResult> UpdateIngredient([FromBody] Ingredient ingredient)
+	{
+		var result = await mediator.Send(new UpdateIngredientCommand(ingredient));
+
+		return result.Match(
+			Ok,
+			errors => Problem(errors.First().Description));
+	}
 
 	//[HttpDelete("{id}")]
 	//public async Task<IActionResult> DeleteRecipe(Guid id)
