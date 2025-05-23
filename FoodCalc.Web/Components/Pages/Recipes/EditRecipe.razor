@@ -27,45 +27,37 @@
 <div class="row">
     <!-- Right Side: Edit Form -->
     <div class="col-md-6">
+        <label for="ingredientSearch" class="form-label">Search Ingredient</label>
+        <div class="input-group mb-2">
+            <input id="ingredientSearch"
+                   class="form-control"
+                   type="text"
+                   placeholder="Type to search..."
+                   @bind="ingredientSearch"
+                   @bind:event="oninput"
+                   @onfocus="() => dropdownOpen = true"
+                   @onblur="OnDropdownBlur"
+                   autocomplete="off"
+                   @onkeydown="HandleIngredientSearchKeydown"
+                   @onkeydown:preventDefault="@(ingredientSearchFocused)" />
+            <button class="btn btn-outline-success"
+                    type="button"
+                    title="Add new ingredient"
+                    @onclick="AddIngredient">
+                +
+            </button>
+        </div>
+        
         <EditForm Model="recipeIngredient" OnValidSubmit="AddOrUpdateIngredient">
-            @*<div class="mb-3">
-                <label for="ingredientSelect" class="form-label">Select Ingredient</label>
-                <InputSelect id="ingredientSelect" @bind-Value="recipeIngredient.IngredientId" class="form-select">
-                    <option value="@noIngredient">Select an Ingredient</option>
-                    @foreach (var ingredient in ingredients)
-                    {
-                        <option value="@ingredient.Id">@ingredient.Name</option>
-                    }
-                </InputSelect>
-            </div> *@
-
             <div class="mb-3">
-                <label for="ingredientSearch" class="form-label">Search Ingredient</label>
-                <div class="input-group mb-2">
-                    <input id="ingredientSearch"
-                           class="form-control"
-                           type="text"
-                           placeholder="Type to search..."
-                           @bind="ingredientSearch"
-                           @bind:event="oninput"
-                           @onfocus="() => dropdownOpen = true"
-                           @onblur="OnDropdownBlur" />
-                    <button class="btn btn-outline-success"
-                            type="button"
-                            title="Add new ingredient"
-                            @onclick="AddIngredient">
-                        +
-                    </button>
-                </div>
-
                 <div class="dropdown" style="width:100%; position:relative;">
                     <div class="dropdown-menu show"
-                         style="width:100%; max-height:200px; overflow-y:auto; display:@(dropdownOpen && FilteredIngredients.Any() ? "block" : "none"); position:absolute; z-index:1000;">
+                    style="width:100%; max-height:200px; overflow-y:auto; display:@(dropdownOpen && FilteredIngredients.Any() ? "block" : "none"); position:absolute; z-index:1000;">
                         @foreach (var ingredient in FilteredIngredients)
                         {
                             <button type="button"
-                                    class="dropdown-item @(recipeIngredient.IngredientId == ingredient.Id ? "active" : "")"
-                                    @onclick="() => SelectIngredient(ingredient)">
+                            class="dropdown-item @(recipeIngredient.IngredientId == ingredient.Id ? "active" : "")"
+                            @onclick="() => SelectIngredient(ingredient)">
                                 @ingredient.Name
                             </button>
                         }
@@ -94,10 +86,6 @@
 
             <button class="btn btn-primary me-2" type="submit">Add/Save</button>
             <button class="btn btn-outline-primary me-2" type="button" @onclick="ClearForm">Clear</button>
-            @if (IsEditMode)
-            {
-                <button class="btn btn-sm btn-danger" type="button" @onclick="() => DeleteIngredient(recipeIngredient.Id)">Delete</button>
-            }
         </EditForm>
     </div>
 
@@ -106,9 +94,14 @@
         <ul class="list-group">
             @foreach (var ingredient in recipe?.RecipeIngredient ?? new List<RecipeIngredient>())
             {
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    @ingredient.Ingredient.Name - @ingredient.Amount @ingredient.IngredientAmount
-                    <button class="btn btn-sm btn-secondary ms-2" @onclick="() => EditIngredient(ingredient)">Edit</button>
+                <li class="list-group-item d-flex">
+                    <span>
+                        @ingredient.Ingredient.Name - @ingredient.Amount @ingredient.IngredientAmount
+                    </span>
+                    <span class="ms-auto">
+                        <button class="btn btn-sm btn-secondary me-2" @onclick="() => EditIngredient(ingredient)">Edit</button>
+                        <button class="btn btn-sm btn-danger" type="button" @onclick="() => DeleteIngredient(ingredient.Id)">Delete</button>
+                    </span>
                 </li>
             }
         </ul>
@@ -128,7 +121,6 @@
     private Recipe recipe;
     private List<Ingredient> ingredients = new();
     private RecipeIngredient recipeIngredient = new();
-    private bool IsEditMode => recipeIngredient != null && recipeIngredient.IngredientId != noIngredient;
     private Guid noIngredient;
     private bool isEditingName = false;
     private string ingredientSearch = string.Empty;
@@ -136,6 +128,8 @@
         string.IsNullOrWhiteSpace(ingredientSearch)
             ? ingredients
             : ingredients.Where(i => i.Name.Contains(ingredientSearch, StringComparison.OrdinalIgnoreCase));
+    private bool dropdownOpen = false;
+    private bool ingredientSearchFocused = false;
 
     private bool showMessage = false;
     private bool IsError = false;
@@ -233,9 +227,14 @@
         try
         {
             var ingredient = new Ingredient { Id = Guid.NewGuid(), Name = ingredientSearch };
+
             await IngredientService.AddIngredientAsync(ingredient);
+
             ingredients = await IngredientService.GetAllIngredientsAsync();
-            ingredientSearch = string.Empty;
+
+            recipeIngredient.IngredientId = ingredients.Where(i => i.Name == ingredientSearch).FirstOrDefault().Id;
+            //ingredientSearch = string.Empty;
+
             ShowMessage("Ingredient added", false);
             StateHasChanged();
         }
@@ -245,8 +244,6 @@
             Logger.LogError($"Error adding ingredient: {ex.Message}");
         }
     }
-
-    private bool dropdownOpen = false;
 
     private void SelectIngredient(Ingredient ingredient)
     {
@@ -266,6 +263,14 @@
     private void CancelEditName()
     {
         isEditingName = false;
+    }
+
+    private async Task HandleIngredientSearchKeydown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await AddIngredient();
+        }
     }
 
     async Task ShowMessage(string message, bool isError, int timeInMs = 2000)

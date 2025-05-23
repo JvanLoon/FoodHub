@@ -25,11 +25,11 @@ namespace FoodCalc.Web.Components.Services
             return await response.Content.ReadFromJsonAsync<Recipe>();
         }
 
-        public async Task<HttpResponseMessage> AddRecipe(Recipe recipe)
+        public async Task<Recipe?> AddRecipe(Recipe recipe)
         {
             var response = await httpClient.PostAsJsonAsync("api/recipe", recipe);
             response.EnsureSuccessStatusCode();
-            return response;
+            return await response.Content.ReadFromJsonAsync<Recipe>();
         }
 
         public async Task<HttpResponseMessage> UpdateRecipe(Recipe recipe)
@@ -43,6 +43,13 @@ namespace FoodCalc.Web.Components.Services
 		{
 			var payload = new RecipeNameUpdateDto { Id = recipeId, Name = recipeName };
 			var response = await httpClient.PutAsJsonAsync("api/recipe/name", payload);
+			response.EnsureSuccessStatusCode();
+			return response;
+		}
+
+		public async Task<HttpResponseMessage> DeleteRecipe(Guid recipeId)
+		{
+			var response = await httpClient.DeleteAsync($"api/recipe/deleterecipe/{recipeId}");
 			response.EnsureSuccessStatusCode();
 			return response;
 		}
@@ -63,7 +70,7 @@ namespace FoodCalc.Web.Components.Services
 
 		public async Task<HttpResponseMessage> DeleteIngredient(Guid recipeIngredientId)
 		{
-			var response = await httpClient.DeleteAsync($"api/recipe/deleterecipe/{recipeIngredientId}");
+			var response = await httpClient.DeleteAsync($"api/recipe/deleteingredient/{recipeIngredientId}");
 			response.EnsureSuccessStatusCode();
 			return response;
 		}

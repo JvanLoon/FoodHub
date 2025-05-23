@@ -1,87 +1,67 @@
-﻿@page "/recipes/add"
+﻿@page "/recipes/create"
 @using FoodCalc.Web.Components.Services
 @using FoodHub.Persistence.Entities
-@using Microsoft.Extensions.Logging
+@inject RecipeService RecipeService
+@inject NavigationManager NavigationManager
+@inject ILogger<CreateRecipe> Logger
 
-@inject RecipeService recipeService
-@inject ILogger<CreateRecipe> logger
+<PageTitle>Create Recipe</PageTitle>
 
+<h2>Create a New Recipe</h2>
 
-<PageTitle>Add Recipe</PageTitle>
+<EditForm Model="recipe" OnValidSubmit="CreateRecipeAsync">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
 
-<h3>Add Recipe</h3>
-
-
-<EditForm Model="recipe" OnSubmit="@SubmitData" FormName="addRecipeForm">
     <div class="mb-3">
-        <label for="Name" class="form-label">Name</label>
-        <InputText @bind-Value=recipe.Name id="Name" class="form-control" />
+        <label for="recipeName" class="form-label">Recipe Name</label>
+        <InputText id="recipeName" class="form-control" @bind-Value="recipe.Name" required />
     </div>
 
-    <button type="submit" class="btn btn-primary">Save</button>
+    <button class="btn btn-primary" type="submit">Create</button>
 </EditForm>
-
 
 @if (showMessage)
 {
-    @if (IsError)
-    {
-        <div class="alert alert-danger fade-out">
-            @_message
-        </div>
-    }
-    else
-    {
-        <div class="alert alert-success fade-out">
-            @_message
-        </div>
-    }
+    <div class="alert @(isError ? "alert-danger" : "alert-success") mt-3">
+        @message
+    </div>
 }
 
-
-@code{
+@code {
+    private Recipe recipe = new();
     private bool showMessage = false;
-    private bool IsError = false;
-    private string _message = string.Empty;
+    private bool isError = false;
+    private string message = string.Empty;
 
-    private Recipe recipe = new Recipe();
-
-    async Task SubmitData()
+    private async Task CreateRecipeAsync()
     {
         try
         {
-            await recipeService.AddRecipe(recipe);
+            // Create the recipe (assumes RecipeService.AddRecipeAsync returns the created Recipe with Id)
+            var createdRecipe = await RecipeService.AddRecipe(recipe);
 
-            recipe.Id = Guid.NewGuid();
-            recipe.Name = string.Empty;
-
-            await ShowMessage($"Recipe {recipe.Name} added", false);
-            //recipeService.navigationManager.NavigateTo("/");
+            if (createdRecipe?.Id != Guid.Empty)
+            {
+                // Navigate to EditRecipe page with the new recipe's ID
+                NavigationManager.NavigateTo($"/recipes/edit/{createdRecipe.Id}");
+            }
+            else
+            {
+                ShowMessage("Failed to create recipe.", true);
+            }
         }
         catch (Exception ex)
         {
-            await ShowMessage("Something went wrong", true);
-            logger.LogError($"An unexpected error occurred: {ex.Message}");
-        }
-        finally
-        {
-            StateHasChanged();
+            ShowMessage("Error creating recipe.", true);
+            Logger.LogError(ex, "Error creating recipe");
         }
     }
 
-    async Task ShowMessage(string message, bool isError, int timeInMs = 2000)
+    private void ShowMessage(string msg, bool error)
     {
-        _message = message;
-        IsError = isError;
-
+        message = msg;
+        isError = error;
         showMessage = true;
-        StateHasChanged();
-
-        await Task.Delay(timeInMs);
-
-        showMessage = false;
-        _message = string.Empty;
-        IsError = false;
-        StateHasChanged();
     }
 }

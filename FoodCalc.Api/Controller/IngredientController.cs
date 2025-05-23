@@ -60,7 +60,7 @@ public class IngredientController(IMediator mediator) : ControllerBase
 	//[HttpDelete("{id}")]
 	//public async Task<IActionResult> DeleteRecipe(Guid id)
 	//{
-	//	var result = await mediator.Send(new DeleteRecipeCommand(id));
+	//	var result = await mediator.Send(new DeleteIngredientFromRecipeCommand(id));
 
 	//	return result.Match(
 	//	success => Ok(success),

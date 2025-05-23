@@ -2,6 +2,7 @@
 
 using FoodCalc.Features.Recipes.Commands.AddIngredientToRecipe;
 using FoodCalc.Features.Recipes.Commands.AddRecipe;
+using FoodCalc.Features.Recipes.Commands.DeleteIngredientFromRecipe;
 using FoodCalc.Features.Recipes.Commands.DeleteRecipe;
 using FoodCalc.Features.Recipes.Commands.UpdateRecipe;
 using FoodCalc.Features.Recipes.Queries.GetAllRecipes;
@@ -40,21 +41,21 @@ public class RecipeController(IMediator mediator) : ControllerBase
 	}
 
 	[HttpPost]
-	public async Task<IActionResult> AddRecipe([FromBody] Recipe recipe)
-	{
-		Console.WriteLine($"Received Recipe: {recipe.Name}");
+    public async Task<IActionResult> AddRecipe([FromBody] Recipe recipe)
+    {
+        Console.WriteLine($"Received Recipe: {recipe.Name}");
 
-		if (string.IsNullOrEmpty(recipe.Name))
-		{
-			return BadRequest("No name provided");
-		}
+        if (string.IsNullOrEmpty(recipe.Name))
+        {
+            return BadRequest("No name provided");
+        }
 
-		var result = await mediator.Send(new AddRecipeCommand(recipe));
+        var result = await mediator.Send(new AddRecipeCommand(recipe));
 
-		return result.Match(
-			Ok,
-			errors => Problem(errors.First().Description));
-	}
+        return result.Match(
+			result => Ok(recipe),
+            errors => Problem(errors.First().Description));
+    }
 
 	[HttpPut("name")]
 	public async Task<IActionResult> UpdateRecipe([FromBody] RecipeNameUpdateDto payload)
@@ -76,10 +77,20 @@ public class RecipeController(IMediator mediator) : ControllerBase
 			errors => Problem(errors.First().Description));
 	}
 
-	[HttpDelete("DeleteRecipe/{id}")]
+	[HttpDelete("deleterecipe/{id}")]
 	public async Task<IActionResult> DeleteRecipe(Guid id)
 	{
 		var result = await mediator.Send(new DeleteRecipeCommand(id));
+
+		return result.Match(
+		success => Ok(success),
+		errors => Problem(errors.First().Description));
+	}
+
+	[HttpDelete("deleteingredient/{id}")]
+	public async Task<IActionResult> DeleteIngredient(Guid id)
+	{
+		var result = await mediator.Send(new DeleteIngredientFromRecipeCommand(id));
 
 		return result.Match(
 		success => Ok(success),

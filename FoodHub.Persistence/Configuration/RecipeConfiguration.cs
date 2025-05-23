@@ -9,7 +9,7 @@ public class RecipeConfiguration : IEntityTypeConfiguration<Recipe>
 	{
 		builder.HasKey(r => r.Id);
 		builder.HasIndex(r => r.Name).IsUnique();
-		builder.Property(r => r.Name).IsRequired();
+		builder.Property(r => r.Name).HasMaxLength(450).IsRequired();
 		builder.Navigation(r => r.RecipeIngredient).AutoInclude();
 
 		builder.HasMany(r => r.RecipeIngredient)
