@@ -14,11 +14,15 @@ public class UpdateRecipeCommandHandler(IUnitOfWork unitOfWork, ILogger<UpdateRe
 			Recipe recipe = await unitOfWork.RecipeRepository.GetByIdAsync(request.Recipe.Id, cancellationToken) ??
 							throw new Exception($"recipe by id:{request.Recipe.Id} not found.");
 
-			if (!string.IsNullOrWhiteSpace(request.Recipe.Name))
+			if (recipe.Name != request.Recipe.Name)
 			{
 				recipe.Name = request.Recipe.Name;
 			}
 
+			if (request.Recipe.RecipeIngredient.Count > 1)
+			{
+				throw new Exception($"{request.Recipe.RecipeIngredient.Count} ingredients provided. More the 1 is required");
+			}
 			recipe.RecipeIngredient.Clear();
 
 			foreach (RecipeIngredient ingredient in request.Recipe.RecipeIngredient)
@@ -27,7 +31,6 @@ public class UpdateRecipeCommandHandler(IUnitOfWork unitOfWork, ILogger<UpdateRe
 			}
 
 			await unitOfWork.RecipeRepository.UpdateAsync(recipe, cancellationToken);
-			await unitOfWork.SaveChangesAsync(cancellationToken);
 
 			return request.Recipe;
 		}

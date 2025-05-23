@@ -1,7 +1,9 @@
-﻿using System.Net.Http.Json;
+﻿using FoodHub.Persistence.Entities;
+using FoodHub.ServiceDefaults;
 
-using FoodHub.Persistence.Entities;
 using Microsoft.AspNetCore.Components;
+
+using System.Net.Http.Json;
 
 namespace FoodCalc.Web.Components.Services
 {
@@ -37,7 +39,15 @@ namespace FoodCalc.Web.Components.Services
             return response;
         }
 
-        public async Task<List<Ingredient>> GetIngredientsAsync()
+		public async Task<HttpResponseMessage> UpdateRecipeName(Guid recipeId, string recipeName)
+		{
+			var payload = new RecipeNameUpdateDto { Id = recipeId, Name = recipeName };
+			var response = await httpClient.PutAsJsonAsync("api/recipe/name", payload);
+			response.EnsureSuccessStatusCode();
+			return response;
+		}
+
+		public async Task<List<Ingredient>> GetIngredientsAsync()
         {
             var response = await httpClient.GetAsync("api/recipe/ingredients");
             response.EnsureSuccessStatusCode();
@@ -50,5 +60,12 @@ namespace FoodCalc.Web.Components.Services
             response.EnsureSuccessStatusCode();
             return response;
         }
-    }
+
+		public async Task<HttpResponseMessage> DeleteIngredient(Guid recipeIngredientId)
+		{
+			var response = await httpClient.DeleteAsync($"api/recipe/deleterecipe/{recipeIngredientId}");
+			response.EnsureSuccessStatusCode();
+			return response;
+		}
+	}
 }

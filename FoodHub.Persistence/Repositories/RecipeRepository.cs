@@ -48,6 +48,17 @@ public class RecipeRepository(ApplicationDbContext context) : IRecipeRepository
 		await context.SaveChangesAsync(cancellationToken);
 	}
 
+	public async Task UpdateNameAsync(Recipe recipe, CancellationToken cancellationToken)
+	{
+		// Attach the Recipe entity to the context
+		context.Recipes.Attach(recipe);
+
+		// Mark the Recipe entity as modified
+		context.Entry(recipe).State = EntityState.Modified;
+
+		await context.SaveChangesAsync(cancellationToken);
+	}
+
 	public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
     {
         Recipe? recipe = await context.Recipes.SingleOrDefaultAsync(r => r.Id == id, cancellationToken);

@@ -50,7 +50,7 @@ public class IngredientController(IMediator mediator) : ControllerBase
 	//[HttpPut]
 	//public async Task<IActionResult> UpdateRecipe([FromBody] Recipe recipe)
 	//{
-	//	var result = await mediator.Send(new UpdateRecipeCommand(recipe));
+	//	var result = await mediator.Send(new UpdateRecipeNameCommand(recipe));
 
 	//	return result.Match(
 	//		Ok,

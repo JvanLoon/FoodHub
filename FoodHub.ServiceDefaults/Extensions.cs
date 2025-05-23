@@ -129,7 +129,7 @@ public static class Extensions
   //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetAllRecipesQueryHandler).Assembly));
   //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetRecipeByIdQueryHandler).Assembly));
   //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(AddRecipeCommandHandler).Assembly));
-  //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(UpdateRecipeCommandHandler).Assembly));
+  //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(UpdateRecipeNameCommandHandler).Assembly));
   //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DeleteRecipeCommandHandler).Assembly));
   //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetAllIngredientsQueryHandler).Assembly));
   //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(AddIngredientCommandHandler).Assembly));

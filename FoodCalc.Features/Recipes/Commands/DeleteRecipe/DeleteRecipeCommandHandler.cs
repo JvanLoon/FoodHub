@@ -11,7 +11,7 @@ public class DeleteRecipeCommandHandler(IUnitOfWork unitOfWork, ILogger<DeleteRe
 	{
 		try
 		{
-			await unitOfWork.RecipeRepository.DeleteAsync(request.Id, cancellationToken);
+			await unitOfWork.RecipeRepository.DeleteRecipeIngredientAsync(request.Id, cancellationToken);
 
 			return true;
 		}

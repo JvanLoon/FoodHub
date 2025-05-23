@@ -8,6 +8,7 @@ using FoodCalc.Features.Recipes.Queries.GetAllRecipes;
 using FoodCalc.Features.Recipes.Queries.GetById;
 
 using FoodHub.Persistence.Entities;
+using FoodHub.ServiceDefaults;
 
 using MediatR;
 
@@ -55,6 +56,16 @@ public class RecipeController(IMediator mediator) : ControllerBase
 			errors => Problem(errors.First().Description));
 	}
 
+	[HttpPut("name")]
+	public async Task<IActionResult> UpdateRecipe([FromBody] RecipeNameUpdateDto payload)
+	{
+		var result = await mediator.Send(new UpdateRecipeNameCommand(payload.Id, payload.Name));
+
+		return result.Match(
+			Ok,
+			errors => Problem(errors.First().Description));
+	}
+
 	[HttpPut]
 	public async Task<IActionResult> UpdateRecipe([FromBody] Recipe recipe)
 	{
@@ -65,7 +76,7 @@ public class RecipeController(IMediator mediator) : ControllerBase
 			errors => Problem(errors.First().Description));
 	}
 
-	[HttpDelete("{id}")]
+	[HttpDelete("DeleteRecipe/{id}")]
 	public async Task<IActionResult> DeleteRecipe(Guid id)
 	{
 		var result = await mediator.Send(new DeleteRecipeCommand(id));

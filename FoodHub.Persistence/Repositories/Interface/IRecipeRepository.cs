@@ -7,6 +7,7 @@ public interface IRecipeRepository
     Task<Recipe?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
     Task<Recipe> AddAsync(Recipe recipe, CancellationToken cancellationToken);
     Task UpdateAsync(Recipe recipe, CancellationToken cancellationToken);
+	Task UpdateNameAsync(Recipe recipe, CancellationToken cancellationToken);
 	Task DeleteAsync(Guid id, CancellationToken cancellationToken);
 
 	Task AddRecipeIngredientAsync(RecipeIngredient recipeIngredient, CancellationToken cancellationToken);
