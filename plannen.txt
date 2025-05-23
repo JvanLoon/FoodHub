@@ -1,0 +1,70 @@
+AH: https://www.ah.nl/zoeken/api/products/search?query=gehakt&size=36
+Jumbo: https://www.jumbo.com/api/graphql
+
+
+0.9: entities "MarkForDelete" tabel per entitie maken. zodat bepaalde rollen entities kunnen marken voor delete
+		denk aan een knop "mark for delete" op alle edit schermen
+			UserRecipeMarkDelete
+				UserId
+				RecipeId
+				IngredientId
+				CookingStepId
+				.. //all other entities
+				??ReasonId??
+				CustomReason
+			
+			Reason
+				Id
+				Description
+				??Severity?? // for later?
+				
+		?? Reason tabel maken en een ReasonId koppelen ?? //Zodat er beter bepaald kan worden waarom iets word afgekeurd.
+			Wel opening voor comments
+		En een beheer paneel om te zien welke er zijn gemarkd for delete
+
+1: Login
+	Rollen
+		Admin // alles ook deleten
+		Beheerder //mag aanmaken en editen/goedkeuren. geen delete
+		??RecipeUser?? // soort premium user die recepten mag goedkeuren meer niet, niet verwijderen of editen.
+		??CookingStepUser??
+		User
+
+2: Concept recepten kunnen maken
+	kunnen aangeven of deze publiek mag worden
+	admin paneel om publieke recepten toe te voegen in de algemene bak recepten
+	
+	Denk aan:
+		Recipe
+			Ingredients
+			
+		ConceptRecipe
+			Ingredients
+			MayBecomePublic
+	
+	Beheer paneel om de stappen aan te maken en de accepteren. Niet editen....
+		eventueel een rol hiervoor
+		wanneer geaccepteerd in admin paneel, ConceptRecipes omzetten naar normaal Recipe
+
+3: Koken van de recipes
+	Stap voor stap door een bepaald recept heen
+	
+	Ik dacht aan een set css "cards" naast elkaar met op elke card een stap in het koop process
+	Met navigatie knoppen om door de stappen heen te gaan.
+	
+	Denk aan: (1 Recipe heeft meerdere CookingSteps)
+		Recipe
+			CookingStep
+				Id
+				Description
+				Order
+				
+			ConceptCookingStep
+				Id
+				Description
+				Order
+			
+	
+	Beheer paneel om de stappen aan te maken en de editen
+		eventueel een rol hiervoor
+		
