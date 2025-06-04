@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy ASP.Net Core app to Azure Web App - Foodhub
+name: Build and deploy ASP.Net Core app to Azure Web App - foodhub
 
 on:
   push:
@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     permissions:
       contents: read #This is required for actions/checkout
 
@@ -27,7 +27,7 @@ jobs:
         run: dotnet build --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -36,7 +36,7 @@ jobs:
           path: ${{env.DOTNET_ROOT}}/myapp
 
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     needs: build
     environment:
       name: 'Production'
@@ -54,15 +54,15 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_7A88EA4298154BC2B5DE29B9AE564B70 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_B403749880684BDFAC1ABC7F95C9B273 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_99F9EC434D3F40E39F664CDB40889ACC }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_14E6595ADA9F4DFDA8E5FCA019C3A633 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_0F749767E24E4CA5A9FD9D2EAADD7DA6 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_A0BE866FCEC640998C93D0AD39E14698 }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'Foodhub'
+          app-name: 'foodhub'
           slot-name: 'Production'
           package: .
           
