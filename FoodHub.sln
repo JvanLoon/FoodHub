@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoodCalc.Api", "FoodCalc.Ap
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoodCalc.Web", "FoodCalc.Web\FoodCalc.Web.csproj", "{09DA18A5-5F4F-170C-B0D5-0F56A1001C0B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoodHub.DTOs", "FoodHub.DTOs\FoodHub.DTOs.csproj", "{AE4D19B1-83FE-23BB-3B37-F3F697539E4D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{09DA18A5-5F4F-170C-B0D5-0F56A1001C0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{09DA18A5-5F4F-170C-B0D5-0F56A1001C0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{09DA18A5-5F4F-170C-B0D5-0F56A1001C0B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE4D19B1-83FE-23BB-3B37-F3F697539E4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE4D19B1-83FE-23BB-3B37-F3F697539E4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE4D19B1-83FE-23BB-3B37-F3F697539E4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE4D19B1-83FE-23BB-3B37-F3F697539E4D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
