@@ -10,7 +10,9 @@ public class RecipeIngredientConfigurator : IEntityTypeConfiguration<RecipeIngre
     {
         builder.HasKey(ri => ri.Id);
 
-        builder.Property(ri => ri.Amount).IsRequired();
+        builder.Property(ri => ri.Amount)
+			.IsRequired()
+			.HasColumnType("decimal(10,2)");
         builder.ToTable(t =>
             t.HasCheckConstraint("CK_RecipeIngredient_Amount", "Amount > 0"));
 
