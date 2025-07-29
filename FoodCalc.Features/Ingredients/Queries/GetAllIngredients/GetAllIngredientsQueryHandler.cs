@@ -1,4 +1,6 @@
 ﻿using ErrorOr;
+using AutoMapper;
+using FoodHub.DTOs;
 using FoodHub.Persistence.Entities;
 using FoodHub.Persistence.Persistence;
 using MediatR;
@@ -6,13 +8,14 @@ using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Feature.Ingredients.Queries.GetAllIngredients;
 
-public class GetAllIngredientsQueryHandler(IUnitOfWork unitOfWork, ILogger<GetAllIngredientsQueryHandler> logger) : IRequestHandler<GetAllIngredientsQuery, ErrorOr<List<FoodHub.Persistence.Entities.Ingredient>>>
+public class GetAllIngredientsQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GetAllIngredientsQueryHandler> logger) : IRequestHandler<GetAllIngredientsQuery, ErrorOr<List<IngredientDto>>>
 {
-	public async Task<ErrorOr<List<FoodHub.Persistence.Entities.Ingredient>>> Handle(GetAllIngredientsQuery request, CancellationToken cancellationToken)
+	public async Task<ErrorOr<List<IngredientDto>>> Handle(GetAllIngredientsQuery request, CancellationToken cancellationToken)
 	{
 		try
 		{
-			return await unitOfWork.IngredientRepository.GetAllAsync(cancellationToken);
+			var ingredients = await unitOfWork.IngredientRepository.GetAllAsync(cancellationToken);
+			return mapper.Map<List<IngredientDto>>(ingredients);
 		}
 		catch (Exception ex)
 		{

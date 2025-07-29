@@ -1,6 +1,6 @@
 ﻿@page "/recipes/edit/{RecipeId:guid}"
 @using FoodCalc.Web.Components.Services
-@using FoodHub.Persistence.Entities
+@using FoodHub.DTOs
 @inject RecipeService RecipeService
 @inject IngredientService IngredientService
 @inject ILogger<EditRecipe> Logger
@@ -77,7 +77,7 @@
             <div class="mb-3">
                 <label for="amountTypeSelect" class="form-label">Amount Type</label>
                 <InputSelect id="amountTypeSelect" @bind-Value="recipeIngredient.IngredientAmount" class="form-select">
-                    @foreach (IngredientAmountType amountType in Enum.GetValues<IngredientAmountType>())
+                    @foreach (IngredientAmountTypeDto amountType in Enum.GetValues<IngredientAmountTypeDto>())
                     {
                         <option value="@amountType">@amountType</option>
                     }
@@ -92,7 +92,7 @@
     <!-- Right Side: Recipe Name and Ingredients -->
     <div class="col-md-6">
         <ul class="list-group">
-            @foreach (var ingredient in recipe?.RecipeIngredient ?? new List<RecipeIngredient>())
+            @foreach (var ingredient in recipe?.RecipeIngredient ?? new List<RecipeIngredientDto>())
             {
                 <li class="list-group-item d-flex">
                     <span>
@@ -118,13 +118,13 @@
 @code {
     [Parameter] public Guid RecipeId { get; set; }
 
-    private Recipe recipe;
-    private List<Ingredient> ingredients = new();
-    private RecipeIngredient recipeIngredient = new();
+    private RecipeDto recipe;
+    private List<IngredientDto> ingredients = new();
+    private RecipeIngredientDto recipeIngredient = new();
     private Guid noIngredient;
     private bool isEditingName = false;
     private string ingredientSearch = string.Empty;
-    private IEnumerable<Ingredient> FilteredIngredients =>
+    private IEnumerable<IngredientDto> FilteredIngredients =>
         string.IsNullOrWhiteSpace(ingredientSearch)
             ? ingredients
             : ingredients.Where(i => i.Name.Contains(ingredientSearch, StringComparison.OrdinalIgnoreCase));
@@ -139,7 +139,7 @@
     {
         try
         {
-            recipe = await RecipeService.GetRecipeByIdAsync(RecipeId) ?? new Recipe();
+            recipe = await RecipeService.GetRecipeByIdAsync(RecipeId) ?? new RecipeDto();
             ingredients = await IngredientService.GetAllIngredientsAsync();
             noIngredient = Guid.NewGuid();
             recipeIngredient.IngredientId = noIngredient;
@@ -161,7 +161,7 @@
             ShowMessage("Ingredient added/updated successfully", false);
 
             // Clear form
-            recipeIngredient = new RecipeIngredient { RecipeId = RecipeId, IngredientId = Guid.Empty };
+            recipeIngredient = new RecipeIngredientDto { RecipeId = RecipeId, IngredientId = Guid.Empty };
             recipe = await RecipeService.GetRecipeByIdAsync(RecipeId); // Refresh the list
         }
         catch (Exception ex)
@@ -171,9 +171,9 @@
         }
     }
 
-    private void EditIngredient(RecipeIngredient ingredient)
+    private void EditIngredient(RecipeIngredientDto ingredient)
     {
-        recipeIngredient = new RecipeIngredient
+        recipeIngredient = new RecipeIngredientDto
         {
             Id = ingredient.Id,
             // RecipeId = ingredient.RecipeId,
@@ -204,7 +204,7 @@
     private void ClearForm()
     {
         ingredientSearch = string.Empty;
-        recipeIngredient = new RecipeIngredient { Id = Guid.NewGuid(), RecipeId = RecipeId, IngredientId = noIngredient };
+        recipeIngredient = new RecipeIngredientDto { Id = Guid.NewGuid(), RecipeId = RecipeId, IngredientId = noIngredient };
     }
 
     private async Task SaveRecipeName()
@@ -227,7 +227,7 @@
     {
         try
         {
-            var ingredient = new Ingredient { Id = Guid.NewGuid(), Name = ingredientSearch };
+            var ingredient = new CreateIngredientDto { Name = ingredientSearch };
 
             await IngredientService.AddIngredientAsync(ingredient);
 
@@ -246,7 +246,7 @@
         }
     }
 
-    private void SelectIngredient(Ingredient ingredient)
+    private void SelectIngredient(IngredientDto ingredient)
     {
         recipeIngredient.IngredientId = ingredient.Id;
         ingredientSearch = ingredient.Name;

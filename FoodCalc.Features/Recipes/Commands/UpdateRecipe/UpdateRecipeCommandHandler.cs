@@ -1,13 +1,15 @@
 ﻿using ErrorOr;
 using MediatR;
+using AutoMapper;
+using FoodHub.DTOs;
 using FoodHub.Persistence.Entities;
 using FoodHub.Persistence.Persistence;
 using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Features.Recipes.Commands.UpdateRecipe;
-public class UpdateRecipeCommandHandler(IUnitOfWork unitOfWork, ILogger<UpdateRecipeCommandHandler> logger) : IRequestHandler<UpdateRecipeCommand, ErrorOr<Recipe>>
+public class UpdateRecipeCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ILogger<UpdateRecipeCommandHandler> logger) : IRequestHandler<UpdateRecipeCommand, ErrorOr<RecipeDto>>
 {
-	public async Task<ErrorOr<Recipe>> Handle(UpdateRecipeCommand request, CancellationToken cancellationToken)
+	public async Task<ErrorOr<RecipeDto>> Handle(UpdateRecipeCommand request, CancellationToken cancellationToken)
 	{
 		try
 		{
@@ -25,14 +27,15 @@ public class UpdateRecipeCommandHandler(IUnitOfWork unitOfWork, ILogger<UpdateRe
 			}
 			recipe.RecipeIngredient.Clear();
 
-			foreach (RecipeIngredient ingredient in request.Recipe.RecipeIngredient)
+			foreach (RecipeIngredientDto ingredientDto in request.Recipe.RecipeIngredient)
 			{
+				var ingredient = mapper.Map<RecipeIngredient>(ingredientDto);
 				recipe.RecipeIngredient.Add(ingredient);
 			}
 
 			await unitOfWork.RecipeRepository.UpdateAsync(recipe, cancellationToken);
 
-			return request.Recipe;
+			return mapper.Map<RecipeDto>(recipe);
 		}
 		catch (Exception ex)
 		{

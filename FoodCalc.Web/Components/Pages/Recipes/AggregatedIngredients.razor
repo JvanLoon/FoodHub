@@ -1,12 +1,12 @@
 ﻿@page "/aggregated-ingredients"
 @layout FoodCalc.Web.Components.Layout.MinimalLayout
-@using FoodHub.Persistence.Entities;
+@using FoodHub.DTOs;
 @inject FoodCalc.Web.Components.Services.AggregatedIngredientService AggregatedIngredientService
 
 @if (AggregatedIngredientService.AggregatedIngredients.Any())
 {
     <ul>
-        @foreach (RecipeIngredient ingredient in AggregatedIngredientService.AggregatedIngredients.ToList())
+        @foreach (RecipeIngredientDto ingredient in AggregatedIngredientService.AggregatedIngredients.ToList())
         {
             <li>
                 @ingredient.Ingredient.Name: @ingredient.Amount @ingredient.IngredientAmount.ToString()
@@ -21,7 +21,7 @@ else
 }
 
 @code {
-    private void RemoveIngredient(RecipeIngredient ingredient)
+    private void RemoveIngredient(RecipeIngredientDto ingredient)
     {
         AggregatedIngredientService.AggregatedIngredients.Remove(ingredient);
         StateHasChanged();

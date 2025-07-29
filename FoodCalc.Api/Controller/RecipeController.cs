@@ -5,11 +5,11 @@ using FoodCalc.Features.Recipes.Commands.AddRecipe;
 using FoodCalc.Features.Ingredients.Commands.DeleteIngredientFromRecipe;
 using FoodCalc.Features.Recipes.Commands.DeleteRecipe;
 using FoodCalc.Features.Recipes.Commands.UpdateRecipe;
+using FoodCalc.Features.Recipes.Commands.UpdateRecipeName;
 using FoodCalc.Features.Recipes.Queries.GetAllRecipes;
 using FoodCalc.Features.Recipes.Queries.GetById;
 
-using FoodHub.Persistence.Entities;
-using FoodHub.ServiceDefaults;
+using FoodHub.DTOs;
 
 using MediatR;
 
@@ -21,7 +21,7 @@ namespace FoodCalc.ApiService.Controller;
 public class RecipeController(IMediator mediator) : ControllerBase
 {
 	[HttpGet]
-	public async Task<ActionResult<IEnumerable<Recipe>>> GetAllRecipes()
+	public async Task<ActionResult<IEnumerable<RecipeDto>>> GetAllRecipes()
 	{
 		var result = await mediator.Send(new GetAllRecipesQuery());
 
@@ -31,7 +31,7 @@ public class RecipeController(IMediator mediator) : ControllerBase
 	}
 
 	[HttpGet("{id}")]
-	public async Task<ActionResult<Recipe>> GetRecipeById(Guid id)
+	public async Task<ActionResult<RecipeDto>> GetRecipeById(Guid id)
 	{
 		var result = await mediator.Send(new GetRecipeByIdQuery(id));
 
@@ -41,7 +41,7 @@ public class RecipeController(IMediator mediator) : ControllerBase
 	}
 
 	[HttpPost]
-    public async Task<IActionResult> AddRecipe([FromBody] Recipe recipe)
+    public async Task<IActionResult> AddRecipe([FromBody] CreateRecipeDto recipe)
     {
         Console.WriteLine($"Received Recipe: {recipe.Name}");
 
@@ -68,7 +68,7 @@ public class RecipeController(IMediator mediator) : ControllerBase
 	}
 
 	[HttpPut]
-	public async Task<IActionResult> UpdateRecipe([FromBody] Recipe recipe)
+	public async Task<IActionResult> UpdateRecipe([FromBody] UpdateRecipeDto recipe)
 	{
 		var result = await mediator.Send(new UpdateRecipeCommand(recipe));
 
@@ -99,7 +99,7 @@ public class RecipeController(IMediator mediator) : ControllerBase
 
 	[HttpPost("ingredient")]
 
-	public async Task<IActionResult> AddIngredientToRecipe([FromBody] RecipeIngredient recipeIngredient)
+	public async Task<IActionResult> AddIngredientToRecipe([FromBody] RecipeIngredientDto recipeIngredient)
 	{
 		var result = await mediator.Send(new AddIngredientToRecipeCommand(recipeIngredient));
 		return result.Match(

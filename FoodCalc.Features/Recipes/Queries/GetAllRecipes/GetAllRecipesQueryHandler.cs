@@ -1,19 +1,22 @@
 ﻿using ErrorOr;
 using MediatR;
+using AutoMapper;
 
+using FoodHub.DTOs;
 using FoodHub.Persistence.Entities;
 using FoodHub.Persistence.Persistence;
 using Microsoft.Extensions.Logging;
 
 
 namespace FoodCalc.Features.Recipes.Queries.GetAllRecipes;
-public class GetAllRecipesQueryHandler(IUnitOfWork unitOfWork, ILogger<GetAllRecipesQueryHandler> logger) : IRequestHandler<GetAllRecipesQuery, ErrorOr<List<Recipe>>>
+public class GetAllRecipesQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GetAllRecipesQueryHandler> logger) : IRequestHandler<GetAllRecipesQuery, ErrorOr<List<RecipeDto>>>
 {
-	public async Task<ErrorOr<List<Recipe>>> Handle(GetAllRecipesQuery request, CancellationToken cancellationToken)
+	public async Task<ErrorOr<List<RecipeDto>>> Handle(GetAllRecipesQuery request, CancellationToken cancellationToken)
 	{
 		try
 		{
-			return await unitOfWork.RecipeRepository.GetAllAsync(cancellationToken);
+			var recipes = await unitOfWork.RecipeRepository.GetAllAsync(cancellationToken);
+			return mapper.Map<List<RecipeDto>>(recipes);
 		}
 		catch (Exception ex)
 		{

@@ -1,7 +1,7 @@
 ﻿using ErrorOr;
 using MediatR;
 
-using FoodHub.Persistence.Entities;
+using FoodHub.DTOs;
 
 namespace FoodCalc.Features.Recipes.Queries.GetAllRecipes;
-public record GetAllRecipesQuery() : IRequest<ErrorOr<List<Recipe>>>;
+public record GetAllRecipesQuery() : IRequest<ErrorOr<List<RecipeDto>>>;

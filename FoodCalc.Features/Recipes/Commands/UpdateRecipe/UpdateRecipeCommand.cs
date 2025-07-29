@@ -1,8 +1,8 @@
 ﻿using ErrorOr;
 using MediatR;
 
-using FoodHub.Persistence.Entities;
+using FoodHub.DTOs;
 
 namespace FoodCalc.Features.Recipes.Commands.UpdateRecipe;
-public record UpdateRecipeCommand(Recipe Recipe) : IRequest<ErrorOr<Recipe>>;
+public record UpdateRecipeCommand(UpdateRecipeDto Recipe) : IRequest<ErrorOr<RecipeDto>>;
 

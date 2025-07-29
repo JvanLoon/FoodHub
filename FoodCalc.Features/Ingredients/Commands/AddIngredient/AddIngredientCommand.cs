@@ -1,7 +1,7 @@
 ﻿using ErrorOr;
 using MediatR;
 
-using FoodHub.Persistence.Entities;
+using FoodHub.DTOs;
 
 namespace FoodCalc.Features.Ingredients.Commands.AddIngredient;
-public record AddIngredientCommand(Ingredient Ingredient) : IRequest<ErrorOr<Ingredient>>;
+public record AddIngredientCommand(CreateIngredientDto Ingredient) : IRequest<ErrorOr<IngredientDto>>;
