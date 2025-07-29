@@ -25,7 +25,7 @@
 </div>
 
 <div class="row">
-    <!-- Right Side: Edit Form -->
+    <!-- Left Side: Edit Form -->
     <div class="col-md-6">
         <label for="ingredientSearch" class="form-label">Search Ingredient</label>
         <div class="input-group mb-2">
@@ -89,7 +89,7 @@
         </EditForm>
     </div>
 
-    <!-- Left Side: Recipe Name and Ingredients -->
+    <!-- Right Side: Recipe Name and Ingredients -->
     <div class="col-md-6">
         <ul class="list-group">
             @foreach (var ingredient in recipe?.RecipeIngredient ?? new List<RecipeIngredient>())
@@ -181,6 +181,7 @@
             Amount = ingredient.Amount,
             IngredientAmount = ingredient.IngredientAmount
         };
+        ingredientSearch = ingredient.Ingredient.Name;
     }
 
     private async Task DeleteIngredient(Guid recipeIngredientId)
@@ -250,6 +251,7 @@
         recipeIngredient.IngredientId = ingredient.Id;
         ingredientSearch = ingredient.Name;
         dropdownOpen = false;
+        StateHasChanged();
     }
 
     private async Task OnDropdownBlur()
