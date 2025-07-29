@@ -27,7 +27,7 @@ public class AddIngredientToRecipeCommandHandler(IUnitOfWork unitOfWork, IMapper
 			}
 			else
 			{
-				var mappedRecipeIngredient = mapper.Map<RecipeIngredient>(request.RecipeIngredient);
+				RecipeIngredient mappedRecipeIngredient = mapper.Map<RecipeIngredient>(request.RecipeIngredient);
 				await unitOfWork.RecipeRepository.AddRecipeIngredientAsync(mappedRecipeIngredient, cancellationToken);
 				return mapper.Map<RecipeIngredientDto>(mappedRecipeIngredient);
 			}
