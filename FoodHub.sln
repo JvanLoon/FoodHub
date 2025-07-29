@@ -1,4 +1,4 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.35821.62
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -20,6 +20,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoodCalc.Api", "FoodCalc.Api\FoodCalc.Api.csproj", "{F0D03E3D-8C14-D7A4-7E13-BB84C241300E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoodCalc.Web", "FoodCalc.Web\FoodCalc.Web.csproj", "{09DA18A5-5F4F-170C-B0D5-0F56A1001C0B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoodHub.DTOs", "FoodHub.DTOs\FoodHub.DTOs.csproj", "{0BA5FFCD-3107-4ED5-9100-1AA0F60C1DDC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{09DA18A5-5F4F-170C-B0D5-0F56A1001C0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{09DA18A5-5F4F-170C-B0D5-0F56A1001C0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{09DA18A5-5F4F-170C-B0D5-0F56A1001C0B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0BA5FFCD-3107-4ED5-9100-1AA0F60C1DDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BA5FFCD-3107-4ED5-9100-1AA0F60C1DDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0BA5FFCD-3107-4ED5-9100-1AA0F60C1DDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0BA5FFCD-3107-4ED5-9100-1AA0F60C1DDC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
