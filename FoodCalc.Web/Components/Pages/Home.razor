@@ -45,7 +45,7 @@
                                 {
                                     <li class="d-flex justify-content-between align-items-center">
                                         <span>@ingredient.Ingredient.Name</span>
-                                        <span>@ingredient.Amount @ingredient.IngredientAmount.ToString()</span>
+                                        <span>@ingredient.Amount.ToFormattedString() @ingredient.IngredientAmount.ToString()</span>
                                     </li>
                                 }
                             }

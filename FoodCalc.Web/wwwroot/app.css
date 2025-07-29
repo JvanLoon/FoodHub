@@ -69,3 +69,10 @@ h1:focus {
 .row.row-cols-lg-3 .card-equal-width {
 	flex: 1 1 0;
 }
+
+/* Printing */
+@media print {
+	.no-print {
+		display: none !important;
+	}
+}
