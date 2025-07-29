@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FoodHub.Persistence\FoodHub.Persistence.csproj" />
+    <ProjectReference Include="..\FoodHub.DTOs\FoodHub.DTOs.csproj" />
     <ProjectReference Include="..\FoodHub.ServiceDefaults\FoodHub.ServiceDefaults.csproj" />
   </ItemGroup>
 

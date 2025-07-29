@@ -1,15 +1,17 @@
 ﻿using ErrorOr;
 using MediatR;
+using AutoMapper;
 
+using FoodHub.DTOs;
 using FoodHub.Persistence.Entities;
 using FoodHub.Persistence.Persistence;
 
 using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Features.Recipes.Commands.AddIngredientToRecipe;
-public class AddIngredientToRecipeCommandHandler(IUnitOfWork unitOfWork, ILogger<AddIngredientToRecipeCommandHandler> logger) : IRequestHandler<AddIngredientToRecipeCommand, ErrorOr<RecipeIngredient>>
+public class AddIngredientToRecipeCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ILogger<AddIngredientToRecipeCommandHandler> logger) : IRequestHandler<AddIngredientToRecipeCommand, ErrorOr<RecipeIngredientDto>>
 {
-    public async Task<ErrorOr<RecipeIngredient>> Handle(AddIngredientToRecipeCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<RecipeIngredientDto>> Handle(AddIngredientToRecipeCommand request, CancellationToken cancellationToken)
     {
 		try
 		{
@@ -18,17 +20,17 @@ public class AddIngredientToRecipeCommandHandler(IUnitOfWork unitOfWork, ILogger
 			if (recipeIngredient != null)
 			{
 				recipeIngredient.Amount = request.RecipeIngredient.Amount;
-				recipeIngredient.IngredientAmount = request.RecipeIngredient.IngredientAmount;
-				//recipeIngredient.ShouldBeAddedToShoppingCart = request.RecipeIngredient.ShouldBeAddedToShoppingCart;
+				recipeIngredient.IngredientAmount = mapper.Map<IngredientAmountType>(request.RecipeIngredient.IngredientAmount);
 
 				await unitOfWork.IngredientRepository.UpdateAsync(recipeIngredient.Ingredient, cancellationToken);
+				return mapper.Map<RecipeIngredientDto>(recipeIngredient);
 			}
 			else
 			{
-				await unitOfWork.RecipeRepository.AddRecipeIngredientAsync(request.RecipeIngredient, cancellationToken);
+				var mappedRecipeIngredient = mapper.Map<RecipeIngredient>(request.RecipeIngredient);
+				await unitOfWork.RecipeRepository.AddRecipeIngredientAsync(mappedRecipeIngredient, cancellationToken);
+				return mapper.Map<RecipeIngredientDto>(mappedRecipeIngredient);
 			}
-
-			return request.RecipeIngredient;
 		}
 	    catch (Exception ex)
 	    {

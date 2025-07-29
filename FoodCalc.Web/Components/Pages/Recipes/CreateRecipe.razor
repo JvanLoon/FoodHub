@@ -1,6 +1,6 @@
 ﻿@page "/recipes/create"
 @using FoodCalc.Web.Components.Services
-@using FoodHub.Persistence.Entities
+@using FoodHub.DTOs
 @inject RecipeService RecipeService
 @inject NavigationManager NavigationManager
 @inject ILogger<CreateRecipe> Logger
@@ -29,7 +29,7 @@
 }
 
 @code {
-    private Recipe recipe = new();
+    private CreateRecipeDto recipe = new();
     private bool showMessage = false;
     private bool isError = false;
     private string message = string.Empty;

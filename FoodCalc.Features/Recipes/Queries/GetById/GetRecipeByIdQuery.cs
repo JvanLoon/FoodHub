@@ -1,6 +1,6 @@
 ﻿using MediatR;
-using FoodHub.Persistence.Entities;
+using FoodHub.DTOs;
 using ErrorOr;
 
 namespace FoodCalc.Features.Recipes.Queries.GetById;
-public record GetRecipeByIdQuery(Guid Id) : IRequest<ErrorOr<Recipe?>>;
+public record GetRecipeByIdQuery(Guid Id) : IRequest<ErrorOr<RecipeDto?>>;

@@ -5,7 +5,7 @@ using FoodCalc.Features.Ingredients.Commands.DeleteIngredientFromRecipe;
 using FoodCalc.Features.Ingredients.Commands.UpdateIngredient;
 using FoodCalc.Features.Recipes.Commands.AddIngredientToRecipe;
 
-using FoodHub.Persistence.Entities;
+using FoodHub.DTOs;
 
 using MediatR;
 
@@ -17,7 +17,7 @@ namespace FoodCalc.ApiService.Controller;
 public class IngredientController(IMediator mediator) : ControllerBase
 {
 	[HttpGet]
-	public async Task<ActionResult<IEnumerable<Recipe>>> GetAllIngredients()
+	public async Task<ActionResult<IEnumerable<IngredientDto>>> GetAllIngredients()
 	{
 		var result = await mediator.Send(new GetAllIngredientsQuery());
 
@@ -37,7 +37,7 @@ public class IngredientController(IMediator mediator) : ControllerBase
 	//}
 
 	[HttpPost]
-	public async Task<IActionResult> AddIngredient([FromBody]Ingredient ingredient)
+	public async Task<IActionResult> AddIngredient([FromBody]CreateIngredientDto ingredient)
 	{
 		if (string.IsNullOrEmpty(ingredient.Name))
 		{
@@ -62,7 +62,7 @@ public class IngredientController(IMediator mediator) : ControllerBase
 	}
 
 	[HttpPut]
-	public async Task<IActionResult> UpdateIngredient([FromBody] Ingredient ingredient)
+	public async Task<IActionResult> UpdateIngredient([FromBody] UpdateIngredientDto ingredient)
 	{
 		var result = await mediator.Send(new UpdateIngredientCommand(ingredient));
 

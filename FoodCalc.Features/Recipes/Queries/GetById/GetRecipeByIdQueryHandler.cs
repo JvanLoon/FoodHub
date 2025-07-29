@@ -1,5 +1,7 @@
 ﻿using ErrorOr;
+using AutoMapper;
 
+using FoodHub.DTOs;
 using FoodHub.Persistence.Entities;
 using FoodHub.Persistence.Repositories.Interface;
 
@@ -8,9 +10,9 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Features.Recipes.Queries.GetById;
-public class GetRecipeByIdQueryHandler(IRecipeRepository recipeRepository, ILogger<GetRecipeByIdQueryHandler> logger) : IRequestHandler<GetRecipeByIdQuery, ErrorOr<Recipe?>>
+public class GetRecipeByIdQueryHandler(IRecipeRepository recipeRepository, IMapper mapper, ILogger<GetRecipeByIdQueryHandler> logger) : IRequestHandler<GetRecipeByIdQuery, ErrorOr<RecipeDto?>>
 {
-	public async Task<ErrorOr<Recipe?>> Handle(GetRecipeByIdQuery request, CancellationToken cancellationToken)
+	public async Task<ErrorOr<RecipeDto?>> Handle(GetRecipeByIdQuery request, CancellationToken cancellationToken)
 	{
 		try
 		{
@@ -20,7 +22,7 @@ public class GetRecipeByIdQueryHandler(IRecipeRepository recipeRepository, ILogg
 			{
 				return Error.Failure("Recipe not found");
 			}
-			return recipe;
+			return mapper.Map<RecipeDto>(recipe);
 		}
 		catch (Exception ex)
 		{

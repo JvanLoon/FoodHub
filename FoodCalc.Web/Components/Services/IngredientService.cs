@@ -1,4 +1,4 @@
-﻿using FoodHub.Persistence.Entities;
+﻿using FoodHub.DTOs;
 
 using Microsoft.AspNetCore.Components;
 
@@ -8,14 +8,14 @@ namespace FoodCalc.Web.Components.Services
 	{
 		public NavigationManager navigationManager { get; set; } = navigationManager;
 
-		public async Task<List<Ingredient>> GetAllIngredientsAsync()
+		public async Task<List<IngredientDto>> GetAllIngredientsAsync()
 		{
 			var response = await httpClient.GetAsync("api/ingredient");
 			response.EnsureSuccessStatusCode();
-			return await response.Content.ReadFromJsonAsync<List<Ingredient>>() ?? new List<Ingredient>();
+			return await response.Content.ReadFromJsonAsync<List<IngredientDto>>() ?? new List<IngredientDto>();
 		}
 
-		public async Task<HttpResponseMessage> UpdateIngredient(Ingredient ingredient)
+		public async Task<HttpResponseMessage> UpdateIngredient(UpdateIngredientDto ingredient)
 		{
 			var response = await httpClient.PutAsJsonAsync("api/ingredient", ingredient);
 			response.EnsureSuccessStatusCode();
@@ -29,7 +29,7 @@ namespace FoodCalc.Web.Components.Services
 			return await response.Content.ReadFromJsonAsync<bool>();
 		}
 
-		public async Task<HttpResponseMessage> AddIngredientAsync(Ingredient ingredient)
+		public async Task<HttpResponseMessage> AddIngredientAsync(CreateIngredientDto ingredient)
 		{
 			var response = await httpClient.PostAsJsonAsync("api/ingredient", ingredient);
 			response.EnsureSuccessStatusCode();

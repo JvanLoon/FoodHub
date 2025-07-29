@@ -1,4 +1,5 @@
 using FoodCalc.Api.Extensions;
+using FoodCalc.Features.Mapping;
 
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +16,9 @@ builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Add AutoMapper
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 builder.Services.Configure<JsonOptions>(options =>
 {

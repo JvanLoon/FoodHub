@@ -1,7 +1,7 @@
 ﻿@page "/ingredients"
 
 @using FoodCalc.Web.Components.Services
-@using FoodHub.Persistence.Entities
+@using FoodHub.DTOs
 @inject IngredientService IngredientService
 
 <h3>Ingredients</h3>
@@ -52,7 +52,7 @@ else
 }
 
 @code {
-    private List<Ingredient> ingredients;
+    private List<IngredientDto> ingredients;
 
     private bool showMessage = false;
     private bool IsError = false;
@@ -63,12 +63,18 @@ else
         ingredients = await IngredientService.GetAllIngredientsAsync();
     }
 
-    private async Task OnCheckboxChanged(Ingredient ingredient, ChangeEventArgs e)
+    private async Task OnCheckboxChanged(IngredientDto ingredient, ChangeEventArgs e)
     {
         ingredient.ShouldBeAddedToShoppingCart = (bool)e.Value!;
 
         // Save the change to the server
-        await IngredientService.UpdateIngredient(ingredient);
+        var updateDto = new UpdateIngredientDto 
+        { 
+            Id = ingredient.Id, 
+            Name = ingredient.Name, 
+            ShouldBeAddedToShoppingCart = ingredient.ShouldBeAddedToShoppingCart 
+        };
+        await IngredientService.UpdateIngredient(updateDto);
 
         // Show a message indicating success
         ShowMessage("Ingredient updated successfully!", false);

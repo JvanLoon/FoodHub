@@ -1,5 +1,5 @@
 ﻿@using FoodCalc.Web.Components.Services
-@using FoodHub.Persistence.Entities
+@using FoodHub.DTOs
 
 @page "/"
 
@@ -20,7 +20,7 @@
 
 <div class="container-fluid ps-3">
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-        @foreach (Recipe recipe in Recipes)
+        @foreach (RecipeDto recipe in Recipes)
         {
             <div class="col d-flex card-equal-width p-1" @key="recipe.Id">
                 <div class="card h-100 w-100 shadow-sm">
@@ -41,7 +41,7 @@
                         <ul class="list-unstyled mb-0">
                             @if (recipe.RecipeIngredient != null)
                             {
-                                foreach (RecipeIngredient ingredient in recipe.RecipeIngredient)
+                                foreach (RecipeIngredientDto ingredient in recipe.RecipeIngredient)
                                 {
                                     <li class="d-flex justify-content-between align-items-center">
                                         <span>@ingredient.Ingredient.Name</span>
@@ -70,9 +70,9 @@
 
 
 @code {
-    List<Recipe> Recipes = new();
+    List<RecipeDto> Recipes = new();
     private HashSet<Guid> SelectedRecipeIds = new();
-    private List<RecipeIngredient> AggregatedIngredients = new();
+    private List<RecipeIngredientDto> AggregatedIngredients = new();
 
     private bool showMessage = false;
     private bool IsError = false;
@@ -114,7 +114,7 @@
 
     private void AggregateIngredients()
     {
-        var ingredientDict = new Dictionary<(Guid IngredientId, IngredientAmountType AmountType), RecipeIngredient>();
+        var ingredientDict = new Dictionary<(Guid IngredientId, IngredientAmountTypeDto AmountType), RecipeIngredientDto>();
 
         foreach (var recipe in Recipes.Where(r => SelectedRecipeIds.Contains(r.Id)))
         {
@@ -132,7 +132,7 @@
                     else
                     {
                         // Clone to avoid mutating original
-                        ingredientDict[key] = new RecipeIngredient
+                        ingredientDict[key] = new RecipeIngredientDto
                         {
                             Ingredient = ri.Ingredient,
                             IngredientId = ri.IngredientId,

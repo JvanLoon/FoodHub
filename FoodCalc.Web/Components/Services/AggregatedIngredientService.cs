@@ -1,8 +1,8 @@
-﻿using FoodHub.Persistence.Entities;
+﻿using FoodHub.DTOs;
 
 namespace FoodCalc.Web.Components.Services;
 
 public class AggregatedIngredientService
 {
-	public List<RecipeIngredient> AggregatedIngredients { get; set; } = new();
+	public List<RecipeIngredientDto> AggregatedIngredients { get; set; } = new();
 }
