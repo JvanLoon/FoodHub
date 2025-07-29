@@ -122,7 +122,7 @@
 
             foreach (var ri in recipe.RecipeIngredient)
             {
-                if (ri.Ingredient.ShouldBeAddedToShoppingCart)
+                if (ri.Ingredient!.ShouldBeAddedToShoppingCart)
                 {
                     var key = (ri.IngredientId, ri.IngredientAmount);
                     if (ingredientDict.TryGetValue(key, out var existing))
@@ -144,7 +144,7 @@
             }
         }
 
-        AggregatedIngredients = ingredientDict.Values.ToList();
+        AggregatedIngredients = ingredientDict.Values.OrderBy(i => i.Ingredient!.Name).ToList();
     }
 
     private void EditRecipe(Guid recipeId)
