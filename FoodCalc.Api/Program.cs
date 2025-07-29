@@ -1,4 +1,4 @@
-using FoodCalc.Api.Extentions;
+using FoodCalc.Api.Extensions;
 
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;

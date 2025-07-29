@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace FoodCalc.Api.Extentions;
+namespace FoodCalc.Api.Extensions;
 
 public class DateTimeConverter : JsonConverter<DateTime>
 {
