@@ -16,7 +16,8 @@ public class GetAllRecipesQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, I
 		try
 		{
 			var recipes = await unitOfWork.RecipeRepository.GetAllAsync(cancellationToken);
-			return mapper.Map<List<RecipeDto>>(recipes);
+
+			return mapper.Map<List<RecipeDto>>(recipes.OrderBy(r => r.Name));
 		}
 		catch (Exception ex)
 		{

@@ -12,7 +12,7 @@ namespace FoodCalc.Web.Components.Services
 		{
 			var response = await httpClient.GetAsync("api/ingredient");
 			response.EnsureSuccessStatusCode();
-			return await response.Content.ReadFromJsonAsync<List<IngredientDto>>() ?? new List<IngredientDto>();
+			return await response.Content.ReadFromJsonAsync<List<IngredientDto>>() ?? [];
 		}
 
 		public async Task<HttpResponseMessage> UpdateIngredient(UpdateIngredientDto ingredient)

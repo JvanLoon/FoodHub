@@ -15,7 +15,7 @@ public class GetAllIngredientsQueryHandler(IUnitOfWork unitOfWork, IMapper mappe
 		try
 		{
 			var ingredients = await unitOfWork.IngredientRepository.GetAllAsync(cancellationToken);
-			return mapper.Map<List<IngredientDto>>(ingredients);
+			return mapper.Map<List<IngredientDto>>(ingredients.OrderBy(i => i.Name));
 		}
 		catch (Exception ex)
 		{

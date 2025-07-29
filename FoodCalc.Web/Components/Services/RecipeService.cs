@@ -15,7 +15,7 @@ namespace FoodCalc.Web.Components.Services
         {
             var response = await httpClient.GetAsync("api/recipe");
             response.EnsureSuccessStatusCode();
-            return await response.Content.ReadFromJsonAsync<List<RecipeDto>>() ?? new List<RecipeDto>();
+			return await response.Content.ReadFromJsonAsync<List<RecipeDto>>() ?? [];
         }
 
         public async Task<RecipeDto?> GetRecipeByIdAsync(Guid recipeId)
