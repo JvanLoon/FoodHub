@@ -1,74 +1,145 @@
-# FoodCalcHub
+﻿# 🍽️ FoodHub
 
-## Overview
+**A comprehensive recipe and ingredient management system built with .NET 8 and Blazor Server**
 
-FoodCalcHub is a web application designed to help users manage recipes and calculate ingredient quantities efficiently. The app allows users to create, edit, and aggregate recipes, making it easier to plan meals and manage shopping lists.
+FoodHub is a modern web application that helps you manage recipes, track ingredients, and generate shopping lists. Whether you're a home cook or managing a kitchen, FoodHub makes meal planning and ingredient management effortless.
 
-## Technologies Used
+## ✨ Features
 
-- **.NET 8**
-- **Blazor** (WebAssembly)
-- **Entity Framework Core**
-- **ASP.NET Core Web API**
+- 📝 **Recipe Management**: Create, edit, and organize your favorite recipes
+- 🥘 **Ingredient Management**: Manage ingredients with quantities and measurement units
+- 🛒 **Shopping List Generation**: Automatically generate shopping lists from selected recipes
+- 📊 **Ingredient Aggregation**: Combine ingredients across multiple recipes to avoid duplicates
+- 🌐 **Modern Web Interface**: Responsive Blazor Server UI with real-time updates
+- 🔄 **API**: Clean API architecture for integration possibilities
 
-## Getting Started
+## 🛠️ Technology Stack
+
+- **Backend**: .NET 8, ASP.NET Core Web API
+- **Frontend**: Blazor Server, Bootstrap 5
+- **Database**: SQL Server with Entity Framework Core
+- **Architecture**: Clean Architecture with CQRS pattern using MediatR
+- **ORM**: Entity Framework Core with Code-First migrations
+- **Dependency Injection**: Built-in .NET DI container
+- **Mapping**: AutoMapper for object-to-object mapping
+
+## 🚀 Quick Start
 
 ### Prerequisites
 
 - [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
-- [Visual Studio 2022](https://visualstudio.microsoft.com/vs/)
-- [EF Core CLI tools](https://learn.microsoft.com/ef/core/cli/dotnet)  
-  Install with: ```dotnet tool install --global dotnet-ef```
+- [SQL Server](https://www.microsoft.com/en-us/sql-server/sql-server-downloads) or [SQL Server Express](https://www.microsoft.com/en-us/sql-server/sql-server-editions-express)
 
-### Building and Running the Application
+### Getting Started
 
-use Visual Studio to start both projects
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/JvanLoon/FoodHub.git
+   cd FoodHub
+   ```
 
-Alternatively, you can:
+2. **Restore dependencies**
+   ```bash
+   dotnet restore
+   ```
 
-1. Restore dependencies:
-```dotnet restore```
-   
-2. Build the solution:
-```dotnet build```
+3. **Update connection string**
+   Update the connection string in `FoodCalc.Api/appsettings.json` to point to your SQL Server instance.
 
-3. Run the application using VS
+4. **Run database migrations**
+   ```bash
+   dotnet ef database update --project FoodHub.Persistence --startup-project FoodCalc.Api
+   ```
 
-## Database Migrations
+5. **Start the application**
+   ```bash
+   dotnet run --project FoodHub.AppHost
+   ```
 
-Entity Framework Core is used for database migrations. 
+6. **Access the application**
+   - Web Application: The URL will be displayed in the console (typically https://localhost:7xxx)
+   - API Documentation: Available at the API's swagger endpoint (typically https://localhost:7426/swagger)
 
-**Before running the application for the first time, you must apply the migrations to create and update the database schema.**
-
-To do this, open the Package Manager Console and run:
-
-
-- **Add a new migration:**
-
-```Add-Migration -Project FoodHub.Persistence -StartupProject FoodCalc.Api -Name <MigrationName>```
-
-- **Remove the latest migration:**
-
-```Remove-Migration -Project FoodHub.Persistence -StartupProject FoodCalc.Api```
-
-- **Update the database to a specific migration:**
-
-```Update-Database -Context ApplicationDbContext -Project FoodHub.Persistence -StartupProject FoodCalc.Api```
-
-To revert a migration, use the following command:
-
-```Update-Database -Context ApplicationDbContext -Project FoodHub.Persistence -StartupProject FoodCalc.Api -Migration <MigrationName>```
-
-> **Note:** Always ensure your database is up to date by running the update command above before starting the application.
+## 📖 Usage Guide
 
 
+### Generating Shopping Lists
+
+1. **Select Recipes**
+   - On the home page, check the boxes for recipes you want to cook
+   - Click "Get Ingredients from Selected Recipes"
+
+2. **Review Aggregated Ingredients**
+   - The system automatically combines similar ingredients
+   - Review quantities and adjust as needed
+   - Use the generated list for shopping
+
+## 🔧 Development
+
+### Database Migrations
+
+```bash
+# Add a new migration
+dotnet ef migrations add <MigrationName> --project FoodHub.Persistence --startup-project FoodCalc.Api
+
+# Apply migrations
+dotnet ef database update --project FoodHub.Persistence --startup-project FoodCalc.Api
+
+# Remove last migration
+dotnet ef migrations remove --project FoodHub.Persistence --startup-project FoodCalc.Api
+
+# Revert to specific migration
+dotnet ef database update --project FoodHub.Persistence --startup-project FoodCalc.Api --migration <MigrationName>
+```
+
+OR
+
+```bash
+# Add a new migration
+Add-Migration -Project FoodHub.Persistence -StartupProject FoodCalc.Api -Name <MigrationName>
+
+# Apply migrations
+Update-Database -Context ApplicationDbContext -Project FoodHub.Persistence -StartupProject FoodCalc.Api
+
+# Remove last migration
+Remove-Migration -Project FoodHub.Persistence -StartupProject FoodCalc.Api
+
+# Revert to specific migration
+Update-Database -Context ApplicationDbContext -Project FoodHub.Persistence -StartupProject FoodCalc.Api -Migration <MigrationName>
+```
+
+### API Documentation
+
+When running the application, Swagger documentation is available at:
+- Local development: `https://localhost:7426/swagger` (or the port shown in your console)
+
+## 🤝 Contributing
+
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 
-## Purpose and Features
+## 🆘 Support
 
-FoodCalcHub is built to streamline recipe management and ingredient calculation. Key features include:
+If you encounter any issues or have questions:
 
-- Creating and editing recipes
-- Managing ingredients
-- Generating shopping lists based on selected recipes
-- More to come!
+1. Check the [Issues](https://github.com/JvanLoon/FoodHub/issues) page
+2. Create a new issue if your problem isn't already reported
+3. Provide detailed information about your environment and the issue
+
+## 🔮 Roadmap
+
+- [ ] User authentication and authorization
+- [ ] Recipe categories and tags
+- [ ] Nutritional information tracking
+- [ ] Recipe sharing and community features
+- [ ] Mobile app (Xamarin/MAUI)
+- [ ] Recipe import from popular cooking websites
+- [ ] Meal planning calendar
+- [ ] Inventory management
+
+---
+
+**Made with ❤️ by the FoodHub "team"**
