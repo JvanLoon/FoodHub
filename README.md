@@ -20,19 +20,19 @@ FoodCalcHub is a web application designed to help users manage recipes and calcu
 
 ### Building and Running the Application
 
+use Visual Studio to start both projects, Alternatively, you can:
+
 1. Clone the repository:
-git clone <repository-url> cd <repository-folder>
+```git clone <repository-url> cd <repository-folder>```
 
 2. Restore dependencies:
-dotnet restore
+```dotnet restore```
    
 3. Build the solution:
-dotnet build
+```dotnet build```
 
 4. Run the API and Blazor projects:
-dotnet run --project FoodCalc.Api dotnet run --project FoodCalc.Web
-
-Alternatively, you can use Visual Studio to start both projects.
+```dotnet run --project FoodCalc.Api dotnet run --project FoodCalc.Web```
 
 ## Database Migrations
 
