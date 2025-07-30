@@ -69,7 +69,5 @@ FoodCalcHub is built to streamline recipe management and ingredient calculation.
 
 - Creating and editing recipes
 - Managing ingredients
-- Aggregating ingredients across multiple recipes
 - Generating shopping lists based on selected recipes
-
-This application is ideal for home cooks, meal planners, and anyone looking to organize their cooking and shopping efficiently.
+- More to come!
