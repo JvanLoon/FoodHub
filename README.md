@@ -36,16 +36,27 @@ Alternatively, you can:
 
 ## Database Migrations
 
-Entity Framework Core is used for database migrations. Use the following commands in the Package Manager Console or terminal:
+Entity Framework Core is used for database migrations. 
+
+**Before running the application for the first time, you must apply the migrations to create and update the database schema.**
+
+To do this, open the Package Manager Console and run:
+
 ```
+- **Add a new migration:**
 Add-Migration -Project FoodHub.Persistence -StartupProject FoodCalc.Api -Name <MigrationName>
 
+- **Remove the latest migration:**
 Remove-Migration -Project FoodHub.Persistence -StartupProject FoodCalc.Api
 
+- **Update the database to a specific migration:**
 Update-Database -Context ApplicationDbContext -Project FoodHub.Persistence -StartupProject FoodCalc.Api
 
-To apply a specific migration, use the following command:
+To revert a migration, use the following command:
 Update-Database -Context ApplicationDbContext -Project FoodHub.Persistence -StartupProject FoodCalc.Api -Migration <MigrationName>
+
+> **Note:** Always ensure your database is up to date by running the update command above before starting the application.
+
 ```
 
 
