@@ -67,4 +67,3 @@ Jumbo: https://www.jumbo.com/api/graphql
 	
 	Beheer paneel om de stappen aan te maken en de editen
 		eventueel een rol hiervoor
-		
