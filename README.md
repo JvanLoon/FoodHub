@@ -1,8 +1,10 @@
 ﻿# 🍽️ FoodHub
 
-**A comprehensive recipe and ingredient management system built with .NET 8 and Blazor Server**
+**A recipe and ingredient management system built with .NET 8 and Blazor Server**
 
 FoodHub is a modern web application that helps you manage recipes, track ingredients, and generate shopping lists. Whether you're a home cook or managing a kitchen, FoodHub makes meal planning and ingredient management effortless.
+
+FoodHub will become more than just a recipe app. It will evolve into a comprehensive food management system, integrating features like meal planning, inventory tracking, and nutritional analysis. The goal is to create a one-stop solution for all your culinary needs, making it easier to cook, shop, and eat healthily.
 
 ## ✨ Features
 
@@ -59,20 +61,6 @@ FoodHub is a modern web application that helps you manage recipes, track ingredi
 6. **Access the application**
    - Web Application: The URL will be displayed in the console (typically https://localhost:7xxx)
    - API Documentation: Available at the API's swagger endpoint (typically https://localhost:7426/swagger)
-
-## 📖 Usage Guide
-
-
-### Generating Shopping Lists
-
-1. **Select Recipes**
-   - On the home page, check the boxes for recipes you want to cook
-   - Click "Get Ingredients from Selected Recipes"
-
-2. **Review Aggregated Ingredients**
-   - The system automatically combines similar ingredients
-   - Review quantities and adjust as needed
-   - Use the generated list for shopping
 
 ## 🔧 Development
 
