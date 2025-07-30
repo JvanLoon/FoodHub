@@ -17,22 +17,22 @@ FoodCalcHub is a web application designed to help users manage recipes and calcu
 
 - [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
 - [Visual Studio 2022](https://visualstudio.microsoft.com/vs/)
+- [EF Core CLI tools](https://learn.microsoft.com/ef/core/cli/dotnet)  
+  Install with: ```dotnet tool install --global dotnet-ef```
 
 ### Building and Running the Application
 
-use Visual Studio to start both projects, Alternatively, you can:
+use Visual Studio to start both projects
 
-1. Clone the repository:
-```git clone <repository-url> cd <repository-folder>```
+Alternatively, you can:
 
-2. Restore dependencies:
+1. Restore dependencies:
 ```dotnet restore```
    
-3. Build the solution:
+2. Build the solution:
 ```dotnet build```
 
-4. Run the API and Blazor projects:
-```dotnet run --project FoodCalc.Api dotnet run --project FoodCalc.Web```
+3. Run the application using VS
 
 ## Database Migrations
 
