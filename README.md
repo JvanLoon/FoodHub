@@ -44,15 +44,15 @@ To do this, open the Package Manager Console and run:
 
 
 - **Add a new migration:**
-- 
+
 ```Add-Migration -Project FoodHub.Persistence -StartupProject FoodCalc.Api -Name <MigrationName>```
 
 - **Remove the latest migration:**
-- 
+
 ```Remove-Migration -Project FoodHub.Persistence -StartupProject FoodCalc.Api```
 
 - **Update the database to a specific migration:**
-- 
+
 ```Update-Database -Context ApplicationDbContext -Project FoodHub.Persistence -StartupProject FoodCalc.Api```
 
 To revert a migration, use the following command:
