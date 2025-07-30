@@ -56,6 +56,7 @@ To do this, open the Package Manager Console and run:
 ```Update-Database -Context ApplicationDbContext -Project FoodHub.Persistence -StartupProject FoodCalc.Api```
 
 To revert a migration, use the following command:
+
 ```Update-Database -Context ApplicationDbContext -Project FoodHub.Persistence -StartupProject FoodCalc.Api -Migration <MigrationName>```
 
 > **Note:** Always ensure your database is up to date by running the update command above before starting the application.
