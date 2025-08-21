@@ -1,6 +1,7 @@
 using FoodCalc.Web.Components;
 using FoodCalc.Web.Components.Services;
 
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.Json;
 
 public class Program
@@ -23,6 +24,9 @@ public class Program
 		var apiBaseAddress = builder.Configuration["API:BaseAddress"] ?? "https://localhost:7426";
 		builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(apiBaseAddress) });
 
+		builder.Services.AddDataProtection()
+		.PersistKeysToFileSystem(new DirectoryInfo(@"/root/.aspnet/DataProtection-Keys"))
+		.SetApplicationName("FoodHub");
 
 		builder.Services.AddScoped<RecipeService>();
 		builder.Services.AddScoped<IngredientService>();
