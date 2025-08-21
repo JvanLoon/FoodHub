@@ -1,0 +1,66 @@
+services:
+  db:
+   image: mcr.microsoft.com/mssql/server:2022-latest
+   environment:
+    SA_PASSWORD: "LY#DF3*8cjadGPK41q^gNg^byj@kjb"
+    ACCEPT_EULA: "Y"
+   ports:
+    - "1433:1433"
+   volumes:
+    - mssql-data:/var/opt/mssql
+   healthcheck:
+    test: ["CMD-SHELL", "sqlcmd -S localhost -U sa -P 'LY#DF3*8cjadGPK41q^gNg^byj@kjb' -Q 'select 1'"]
+    interval: 10s
+    timeout: 5s
+    retries: 10
+
+  db-init:
+    image: mcr.microsoft.com/mssql-tools
+    depends_on:
+      db:
+        condition: service_completed_successfully
+    volumes:
+      - ./init-db.sql:/init-db.sql
+    entrypoint:
+      - /bin/bash
+      - -c
+      - |
+        echo "Waiting for DB to be ready..."
+        until /opt/mssql-tools/bin/sqlcmd -S db -U sa -P 'LY#DF3*8cjadGPK41q^gNg^byj@kjb' -Q "SELECT 1" ; do
+          sleep 5
+        done
+        echo "Running init-db.sql..."
+        /opt/mssql-tools/bin/sqlcmd -S db -U sa -P 'LY#DF3*8cjadGPK41q^gNg^byj@kjb' -i /init-db.sql
+  api:
+    build:
+      context: .
+      dockerfile: FoodCalc.Api/DockerFile
+    volumes:
+      - ./keys:/root/.aspnet/DataProtection-Keys
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__Default=Server=db;Database=FoodCalc;User Id=foodhubuser;Password=aj7a!unEe#Ms*BqTE7WJ2a4tX1$^y7;TrustServerCertificate=True;
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    ports:
+      - "5001:443"
+
+  web:
+    build:
+      context: .
+      dockerfile: FoodCalc.Web/DockerFile
+    volumes:
+      - ./keys:/root/.aspnet/DataProtection-Keys
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - API__BaseAddress=http://api:443
+      - ConnectionStrings__Default=Server=db;Database=FoodCalc;User Id=foodhubuser;Password=aj7a!unEe#Ms*BqTE7WJ2a4tX1$^y7;TrustServerCertificate=True;
+      - DataProtection__PersistKeysToFileSystem=/keys
+    depends_on:
+      - api
+    ports:
+      - "5000:443"
+
+volumes:
+  mssql-data:

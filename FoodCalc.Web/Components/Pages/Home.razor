@@ -28,10 +28,10 @@
                     <div class="card-body">
                         <div class="form-check mb-2">
                             <input class="form-check-input"
-                            type="checkbox"
-                            id="select-@recipe.Id"
-                            @onchange="(e) => ToggleRecipeSelection(recipe.Id, e.Value as bool?)"
-                            checked="@SelectedRecipeIds.Contains(recipe.Id)" />
+                                   type="checkbox"
+                                   id="select-@recipe.Id"
+                                   @onchange="(e) => ToggleRecipeSelection(recipe.Id, e?.Value?.ToString() == true.ToString())"
+                                   checked="@SelectedRecipeIds.Contains(recipe.Id)" />
                             <label class="form-check-label" for="select-@recipe.Id">
                                 Select
                             </label>
@@ -43,10 +43,13 @@
                             {
                                 foreach (RecipeIngredientDto ingredient in recipe.RecipeIngredient)
                                 {
-                                    <li class="d-flex justify-content-between align-items-center">
-                                        <span>@ingredient.Ingredient.Name</span>
-                                        <span>@ingredient.Amount.ToFormattedString() @ingredient.IngredientAmount.ToString()</span>
-                                    </li>
+                                    if (ingredient.Ingredient != null)
+                                    {
+                                        <li class="d-flex justify-content-between align-items-center">
+                                            <span>@ingredient.Ingredient.Name</span>
+                                            <span>@ingredient.Amount.ToFormattedString() @ingredient.IngredientAmount.ToString()</span>
+                                        </li>
+                                    }
                                 }
                             }
                         </ul>
@@ -87,6 +90,7 @@
         }
         catch (Exception ex)
         {
+            Recipes = [];
             _message = ex.Message;
             StateHasChanged();
             throw ex;
