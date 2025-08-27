@@ -7,8 +7,31 @@
 
     <main>
         <div class="top-row px-4">
-            <a href="" target="_blank">About</a>
+            @if (userEmail != null)
+            {
+                <span>@userEmail</span>
+            }
         </div>
+</div>
+
+@code {
+    private string userEmail;
+    protected override async Task OnInitializedAsync()
+    {
+        // Example: get user email from authentication state
+        var authStateProvider = this.GetAuthenticationStateProvider();
+        var authState = await authStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (user.Identity.IsAuthenticated)
+        {
+            userEmail = user.Identity.Name;
+        }
+    }
+    private AuthenticationStateProvider GetAuthenticationStateProvider()
+    {
+        return (AuthenticationStateProvider)Context.Services.GetService(typeof(AuthenticationStateProvider));
+    }
+}
 
         <article class="content px-4">
             @Body
