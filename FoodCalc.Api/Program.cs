@@ -1,7 +1,10 @@
 using FoodCalc.Api.Extensions;
 using FoodCalc.Features.Mapping;
 
+using FoodHub.Persistence.Entities;
+
 using Microsoft.AspNetCore.Http.Json;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 public class Program
@@ -32,6 +35,10 @@ public class Program
 			options.SerializerOptions.Converters.Add(new DateTimeConverter());
 			//options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 		});
+
+		builder.Services.AddIdentity<User, IdentityRole>()
+			.AddEntityFrameworkStores<ApplicationDbContext>()
+			.AddDefaultTokenProviders();
 
 		// Add services to the container.
 		builder.Services.AddDbContext<ApplicationDbContext>(options =>

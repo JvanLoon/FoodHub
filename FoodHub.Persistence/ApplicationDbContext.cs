@@ -1,8 +1,9 @@
 using FoodHub.Persistence.Entities;
-using Microsoft.EntityFrameworkCore;
-
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using FoodHub.Persistence.Entities;
+
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 public class ApplicationDbContext : IdentityDbContext<User>
 {
 	public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options){}
@@ -42,5 +43,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
 		modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+		base.OnModelCreating(modelBuilder);
+		modelBuilder.Entity<IdentityUserLogin<string>>().HasKey(login => new { login.LoginProvider, login.ProviderKey });
 	}
 }
