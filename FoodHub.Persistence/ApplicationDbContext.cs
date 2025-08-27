@@ -1,9 +1,11 @@
 using FoodHub.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
 
-public class ApplicationDbContext : DbContext
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using FoodHub.Persistence.Entities;
+public class ApplicationDbContext : IdentityDbContext<User>
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options){}
+	public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options){}
 
 	// Define your DbSets here
 	public DbSet<Recipe> Recipes { get; set; }
