@@ -1,0 +1,46 @@
+@page "/login"
+@using System.ComponentModel.DataAnnotations
+@inject NavigationManager Navigation
+@inject HttpClient Http
+
+<h3>Login</h3>
+
+<EditForm Model="loginModel" OnValidSubmit="HandleLogin">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div>
+        <label>Username:</label>
+        <InputText @bind-Value="loginModel.UserName" />
+    </div>
+    <div>
+        <label>Password:</label>
+        <InputText @bind-Value="loginModel.Password" type="password" />
+    </div>
+    <button type="submit">Login</button>
+</EditForm>
+
+@code {
+    private LoginModel loginModel = new();
+
+    private async Task HandleLogin()
+    {
+        var response = await Http.PostAsJsonAsync("api/auth/login", loginModel);
+        if (response.IsSuccessStatusCode)
+        {
+            // Redirect or set auth state
+            Navigation.NavigateTo("/");
+        }
+        else
+        {
+            // Show error
+        }
+    }
+
+    public class LoginModel
+    {
+        [Required]
+        public string UserName { get; set; }
+        [Required]
+        public string Password { get; set; }
+    }
+}

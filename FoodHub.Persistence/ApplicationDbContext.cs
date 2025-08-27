@@ -5,10 +5,11 @@ public class ApplicationDbContext : DbContext
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options){}
 
-    // Define your DbSets here
-    public DbSet<Recipe> Recipes { get; set; }
-    public DbSet<RecipeIngredient> RecipeIngredients { get; set; }
+	// Define your DbSets here
+	public DbSet<Recipe> Recipes { get; set; }
+	public DbSet<RecipeIngredient> RecipeIngredients { get; set; }
 	public DbSet<Ingredient> Ingredients { get; set; }
+	public DbSet<User> Users { get; set; }
 
 	public override int SaveChanges()
 	{
