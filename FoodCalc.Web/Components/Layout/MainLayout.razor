@@ -9,7 +9,7 @@
 
     <main>
         <div class="top-row px-4">
-            @if (userEmail == null) 
+            @if (userEmail == null)
             {
                 <a href="/login">Login</a>
             }
@@ -31,16 +31,15 @@
 </div>
 
 @code {
-    private string userEmail;
+    private string userEmail = null;
+
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-        if (user.Identity.IsAuthenticated)
+        if (user.Identity!.IsAuthenticated)
         {
-            userEmail = user.Identity.Name;
+            userEmail = user.Identity!.Name ?? "identity name null";
         }
     }
 }
-
-        

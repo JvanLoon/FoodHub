@@ -23,6 +23,8 @@ namespace FoodCalc.Api.Controller
 			if (!result.Succeeded)
 				return Unauthorized();
 			// TODO: Issue JWT or session
+
+			await signInManager.SignInAsync(user, isPersistent: false);
 			return Ok();
 		}
 
