@@ -6,44 +6,10 @@ using System.Security.Cryptography;
 using System.Text;
 
 namespace FoodCalc.Api.Controller
-    [HttpGet("admin/users")]
-    public async Task<IActionResult> GetUsers()
-    {
-        var users = _userManager.Users.Select(u => new { id = u.Id, email = u.Email, enabled = u.Enabled }).ToList();
-        return Ok(users);
-    }
-
-    [HttpPost("admin/enable/{id}")]
-    public async Task<IActionResult> EnableUser(string id)
-    {
-        var user = await _userManager.FindByIdAsync(id);
-        if (user == null) return NotFound();
-        user.Enabled = true;
-        await _userManager.UpdateAsync(user);
-        return Ok();
-    }
-    public class RegisterRequest
-    {
-        public string Email { get; set; }
-        public string Password { get; set; }
-    }
-
-    [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
-    {
-        var user = new User { UserName = request.Email, Email = request.Email };
-        var result = await _userManager.CreateAsync(user, request.Password);
-        if (result.Succeeded)
-        {
-            // Optionally add to role: await _userManager.AddToRoleAsync(user, "Admin");
-            return Ok();
-        }
-        return BadRequest(result.Errors);
-    }
 {
+    using Microsoft.AspNetCore.Identity;
     [ApiController]
     [Route("api/auth")]
-    using Microsoft.AspNetCore.Identity;
     public class AuthController : ControllerBase
     {
         private readonly SignInManager<User> _signInManager;
@@ -66,11 +32,47 @@ namespace FoodCalc.Api.Controller
             // TODO: Issue JWT or session
             return Ok();
         }
-    }
 
-    public class LoginRequest
-    {
-        public string Email { get; set; }
-        public string Password { get; set; }
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+        {
+            var user = new User { UserName = request.Email, Email = request.Email, Enabled = false };
+            var result = await _userManager.CreateAsync(user, request.Password);
+            if (result.Succeeded)
+            {
+                // Optionally add to role: await _userManager.AddToRoleAsync(user, "Admin");
+                return Ok();
+            }
+            return BadRequest(result.Errors);
+        }
+
+        [HttpGet("admin/users")]
+        public async Task<IActionResult> GetUsers()
+        {
+            var users = _userManager.Users.Select(u => new { id = u.Id, email = u.Email, enabled = u.Enabled }).ToList();
+            return Ok(users);
+        }
+
+        [HttpPost("admin/enable/{id}")]
+        public async Task<IActionResult> EnableUser(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null) return NotFound();
+            user.Enabled = true;
+            await _userManager.UpdateAsync(user);
+            return Ok();
+        }
+
+        public class LoginRequest
+        {
+            public string Email { get; set; }
+            public string Password { get; set; }
+        }
+
+        public class RegisterRequest
+        {
+            public string Email { get; set; }
+            public string Password { get; set; }
+        }
     }
 }
