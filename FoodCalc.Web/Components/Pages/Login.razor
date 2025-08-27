@@ -9,8 +9,8 @@
     <DataAnnotationsValidator />
     <ValidationSummary />
     <div>
-        <label>Username:</label>
-        <InputText @bind-Value="loginModel.UserName" />
+        <label>Email:</label>
+        <InputText @bind-Value="loginModel.Email" type="email" />
     </div>
     <div>
         <label>Password:</label>
@@ -27,8 +27,7 @@
         var response = await Http.PostAsJsonAsync("api/auth/login", loginModel);
         if (response.IsSuccessStatusCode)
         {
-            // Redirect or set auth state
-            Navigation.NavigateTo("/");
+            Navigation.NavigateTo("/home");
         }
         else
         {
@@ -39,7 +38,8 @@
     public class LoginModel
     {
         [Required]
-        public string UserName { get; set; }
+        [EmailAddress]
+        public string Email { get; set; }
         [Required]
         public string Password { get; set; }
     }

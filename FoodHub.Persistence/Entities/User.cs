@@ -2,14 +2,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace FoodHub.Persistence.Entities
 {
-    public class User : BaseEntity
+    using Microsoft.AspNetCore.Identity;
+    public class User : IdentityUser
     {
-        [Key]
-        public int Id { get; set; }
-        [Required]
-        public string UserName { get; set; }
-        [Required]
-        public string PasswordHash { get; set; }
-        // Add more fields as needed (Email, etc.)
+        public bool Enabled { get; set; } = false;
+        // Additional custom properties can be added here if needed
     }
 }
