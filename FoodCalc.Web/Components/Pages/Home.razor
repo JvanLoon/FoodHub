@@ -1,7 +1,4 @@
-﻿@using FoodCalc.Web.Components.Services
-@using FoodHub.DTOs
-
-@page "/"
+﻿@page "/"
 
 @inject RecipeService recipeService
 @inject NavigationManager NavigationManager
@@ -93,7 +90,7 @@
             Recipes = [];
             _message = ex.Message;
             StateHasChanged();
-            throw ex;
+            //throw ex;
         }
     }
 

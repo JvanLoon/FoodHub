@@ -1,7 +1,5 @@
 @page "/login"
-@using System.ComponentModel.DataAnnotations
-@inject NavigationManager Navigation
-@inject HttpClient Http
+@inject LoginService LoginService
 
 <h3>Login</h3>
 
@@ -35,16 +33,11 @@
 
     private async Task HandleLogin()
     {
-        var response = await Http.PostAsJsonAsync("api/auth/login", loginModel);
-        if (response.IsSuccessStatusCode)
-        {
-            Navigation.NavigateTo("/", true);
-            //Navigation.NavigateTo("/home");
-        }
-        else
+        bool success = await LoginService.Login(loginModel);
+        if (!success)
         {
             // Show error
-            await ShowMessage("Failed to login", true);
+            ShowMessage("Failed to login", true);
         }
     }
 
@@ -62,14 +55,5 @@
         _message = string.Empty;
         IsError = false;
         StateHasChanged();
-    }
-
-    public class LoginModel
-    {
-        [Required]
-        [EmailAddress]
-        public string Email { get; set; }
-        [Required]
-        public string Password { get; set; }
     }
 }

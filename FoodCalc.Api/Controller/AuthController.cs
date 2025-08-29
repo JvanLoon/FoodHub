@@ -14,6 +14,7 @@ namespace FoodCalc.Api.Controller
 	public class AuthController(SignInManager<User> signInManager, UserManager<User> userManager) : ControllerBase
 	{
 		[HttpPost("login")]
+		[AllowAnonymous]
 		public async Task<IActionResult> Login([FromBody] LoginRequest request)
 		{
 			var user = await userManager.FindByEmailAsync(request.Email);
@@ -25,6 +26,14 @@ namespace FoodCalc.Api.Controller
 			// TODO: Issue JWT or session
 
 			await signInManager.SignInAsync(user, isPersistent: false);
+			return Ok();
+		}
+
+		[HttpPost("logout")]
+		[AllowAnonymous]
+		public async Task<IActionResult> logout()
+		{
+			await signInManager.SignOutAsync();
 			return Ok();
 		}
 

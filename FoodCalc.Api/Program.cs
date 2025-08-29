@@ -13,6 +13,8 @@ public class Program
 	{
 		var builder = WebApplication.CreateBuilder(args);
 
+		var apiBaseAddress = builder.Configuration["API:BaseAddress"] ?? "https://localhost:7426";
+
 		// Add service defaults & Aspire client integrations.
 		builder.AddServiceDefaults();
 
@@ -49,6 +51,23 @@ public class Program
 
 		builder.Services.AddApplicationMediatR();
 
+		builder.Services.AddCors(options =>
+		{
+			options.AddDefaultPolicy(policy =>
+			{
+				policy.WithOrigins(apiBaseAddress) // your frontend origin
+					  .AllowAnyHeader()
+					  .AllowAnyMethod()
+					  .AllowCredentials();
+			});
+		});
+
+		builder.Services.ConfigureApplicationCookie(options =>
+		{
+			options.Cookie.SameSite = SameSiteMode.None;
+			options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // requires HTTPS
+		});
+
 		var app = builder.Build();
 
 		// Run migrations at startup
@@ -57,54 +76,6 @@ public class Program
 			var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 			db.Database.Migrate();
 		}
-
-		// Apply migrations at startup
-		//using (var scope = app.Services.CreateScope())
-		//{
-		//	var services = scope.ServiceProvider;
-		//	try
-		//	{
-		//		var dbContext = services.GetRequiredService<ApplicationDbContext>();
-		//		// Add retries to handle SQL Server startup timing
-		//		var retryCount = 0;
-		//		const int maxRetries = 5;
-
-		//		while (retryCount < maxRetries)
-		//		{
-		//			try
-		//			{
-		//				// Apply pending migrations
-		//				dbContext.Database.Migrate();
-
-		//				// Log success
-		//				var logger = services.GetRequiredService<ILogger<Program>>();
-		//				logger.LogInformation("Database migrations applied successfully");
-
-		//				// Break out of retry loop on success
-		//				break;
-		//			}
-		//			catch (Exception ex) when (retryCount < maxRetries - 1)
-		//			{
-		//				// Log the error but continue retrying
-		//				var logger = services.GetRequiredService<ILogger<Program>>();
-		//				logger.LogWarning(ex, "Error applying migrations (attempt {RetryCount}/{MaxRetries}). Retrying in 5 seconds...",
-		//					retryCount + 1, maxRetries);
-
-		//				retryCount++;
-		//				Thread.Sleep(5000); // Wait 5 seconds before retrying
-		//			}
-		//		}
-		//	}
-		//	catch (Exception ex)
-		//	{
-		//		// Log fatal error if all retries failed
-		//		var logger = services.GetRequiredService<ILogger<Program>>();
-		//		logger.LogError(ex, "Fatal error occurred while applying database migrations");
-
-		//		// Optionally, you could rethrow to prevent the application from starting
-		//		// throw;
-		//	}
-		//}
 
 		// Configure the HTTP request pipeline.
 		app.UseExceptionHandler();
@@ -123,6 +94,7 @@ public class Program
 		app.UseStaticFiles();
 		app.UseRouting();
 		app.MapControllers();
+		app.UseCors();
 
 		app.Run();
 	}

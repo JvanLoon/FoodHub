@@ -2,7 +2,6 @@
   "profiles": {
     "https": {
       "commandName": "Project",
-      "commandLineArgs": "--incognito",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
@@ -15,7 +14,6 @@
     },
     "http": {
       "commandName": "Project",
-      "commandLineArgs": "--incognito",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",

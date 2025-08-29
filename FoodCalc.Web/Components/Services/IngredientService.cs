@@ -4,10 +4,8 @@ using Microsoft.AspNetCore.Components;
 
 namespace FoodCalc.Web.Components.Services
 {
-	public class IngredientService(HttpClient httpClient, NavigationManager navigationManager)
+	public class IngredientService(HttpClient httpClient)
 	{
-		public NavigationManager navigationManager { get; set; } = navigationManager;
-
 		public async Task<List<IngredientDto>> GetAllIngredientsAsync()
 		{
 			var response = await httpClient.GetAsync("api/ingredient");

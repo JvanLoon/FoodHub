@@ -7,10 +7,8 @@ using System.Net.Http.Json;
 
 namespace FoodCalc.Web.Components.Services
 {
-    public class RecipeService(HttpClient httpClient, NavigationManager navigationManager)
+    public class RecipeService(HttpClient httpClient)
     {
-        public NavigationManager navigationManager { get; set; } = navigationManager;
-
         public async Task<List<RecipeDto>> GetAllRecipesAsync()
         {
             var response = await httpClient.GetAsync("api/recipe");

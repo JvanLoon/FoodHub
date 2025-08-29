@@ -21,24 +21,29 @@ else
             </tr>
         </thead>
         <tbody>
-            @for (int i = 0; i < ingredients.Count; i++)
+            @if (ingredients != null)
             {
-                var ingredient = ingredients[i];
-                var rowClass = i % 2 == 0 ? "table-row-even" : "table-row-odd";
-                <tr class="@rowClass">
-                    <td>@ingredient.Name</td>
-                    <td>
-                        <input type="checkbox"
-                        checked="@ingredient.ShouldBeAddedToShoppingCart"
-                        @onchange="(e) => OnCheckboxChanged(ingredient, e)" />
-                    </td>
-                    <td>
-                        <button class="btn btn-danger btn-sm"
-                        @onclick="() => DeleteIngredient(ingredient.Id)">
-                            Delete
-                        </button>
-                    </td>
-                </tr>
+                var index = 0;
+                @foreach (IngredientDto ingredient in ingredients)
+                {
+
+                    var rowClass = index % 2 == 0 ? "table-row-even" : "table-row-odd";
+                    <tr class="@rowClass">
+                        <td>@ingredient.Name</td>
+                        <td>
+                            <input type="checkbox"
+                                   checked="@ingredient.ShouldBeAddedToShoppingCart"
+                                   @onchange="(e) => OnCheckboxChanged(ingredient, e)" />
+                        </td>
+                        <td>
+                            <button class="btn btn-danger btn-sm"
+                                    @onclick="() => DeleteIngredient(ingredient.Id)">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                    index++;
+                }
             }
         </tbody>
     </table>
