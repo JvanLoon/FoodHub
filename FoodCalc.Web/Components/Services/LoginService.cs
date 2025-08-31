@@ -1,3 +1,5 @@
+using FoodCalc.Web.Components.Services.Auth;
+
 using FoodHub.DTOs;
 
 using Microsoft.AspNetCore.Components;
@@ -6,7 +8,7 @@ using System.Net.Http.Json;
 using System.Threading.Tasks;
 
 namespace FoodCalc.Web.Components.Services;
-public class LoginService
+public class LoginService//(AuthenticatedHttpClientService httpClient)
 {
     private readonly HttpClient _httpClient;
 
@@ -18,7 +20,6 @@ public class LoginService
     public async Task<HttpResponseMessage> LoginAsync(LoginDto user)
     {
 		return await _httpClient.PostAsJsonAsync("api/authentication/login", user); ;
-
 	}
 
     public async Task<bool> RegisterAsync(RegisterDto user)

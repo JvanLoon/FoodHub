@@ -1,4 +1,5 @@
-﻿@inject AuthTokenService AuthTokenService
+﻿@using FoodCalc.Web.Components.Services.Auth
+@inject AuthTokenService AuthTokenService
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -38,9 +39,6 @@
                         </NavLink>
                 </div>
             }
-            <div class="nav-item px-3">
-                <span class="nav-link">@userEmail</span>
-            </div>
         }
     </nav>
 </div>
@@ -63,6 +61,7 @@
                 var roles = await AuthTokenService.GetRolesAsync();
                 isLoggedIn = roles.Any();
                 isAdmin = roles?.Contains("Admin") == true;
+                StateHasChanged();
                 // TODO: Replace with actual role check from auth state
                 // isAdmin = await AuthService.IsUserInRoleAsync("Admin");
                 // TODO: Replace with actual login state and email from auth state

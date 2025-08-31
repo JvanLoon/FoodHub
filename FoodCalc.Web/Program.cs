@@ -2,6 +2,8 @@ using Blazored.LocalStorage;
 
 using FoodCalc.Web.Components;
 using FoodCalc.Web.Components.Services;
+using FoodCalc.Web.Components.Services.Admin;
+using FoodCalc.Web.Components.Services.Auth;
 
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.Json;
@@ -21,24 +23,31 @@ public class Program
 
 		builder.Services.AddOutputCache();
 
+		builder.Services.AddBlazoredLocalStorage();
+
 		var apiBaseAddress = builder.Configuration["API:BaseAddress"];
-		builder.Services.AddTransient<AuthTokenHandler>();
 		builder.Services.AddHttpClient("ApiClient", client =>
 		{
 			client.BaseAddress = new Uri(apiBaseAddress);
-		}).AddHttpMessageHandler<AuthTokenHandler>();
+		});
 
-		builder.Services.AddBlazoredLocalStorage();
-
-		builder.Services.AddDataProtection()
-		.PersistKeysToFileSystem(new DirectoryInfo(@"/root/.aspnet/DataProtection-Keys"))
-		.SetApplicationName("FoodHub");
+		//builder.Services.AddDataProtection()
+		//.PersistKeysToFileSystem(new DirectoryInfo(@"/root/.aspnet/DataProtection-Keys"))
+		//.SetApplicationName("FoodHub");
 
 		builder.Services.AddScoped<RecipeService>();
 		builder.Services.AddScoped<IngredientService>();
 		builder.Services.AddScoped<LoginService>();
 		builder.Services.AddScoped<AdminService>();
 		builder.Services.AddScoped<AuthTokenService>();
+
+		builder.Services.AddScoped<AuthenticatedHttpClientService>(sp =>
+		{
+			var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
+			var localStorage = sp.GetRequiredService<Blazored.LocalStorage.ILocalStorageService>();
+			var httpClient = httpClientFactory.CreateClient("ApiClient");
+			return new AuthenticatedHttpClientService(httpClient, localStorage);
+		});
 
 		builder.Services.AddSingleton<AggregatedIngredientService>();
 

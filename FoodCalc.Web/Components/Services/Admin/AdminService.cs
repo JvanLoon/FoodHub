@@ -1,24 +1,19 @@
 using Azure;
 
+using FoodCalc.Web.Components.Services.Auth;
+
 using FoodHub.DTOs;
 
 using System.Collections.Generic;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 
-namespace FoodCalc.Web.Components.Services;
-public class AdminService
+namespace FoodCalc.Web.Components.Services.Admin;
+public class AdminService(AuthenticatedHttpClientService httpClient)
 {
-    private readonly HttpClient _httpClient;
-
-    public AdminService(IHttpClientFactory httpClientFactory)
-    {
-        _httpClient = httpClientFactory.CreateClient("ApiClient");
-    }
-
     public async Task<List<UserDto>> GetUsersAsync()
     {
-		var response = await _httpClient.GetAsync("api/Admin/users");
+		var response = await httpClient.GetAsync("api/Admin/users");
 		if (!response.IsSuccessStatusCode)
 		{
 			// Optionally log or handle the error

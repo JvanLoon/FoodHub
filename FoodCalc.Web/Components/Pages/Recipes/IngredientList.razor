@@ -70,6 +70,7 @@ else
             try
             {
                 ingredients = await IngredientService.GetAllIngredientsAsync();
+                StateHasChanged();
             }
             catch (Exception ex)
             {

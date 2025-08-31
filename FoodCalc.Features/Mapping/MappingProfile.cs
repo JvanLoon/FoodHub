@@ -21,6 +21,7 @@ public class MappingProfile : Profile
         CreateMap<IngredientDto, Ingredient>();
         CreateMap<RecipeIngredientDto, RecipeIngredient>();
         CreateMap<IngredientAmountTypeDto, IngredientAmountType>();
+		CreateMap<UserDto, IdentityUser>();
 
         // Command DTOs to Entity mappings
         CreateMap<CreateRecipeDto, Recipe>()
@@ -57,5 +58,12 @@ public class MappingProfile : Profile
 			.ForMember(dest => dest.UserName, opt => opt.Ignore())
 			.ForMember(dest => dest.Email, opt => opt.Ignore())
 			.ForMember(dest => dest.ConcurrencyStamp, opt => opt.Ignore());
+
+		CreateMap<IdentityUser, UserDto>()
+			.ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+			.ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.UserName))
+			.ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+			.ForMember(dest => dest.Enabled, opt => opt.MapFrom(src => src.LockoutEnabled))
+			.ForMember(dest => dest.Roles, opt => opt.Ignore());
 	}
 }

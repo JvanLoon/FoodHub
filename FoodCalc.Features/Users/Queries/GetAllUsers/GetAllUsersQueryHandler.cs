@@ -26,6 +26,7 @@ public class GetAllUsersQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, ILo
 			{
 				var roles = await userManager.GetRolesAsync(user);
 				var userDto = mapper.Map<UserDto>(user);
+				userDto.Enabled = user.EmailConfirmed;
 				userDto.Roles = roles.ToList();
 				userDtos.Add(userDto);
 			}

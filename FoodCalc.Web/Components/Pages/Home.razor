@@ -93,7 +93,7 @@
             try
             {
                 Recipes = await recipeService.GetAllRecipesAsync();
-                //StateHasChanged();
+                StateHasChanged();
             }
             catch (Exception ex)
             {

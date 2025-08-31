@@ -1,3 +1,4 @@
+@using FoodCalc.Web.Components.Services.Admin
 @inject AdminService AdminService
 
 <h4>User List</h4>
@@ -31,6 +32,7 @@ else
             try
             {
                 users = await AdminService.GetUsersAsync();
+                StateHasChanged();
             }
             catch (Exception ex)
             {

@@ -146,6 +146,7 @@
                 noIngredient = Guid.NewGuid();
                 recipeIngredient.IngredientId = noIngredient;
                 ClearForm();
+                StateHasChanged();
             }
             catch (Exception ex)
             {
