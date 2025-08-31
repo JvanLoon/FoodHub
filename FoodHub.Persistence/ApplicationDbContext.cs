@@ -1,10 +1,8 @@
 using FoodHub.Persistence.Entities;
-using FoodHub.Persistence.Entities;
 
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-public class ApplicationDbContext : IdentityDbContext<User>
+public class ApplicationDbContext : IdentityDbContext
 {
 	public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options){}
 
@@ -12,7 +10,6 @@ public class ApplicationDbContext : IdentityDbContext<User>
 	public DbSet<Recipe> Recipes { get; set; }
 	public DbSet<RecipeIngredient> RecipeIngredients { get; set; }
 	public DbSet<Ingredient> Ingredients { get; set; }
-	public DbSet<User> Users { get; set; }
 
 	public override int SaveChanges()
 	{
@@ -44,6 +41,5 @@ public class ApplicationDbContext : IdentityDbContext<User>
 	{
 		modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
 		base.OnModelCreating(modelBuilder);
-		modelBuilder.Entity<IdentityUserLogin<string>>().HasKey(login => new { login.LoginProvider, login.ProviderKey });
 	}
 }

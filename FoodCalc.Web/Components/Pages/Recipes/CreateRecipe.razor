@@ -44,7 +44,7 @@
             if (createdRecipe?.Id != Guid.Empty)
             {
                 // Navigate to EditRecipe page with the new recipe's ID
-                NavigationManager.NavigateTo($"/recipes/edit/{createdRecipe.Id}");
+                NavigationManager.NavigateTo($"/recipes/edit/{createdRecipe!.Id}");
             }
             else
             {

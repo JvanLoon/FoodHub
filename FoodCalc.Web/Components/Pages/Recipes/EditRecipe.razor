@@ -96,7 +96,7 @@
             {
                 <li class="list-group-item d-flex">
                     <span>
-                        @ingredient.Ingredient.Name - @ingredient.Amount.ToFormattedString() @ingredient.IngredientAmount
+                        @ingredient.Ingredient!.Name - @ingredient.Amount.ToFormattedString() @ingredient.IngredientAmount
                     </span>
                     <span class="ms-auto">
                         <button class="btn btn-sm btn-secondary me-2" @onclick="() => EditIngredient(ingredient)">Edit</button>

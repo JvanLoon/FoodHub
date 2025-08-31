@@ -9,7 +9,7 @@
         @foreach (RecipeIngredientDto ingredient in AggregatedIngredientService.AggregatedIngredients.ToList())
         {
             <li>
-                @ingredient.Ingredient.Name: @ingredient.Amount.ToFormattedString() @ingredient.IngredientAmount.ToString()
+                @ingredient.Ingredient!.Name: @ingredient.Amount.ToFormattedString() @ingredient.IngredientAmount.ToString()
                 <button class="btn btn-sm btn-danger ms-2 no-print" @onclick="() => RemoveIngredient(ingredient)">Remove</button>
             </li>
         }
