@@ -42,25 +42,68 @@ public class Program
 		builder.Services.AddDbContext<ApplicationDbContext>(options =>
 			options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+		// Add Identity
+		builder.Services.AddIdentity<User, IdentityRole>(options =>
+		{
+			options.SignIn.RequireConfirmedAccount = false;
+			options.User.RequireUniqueEmail = true;
+		})
+		.AddEntityFrameworkStores<ApplicationDbContext>()
+		.AddDefaultTokenProviders();
+
+		// Configure JWT authentication
+		var jwtSettings = builder.Configuration.GetSection("Jwt");
+		builder.Services.AddAuthentication(options =>
+		{
+			options.DefaultAuthenticateScheme = "JwtBearer";
+			options.DefaultChallengeScheme = "JwtBearer";
+		})
+		.AddJwtBearer("JwtBearer", options =>
+		{
+			options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+			{
+				ValidateIssuer = true,
+				ValidateAudience = false,
+				ValidateLifetime = true,
+				ValidateIssuerSigningKey = true,
+				ValidIssuer = jwtSettings["Issuer"],
+				IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(jwtSettings["Key"])),
+				ClockSkew = TimeSpan.Zero
+			};
+		});
+
+		// Cookie config
+		builder.Services.ConfigureApplicationCookie(options =>
+		{
+			options.Cookie.SameSite = SameSiteMode.None;
+			options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+			options.ExpireTimeSpan = TimeSpan.FromHours(12);
+		});
+
+		// CORS config
+		builder.Services.AddCors(options =>
+		{
+			options.AddPolicy("AllowWebApp",
+				builder => builder
+					.WithOrigins(apiBaseAddress)
+					.AllowAnyHeader()
+					.AllowAnyMethod()
+					.AllowCredentials());
+		});
+
 		// Use the custom service registration method
 		builder.Services.AddCustomServices();
 
 		builder.Services.AddApplicationMediatR();
 
-		builder.Services.ConfigureApplicationCookie(options =>
-		{
-			options.Cookie.SameSite = SameSiteMode.None;
-			options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // requires HTTPS
-		});
-
 		var app = builder.Build();
 
 		// Run migrations at startup
-		using (var scope = app.Services.CreateScope())
-		{
-			var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-			db.Database.Migrate();
-		}
+		// using (var scope = app.Services.CreateScope())
+		// {
+		// 	var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+		// 	db.Database.Migrate();
+		// }
 
 		// Configure the HTTP request pipeline.
 		app.UseExceptionHandler();
@@ -71,13 +114,15 @@ public class Program
 			app.UseDeveloperExceptionPage();
 			app.UseSwagger();
 			app.UseSwaggerUI();
-
 		}
 
 		app.MapDefaultEndpoints();
 		app.UseHttpsRedirection();
 		app.UseStaticFiles();
 		app.UseRouting();
+		app.UseCors("AllowWebApp");
+		app.UseAuthentication();
+		app.UseAuthorization();
 		app.MapControllers();
 
 		app.Run();
