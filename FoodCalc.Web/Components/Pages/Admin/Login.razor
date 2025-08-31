@@ -1,8 +1,8 @@
 @page "/login"
 @using Microsoft.AspNetCore.Components.Forms
-@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
 @inject LoginService LoginService
 @inject NavigationManager Navigation
+@inject AuthTokenService AuthTokenService
 
 <h3>Login</h3>
 <EditForm Model="loginModel" OnValidSubmit="HandleLogin">
@@ -13,8 +13,19 @@
     <button type="submit">Login</button>
 </EditForm>
 
+@if (showMessage)
+{
+    <div class="alert @(IsError ? "alert-danger" : "alert-success")">
+        @_message
+    </div>
+}
+
 @code {
     private LoginDto loginModel = new();
+
+    private bool showMessage = false;
+    private bool IsError = false;
+    private string _message = string.Empty;
 
     private async Task HandleLogin()
     {
@@ -23,10 +34,27 @@
         if (response.IsSuccessStatusCode)
         {
             var result = await response.Content.ReadFromJsonAsync<AuthResponseDto>();
-
-            await LocalStorage.SetItemAsync("authToken", result.Token); // Store JWT token
-
+            // Store JWT token in a secure cookie
+            await AuthTokenService.SetTokenAsync(result.Token);
             Navigation.NavigateTo("/");
+        }else{
+            ShowMessage("Failed to login", true);
         }
+    }
+
+    async Task ShowMessage(string message, bool isError, int timeInMs = 2000)
+    {
+        _message = message;
+        IsError = isError;
+
+        showMessage = true;
+        StateHasChanged();
+
+        await Task.Delay(timeInMs);
+
+        showMessage = false;
+        _message = string.Empty;
+        IsError = false;
+        StateHasChanged();
     }
 }

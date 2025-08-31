@@ -22,7 +22,11 @@ public class Program
 		builder.Services.AddOutputCache();
 
 		var apiBaseAddress = builder.Configuration["API:BaseAddress"];
-		builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.Configuration["API:BaseAddress"]) });
+		builder.Services.AddTransient<AuthTokenHandler>();
+		builder.Services.AddHttpClient("ApiClient", client =>
+		{
+			client.BaseAddress = new Uri(apiBaseAddress);
+		}).AddHttpMessageHandler<AuthTokenHandler>();
 
 		builder.Services.AddDataProtection()
 		.PersistKeysToFileSystem(new DirectoryInfo(@"/root/.aspnet/DataProtection-Keys"))

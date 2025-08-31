@@ -7,16 +7,23 @@ using System.Threading.Tasks;
 
 namespace FoodCalc.Web.Components.Services
 {
-    public class LoginService(HttpClient httpClient)
+    public class LoginService
 	{
+        private readonly HttpClient _httpClient;
+
+        public LoginService(IHttpClientFactory httpClientFactory)
+        {
+            _httpClient = httpClientFactory.CreateClient("ApiClient");
+        }
+
         public async Task<HttpResponseMessage> LoginAsync(LoginDto user)
         {
-			return await httpClient.PostAsJsonAsync("api/authentication/login", user);
+            return await _httpClient.PostAsJsonAsync("api/authentication/login", user);
         }
 
         public async Task<bool> RegisterAsync(RegisterDto user)
         {
-            var response = await httpClient.PostAsJsonAsync("/api/authentication/register", user);
+            var response = await _httpClient.PostAsJsonAsync("/api/authentication/register", user);
             return response.IsSuccessStatusCode;
         }
     }
