@@ -1,4 +1,6 @@
 ﻿@inherits LayoutComponentBase
+@inject AuthTokenService AuthTokenService
+@inject NavigationManager Navigation
 
 <div class="page">
     <div class="sidebar">
@@ -6,6 +8,17 @@
     </div>
 
     <main>
+        <div class="nav-item px-3">
+            @if (!string.IsNullOrEmpty(userEmail))
+            {
+                <span class="nav-link">@userEmail</span>
+                <button class="nav-link" @onclick="Logout">Logout</button>
+            }
+            else
+            {
+                <a class="nav-link" href="/login">Login</a>
+            }
+        </div>
         <article class="content px-4">
             @Body
         </article>
@@ -17,3 +30,24 @@
     <a href="" class="reload">Reload</a>
     <a class="dismiss">🗙</a>
 </div>
+
+@code{
+     private string? userEmail;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (await AuthTokenService.IsTokenExpiredAsync())
+        {
+            await AuthTokenService.RemoveTokenAsync();
+            Navigation.NavigateTo("/login");
+        }
+        
+        userEmail = await AuthTokenService.GetEmailAsync();
+    }
+
+    private async Task Logout()
+    {
+        await AuthTokenService.RemoveTokenAsync(); // Clear the cookie
+        Navigation.NavigateTo("/login");
+    }
+}

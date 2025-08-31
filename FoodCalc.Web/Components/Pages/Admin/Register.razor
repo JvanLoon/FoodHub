@@ -4,21 +4,31 @@
 @inject NavigationManager Navigation
 
 <h3>Register</h3>
-<EditForm  OnValidSubmit="HandleRegister">
+<EditForm Model="registerModel" OnValidSubmit="HandleRegister">
     <DataAnnotationsValidator />
     <ValidationSummary />
-    <InputText @bind-Value="Email" placeholder="Email" />
-    <InputText @bind-Value="Password" type="password" placeholder="Password" />
+    <InputText @bind-Value="registerModel.Email" placeholder="Email" />
+    <InputText @bind-Value="registerModel.Password" type="password" placeholder="Password" />
     <button type="submit">Register</button>
 </EditForm>
 
+@if (showMessage)
+{
+    <div class="alert @(IsError ? "alert-danger" : "alert-success")">
+        @_message
+    </div>
+}
+
 @code {
-    private string Email { get; set; } = string.Empty;
-    private string Password { get; set; } = string.Empty;
+    private RegisterDto registerModel { get; set; }
+
+    private bool showMessage = false;
+    private bool IsError = false;
+    private string _message = string.Empty;
 
     private async Task HandleRegister()
     {
-        var response = await LoginService.RegisterAsync(new RegisterDto { Email = Email, Password = Password });
+        var response = await LoginService.RegisterAsync(registerModel);
 
         if (response)
         {
@@ -26,7 +36,23 @@
         }
         else
         {
-            // Show error
+            ShowMessage("Registration failed!", true);
         }
+    }
+
+    async Task ShowMessage(string message, bool isError, int timeInMs = 2000)
+    {
+        _message = message;
+        IsError = isError;
+
+        showMessage = true;
+        StateHasChanged();
+
+        await Task.Delay(timeInMs);
+
+        showMessage = false;
+        _message = string.Empty;
+        IsError = false;
+        StateHasChanged();
     }
 }

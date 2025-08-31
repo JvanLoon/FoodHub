@@ -38,7 +38,7 @@
             await AuthTokenService.SetTokenAsync(result.Token);
             Navigation.NavigateTo("/");
         }else{
-            ShowMessage("Failed to login", true);
+            ShowMessage("Failed to login. Invalid email or password.", true);
         }
     }
 

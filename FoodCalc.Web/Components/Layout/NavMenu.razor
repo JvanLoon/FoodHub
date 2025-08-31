@@ -1,4 +1,6 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@inject AuthTokenService AuthTokenService
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">FoodHub</a>
     </div>
@@ -25,26 +27,27 @@
                 <span class="bi bi-list-nested" aria-hidden="true"></span> Edit Ingredients
             </NavLink>
         </div>
-        <div class="nav-item px-3">
+        @if (isLoggedIn)
+        {
             @if (isAdmin)
             {
-                <NavLink class="nav-link" href="/admin">
-                    <span class="bi bi-gear" aria-hidden="true"></span> Admin
-                </NavLink>
+                <div class="nav-item px-3">
+                    
+                        <NavLink class="nav-link" href="/admin">
+                            <span class="bi bi-gear" aria-hidden="true"></span> Admin
+                        </NavLink>
+                </div>
             }
-        </div>
-        <div class="nav-item px-3">
-            @if (isLoggedIn)
-            {
+            <div class="nav-item px-3">
                 <span class="nav-link">@userEmail</span>
-            }
-            else
-            {
-                <NavLink class="nav-link" href="/login">
-                    <span class="bi bi-box-arrow-in-right" aria-hidden="true"></span> Login
-                </NavLink>
-            }
-        </div>
+            </div>
+        } 
+        else
+        {
+            <NavLink class="nav-link" href="/login">
+                <span class="bi bi-box-arrow-in-right" aria-hidden="true"></span> Login
+            </NavLink>
+        }
     </nav>
 </div>
 
@@ -55,6 +58,9 @@
 
     protected override async Task OnInitializedAsync()
     {
+        var roles = await AuthTokenService.GetRolesAsync();
+        isLoggedIn = roles.Any();
+        isAdmin = roles?.Contains("Admin") == true;
         // TODO: Replace with actual role check from auth state
         // isAdmin = await AuthService.IsUserInRoleAsync("Admin");
         // TODO: Replace with actual login state and email from auth state

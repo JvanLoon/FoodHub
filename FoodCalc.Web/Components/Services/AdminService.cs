@@ -3,20 +3,18 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using FoodHub.DTOs;
 
-namespace FoodCalc.Web.Components.Services
+namespace FoodCalc.Web.Components.Services;
+public class AdminService
 {
-    public class AdminService
+    private readonly HttpClient _httpClient;
+
+    public AdminService(IHttpClientFactory httpClientFactory)
     {
-        private readonly HttpClient _httpClient;
+        _httpClient = httpClientFactory.CreateClient("ApiClient");
+    }
 
-        public AdminService(IHttpClientFactory httpClientFactory)
-        {
-            _httpClient = httpClientFactory.CreateClient("ApiClient");
-        }
-
-        public async Task<List<UserDto>> GetUsersAsync()
-        {
-            return await _httpClient.GetFromJsonAsync<List<UserDto>>("/api/admin/users") ?? new List<UserDto>();
-        }
+    public async Task<List<UserDto>> GetUsersAsync()
+    {
+        return await _httpClient.GetFromJsonAsync<List<UserDto>>("/api/admin/users") ?? new List<UserDto>();
     }
 }
