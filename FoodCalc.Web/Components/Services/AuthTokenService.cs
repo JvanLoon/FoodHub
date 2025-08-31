@@ -75,7 +75,7 @@ public class AuthTokenService(IJSRuntime js)
 
         var handler = new JwtSecurityTokenHandler();
         var jwt = handler.ReadJwtToken(token);
-        var roles = jwt.Claims.Where(c => c.Type == "role").Select(c => c.Value).ToList();
+        var roles = jwt.Claims.Where(c => c.Type.Contains("role")).Select(c => c.Value).ToList();
         
         return roles;
     }

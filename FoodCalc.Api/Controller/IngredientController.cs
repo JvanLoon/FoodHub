@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace FoodCalc.ApiService.Controller;
 
 [Route("api/[controller]")]
-[Authorize]
+[Authorize(Roles = "User,Moderator,Admin")]
 public class IngredientController(IMediator mediator) : ControllerBase
 {
 	[HttpGet]

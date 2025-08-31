@@ -1,7 +1,10 @@
+using Azure;
+
+using FoodHub.DTOs;
+
+using System.Collections.Generic;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using FoodHub.DTOs;
 
 namespace FoodCalc.Web.Components.Services;
 public class AdminService
@@ -15,6 +18,14 @@ public class AdminService
 
     public async Task<List<UserDto>> GetUsersAsync()
     {
-        return await _httpClient.GetFromJsonAsync<List<UserDto>>("/api/admin/users") ?? new List<UserDto>();
-    }
+		var response = await _httpClient.GetAsync("api/Admin/users");
+		if (!response.IsSuccessStatusCode)
+		{
+			// Optionally log or handle the error
+			var errorContent = await response.Content.ReadAsStringAsync();
+			// Handle 401, 403, 500, etc.
+			return [];
+		}
+		return await response.Content.ReadFromJsonAsync<List<UserDto>>() ?? [];
+	}
 }

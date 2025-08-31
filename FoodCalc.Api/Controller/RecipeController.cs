@@ -19,7 +19,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace FoodCalc.ApiService.Controller;
 
 [Route("api/[controller]")]
-[Authorize]
+[Authorize(Roles = "User,Moderator,Admin")]
 public class RecipeController(IMediator mediator) : ControllerBase
 {
 	[HttpGet]

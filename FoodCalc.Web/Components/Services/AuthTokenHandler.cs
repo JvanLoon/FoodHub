@@ -19,7 +19,7 @@ public class AuthTokenHandler(IJSRuntime js) : DelegatingHandler
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        if (!_excludedPaths.Any(path => request.RequestUri?.AbsolutePath.StartsWith(path) == true))
+        if (!_excludedPaths.Any(path => request.RequestUri?.AbsolutePath.Contains(path) == true))
         {
             var cookie = await js.InvokeAsync<string>("eval", "document.cookie");
             var token = cookie?.Split(';')
