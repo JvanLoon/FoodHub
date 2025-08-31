@@ -9,15 +9,19 @@
     </div>
 
     <main>
-        <div class="nav-item px-3">
+        <div class="auth-bar">
             @if (!string.IsNullOrEmpty(userEmail))
             {
-                <span class="nav-link">@userEmail</span>
-                <button class="nav-link" @onclick="Logout">Logout</button>
+                <div class="auth-info">
+                    <span class="user-email">@userEmail</span>
+                    <button class="logout-btn" @onclick="Logout">Logout</button>
+                </div>
             }
             else
             {
-                <a class="nav-link" href="/login">Login</a>
+                <div class="auth-info">
+                    <button class="login-btn" @onclick='() => Navigation.NavigateTo("/login")'>Login</button>
+                </div>
             }
         </div>
         <article class="content px-4">
