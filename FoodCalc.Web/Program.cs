@@ -19,18 +19,8 @@ public class Program
 
 		builder.Services.AddOutputCache();
 
-		//builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7426") });
-
-		var handler = new HttpClientHandler { UseCookies = true };
-
-		var apiBaseAddress = builder.Configuration["API:BaseAddress"] ?? "https://localhost:7426";
-		builder.Services.AddScoped(sp => {
-
-			var client = new HttpClient(handler);
-			client.BaseAddress = new Uri(apiBaseAddress);
-
-			return sp;
-			});
+		var apiBaseAddress = builder.Configuration["API:BaseAddress"];
+		builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.Configuration["API:BaseAddress"]) });
 
 		builder.Services.AddDataProtection()
 		.PersistKeysToFileSystem(new DirectoryInfo(@"/root/.aspnet/DataProtection-Keys"))
@@ -38,7 +28,6 @@ public class Program
 
 		builder.Services.AddScoped<RecipeService>();
 		builder.Services.AddScoped<IngredientService>();
-		builder.Services.AddScoped<LoginService>();
 
 		builder.Services.AddSingleton<AggregatedIngredientService>();
 
@@ -47,17 +36,6 @@ public class Program
 			options.SerializerOptions.IncludeFields = false;
 			//options.SerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
 			//options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-		});
-
-		builder.Services.AddCors(options =>
-		{
-			options.AddDefaultPolicy(policy =>
-			{
-				policy.WithOrigins(apiBaseAddress) // your frontend origin
-					  .AllowAnyHeader()
-					  .AllowAnyMethod()
-					  .AllowCredentials();
-			});
 		});
 
 		builder.Services.ConfigureApplicationCookie(options =>

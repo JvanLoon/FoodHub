@@ -13,7 +13,7 @@ public class Program
 	{
 		var builder = WebApplication.CreateBuilder(args);
 
-		var apiBaseAddress = builder.Configuration["API:BaseAddress"] ?? "https://localhost:7426";
+		var apiBaseAddress = builder.Configuration["WebServer:BaseAddress"];
 
 		// Add service defaults & Aspire client integrations.
 		builder.AddServiceDefaults();
@@ -38,10 +38,6 @@ public class Program
 			//options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 		});
 
-		builder.Services.AddIdentity<User, IdentityRole>()
-			.AddEntityFrameworkStores<ApplicationDbContext>()
-			.AddDefaultTokenProviders();
-
 		// Add services to the container.
 		builder.Services.AddDbContext<ApplicationDbContext>(options =>
 			options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -50,17 +46,6 @@ public class Program
 		builder.Services.AddCustomServices();
 
 		builder.Services.AddApplicationMediatR();
-
-		builder.Services.AddCors(options =>
-		{
-			options.AddDefaultPolicy(policy =>
-			{
-				policy.WithOrigins(apiBaseAddress) // your frontend origin
-					  .AllowAnyHeader()
-					  .AllowAnyMethod()
-					  .AllowCredentials();
-			});
-		});
 
 		builder.Services.ConfigureApplicationCookie(options =>
 		{
@@ -94,7 +79,6 @@ public class Program
 		app.UseStaticFiles();
 		app.UseRouting();
 		app.MapControllers();
-		app.UseCors();
 
 		app.Run();
 	}
