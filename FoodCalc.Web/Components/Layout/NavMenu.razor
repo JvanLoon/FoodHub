@@ -33,14 +33,32 @@
                 </NavLink>
             }
         </div>
+        <div class="nav-item px-3">
+            @if (isLoggedIn)
+            {
+                <span class="nav-link">@userEmail</span>
+            }
+            else
+            {
+                <NavLink class="nav-link" href="/login">
+                    <span class="bi bi-box-arrow-in-right" aria-hidden="true"></span> Login
+                </NavLink>
+            }
+        </div>
     </nav>
 </div>
 
 @code {
     private bool isAdmin = false;
+    private bool isLoggedIn = false;
+    private string userEmail = "";
+
     protected override async Task OnInitializedAsync()
     {
         // TODO: Replace with actual role check from auth state
         // isAdmin = await AuthService.IsUserInRoleAsync("Admin");
+        // TODO: Replace with actual login state and email from auth state
+        // isLoggedIn = await AuthService.IsLoggedInAsync();
+        // userEmail = await AuthService.GetUserEmailAsync();
     }
 }
