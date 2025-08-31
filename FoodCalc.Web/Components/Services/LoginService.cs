@@ -17,8 +17,9 @@ public class LoginService
 
     public async Task<HttpResponseMessage> LoginAsync(LoginDto user)
     {
-        return await _httpClient.PostAsJsonAsync("api/authentication/login", user);
-    }
+		return await _httpClient.PostAsJsonAsync("api/authentication/login", user); ;
+
+	}
 
     public async Task<bool> RegisterAsync(RegisterDto user)
     {

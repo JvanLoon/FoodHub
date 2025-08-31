@@ -1,12 +1,21 @@
 @inject AdminService AdminService
 
 <h4>User List</h4>
-<ul>
-    @foreach (var user in users)
-    {
-        <li>@user.Email (@(user.Enabled ? "Enabled" : "Disabled"))</li>
-    }
-</ul>
+@if (users.Any())
+{
+    <ul>
+        @foreach (var user in users)
+        {
+            <li>@user.Email (@(user.Enabled ? "Enabled" : "Disabled"))</li>
+        }
+    </ul>
+}
+else
+{
+    <p>No users, something went wrong</p>
+}
+
+
 
 @code {
     private List<UserDto> users = new();

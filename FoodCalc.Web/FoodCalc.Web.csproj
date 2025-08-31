@@ -7,12 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FoodHub.DTOs\FoodHub.DTOs.csproj" />
-    <ProjectReference Include="..\FoodHub.ServiceDefaults\FoodHub.ServiceDefaults.csproj" />
+    <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
+    <ProjectReference Include="..\FoodHub.DTOs\FoodHub.DTOs.csproj" />
+    <ProjectReference Include="..\FoodHub.ServiceDefaults\FoodHub.ServiceDefaults.csproj" />
   </ItemGroup>
 
 </Project>

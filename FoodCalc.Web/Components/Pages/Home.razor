@@ -16,49 +16,57 @@
 </div>
 
 <div class="container-fluid ps-3">
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-        @foreach (RecipeDto recipe in Recipes)
-        {
-            <div class="col d-flex card-equal-width p-1">
-                <div class="card h-100 w-100 shadow-sm">
-                    <img src="https://placehold.co/400x200?text=Recipe\nImage" class="card-img-top" alt="Recipe image">
-                    <div class="card-body">
-                        <div class="form-check mb-2">
-                            <input class="form-check-input"
-                                   type="checkbox"
-                                   id="select-@recipe.Id"
-                                   @onchange="(e) => ToggleRecipeSelection(recipe.Id, e?.Value?.ToString() == true.ToString())"
-                                   checked="@SelectedRecipeIds.Contains(recipe.Id)" />
-                            <label class="form-check-label" for="select-@recipe.Id">
-                                Select
-                            </label>
-                        </div>
-                        <h5 class="card-title">@recipe.Name</h5>
-                        <p class="card-text mb-1"><strong>Ingredients:</strong></p>
-                        <ul class="list-unstyled mb-0">
-                            @if (recipe.RecipeIngredient != null)
-                            {
-                                foreach (RecipeIngredientDto ingredient in recipe.RecipeIngredient)
+    @if (Recipes.Any())
+    {
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            @foreach (RecipeDto recipe in Recipes)
+            {
+                <div class="col d-flex card-equal-width p-1">
+                    <div class="card h-100 w-100 shadow-sm">
+                        <img src="https://placehold.co/400x200?text=Recipe\nImage" class="card-img-top" alt="Recipe image">
+                        <div class="card-body">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input"
+                                type="checkbox"
+                                id="select-@recipe.Id"
+                                @onchange="(e) => ToggleRecipeSelection(recipe.Id, e?.Value?.ToString() == true.ToString())"
+                                checked="@SelectedRecipeIds.Contains(recipe.Id)" />
+                                <label class="form-check-label" for="select-@recipe.Id">
+                                    Select
+                                </label>
+                            </div>
+                            <h5 class="card-title">@recipe.Name</h5>
+                            <p class="card-text mb-1"><strong>Ingredients:</strong></p>
+                            <ul class="list-unstyled mb-0">
+                                @if (recipe.RecipeIngredient != null)
                                 {
-                                    if (ingredient.Ingredient != null)
+                                    foreach (RecipeIngredientDto ingredient in recipe.RecipeIngredient)
                                     {
-                                        <li class="d-flex justify-content-between align-items-center">
-                                            <span>@ingredient.Ingredient.Name</span>
-                                            <span>@ingredient.Amount.ToFormattedString() @ingredient.IngredientAmount.ToString()</span>
-                                        </li>
+                                        if (ingredient.Ingredient != null)
+                                        {
+                                            <li class="d-flex justify-content-between align-items-center">
+                                                <span>@ingredient.Ingredient.Name</span>
+                                                <span>@ingredient.Amount.ToFormattedString() @ingredient.IngredientAmount.ToString()</span>
+                                            </li>
+                                        }
                                     }
                                 }
-                            }
-                        </ul>
-                    </div>
-                    <div class="card-footer bg-transparent border-0 text-end">
-                        <button class="btn btn-primary" @onclick="() => EditRecipe(recipe.Id)">Edit</button>
-                        <button class="btn btn-danger" @onclick="() => DeleteRecipe(recipe.Id)">Delete</button>
+                            </ul>
+                        </div>
+                        <div class="card-footer bg-transparent border-0 text-end">
+                            <button class="btn btn-primary" @onclick="() => EditRecipe(recipe.Id)">Edit</button>
+                            <button class="btn btn-danger" @onclick="() => DeleteRecipe(recipe.Id)">Delete</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        }
-    </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p>No Recipes, something went wrong</p>
+    }
+
 </div>
 
 @if (showMessage)
@@ -78,17 +86,17 @@
     private bool IsError = false;
     private string _message = string.Empty;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         try
         {
             Recipes = await recipeService.GetAllRecipesAsync();
-            StateHasChanged();
+            //StateHasChanged();
         }
         catch (Exception ex)
         {
             Recipes = [];
-            _message = ex.Message;
+            ShowMessage(ex.Message, true, 99999999);
             StateHasChanged();
             //throw ex;
         }

@@ -1,18 +1,21 @@
+using Blazored.LocalStorage;
+
+using ErrorOr;
+
+using Microsoft.JSInterop;
+
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using Microsoft.JSInterop;
+using System.Reflection.Metadata;
 using System.Threading.Tasks;
 namespace FoodCalc.Web.Components.Services;
 
-public class AuthTokenService(IJSRuntime js)
+public class AuthTokenService(ILocalStorageService localStorage)
 {
+	private readonly string _tokenName = "authToken";
     public async Task<string?> GetTokenAsync()
     {
-        var cookie = await js.InvokeAsync<string>("eval", "document.cookie");
-        var token = cookie?.Split(';')
-            .Select(c => c.Trim())
-            .FirstOrDefault(c => c.StartsWith("authToken="));
-        return token != null ? token.Substring("authToken=".Length) : null;
+        return await localStorage.GetItemAsync<string>(_tokenName);
     }
 
     /// <summary>
@@ -22,20 +25,18 @@ public class AuthTokenService(IJSRuntime js)
     {
         if (string.IsNullOrEmpty(token))
         {
-            //delete cookie
             await RemoveTokenAsync();
         }
         else
         {
-            // Set cookie with Secure and SameSite=Strict
-            await js.InvokeVoidAsync("eval", $"document.cookie = 'authToken={token}; path=/; secure; samesite=strict';");
+            await localStorage.SetItemAsync(_tokenName, token);
         }
     }
 
     public async Task RemoveTokenAsync()
     {
-        await js.InvokeVoidAsync("eval", $"document.cookie = 'authToken=; path=/; secure; samesite=strict';");
-    }
+		await localStorage.RemoveItemAsync(_tokenName);
+	}
 
     public async Task<string?> GetEmailAsync()
     {

@@ -28,6 +28,8 @@ public class Program
 			client.BaseAddress = new Uri(apiBaseAddress);
 		}).AddHttpMessageHandler<AuthTokenHandler>();
 
+		builder.Services.AddBlazoredLocalStorage();
+
 		builder.Services.AddDataProtection()
 		.PersistKeysToFileSystem(new DirectoryInfo(@"/root/.aspnet/DataProtection-Keys"))
 		.SetApplicationName("FoodHub");
@@ -39,8 +41,6 @@ public class Program
 		builder.Services.AddScoped<AuthTokenService>();
 
 		builder.Services.AddSingleton<AggregatedIngredientService>();
-
-		builder.Services.AddBlazoredLocalStorage();
 
 		builder.Services.Configure<JsonOptions>(options =>
 		{
