@@ -1,4 +1,13 @@
+using ErrorOr;
+
+using FoodCalc.Features.Recipes.Queries.GetAllRecipes;
+using FoodCalc.Features.Users.Commands.GetUserByEmail;
+
+using FoodHub.DTOs;
 using FoodHub.Persistence.Entities;
+
+using MediatR;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -6,29 +15,25 @@ using Microsoft.AspNetCore.Mvc;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize(Roles = "Admin")]
-public class AdminController : ControllerBase
+public class AdminController(IMediator mediator) : ControllerBase
 {
-    private readonly UserManager<User> _userManager;
-
-    public AdminController(UserManager<User> userManager)
-    {
-        _userManager = userManager;
-    }
-
     [HttpGet("users")]
-    public IActionResult GetUsers()
+    public async Task<IActionResult> GetUsers()
     {
-        var users = _userManager.Users.Select(u => new UserDto
-        {
-            Email = u.Email,
-            Enabled = u.Enabled
-        }).ToList();
-        return Ok(users);
-    }
+        ErrorOr<List<UserDto>> result = await mediator.Send(new GetAllUsersQuery());
 
-    public class UserDto
-    {
-        public string Email { get; set; }
-        public bool Enabled { get; set; }
+        return result.Match(
+            userList =>
+            {
+                var users = userList.Select(u => new UserDto
+                {
+                    Email = u.Email,
+                    Enabled = u.Enabled,
+					Roles = u.Roles
+				}).ToList();
+                return Ok(users);
+            },
+            errors => Problem(detail: string.Join(", ", errors.Select(e => e.ToString())))
+        );
     }
 }

@@ -1,4 +1,4 @@
-using FoodCalc.Api.DTOs;
+using FoodHub.DTOs;
 using FoodHub.Persistence.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

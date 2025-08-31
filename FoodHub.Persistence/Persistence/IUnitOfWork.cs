@@ -6,5 +6,6 @@ public interface IUnitOfWork
 {
     IRecipeRepository RecipeRepository { get; }
     IIngredientRepository IngredientRepository { get; }
-    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+	IUserRepository UserRepository { get; }
+	Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

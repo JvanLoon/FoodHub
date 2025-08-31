@@ -1,3 +1,5 @@
+using Blazored.LocalStorage;
+
 using FoodCalc.Web.Components;
 using FoodCalc.Web.Components.Services;
 
@@ -28,8 +30,12 @@ public class Program
 
 		builder.Services.AddScoped<RecipeService>();
 		builder.Services.AddScoped<IngredientService>();
+		builder.Services.AddScoped<LoginService>();
+		builder.Services.AddScoped<AdminService>();
 
 		builder.Services.AddSingleton<AggregatedIngredientService>();
+
+		builder.Services.AddBlazoredLocalStorage();
 
 		builder.Services.Configure<JsonOptions>(options =>
 		{

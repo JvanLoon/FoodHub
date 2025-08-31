@@ -8,7 +8,7 @@ using FoodHub.Persistence.Persistence;
 using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Features.Recipes.Commands.AddRecipe;
-public class AddRecipeCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ILogger<AddRecipeCommandHandler> logger) : MediatR.IRequestHandler<AddRecipeCommand, ErrorOr<RecipeDto>>
+public class GetUserByEmailHandler(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GetUserByEmailHandler> logger) : MediatR.IRequestHandler<AddRecipeCommand, ErrorOr<RecipeDto>>
 {
     public async Task<ErrorOr<RecipeDto>> Handle(AddRecipeCommand request, CancellationToken cancellationToken)
     {
