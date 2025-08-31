@@ -2,6 +2,8 @@ using AutoMapper;
 using FoodHub.DTOs;
 using FoodHub.Persistence.Entities;
 
+using Microsoft.AspNetCore.Identity;
+
 namespace FoodCalc.Features.Mapping;
 
 public class MappingProfile : Profile
@@ -40,7 +42,7 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.CreatedDate, opt => opt.Ignore())
             .ForMember(dest => dest.ModifiedDate, opt => opt.Ignore());
 
-		CreateMap<UserDto, User>()
+		CreateMap<UserDto, IdentityUser>()
 			.ForMember(dest => dest.PhoneNumber, opt => opt.Ignore())
 			.ForMember(dest => dest.PhoneNumberConfirmed, opt => opt.Ignore())
 			.ForMember(dest => dest.AccessFailedCount, opt => opt.Ignore())
@@ -54,7 +56,6 @@ public class MappingProfile : Profile
 			.ForMember(dest => dest.TwoFactorEnabled, opt => opt.Ignore())
 			.ForMember(dest => dest.UserName, opt => opt.Ignore())
 			.ForMember(dest => dest.Email, opt => opt.Ignore())
-			.ForMember(dest => dest.ConcurrencyStamp, opt => opt.Ignore())
-			.ForMember(dest => dest.Roles, opt => opt.MapFrom(src => src.Roles.ToList())); ;
+			.ForMember(dest => dest.ConcurrencyStamp, opt => opt.Ignore());
 	}
 }

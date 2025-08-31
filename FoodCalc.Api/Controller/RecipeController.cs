@@ -14,10 +14,12 @@ using FoodHub.DTOs;
 using MediatR;
 
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FoodCalc.ApiService.Controller;
 
 [Route("api/[controller]")]
+[Authorize]
 public class RecipeController(IMediator mediator) : ControllerBase
 {
 	[HttpGet]

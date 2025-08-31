@@ -2,6 +2,8 @@ using FoodCalc.Api.Extensions;
 using FoodCalc.Features.Mapping;
 
 using FoodHub.Persistence.Entities;
+using FoodHub.Persistence.Repositories;
+using FoodHub.Persistence.Repositories.Interface;
 
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Identity;
@@ -43,7 +45,7 @@ public class Program
 			options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 		// Add Identity
-		builder.Services.AddIdentity<User, IdentityRole>(options =>
+		builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 		{
 			options.SignIn.RequireConfirmedAccount = false;
 			options.User.RequireUniqueEmail = true;
@@ -99,11 +101,11 @@ public class Program
 		var app = builder.Build();
 
 		// Run migrations at startup
-		// using (var scope = app.Services.CreateScope())
-		// {
-		// 	var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-		// 	db.Database.Migrate();
-		// }
+		using (var scope = app.Services.CreateScope())
+		{
+			var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+			db.Database.Migrate();
+		}
 
 		// Configure the HTTP request pipeline.
 		app.UseExceptionHandler();

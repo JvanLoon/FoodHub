@@ -1,17 +1,12 @@
-﻿using FoodHub.Persistence.Entities;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Identity;
 
 namespace FoodHub.Persistence.Repositories.Interface;
 public interface IUserRepository
 {
-	Task<List<User>> GetAllAsync(CancellationToken cancellationToken);
-	Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken);
-	Task<User> AddAsync(User user, CancellationToken cancellationToken);
-	Task UpdateAsync(User user, CancellationToken cancellationToken);
+	Task<List<IdentityUser>> GetAllAsync(CancellationToken cancellationToken);
+	Task<IdentityUser?> GetByEmailAsync(string email, CancellationToken cancellationToken);
+	Task<IdentityUser> AddAsync(IdentityUser IdentityUser, CancellationToken cancellationToken);
+	Task UpdateAsync(IdentityUser IdentityUser, CancellationToken cancellationToken);
 	Task<int> DeleteAsync(string id, CancellationToken cancellationToken);
+	Task AddRoleToUser(IdentityUser IdentityUser, string role, CancellationToken cancellationToken);
 }

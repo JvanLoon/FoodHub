@@ -2,7 +2,7 @@ using FoodHub.Persistence.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-public class ApplicationDbContext : IdentityDbContext<User>
+public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 {
 	public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options){}
 
@@ -40,15 +40,6 @@ public class ApplicationDbContext : IdentityDbContext<User>
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
 		modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
-		// Rename Identity tables
-		modelBuilder.Entity<User>().ToTable("Users");
-		modelBuilder.Entity<IdentityRole>().ToTable("Role");
-		modelBuilder.Entity<IdentityUserClaim<string>>().ToTable("Claims");
-		modelBuilder.Entity<IdentityUserLogin<string>>().ToTable("UserLogins");
-		modelBuilder.Entity<IdentityUserToken<string>>().ToTable("UserTokens");
-		modelBuilder.Entity<IdentityRoleClaim<string>>().ToTable("RoleClaims");
-		modelBuilder.Entity<IdentityUserRole<string>>().ToTable("UserRoles");
-		
 		base.OnModelCreating(modelBuilder);
 	}
 }

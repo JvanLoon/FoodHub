@@ -116,10 +116,11 @@ public static class Extensions
 
     public static IServiceCollection AddCustomServices(this IServiceCollection services)
     {
-        services.AddTransient<IRecipeRepository, RecipeRepository>();
-        services.AddTransient<IIngredientRepository, IngredientRepository>();
+        services.AddScoped<IRecipeRepository, RecipeRepository>();
+        services.AddScoped<IIngredientRepository, IngredientRepository>();
+		services.AddScoped<IUserRepository, UserRepository>();
 
-        services.AddTransient<IUnitOfWork, UnitOfWork>();
+		services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;
     }

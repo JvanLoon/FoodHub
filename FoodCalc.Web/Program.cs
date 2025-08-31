@@ -36,6 +36,7 @@ public class Program
 		builder.Services.AddScoped<IngredientService>();
 		builder.Services.AddScoped<LoginService>();
 		builder.Services.AddScoped<AdminService>();
+		builder.Services.AddScoped<AuthTokenService>();
 
 		builder.Services.AddSingleton<AggregatedIngredientService>();
 

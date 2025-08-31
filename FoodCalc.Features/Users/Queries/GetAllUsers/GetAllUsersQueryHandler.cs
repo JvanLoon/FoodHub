@@ -13,13 +13,13 @@ using Microsoft.Extensions.Logging;
 
 
 namespace FoodCalc.Features.Recipes.Queries.GetAllRecipes;
-public class GetAllUsersQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GetAllUsersQueryHandler> logger, UserManager<User> userManager) : IRequestHandler<GetAllUsersQuery, ErrorOr<List<UserDto>>>
+public class GetAllUsersQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GetAllUsersQueryHandler> logger, UserManager<IdentityUser> userManager) : IRequestHandler<GetAllUsersQuery, ErrorOr<List<UserDto>>>
 {
 	public async Task<ErrorOr<List<UserDto>>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
 	{
 		try
 		{
-			List<User> users = await unitOfWork.UserRepository.GetAllAsync(cancellationToken);
+			List<IdentityUser> users = await unitOfWork.UserRepository.GetAllAsync(cancellationToken);
 
 			var userDtos = new List<UserDto>();
 			foreach (var user in users)

@@ -10,7 +10,9 @@ public class AuthTokenHandler(IJSRuntime js) : DelegatingHandler
     private readonly string[] _excludedPaths = new[]
     {
         "/api/authentication/login",
-        "/api/authentication/register"
+        "/api/authentication/register",
+		"/register",
+		""
         // Add more paths to exclude if needed
     };
 
