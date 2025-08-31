@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
+[Authorize("Admin,Moderator,User")]
 public class AdminController(IMediator mediator) : ControllerBase
 {
     [HttpGet("users")]

@@ -6,6 +6,7 @@ namespace FoodCalc.Web.Components.Services.Auth;
 
 public class AuthenticatedHttpClientService
 {
+	private readonly string _tokenName = "Authorization";
 	private readonly HttpClient _httpClient;
 	private readonly ILocalStorageService _localStorage;
 
@@ -17,7 +18,7 @@ public class AuthenticatedHttpClientService
 
 	private async Task AttachTokenAsync()
 	{
-		var token = await _localStorage.GetItemAsync<string>("authToken");
+		var token = await _localStorage.GetItemAsync<string>(_tokenName);
 		if (!string.IsNullOrWhiteSpace(token))
 		{
 			_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);

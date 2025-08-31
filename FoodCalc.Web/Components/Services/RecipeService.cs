@@ -12,7 +12,7 @@ public class RecipeService(AuthenticatedHttpClientService httpClient)
 {
     public async Task<List<RecipeDto>> GetAllRecipesAsync()
     {
-        var response = await httpClient.GetAsync("api/recipe");
+        var response = await httpClient.GetAsync("api/recipe/getallrecipes");
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<List<RecipeDto>>() ?? [];
     }

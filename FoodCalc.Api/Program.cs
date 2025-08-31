@@ -15,7 +15,7 @@ public class Program
 	{
 		var builder = WebApplication.CreateBuilder(args);
 
-		var apiBaseAddress = builder.Configuration["WebServer:BaseAddress"];
+		var webBaseAddress = builder.Configuration["WebServer:BaseAddress"];
 
 		// Add service defaults & Aspire client integrations.
 		builder.AddServiceDefaults();
@@ -72,31 +72,30 @@ public class Program
 				IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(jwtSettings["Key"])),
 				ClockSkew = TimeSpan.Zero
 			};
-		});
 
-		// Cookie config
-		builder.Services.ConfigureApplicationCookie(options =>
-		{
-			options.Cookie.SameSite = SameSiteMode.None;
-			options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-			options.ExpireTimeSpan = TimeSpan.FromHours(12);
-		});
+			options.TokenValidationParameters.ValidAudience = "your-api-audience";
+			options.TokenValidationParameters.ValidateAudience = true;
 
-		// CORS config
-		builder.Services.AddCors(options =>
-		{
-			options.AddPolicy("AllowWebApp",
-				builder => builder
-					.WithOrigins(apiBaseAddress)
-					.AllowAnyHeader()
-					.AllowAnyMethod()
-					.AllowCredentials());
+			options.SaveToken = true;
 		});
 
 		// Use the custom service registration method
 		builder.Services.AddCustomServices();
 
 		builder.Services.AddApplicationMediatR();
+
+		// CORS config
+		builder.Services.AddCors(options =>
+		{
+			options.AddPolicy("AllowWebApp",
+				builder => builder
+					.WithOrigins(webBaseAddress)
+					.AllowAnyHeader()
+					.AllowAnyMethod()
+					.AllowCredentials());
+		});
+
+		
 
 		var app = builder.Build();
 
@@ -118,7 +117,6 @@ public class Program
 			app.UseSwaggerUI();
 		}
 
-		app.MapDefaultEndpoints();
 		app.UseHttpsRedirection();
 		app.UseStaticFiles();
 		app.UseRouting();
@@ -126,6 +124,7 @@ public class Program
 		app.UseAuthentication();
 		app.UseAuthorization();
 		app.MapControllers();
+		app.MapDefaultEndpoints();
 
 		app.Run();
 	}

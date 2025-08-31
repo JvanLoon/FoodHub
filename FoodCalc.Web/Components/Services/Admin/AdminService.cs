@@ -23,4 +23,14 @@ public class AdminService(AuthenticatedHttpClientService httpClient)
 		}
 		return await response.Content.ReadFromJsonAsync<List<UserDto>>() ?? [];
 	}
+
+	public async Task<bool> ToggleUserAsync(string email, bool enable = true)
+	{
+		var response = await httpClient.GetAsync($"api/Admin/toggleUser?email={email}&enable={enable}");
+		if (!response.IsSuccessStatusCode)
+		{
+			return false;
+		}
+		return true;
+	}
 }

@@ -63,4 +63,52 @@ public class AuthenticationController(IConfiguration configuration, UserManager<
         };
         return Ok(response);
     }
+
+	[HttpPost("toggleUser")]
+	[Authorize("Admin")]
+	public async Task<IActionResult> EnableUser([FromQuery] string Email, [FromQuery] bool Enable = true)
+	{
+		var user = await userManager.FindByEmailAsync(Email);
+
+		if (user == null)
+			return NotFound("User not found");
+
+		user.EmailConfirmed = Enable;
+		var result = await userManager.UpdateAsync(user);
+
+		if (!result.Succeeded)
+			return BadRequest(result.Errors);
+
+		return Ok();
+	}
+
+	[HttpPost("checkjwttoken")]
+	[AllowAnonymous]
+	public async Task<IActionResult> CheckJWTToken([FromQuery] string token)
+	{
+		if (string.IsNullOrWhiteSpace(token))
+			return Ok(false);
+
+		var tokenHandler = new JwtSecurityTokenHandler();
+		var key = Encoding.UTF8.GetBytes(configuration["Jwt:Key"]);
+		try
+		{
+			tokenHandler.ValidateToken(token, new TokenValidationParameters
+			{
+				ValidateIssuer = true,
+				ValidIssuer = configuration["Jwt:Issuer"],
+				ValidateAudience = false,
+				ValidateLifetime = true,
+				IssuerSigningKey = new SymmetricSecurityKey(key),
+				ValidateIssuerSigningKey = true,
+				ClockSkew = TimeSpan.Zero
+			}, out SecurityToken validatedToken);
+
+			return Ok(true);
+		}
+		catch
+		{
+			return Ok(false);
+		}
+	}
 }

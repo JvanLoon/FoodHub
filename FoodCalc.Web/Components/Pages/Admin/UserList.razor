@@ -7,7 +7,17 @@
     <ul>
         @foreach (var user in users)
         {
-            <li>@user.Email (@(user.Enabled ? "Enabled" : "Disabled"))</li>
+            <li>@user.Email (@(user.Enabled ? "Enabled" : "Disabled")) </li>
+            <div>
+                @if (user.Enabled)
+                {
+                    <button @onclick='async () => await AdminService.ToggleUserAsync(user.Email, false)'>Disable</button>
+                }
+                else
+                {
+                    <button @onclick='async () => await AdminService.ToggleUserAsync(user.Email)'>Enable</button>
+                }
+            </div>
         }
     </ul>
 }
@@ -41,6 +51,11 @@ else
                 StateHasChanged();
             }
         }
+    }
+
+    public async Task<bool> EnableUser(string email)
+    {
+        return await AdminService.ToggleUserAsync(email);
     }
 
     async Task ShowMessage(string message, bool isError, int timeInMs = 2000)

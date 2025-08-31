@@ -38,7 +38,8 @@ services:
     volumes:
       - ./keys:/root/.aspnet/DataProtection-Keys
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=Production
+      - WebServer__BaseAddress=http://web:5002
       - ConnectionStrings__Default=Server=db;Database=FoodCalc;User Id=foodhubuser;Password=aj7a!unEe#Ms*BqTE7WJ2a4tX1$^y7;TrustServerCertificate=True;
     depends_on:
       db-init:
@@ -53,14 +54,14 @@ services:
     volumes:
       - ./keys:/root/.aspnet/DataProtection-Keys
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=Production
       - API__BaseAddress=http://api:443
       - ConnectionStrings__Default=Server=db;Database=FoodCalc;User Id=foodhubuser;Password=aj7a!unEe#Ms*BqTE7WJ2a4tX1$^y7;TrustServerCertificate=True;
       - DataProtection__PersistKeysToFileSystem=/keys
     depends_on:
       - api
     ports:
-      - "443:443"
+      - "5002:443"
 
 volumes:
   mssql-data:

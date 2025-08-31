@@ -22,7 +22,7 @@ namespace FoodCalc.ApiService.Controller;
 [Authorize(Roles = "User,Moderator,Admin")]
 public class RecipeController(IMediator mediator) : ControllerBase
 {
-	[HttpGet]
+	[HttpGet("getallrecipes")]
 	public async Task<ActionResult<IEnumerable<RecipeDto>>> GetAllRecipes()
 	{
 		var result = await mediator.Send(new GetAllRecipesQuery());

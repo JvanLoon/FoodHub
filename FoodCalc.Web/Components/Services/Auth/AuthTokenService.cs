@@ -12,7 +12,7 @@ namespace FoodCalc.Web.Components.Services.Auth;
 
 public class AuthTokenService(ILocalStorageService localStorage)
 {
-	private readonly string _tokenName = "authToken";
+	private readonly string _tokenName = "Authorization";
     public async Task<string?> GetTokenAsync()
     {
         return await localStorage.GetItemAsync<string>(_tokenName);

@@ -8,6 +8,8 @@ using FoodCalc.Web.Components.Services.Auth;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.Json;
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+
 public class Program
 {
 	public static void Main(string[] args)
@@ -31,15 +33,16 @@ public class Program
 			client.BaseAddress = new Uri(apiBaseAddress);
 		});
 
-		//builder.Services.AddDataProtection()
-		//.PersistKeysToFileSystem(new DirectoryInfo(@"/root/.aspnet/DataProtection-Keys"))
-		//.SetApplicationName("FoodHub");
+		builder.Services.AddDataProtection()
+		.PersistKeysToFileSystem(new DirectoryInfo(@"/root/.aspnet/DataProtection-Keys"))
+		.SetApplicationName("FoodHub");
 
+		builder.Services.AddScoped<AuthTokenService>();
+		builder.Services.AddScoped<AdminService>();
+		builder.Services.AddScoped<LoginService>();
 		builder.Services.AddScoped<RecipeService>();
 		builder.Services.AddScoped<IngredientService>();
-		builder.Services.AddScoped<LoginService>();
-		builder.Services.AddScoped<AdminService>();
-		builder.Services.AddScoped<AuthTokenService>();
+		builder.Services.AddSingleton<AggregatedIngredientService>();
 
 		builder.Services.AddScoped<AuthenticatedHttpClientService>(sp =>
 		{
@@ -49,7 +52,6 @@ public class Program
 			return new AuthenticatedHttpClientService(httpClient, localStorage);
 		});
 
-		builder.Services.AddSingleton<AggregatedIngredientService>();
 
 		builder.Services.Configure<JsonOptions>(options =>
 		{
@@ -58,11 +60,32 @@ public class Program
 			//options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 		});
 
-		builder.Services.ConfigureApplicationCookie(options =>
-		 {
-			 options.Cookie.SameSite = SameSiteMode.None;
-			 options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // requires HTTPS
-		 });
+		builder.Services.AddAuthentication("JwtBearer")
+		.AddJwtBearer("JwtBearer", options =>
+		{
+			options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+			{
+				ValidateIssuer = true,
+				ValidateAudience = false, // set to true and specify ValidAudience if needed
+				ValidateLifetime = true,
+				ValidateIssuerSigningKey = true,
+				ValidIssuer = builder.Configuration["Jwt:Issuer"],
+				IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
+					System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])
+				),
+				ClockSkew = TimeSpan.Zero
+			};
+			options.TokenValidationParameters.ValidAudience = "your-api-audience";
+			options.TokenValidationParameters.ValidateAudience = true;
+
+			options.SaveToken = true;
+			options.Events = new JwtBearerEvents
+			{
+				//Allows you to hook into JWT authentication events (e.g., for logging, custom validation).
+				OnAuthenticationFailed = context => {  return Task.CompletedTask; }
+			};
+		});
+		builder.Services.AddAuthorization();
 
 		var app = builder.Build();
 
@@ -77,7 +100,10 @@ public class Program
 		app.UseStaticFiles();
 		app.UseAntiforgery();
 
-		app.UseOutputCache();
+		//app.UseOutputCache();
+
+		app.UseAuthentication();
+		app.UseAuthorization();
 
 		app.MapRazorComponents<App>()
 			.AddInteractiveServerRenderMode();
