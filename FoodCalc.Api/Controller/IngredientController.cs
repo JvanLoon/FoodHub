@@ -15,10 +15,10 @@ using Microsoft.AspNetCore.Mvc;
 namespace FoodCalc.ApiService.Controller;
 
 [Route("api/[controller]")]
-[Authorize(Roles = "User,Moderator,Admin")]
 public class IngredientController(IMediator mediator) : ControllerBase
 {
 	[HttpGet]
+	[Authorize]
 	public async Task<ActionResult<IEnumerable<IngredientDto>>> GetAllIngredients()
 	{
 		var result = await mediator.Send(new GetAllIngredientsQuery());
@@ -39,6 +39,7 @@ public class IngredientController(IMediator mediator) : ControllerBase
 	//}
 
 	[HttpPost]
+	[Authorize(Roles = "Admin")]
 	public async Task<IActionResult> AddIngredient([FromBody]CreateIngredientDto ingredient)
 	{
 		if (string.IsNullOrEmpty(ingredient.Name))
@@ -54,6 +55,7 @@ public class IngredientController(IMediator mediator) : ControllerBase
 	}
 
 	[HttpDelete("deleteingredient/{id}")]
+	[Authorize(Roles = "Admin")]
 	public async Task<IActionResult> DeleteIngredient(Guid id)
 	{
 		var result = await mediator.Send(new DeleteIngredientCommand(id));
@@ -64,6 +66,7 @@ public class IngredientController(IMediator mediator) : ControllerBase
 	}
 
 	[HttpPut]
+	[Authorize(Roles = "Admin")]
 	public async Task<IActionResult> UpdateIngredient([FromBody] UpdateIngredientDto ingredient)
 	{
 		var result = await mediator.Send(new UpdateIngredientCommand(ingredient));

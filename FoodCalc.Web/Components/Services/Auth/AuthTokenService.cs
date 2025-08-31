@@ -18,19 +18,12 @@ public class AuthTokenService(ILocalStorageService localStorage)
         return await localStorage.GetItemAsync<string>(_tokenName);
     }
 
-    /// <summary>
-    /// If empty string cookie is cleared
-    /// </summary>
     public async Task SetTokenAsync(string token)
     {
-        if (string.IsNullOrEmpty(token))
+        if (!string.IsNullOrEmpty(token))
         {
-            await RemoveTokenAsync();
-        }
-        else
-        {
-            await localStorage.SetItemAsync(_tokenName, token);
-        }
+			await localStorage.SetItemAsync(_tokenName, token);
+		}
     }
 
     public async Task RemoveTokenAsync()

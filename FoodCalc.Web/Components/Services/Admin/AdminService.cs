@@ -13,24 +13,25 @@ public class AdminService(AuthenticatedHttpClientService httpClient)
 {
     public async Task<List<UserDto>> GetUsersAsync()
     {
-		var response = await httpClient.GetAsync("api/Admin/users");
-		if (!response.IsSuccessStatusCode)
-		{
-			// Optionally log or handle the error
-			var errorContent = await response.Content.ReadAsStringAsync();
-			// Handle 401, 403, 500, etc.
-			return [];
-		}
-		return await response.Content.ReadFromJsonAsync<List<UserDto>>() ?? [];
-	}
+        var response = await httpClient.GetAsync("api/Admin/users");
+        if (!response.IsSuccessStatusCode)
+        {
+            // Optionally log or handle the error
+            var errorContent = await response.Content.ReadAsStringAsync();
+            // Handle 401, 403, 500, etc.
+            return [];
+        }
+        return await response.Content.ReadFromJsonAsync<List<UserDto>>() ?? [];
+    }
 
-	public async Task<bool> ToggleUserAsync(string email, bool enable = true)
-	{
-		var response = await httpClient.GetAsync($"api/Admin/toggleUser?email={email}&enable={enable}");
-		if (!response.IsSuccessStatusCode)
-		{
-			return false;
-		}
-		return true;
-	}
+    public async Task<bool> ToggleUserAsync(string email, bool enable = true)
+    {
+        // Specify the type argument explicitly to resolve CS0411
+        var response = await httpClient.PostAsync($"api/authentication/toggleUser?email={email}&enable={enable}", null);
+        if (!response.IsSuccessStatusCode)
+        {
+            return false;
+        }
+        return true;
+    }
 }

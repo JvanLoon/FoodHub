@@ -66,14 +66,14 @@ public class AuthenticationController(IConfiguration configuration, UserManager<
 
 	[HttpPost("toggleUser")]
 	[Authorize("Admin")]
-	public async Task<IActionResult> EnableUser([FromQuery] string Email, [FromQuery] bool Enable = true)
+	public async Task<IActionResult> EnableUser([FromQuery] string email, [FromQuery] bool enable = true)
 	{
-		var user = await userManager.FindByEmailAsync(Email);
+		var user = await userManager.FindByEmailAsync(email);
 
 		if (user == null)
 			return NotFound("User not found");
 
-		user.EmailConfirmed = Enable;
+		user.EmailConfirmed = enable;
 		var result = await userManager.UpdateAsync(user);
 
 		if (!result.Succeeded)
@@ -97,7 +97,8 @@ public class AuthenticationController(IConfiguration configuration, UserManager<
 			{
 				ValidateIssuer = true,
 				ValidIssuer = configuration["Jwt:Issuer"],
-				ValidateAudience = false,
+				ValidateAudience = true,
+				ValidAudience = configuration["Jwt:Audience"],
 				ValidateLifetime = true,
 				IssuerSigningKey = new SymmetricSecurityKey(key),
 				ValidateIssuerSigningKey = true,

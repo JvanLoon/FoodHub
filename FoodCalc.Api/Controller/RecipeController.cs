@@ -19,10 +19,10 @@ using Microsoft.AspNetCore.Authorization;
 namespace FoodCalc.ApiService.Controller;
 
 [Route("api/[controller]")]
-[Authorize(Roles = "User,Moderator,Admin")]
 public class RecipeController(IMediator mediator) : ControllerBase
 {
 	[HttpGet("getallrecipes")]
+	[Authorize]
 	public async Task<ActionResult<IEnumerable<RecipeDto>>> GetAllRecipes()
 	{
 		var result = await mediator.Send(new GetAllRecipesQuery());
@@ -33,6 +33,7 @@ public class RecipeController(IMediator mediator) : ControllerBase
 	}
 
 	[HttpGet("{id}")]
+	[Authorize(Roles = "Admin")]
 	public async Task<ActionResult<RecipeDto>> GetRecipeById(Guid id)
 	{
 		var result = await mediator.Send(new GetRecipeByIdQuery(id));
@@ -43,7 +44,8 @@ public class RecipeController(IMediator mediator) : ControllerBase
 	}
 
 	[HttpPost]
-    public async Task<IActionResult> AddRecipe([FromBody] CreateRecipeDto recipe)
+	[Authorize(Roles = "Admin")]
+	public async Task<IActionResult> AddRecipe([FromBody] CreateRecipeDto recipe)
     {
         Console.WriteLine($"Received Recipe: {recipe.Name}");
 
@@ -60,6 +62,7 @@ public class RecipeController(IMediator mediator) : ControllerBase
     }
 
 	[HttpPut("name")]
+	[Authorize(Roles = "Admin")]
 	public async Task<IActionResult> UpdateRecipe([FromBody] RecipeNameUpdateDto payload)
 	{
 		var result = await mediator.Send(new UpdateRecipeNameCommand(payload.Id, payload.Name));
@@ -70,6 +73,7 @@ public class RecipeController(IMediator mediator) : ControllerBase
 	}
 
 	[HttpPut]
+	[Authorize(Roles = "Admin")]
 	public async Task<IActionResult> UpdateRecipe([FromBody] UpdateRecipeDto recipe)
 	{
 		var result = await mediator.Send(new UpdateRecipeCommand(recipe));
@@ -80,6 +84,7 @@ public class RecipeController(IMediator mediator) : ControllerBase
 	}
 
 	[HttpDelete("deleterecipe/{id}")]
+	[Authorize(Roles = "Admin")]
 	public async Task<IActionResult> DeleteRecipe(Guid id)
 	{
 		var result = await mediator.Send(new DeleteRecipeCommand(id));
@@ -90,6 +95,7 @@ public class RecipeController(IMediator mediator) : ControllerBase
 	}
 
 	[HttpDelete("deleteingredient/{id}")]
+	[Authorize(Roles = "Admin")]
 	public async Task<IActionResult> DeleteIngredient(Guid id)
 	{
 		var result = await mediator.Send(new DeleteIngredientFromRecipeCommand(id));
@@ -100,7 +106,7 @@ public class RecipeController(IMediator mediator) : ControllerBase
 	}
 
 	[HttpPost("ingredient")]
-
+	[Authorize(Roles = "Admin")]
 	public async Task<IActionResult> AddIngredientToRecipe([FromBody] RecipeIngredientDto recipeIngredient)
 	{
 		var result = await mediator.Send(new AddIngredientToRecipeCommand(recipeIngredient));

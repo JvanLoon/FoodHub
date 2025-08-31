@@ -41,6 +41,12 @@ public class AuthenticatedHttpClientService
 		return await _httpClient.PostAsJsonAsync(requestUri, value);
 	}
 
+	public async Task<HttpResponseMessage> PostAsync(string requestUri, HttpContent? content = null)
+	{
+		await AttachTokenAsync();
+		return await _httpClient.PostAsync(requestUri, content);
+	}
+
 	public async Task<HttpResponseMessage> PutAsJsonAsync<T>(string requestUri, T value)
 	{
 		await AttachTokenAsync();

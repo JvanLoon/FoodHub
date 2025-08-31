@@ -53,6 +53,24 @@ public class Program
 		.AddEntityFrameworkStores<ApplicationDbContext>()
 		.AddDefaultTokenProviders();
 
+		builder.Services.AddAuthorization(options =>
+		{
+			options.AddPolicy("Admin,Moderator,User", policy =>
+				policy.RequireRole("Admin", "Moderator", "User"));
+
+			options.AddPolicy("Admin,Moderator", policy =>
+				policy.RequireRole("Admin", "Moderator"));
+
+			options.AddPolicy("Admin", policy =>
+				policy.RequireRole("Admin"));
+
+			options.AddPolicy("Moderator", policy =>
+				policy.RequireRole("Moderator"));
+
+			options.AddPolicy("User", policy =>
+				policy.RequireRole("User"));
+		});
+
 		// Configure JWT authentication
 		var jwtSettings = builder.Configuration.GetSection("Jwt");
 		builder.Services.AddAuthentication(options =>
@@ -66,15 +84,13 @@ public class Program
 			{
 				ValidateIssuer = true,
 				ValidateAudience = false,
+				ValidAudience = jwtSettings["Audience"],
 				ValidateLifetime = true,
 				ValidateIssuerSigningKey = true,
 				ValidIssuer = jwtSettings["Issuer"],
 				IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(jwtSettings["Key"])),
 				ClockSkew = TimeSpan.Zero
 			};
-
-			options.TokenValidationParameters.ValidAudience = "your-api-audience";
-			options.TokenValidationParameters.ValidateAudience = true;
 
 			options.SaveToken = true;
 		});
@@ -94,8 +110,6 @@ public class Program
 					.AllowAnyMethod()
 					.AllowCredentials());
 		});
-
-		
 
 		var app = builder.Build();
 

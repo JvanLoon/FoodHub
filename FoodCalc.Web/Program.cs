@@ -5,10 +5,10 @@ using FoodCalc.Web.Components.Services;
 using FoodCalc.Web.Components.Services.Admin;
 using FoodCalc.Web.Components.Services.Auth;
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.Json;
-
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 public class Program
 {
@@ -52,6 +52,16 @@ public class Program
 			return new AuthenticatedHttpClientService(httpClient, localStorage);
 		});
 
+		// CORS config
+		builder.Services.AddCors(options =>
+		{
+			options.AddPolicy("AllowAPI",
+				builder => builder
+					.WithOrigins(apiBaseAddress)
+					.AllowAnyHeader()
+					.AllowAnyMethod()
+					.AllowCredentials());
+		});
 
 		builder.Services.Configure<JsonOptions>(options =>
 		{
@@ -63,22 +73,23 @@ public class Program
 		builder.Services.AddAuthentication("JwtBearer")
 		.AddJwtBearer("JwtBearer", options =>
 		{
+			var jwtSettings = builder.Configuration.GetSection("Jwt");
 			options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
 			{
 				ValidateIssuer = true,
-				ValidateAudience = false, // set to true and specify ValidAudience if needed
+				ValidateAudience = false,
+				ValidAudience = jwtSettings["Audience"],
 				ValidateLifetime = true,
 				ValidateIssuerSigningKey = true,
-				ValidIssuer = builder.Configuration["Jwt:Issuer"],
+				ValidIssuer = jwtSettings["Issuer"],
 				IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
-					System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])
+					System.Text.Encoding.UTF8.GetBytes(jwtSettings["Key"])
 				),
 				ClockSkew = TimeSpan.Zero
 			};
-			options.TokenValidationParameters.ValidAudience = "your-api-audience";
-			options.TokenValidationParameters.ValidateAudience = true;
 
 			options.SaveToken = true;
+
 			options.Events = new JwtBearerEvents
 			{
 				//Allows you to hook into JWT authentication events (e.g., for logging, custom validation).
@@ -101,9 +112,11 @@ public class Program
 		app.UseAntiforgery();
 
 		//app.UseOutputCache();
+		app.UseCors("AllowAPI");
 
 		app.UseAuthentication();
 		app.UseAuthorization();
+
 
 		app.MapRazorComponents<App>()
 			.AddInteractiveServerRenderMode();
