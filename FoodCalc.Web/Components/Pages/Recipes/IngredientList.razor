@@ -32,12 +32,12 @@ else
                         <td>@ingredient.Name</td>
                         <td>
                             <input type="checkbox"
-                                   checked="@ingredient.ShouldBeAddedToShoppingCart"
-                                   @onchange="(e) => OnCheckboxChanged(ingredient, e)" />
+                            checked="@ingredient.ShouldBeAddedToShoppingCart"
+                            @onchange="(e) => OnCheckboxChanged(ingredient, e)" />
                         </td>
                         <td>
                             <button class="btn btn-danger btn-sm"
-                                    @onclick="() => DeleteIngredient(ingredient.Id)">
+                            @onclick="() => DeleteIngredient(ingredient.Id)">
                                 Delete
                             </button>
                         </td>
@@ -63,9 +63,21 @@ else
     private bool IsError = false;
     private string _message = string.Empty;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        ingredients = await IngredientService.GetAllIngredientsAsync();
+        if (firstRender)
+        {
+            try
+            {
+                ingredients = await IngredientService.GetAllIngredientsAsync();
+            }
+            catch (Exception ex)
+            {
+                ingredients = [];
+                ShowMessage(ex.Message, true, 20000);
+                StateHasChanged();
+            }
+        }
     }
 
     private async Task OnCheckboxChanged(IngredientDto ingredient, ChangeEventArgs e)

@@ -135,20 +135,35 @@
     private bool IsError = false;
     private string _message = string.Empty;
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                recipe = await RecipeService.GetRecipeByIdAsync(RecipeId) ?? new RecipeDto();
+                ingredients = await IngredientService.GetAllIngredientsAsync();
+                noIngredient = Guid.NewGuid();
+                recipeIngredient.IngredientId = noIngredient;
+                ClearForm();
+            }
+            catch (Exception ex)
+            {
+                ShowMessage(ex.Message, true, 20000);
+                Logger.LogError($"Error loading data: {ex.Message}");
+            }
+        }
+    }
+
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            recipe = await RecipeService.GetRecipeByIdAsync(RecipeId) ?? new RecipeDto();
-            ingredients = await IngredientService.GetAllIngredientsAsync();
-            noIngredient = Guid.NewGuid();
-            recipeIngredient.IngredientId = noIngredient;
-            ClearForm();
+            
         }
         catch (Exception ex)
         {
-            ShowMessage("Failed to load data", true);
-            Logger.LogError($"Error loading data: {ex.Message}");
+            
         }
     }
 

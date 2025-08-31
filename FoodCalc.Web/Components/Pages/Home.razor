@@ -88,17 +88,19 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        try
+        if (firstRender)
         {
-            Recipes = await recipeService.GetAllRecipesAsync();
-            //StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            Recipes = [];
-            ShowMessage(ex.Message, true, 99999999);
-            StateHasChanged();
-            //throw ex;
+            try
+            {
+                Recipes = await recipeService.GetAllRecipesAsync();
+                //StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                Recipes = [];
+                ShowMessage(ex.Message, true, 99999999);
+                StateHasChanged();
+            }
         }
     }
 

@@ -20,8 +20,40 @@ else
 @code {
     private List<UserDto> users = new();
 
-    protected override async Task OnInitializedAsync()
+    private bool showMessage = false;
+    private bool IsError = false;
+    private string _message = string.Empty;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        users = await AdminService.GetUsersAsync();
+        if (firstRender)
+        {
+            try
+            {
+                users = await AdminService.GetUsersAsync();
+            }
+            catch (Exception ex)
+            {
+                users = [];
+                ShowMessage(ex.Message, true, 20000);
+                StateHasChanged();
+            }
+        }
+    }
+
+    async Task ShowMessage(string message, bool isError, int timeInMs = 2000)
+    {
+        _message = message;
+        IsError = isError;
+
+        showMessage = true;
+        StateHasChanged();
+
+        await Task.Delay(timeInMs);
+
+        showMessage = false;
+        _message = string.Empty;
+        IsError = false;
+        StateHasChanged();
     }
 }

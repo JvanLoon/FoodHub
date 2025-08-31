@@ -35,20 +35,50 @@
 @code{
      private string? userEmail;
 
-    protected override async Task OnInitializedAsync()
+    private bool showMessage = false;
+    private bool IsError = false;
+    private string _message = string.Empty;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (await AuthTokenService.IsTokenExpiredAsync())
+        if (firstRender)
         {
-            await AuthTokenService.RemoveTokenAsync();
-            Navigation.NavigateTo("/login");
+            try
+            {
+                if (await AuthTokenService.IsTokenExpiredAsync())
+                {
+                    await AuthTokenService.RemoveTokenAsync();
+                    Navigation.NavigateTo("/login");
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowMessage(ex.Message, true, 20000);
+                StateHasChanged();
+            }
+            userEmail = await AuthTokenService.GetEmailAsync();
         }
-        
-        userEmail = await AuthTokenService.GetEmailAsync();
     }
 
     private async Task Logout()
     {
         await AuthTokenService.RemoveTokenAsync(); // Clear the cookie
         Navigation.NavigateTo("/login");
+    }
+
+    async Task ShowMessage(string message, bool isError, int timeInMs = 2000)
+    {
+        _message = message;
+        IsError = isError;
+
+        showMessage = true;
+        StateHasChanged();
+
+        await Task.Delay(timeInMs);
+
+        showMessage = false;
+        _message = string.Empty;
+        IsError = false;
+        StateHasChanged();
     }
 }
