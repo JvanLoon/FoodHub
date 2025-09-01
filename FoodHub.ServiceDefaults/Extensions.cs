@@ -119,6 +119,7 @@ public static class Extensions
         services.AddScoped<IRecipeRepository, RecipeRepository>();
         services.AddScoped<IIngredientRepository, IngredientRepository>();
 		services.AddScoped<IUserRepository, UserRepository>();
+		services.AddScoped<IRoleRepository, RoleRepository>();
 
 		services.AddScoped<IUnitOfWork, UnitOfWork>();
 

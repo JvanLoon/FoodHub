@@ -37,36 +37,54 @@
 </div>
 
 @code{
-     private string? userEmail;
+    private string? userEmail;
 
     private bool showMessage = false;
     private bool IsError = false;
     private string _message = string.Empty;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if (firstRender)
+        Navigation.LocationChanged += OnLocationChanged;
+        try
         {
-            try
+            if (await AuthTokenService.IsTokenExpiredAsync())
             {
-                if (await AuthTokenService.IsTokenExpiredAsync())
-                {
-                    await AuthTokenService.RemoveTokenAsync();
-                    Navigation.NavigateTo("/login");
-                }
+                await Logout();
             }
-            catch (Exception ex)
-            {
-                ShowMessage(ex.Message, true, 20000);
-                StateHasChanged();
-            }
-            userEmail = await AuthTokenService.GetEmailAsync();
         }
+        catch (Exception ex)
+        {
+            ShowMessage(ex.Message, true, 20000);
+            StateHasChanged();
+        }
+        await RefreshEmailAsync();
+    }
+
+    private async void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    {
+        if (string.IsNullOrEmpty(userEmail))
+        {
+            await RefreshEmailAsync();
+        }
+        
+    }
+
+    private async Task RefreshEmailAsync()
+    {
+        userEmail = await AuthTokenService.GetEmailAsync() ?? string.Empty;
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        Navigation.LocationChanged -= OnLocationChanged;
     }
 
     private async Task Logout()
     {
         await AuthTokenService.RemoveTokenAsync(); // Clear the cookie
+        await RefreshEmailAsync(); // Clear the email and update UI
         Navigation.NavigateTo("/login");
     }
 

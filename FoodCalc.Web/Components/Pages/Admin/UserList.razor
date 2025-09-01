@@ -1,31 +1,43 @@
 @using FoodCalc.Web.Components.Services.Admin
 @inject AdminService AdminService
 
-<h4>User List</h4>
-@if (users.Any())
-{
-    <ul>
-        @foreach (var user in users)
-        {
-            <li>@user.Email (@(user.Enabled ? "Enabled" : "Disabled")) </li>
-            <div>
-                @if (user.Enabled)
-                {
-                    <button @onclick='async () => await ToggleUserAsync(user.Email, false)'>Disable</button>
-                }
-                else
-                {
-                    <button @onclick='async () => await ToggleUserAsync(user.Email, true)'>Enable</button>
-                }
-            </div>
-        }
-    </ul>
-}
-else
-{
-    <p>No users, something went wrong</p>
-}
-
+<div class="container py-4">
+    <h3 class="mb-4">User List</h3>
+    @if (users.Any())
+    {
+        <div class="list-group">
+            @foreach (var user in users)
+            {
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <a class="text-decoration-none flex-grow-1" href="/admin/userroles/@user.Email">
+                        <strong>@user.Email</strong>
+                        <span class="badge ms-2 @(user.Enabled ? "bg-success" : "bg-danger")">@(user.Enabled ? "Enabled" : "Disabled")</span>
+                    </a>
+                    <div>
+                        @if (user.Enabled)
+                        {
+                            <button class="btn btn-sm btn-outline-danger" @onclick='async () => await ToggleUserAsync(user.Email, false)'>Disable</button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-sm btn-outline-success" @onclick='async () => await ToggleUserAsync(user.Email, true)'>Enable</button>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning">No users, something went wrong</div>
+    }
+    @if (showMessage)
+    {
+        <div class="alert @(IsError ? "alert-danger" : "alert-success") mt-3" role="alert">
+            @_message
+        </div>
+    }
+</div>
 
 
 @code {

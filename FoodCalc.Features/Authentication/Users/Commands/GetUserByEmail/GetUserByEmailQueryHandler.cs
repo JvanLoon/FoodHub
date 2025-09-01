@@ -13,7 +13,7 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 
 
-namespace FoodCalc.Features.Users.Commands.GetUserByEmail;
+namespace FoodCalc.Features.Authentication.Users.Commands.GetUserByEmail;
 public class GetUserByEmailQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GetAllRecipesQueryHandler> logger) : IRequestHandler<GetUserByEmailQuery, ErrorOr<UserDto>>
 {
 	public async Task<ErrorOr<UserDto>> Handle(GetUserByEmailQuery request, CancellationToken cancellationToken)

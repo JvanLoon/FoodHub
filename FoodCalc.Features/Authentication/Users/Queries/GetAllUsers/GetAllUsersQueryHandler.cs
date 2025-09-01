@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
 
-namespace FoodCalc.Features.Recipes.Queries.GetAllRecipes;
+namespace FoodCalc.Features.Authentication.Users.Queries.GetAllUsers;
 public class GetAllUsersQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GetAllUsersQueryHandler> logger, UserManager<IdentityUser> userManager) : IRequestHandler<GetAllUsersQuery, ErrorOr<List<UserDto>>>
 {
 	public async Task<ErrorOr<List<UserDto>>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)

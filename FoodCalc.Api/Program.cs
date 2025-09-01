@@ -49,6 +49,10 @@ public class Program
 		{
 			options.SignIn.RequireConfirmedAccount = false;
 			options.User.RequireUniqueEmail = true;
+
+			options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
+			options.Lockout.MaxFailedAccessAttempts = 5;
+			options.Lockout.AllowedForNewUsers = true;
 		})
 		.AddEntityFrameworkStores<ApplicationDbContext>()
 		.AddDefaultTokenProviders();

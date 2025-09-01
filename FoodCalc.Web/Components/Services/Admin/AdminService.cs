@@ -34,4 +34,28 @@ public class AdminService(AuthenticatedHttpClientService httpClient)
         }
         return true;
     }
+
+	public async Task<List<string>> GetAllRolesAsync()
+	{
+		var response = await httpClient.GetAsync("api/Admin/allroles");
+		if (!response.IsSuccessStatusCode)
+			return [];
+
+		var roles = await response.Content.ReadAsStringAsync();
+		return roles.Split(",").ToList();
+	}
+
+	public async Task<List<string>> GetUserRolesAsync(string email)
+	{
+		var response = await httpClient.GetAsync($"api/Admin/userroles?email={email}");
+		if (!response.IsSuccessStatusCode)
+			return [];
+		return await response.Content.ReadFromJsonAsync<List<string>>() ?? [];
+	}
+
+	public async Task<bool> UpdateUserRolesAsync(string email, string newRole)
+	{
+		var response = await httpClient.PostAsync($"api/Admin/userroles?email={email}&role=newRole");
+		return response.IsSuccessStatusCode;
+	}
 }

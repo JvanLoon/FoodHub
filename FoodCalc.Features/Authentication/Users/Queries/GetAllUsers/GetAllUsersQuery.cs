@@ -3,5 +3,5 @@ using MediatR;
 
 using FoodHub.DTOs;
 
-namespace FoodCalc.Features.Recipes.Queries.GetAllRecipes;
+namespace FoodCalc.Features.Authentication.Users.Queries.GetAllUsers;
 public record GetAllUsersQuery() : IRequest<ErrorOr<List<UserDto>>>;

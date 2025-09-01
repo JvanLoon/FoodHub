@@ -7,5 +7,6 @@ public interface IUnitOfWork
     IRecipeRepository RecipeRepository { get; }
     IIngredientRepository IngredientRepository { get; }
 	IUserRepository UserRepository { get; }
+	IRoleRepository RoleRepository { get; }
 	Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

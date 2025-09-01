@@ -17,6 +17,7 @@ public class AuthenticationController(IConfiguration configuration, UserManager<
 	[AllowAnonymous]
 	public async Task<IActionResult> Register([FromBody] RegisterDto dto)
     {
+		return BadRequest("Register not implemented");
         var user = new IdentityUser { UserName = dto.Email, Email = dto.Email};
         var result = await userManager.CreateAsync(user, dto.Password);
         if (!result.Succeeded)
@@ -30,17 +31,32 @@ public class AuthenticationController(IConfiguration configuration, UserManager<
     {
        var user = await userManager.FindByEmailAsync(dto.Email);
         if (user == null)
-            return Unauthorized();
+            return Unauthorized("No user found");
 
-        var result = await signInManager.CheckPasswordSignInAsync(user, dto.Password, false);
-        if (!result.Succeeded)
-            return Unauthorized();
+		if (!user.EmailConfirmed)
+			return Unauthorized("Email not confirmed");
 
-		List<Claim> claims = new List<Claim>
+		if (user.LockoutEnabled)
 		{
-			new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-			new Claim(JwtRegisteredClaimNames.Email, user.Email)
-		};
+			if (user.LockoutEnd < DateTime.Now)
+			{
+				await userManager.SetLockoutEnabledAsync(user, false);
+			}
+			else
+				return Unauthorized("User Lockedout");
+		}
+
+		var result = await signInManager.CheckPasswordSignInAsync(user, dto.Password, false);
+        if (!result.Succeeded)
+		{
+			await userManager.AccessFailedAsync(user);
+			return Unauthorized("Invalid password");
+		}
+
+		List<Claim> claims = [];
+
+		claims.Add(new Claim(JwtRegisteredClaimNames.Sub, user.Id));
+		claims.Add(new Claim(JwtRegisteredClaimNames.Email, user.Email));
 
 		var roles = await userManager.GetRolesAsync(user);
 		foreach (var role in roles)
@@ -73,7 +89,16 @@ public class AuthenticationController(IConfiguration configuration, UserManager<
 		if (user == null)
 			return NotFound("User not found");
 
+		//enable user
 		user.EmailConfirmed = enable;
+
+		//check if user has role user, of not add it
+		if (!await userManager.IsInRoleAsync(user, "User"))
+		{
+			await userManager.AddToRoleAsync(user, "User");
+		}
+
+
 		var result = await userManager.UpdateAsync(user);
 
 		if (!result.Succeeded)

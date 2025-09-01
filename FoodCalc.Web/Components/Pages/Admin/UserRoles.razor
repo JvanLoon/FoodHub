@@ -1,0 +1,131 @@
+﻿@page "/admin/userroles/{email}"
+@using FoodCalc.Web.Components.Services.Admin
+@inject AdminService AdminService
+@inject NavigationManager Navigation
+
+<h4 class="mb-4">Manage Roles for @email</h4>
+
+@if (roles == null || allRoles == null)
+{
+    <p>Loading roles...</p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-6">
+            <label for="addRole" class="form-label">Add Role</label>
+            <div class="input-group mb-3">
+                <select id="addRole" class="form-select" @bind="selectedRole">
+                    <option value="">Select a role...</option>
+                    @foreach (var role in allRoles.Except(roles))
+                    {
+                        <option value="@role">@role</option>
+                    }
+                </select>
+                <button class="btn btn-success" @onclick="AddRole" disabled="@(string.IsNullOrEmpty(selectedRole))">Add</button>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <ul class="list-group">
+                @if (roles.Any())
+                {
+                    @foreach (var role in roles)
+                    {
+                        <li class="list-group-item d-flex align-items-center">
+                            <span>
+                                @role
+                            </span>
+                            <span class="ms-auto">
+                                <button class="btn btn-danger btn-sm" @onclick="() => RemoveRole(role)">Delete</button>
+                            </span>
+                        </li>
+                    }
+                }
+                else
+                {
+                    <li class="list-group-item d-flex align-items-center">
+                        <span>No roles assigned</span>
+                        <span class="ms-auto">
+                            <button class="btn btn-danger btn-sm d-none">x</button>
+                        </span>
+                    </li>
+                }
+                
+            </ul>
+        </div>
+    </div>
+    @if (showMessage)
+    {
+        <div class="alert @(IsError ? "alert-danger" : "alert-success") mt-3" role="alert">
+            @_message
+        </div>
+    }
+}
+
+@code {
+    [Parameter] public string email { get; set; }
+    private List<string> roles;
+    private List<string> allRoles;
+    private string selectedRole;
+
+    private bool showMessage = false;
+    private bool IsError = false;
+    private string _message = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        roles = await AdminService.GetUserRolesAsync(email);
+        allRoles = await AdminService.GetAllRolesAsync();
+    }
+
+    private async Task AddRole()
+    {
+        if (!string.IsNullOrEmpty(selectedRole) && !roles.Contains(selectedRole))
+        {
+            var result = await AdminService.UpdateUserRolesAsync(email, selectedRole);
+            if (result)
+            {
+                roles.Add(selectedRole);
+                selectedRole = string.Empty;
+                ShowMessage("Role added successfully!", false);
+            }
+            else
+            {
+                ShowMessage("Failed to add role.", true);
+            }
+        }
+    }
+
+    private async Task RemoveRole(string role)
+    {
+        var result = await AdminService.UpdateUserRolesAsync(email, role);
+        if (result)
+        {
+            roles.Remove(role);
+            ShowMessage("Role removed successfully!", false);
+        }
+        else
+        {
+            ShowMessage("Failed to remove role.", true);
+        }
+    }
+
+    async Task ShowMessage(string message, bool isError, int timeInMs = 2000)
+    {
+        _message = message;
+        IsError = isError;
+        showMessage = true;
+        StateHasChanged();
+        await Task.Delay(timeInMs);
+        showMessage = false;
+        _message = string.Empty;
+        IsError = false;
+        StateHasChanged();
+    }
+
+    public class RoleModel
+    {
+        public string Roles { get; set; }
+    }
+}
