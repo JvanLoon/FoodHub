@@ -11,11 +11,11 @@
             <div>
                 @if (user.Enabled)
                 {
-                    <button @onclick='async () => await AdminService.ToggleUserAsync(user.Email, false)'>Disable</button>
+                    <button @onclick='async () => await ToggleUserAsync(user.Email, false)'>Disable</button>
                 }
                 else
                 {
-                    <button @onclick='async () => await AdminService.ToggleUserAsync(user.Email)'>Enable</button>
+                    <button @onclick='async () => await ToggleUserAsync(user.Email, true)'>Enable</button>
                 }
             </div>
         }
@@ -53,9 +53,11 @@ else
         }
     }
 
-    public async Task<bool> EnableUser(string email)
+    public async Task ToggleUserAsync(string email, bool enabled)
     {
-        return await AdminService.ToggleUserAsync(email);
+        await AdminService.ToggleUserAsync(email, enabled);
+        users.Where(u => u.Email == email).SingleOrDefault(u => u.Enabled = enabled);
+        //StateHasChanged();
     }
 
     async Task ShowMessage(string message, bool isError, int timeInMs = 2000)

@@ -32,12 +32,25 @@ namespace FoodHub.Persistence.Repositories
 			return userManager.Users.ToListAsync(cancellationToken);
 		}
 
-		public Task<IdentityUser?> GetByEmailAsync(string email, CancellationToken cancellationToken)
+		public async Task<IdentityUser?> GetByEmailAsync(string email, CancellationToken cancellationToken)
 		{
-			return context.Users.SingleOrDefaultAsync(u => u.Email == email, cancellationToken);
+			IdentityUser? user = await context.Users.SingleOrDefaultAsync(u => u.Email == email, cancellationToken);
+			if(user != null)
+			{
+				throw new Exception("User not found");
+			}
+			if (!user!.LockoutEnabled)
+			{
+				throw new Exception("User locked");
+			}
+			if (!user!.EmailConfirmed)
+			{
+				throw new Exception("User not enabled");
+			}
+			return user;
 		}
 
-		public Task UpdateAsync(IdentityUser user, CancellationToken cancellationToken)
+		public async Task UpdateAsync(IdentityUser user, CancellationToken cancellationToken)
 		{
 			throw new NotImplementedException();
 		}

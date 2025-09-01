@@ -27,7 +27,8 @@ public class GetUserByEmailQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, 
 		catch (Exception ex)
 		{
 			logger.LogError(ex, "Failed to get User by email");
-			return Error.Failure("Failed to get User by email");
+			//return message because GetByEmailAsync returns a error with message
+			return Error.Failure(ex.Message);
 		}
 	}
 }
