@@ -1,0 +1,25 @@
+﻿@page "/usersettings"
+@using FoodCalc.Web.Components.Services.Auth
+@inject AuthTokenService AuthTokenService
+
+<h3>User Settings</h3>
+
+@if (string.IsNullOrEmpty(email))
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div class="card p-3" style="max-width: 400px;">
+        <div class="mb-2"><strong>Email:</strong> @email</div>
+    </div>
+}
+
+@code {
+    private string? email;
+
+    protected override async Task OnInitializedAsync()
+    {
+        email = await AuthTokenService.GetEmailAsync();
+    }
+}

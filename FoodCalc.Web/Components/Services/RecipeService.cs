@@ -10,14 +10,14 @@ using System.Net.Http.Json;
 namespace FoodCalc.Web.Components.Services;
 public class RecipeService(AuthenticatedHttpClientService httpClient)
 {
-    public async Task<List<RecipeDto>> GetAllRecipesAsync()
+    public async Task<List<RecipeDto>> GetAllRecipesAsync(bool withIngredients = true)
     {
-        var response = await httpClient.GetAsync("api/recipe/getallrecipes");
+        var response = await httpClient.GetAsync($"api/recipe/getallrecipes?withingredient={withIngredients}");
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<List<RecipeDto>>() ?? [];
     }
 
-    public async Task<RecipeDto?> GetRecipeByIdAsync(Guid recipeId)
+	public async Task<RecipeDto?> GetRecipeByIdAsync(Guid recipeId)
     {
         var response = await httpClient.GetAsync($"api/recipe/{recipeId}");
         response.EnsureSuccessStatusCode();

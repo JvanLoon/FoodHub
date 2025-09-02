@@ -1,0 +1,60 @@
+﻿@inject RecipeService RecipeService
+@inject UserService UserService
+
+<div class="recipe-blacklist card p-4" style="max-width: 500px; margin: 2rem auto; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+    <h4 class="mb-3">Recipes you don't want to see</h4>
+    <ul class="list-group mb-3">
+        @foreach (var recipe in BlacklistedRecipes)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>@recipe.Name</span>
+                <button class="btn btn-sm btn-danger" @onclick="() => RemoveRecipe(recipe.Id)">Remove</button>
+            </li>
+        }
+    </ul>
+    <div class="d-flex gap-2 align-items-center">
+        <select class="form-select" @bind="SelectedRecipeId">
+            <option value="">Select recipe...</option>
+            @foreach (var recipe in AllRecipes.Where(r => !BlacklistedRecipes.Any(b => b.Id == r.Id)))
+            {
+                <option value="@recipe.Id">@recipe.Name</option>
+            }
+        </select>
+        <button class="btn btn-primary" @onclick="AddSelectedRecipe" disabled="@(string.IsNullOrEmpty(SelectedRecipeId))">Add</button>
+    </div>
+</div>
+
+@code {
+    private List<RecipeDto> BlacklistedRecipes = new();
+    private List<RecipeDto> AllRecipes = new();
+    private string? SelectedRecipeId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        AllRecipes = await RecipeService.GetAllRecipesAsync(false);
+    }
+
+    private async Task AddSelectedRecipe()
+    {
+        var parsedId = new Guid(SelectedRecipeId);
+        await UserService.AddRecipeToBlackList(parsedId);
+
+        var selected = AllRecipes.FirstOrDefault(r => r.Id == parsedId);
+        if (selected != null && !BlacklistedRecipes.Any(r => r.Id == selected.Id))
+        {
+            BlacklistedRecipes.Add(selected);
+            SelectedRecipeId = string.Empty;
+        }
+    }
+
+    private async void RemoveRecipe(Guid recipeId)
+    {
+        await UserService.RemoveRecipeToBlackList(recipeId);
+
+        var selected = AllRecipes.FirstOrDefault(r => r.Id == recipeId);
+        if (selected != null && !BlacklistedRecipes.Any(r => r.Id == selected.Id))
+        {
+            BlacklistedRecipes.Remove(selected);
+        }
+    }
+}

@@ -18,7 +18,7 @@ using System.Linq;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize("Admin,Moderator,User")]
+[Authorize("Admin,Moderator")]
 public class AdminController(IMediator mediator, UserManager<IdentityUser> userManager) : ControllerBase
 {
     [HttpGet("users")]

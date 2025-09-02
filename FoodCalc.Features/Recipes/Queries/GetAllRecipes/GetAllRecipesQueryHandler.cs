@@ -17,6 +17,14 @@ public class GetAllRecipesQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, I
 		{
 			var recipes = await unitOfWork.RecipeRepository.GetAllAsync(cancellationToken);
 
+			if (!request.WithIngredient)
+			{
+				foreach (var recipe in recipes)
+				{
+					recipe.RecipeIngredient = null!;
+				}
+			}
+
 			return mapper.Map<List<RecipeDto>>(recipes.OrderBy(r => r.Name));
 		}
 		catch (Exception ex)

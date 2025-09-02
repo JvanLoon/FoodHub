@@ -14,19 +14,6 @@ namespace FoodHub.Persistence.Repositories
 {
 	public class UserRepository(ApplicationDbContext context, UserManager<IdentityUser> userManager) : IUserRepository
 	{
-
-		public Task<IdentityUser> AddAsync(IdentityUser user, CancellationToken cancellationToken)
-		{
-			throw new NotImplementedException();
-		}
-
-		public Task<int> DeleteAsync(string id, CancellationToken cancellationToken)
-		{
-			context.Users.Remove(new IdentityUser { Id = id });
-
-			return context.SaveChangesAsync(cancellationToken);
-		}
-
 		public Task<List<IdentityUser>> GetAllAsync(CancellationToken cancellationToken)
 		{
 			return userManager.Users.ToListAsync(cancellationToken);
@@ -58,6 +45,18 @@ namespace FoodHub.Persistence.Repositories
 		public Task AddRoleToUser(IdentityUser user, string role, CancellationToken cancellationToken)
 		{
 			return userManager.AddToRoleAsync(user, role);
+		}
+
+        public Task AddRecipeToBlackList(Guid userId, Guid recipeId)
+        {
+            context.RecipeBlackLists.Add(new RecipeBlackList { RecipeId = recipeId, UserId = userId });
+            return context.SaveChangesAsync();
+        }
+
+		public Task RemoveRecipeToBlackList(Guid userId, Guid recipeId)
+		{
+			context.RecipeBlackLists.Remove(new RecipeBlackList { RecipeId = recipeId, UserId = userId });
+			return context.SaveChangesAsync();
 		}
 	}
 }

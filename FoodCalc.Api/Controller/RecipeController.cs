@@ -23,9 +23,9 @@ public class RecipeController(IMediator mediator) : ControllerBase
 {
 	[HttpGet("getallrecipes")]
 	[Authorize]
-	public async Task<ActionResult<IEnumerable<RecipeDto>>> GetAllRecipes()
+	public async Task<ActionResult<IEnumerable<RecipeDto>>> GetAllRecipes([FromQuery] bool withingredient = true)
 	{
-		var result = await mediator.Send(new GetAllRecipesQuery());
+		var result = await mediator.Send(new GetAllRecipesQuery(withingredient));
 
 		return result.Match(
 			Ok,

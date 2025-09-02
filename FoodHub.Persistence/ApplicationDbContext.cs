@@ -11,6 +11,8 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 	public DbSet<RecipeIngredient> RecipeIngredients { get; set; }
 	public DbSet<Ingredient> Ingredients { get; set; }
 
+	public DbSet<RecipeBlackList> RecipeBlackLists { get; set; }
+
 	public override int SaveChanges()
 	{
 		var entries = ChangeTracker.Entries<BaseEntity>();
