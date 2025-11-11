@@ -1,7 +1,6 @@
 using ErrorOr;
 
 using FoodCalc.Features.Authentication.Roles.Queries.GetAllRoles;
-using FoodCalc.Features.Authentication.Users.Commands.GetUserByEmail;
 using FoodCalc.Features.Authentication.Users.Queries.GetAllUsers;
 using FoodCalc.Features.Recipes.Queries.GetAllRecipes;
 

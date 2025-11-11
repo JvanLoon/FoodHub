@@ -1,5 +1,6 @@
 ﻿@using FoodCalc.Web.Components.Services.Auth
 @inject AuthTokenService AuthTokenService
+@inject MessageService MessageService
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -48,16 +49,13 @@
             }
         }
     </nav>
+    @* <FoodCalc.Web.Components.Shared.MessageBox /> *@
 </div>
 
 @code {
     private bool isAdmin = false;
     private bool isLoggedIn = false;
     private string userEmail = "";
-
-    private bool showMessage = false;
-    private bool IsError = false;
-    private string _message = string.Empty;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -77,25 +75,9 @@
             }
             catch (Exception ex)
             {
-                ShowMessage(ex.Message, true, 20000);
+                await MessageService.ShowMessageAsync(ex.Message, true, 0);
                 StateHasChanged();
             }
         //}
-    }
-
-    async Task ShowMessage(string message, bool isError, int timeInMs = 2000)
-    {
-        _message = message;
-        IsError = isError;
-
-        showMessage = true;
-        StateHasChanged();
-
-        await Task.Delay(timeInMs);
-
-        showMessage = false;
-        _message = string.Empty;
-        IsError = false;
-        StateHasChanged();
     }
 }

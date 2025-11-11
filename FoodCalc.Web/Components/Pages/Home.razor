@@ -1,9 +1,10 @@
 ﻿@page "/"
 
-@inject RecipeService recipeService
-@inject NavigationManager NavigationManager
 @inject IJSRuntime JS
+@inject RecipeService recipeService
 @inject AggregatedIngredientService AggregatedIngredientService
+@inject MessageService MessageService
+@inject NavigationManager NavigationManager
 
 <PageTitle>Home</PageTitle>
 
@@ -69,22 +70,13 @@
 
 </div>
 
-@if (showMessage)
-{
-    <div class="alert @(IsError ? "alert-danger" : "alert-success")">
-        @_message
-    </div>
-}
+<FoodCalc.Web.Components.Shared.MessageBox />
 
 
 @code {
     List<RecipeDto> Recipes = new();
     private HashSet<Guid> SelectedRecipeIds = new();
     private List<RecipeIngredientDto> AggregatedIngredients = new();
-
-    private bool showMessage = false;
-    private bool IsError = false;
-    private string _message = string.Empty;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -98,7 +90,7 @@
             catch (Exception ex)
             {
                 Recipes = [];
-                ShowMessage(ex.Message, true, 99999999);
+                await MessageService.ShowMessageAsync(ex.Message, true, 0);
                 StateHasChanged();
             }
         }
@@ -177,24 +169,8 @@
         }
         catch (Exception ex)
         {
-            _message = ex.Message;
+            await MessageService.ShowMessageAsync(ex.Message, true);
             StateHasChanged();
         }
-    }
-
-    async Task ShowMessage(string message, bool isError, int timeInMs = 2000)
-    {
-        _message = message;
-        IsError = isError;
-
-        showMessage = true;
-        StateHasChanged();
-
-        await Task.Delay(timeInMs);
-
-        showMessage = false;
-        _message = string.Empty;
-        IsError = false;
-        StateHasChanged();
     }
 }

@@ -1,6 +1,8 @@
 ﻿@page "/admin/userroles/{email}"
 @using FoodCalc.Web.Components.Services.Admin
 @inject AdminService AdminService
+@inject LoginService LoginService
+@inject MessageService MessageService
 @inject NavigationManager Navigation
 
 <h4 class="mb-4">Manage Roles for @email</h4>
@@ -51,27 +53,38 @@ else
                         </span>
                     </li>
                 }
-                
+
             </ul>
         </div>
     </div>
-    @if (showMessage)
+
+    @if (true) //todo: check if loggedin user is admin
     {
-        <div class="alert @(IsError ? "alert-danger" : "alert-success") mt-3" role="alert">
-            @_message
+        <div class="row">
+            <div class="col-md-6">
+                <EditForm Model="resetModel" OnValidSubmit="ResetPassword">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <div class="mb-3">
+                        <label for="bewachtewoord" class="form-label">Reset password</label>
+                        <InputText id="bewachtewoord" class="form-control" @bind-Value="resetModel.password" required />
+                    </div>
+
+                    <button class="btn btn-primary" type="submit">Reset</button>
+                </EditForm>
+            </div>
         </div>
     }
 }
+<FoodCalc.Web.Components.Shared.MessageBox />
 
 @code {
     [Parameter] public string email { get; set; }
     private List<string> roles;
     private List<string> allRoles;
     private string selectedRole;
-
-    private bool showMessage = false;
-    private bool IsError = false;
-    private string _message = string.Empty;
+    public PasswordResetModel resetModel = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -88,11 +101,11 @@ else
             {
                 roles.Add(selectedRole);
                 selectedRole = string.Empty;
-                ShowMessage("Role added successfully!", false);
+                await MessageService.ShowMessageAsync("Role added successfully!", false);
             }
             else
             {
-                ShowMessage("Failed to add role.", true);
+                await MessageService.ShowMessageAsync("Failed to add role.", true);
             }
         }
     }
@@ -103,29 +116,50 @@ else
         if (result)
         {
             roles.Remove(role);
-            ShowMessage("Role removed successfully!", false);
+            await MessageService.ShowMessageAsync("Role removed successfully!", false);
         }
         else
         {
-            ShowMessage("Failed to remove role.", true);
+            await MessageService.ShowMessageAsync("Failed to remove role.", true);
         }
     }
 
-    async Task ShowMessage(string message, bool isError, int timeInMs = 2000)
+    private ResetPasswordDto resetPasswordDto = new();
+
+    private async Task ResetPassword()
     {
-        _message = message;
-        IsError = isError;
-        showMessage = true;
-        StateHasChanged();
-        await Task.Delay(timeInMs);
-        showMessage = false;
-        _message = string.Empty;
-        IsError = false;
-        StateHasChanged();
+        try
+        {
+            resetPasswordDto.Email = email;
+            resetPasswordDto.Password = resetModel.password;
+
+            var resetResponse = await LoginService.ResetPassword(resetPasswordDto);
+
+            if (resetResponse.IsSuccessStatusCode)
+            {
+                await MessageService.ShowMessageAsync("Password reset successfully!", false);
+                resetModel.password = string.Empty;
+                StateHasChanged();
+            }
+            else
+            {
+                string message = resetResponse.ReasonPhrase ?? string.Empty;//await resetResponse.Content.ReadAsStringAsync();
+                await MessageService.ShowMessageAsync(message, true);
+            }
+        }
+        catch (Exception ex)
+        {
+            await MessageService.ShowMessageAsync($"Error resetting password. error: {ex.Message}", true);
+        }
+    }
+
+    public class PasswordResetModel
+    {
+        public string password { get; set; } = string.Empty;
     }
 
     public class RoleModel
     {
-        public string Roles { get; set; }
+        public string Roles { get; set; } = string.Empty;
     }
 }

@@ -43,6 +43,7 @@ public class Program
 		builder.Services.AddScoped<RecipeService>();
 		builder.Services.AddScoped<IngredientService>();
 		builder.Services.AddSingleton<AggregatedIngredientService>();
+		builder.Services.AddSingleton<MessageService>();
 
 		builder.Services.AddScoped<AuthenticatedHttpClientService>(sp =>
 		{

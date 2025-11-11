@@ -1,6 +1,7 @@
 ﻿@page "/recipes/edit/{RecipeId:guid}"
 @using FoodCalc.Web.Components.Services
 @using FoodHub.DTOs
+@inject MessageService MessageService
 @inject RecipeService RecipeService
 @inject IngredientService IngredientService
 @inject ILogger<EditRecipe> Logger
@@ -108,12 +109,7 @@
     </div>
 </div>
 
-@if (showMessage)
-{
-    <div class="alert @(IsError ? "alert-danger" : "alert-success")">
-        @_message
-    </div>
-}
+<FoodCalc.Web.Components.Shared.MessageBox />
 
 @code {
     [Parameter] public Guid RecipeId { get; set; }
@@ -131,10 +127,6 @@
     private bool dropdownOpen = false;
     private bool ingredientSearchFocused = false;
 
-    private bool showMessage = false;
-    private bool IsError = false;
-    private string _message = string.Empty;
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -150,8 +142,7 @@
             }
             catch (Exception ex)
             {
-                ShowMessage(ex.Message, true, 20000);
-                Logger.LogError($"Error loading data: {ex.Message}");
+                await MessageService.ShowMessageAsync(ex.Message, true, 20000);
             }
         }
     }
@@ -174,7 +165,7 @@
         {
             recipeIngredient.RecipeId = RecipeId;
             await RecipeService.AddIngredient(recipeIngredient);
-            ShowMessage("Ingredient added/updated successfully", false);
+            await MessageService.ShowMessageAsync("Ingredient added/updated successfully", false);
 
             // Clear form
             recipeIngredient = new RecipeIngredientDto { RecipeId = RecipeId, IngredientId = Guid.Empty };
@@ -182,8 +173,7 @@
         }
         catch (Exception ex)
         {
-            ShowMessage("Failed to add/update ingredient", true);
-            Logger.LogError($"Error: {ex.Message}");
+            await MessageService.ShowMessageAsync("Failed to add/update ingredient", true);
         }
     }
 
@@ -205,15 +195,14 @@
         try
         {
             await RecipeService.DeleteIngredient(recipeIngredientId);
-            ShowMessage("Ingredient deleted successfully", false);
+            await MessageService.ShowMessageAsync("Ingredient deleted successfully", false);
             ClearForm();
             recipe = await RecipeService.GetRecipeByIdAsync(RecipeId); // Refresh the list
             StateHasChanged();
         }
         catch (Exception ex)
         {
-            ShowMessage("Failed to delete ingredient", true);
-            Logger.LogError($"Error deleting ingredient: {ex.Message}");
+            await MessageService.ShowMessageAsync("Failed to delete ingredient", true);
         }
     }
 
@@ -230,12 +219,11 @@
             await RecipeService.UpdateRecipeName(RecipeId, recipe.Name!);
             isEditingName = false;
             recipe = await RecipeService.GetRecipeByIdAsync(RecipeId); // Refresh
-            ShowMessage("Recipe name updated", false);
+            await MessageService.ShowMessageAsync("Recipe name updated", false);
         }
         catch (Exception ex)
         {
-            ShowMessage("Failed to update recipe name", true);
-            Logger.LogError($"Error updating recipe name: {ex.Message}");
+            await MessageService.ShowMessageAsync("Failed to update recipe name", true);
         }
     }
 
@@ -252,13 +240,12 @@
             recipeIngredient.IngredientId = ingredients.Where(i => i.Name == ingredientSearch).FirstOrDefault().Id;
             //ingredientSearch = string.Empty;
 
-            ShowMessage("Ingredient added", false);
+            await MessageService.ShowMessageAsync("Ingredient added", false);
             StateHasChanged();
         }
         catch (Exception ex)
         {
-            ShowMessage("Failed to add ingredient", true);
-            Logger.LogError($"Error adding ingredient: {ex.Message}");
+            await MessageService.ShowMessageAsync("Failed to add ingredient", true);
         }
     }
 
@@ -289,21 +276,5 @@
         {
             await AddIngredient();
         }
-    }
-
-    async Task ShowMessage(string message, bool isError, int timeInMs = 2000)
-    {
-        _message = message;
-        IsError = isError;
-
-        showMessage = true;
-        StateHasChanged();
-
-        await Task.Delay(timeInMs);
-
-        showMessage = false;
-        _message = string.Empty;
-        IsError = false;
-        StateHasChanged();
     }
 }

@@ -5,6 +5,7 @@
 @inject LoginService LoginService
 @inject NavigationManager Navigation
 @inject AuthTokenService AuthTokenService
+@inject MessageService MessageService
 
 <div class="container d-flex justify-content-center align-items-center">
     <div class="card shadow p-4" style="max-width: 400px; width: 100%;">
@@ -25,21 +26,12 @@
         <div class="mt-3 text-center">
             <a href="/register">Create an account</a>
         </div>
-        @if (showMessage)
-        {
-            <div class="alert @(IsError ? "alert-danger" : "alert-success") mt-3" role="alert">
-                @_message
-            </div>
-        }
+        <FoodCalc.Web.Components.Shared.MessageBox />
     </div>
 </div>
 
 @code {
     private LoginDto loginModel = new();
-
-    private bool showMessage = false;
-    private bool IsError = false;
-    private string _message = string.Empty;
 
     private async Task HandleLogin()
     {
@@ -51,24 +43,10 @@
             // Store JWT token in a secure cookie
             await AuthTokenService.SetTokenAsync(result.Token);
             Navigation.NavigateTo("/");
-        }else{
-            ShowMessage("Failed to login. Invalid email or password.", true);
+        } 
+        else
+        {
+            await MessageService.ShowMessageAsync("Failed to login. Invalid email or password.", true);
         }
-    }
-
-    async Task ShowMessage(string message, bool isError, int timeInMs = 2000)
-    {
-        _message = message;
-        IsError = isError;
-
-        showMessage = true;
-        StateHasChanged();
-
-        await Task.Delay(timeInMs);
-
-        showMessage = false;
-        _message = string.Empty;
-        IsError = false;
-        StateHasChanged();
     }
 }

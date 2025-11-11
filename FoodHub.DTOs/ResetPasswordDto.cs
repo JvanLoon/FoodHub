@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace FoodHub.DTOs;
-public class RegisterDto
+public class ResetPasswordDto
 {
 	[Required]
 	[EmailAddress]
@@ -11,5 +11,3 @@ public class RegisterDto
 	[StringLength(100, MinimumLength = 6)]
 	public string Password { get; set; } = string.Empty;
 }
-
-

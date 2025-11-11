@@ -1,0 +1,48 @@
+﻿@inject MessageService MessageService
+
+@* @if (showMessage) *@
+@* { *@
+@*     <div class="message-box @(isError ? "error" : "info")"> *@
+@*         @message *@
+@*     </div> *@
+@* } *@
+
+@if (showMessage)
+{
+    <div class="alert @(isError ? "alert-danger" : "alert-success") mt-3">
+        @message
+    </div>
+}
+
+@code {
+    private string message = string.Empty;
+    private bool isError;
+    private bool showMessage;
+
+    protected override void OnInitialized()
+    {
+        MessageService.OnShowMessage += ShowMessage;
+    }
+
+    private async Task ShowMessage(string msg, bool error, int timeInMs)
+    {
+        message = msg;
+        isError = error;
+        showMessage = true;
+        StateHasChanged();
+
+        if (timeInMs != 0)
+        {
+            await Task.Delay(timeInMs);
+            showMessage = false;
+            message = string.Empty;
+            isError = false;
+            StateHasChanged();
+        }
+    }
+
+    public void Dispose()
+    {
+        MessageService.OnShowMessage -= ShowMessage;
+    }
+}

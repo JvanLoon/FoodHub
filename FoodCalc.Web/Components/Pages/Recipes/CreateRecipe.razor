@@ -2,8 +2,8 @@
 @using FoodCalc.Web.Components.Services
 @using FoodHub.DTOs
 @inject RecipeService RecipeService
+@inject MessageService MessageService
 @inject NavigationManager NavigationManager
-@inject ILogger<CreateRecipe> Logger
 
 <PageTitle>Create Recipe</PageTitle>
 
@@ -21,18 +21,10 @@
     <button class="btn btn-primary" type="submit">Create</button>
 </EditForm>
 
-@if (showMessage)
-{
-    <div class="alert @(isError ? "alert-danger" : "alert-success") mt-3">
-        @message
-    </div>
-}
+<FoodCalc.Web.Components.Shared.MessageBox />
 
 @code {
     private CreateRecipeDto recipe = new();
-    private bool showMessage = false;
-    private bool isError = false;
-    private string message = string.Empty;
 
     private async Task CreateRecipeAsync()
     {
@@ -48,20 +40,12 @@
             }
             else
             {
-                ShowMessage("Failed to create recipe.", true);
+                await MessageService.ShowMessageAsync("Failed to create recipe.", true);
             }
         }
         catch (Exception ex)
         {
-            ShowMessage("Error creating recipe.", true);
-            Logger.LogError(ex, "Error creating recipe");
+            await MessageService.ShowMessageAsync("Error creating recipe.", true);
         }
-    }
-
-    private void ShowMessage(string msg, bool error)
-    {
-        message = msg;
-        isError = error;
-        showMessage = true;
     }
 }

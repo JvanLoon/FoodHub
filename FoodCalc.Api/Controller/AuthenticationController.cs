@@ -17,11 +17,11 @@ public class AuthenticationController(IConfiguration configuration, UserManager<
 	[AllowAnonymous]
 	public async Task<IActionResult> Register([FromBody] RegisterDto dto)
     {
-		return BadRequest("Register not implemented");
+		//return BadRequest("Register not implemented");
         var user = new IdentityUser { UserName = dto.Email, Email = dto.Email};
         var result = await userManager.CreateAsync(user, dto.Password);
         if (!result.Succeeded)
-            return BadRequest(result.Errors);
+            return BadRequest(result.Errors.First().Description);
         return Ok();
     }
 
@@ -98,13 +98,29 @@ public class AuthenticationController(IConfiguration configuration, UserManager<
 			await userManager.AddToRoleAsync(user, "User");
 		}
 
-
 		var result = await userManager.UpdateAsync(user);
 
 		if (!result.Succeeded)
 			return BadRequest(result.Errors);
 
 		return Ok();
+	}
+
+	[HttpPost("resetpassword")]
+	[Authorize("Admin")]
+	public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
+	{
+		var user = await userManager.FindByEmailAsync(dto.Email);
+		if (user == null)
+			return NotFound("User not found");
+
+		var resetToken = await userManager.GeneratePasswordResetTokenAsync(user);
+
+		var result = await userManager.ResetPasswordAsync(user, resetToken, dto.Password);
+		if (!result.Succeeded)
+			return BadRequest(result.Errors.Select(e => e.Description));
+
+		return Ok("Password has been reset successfully.");
 	}
 
 	[HttpPost("checkjwttoken")]
