@@ -17,7 +17,7 @@ public class AuthenticationController(IConfiguration configuration, UserManager<
 	[AllowAnonymous]
 	public async Task<IActionResult> Register([FromBody] RegisterDto dto)
     {
-		//return BadRequest("Register not implemented");
+		return BadRequest("Register not implemented");
         var user = new IdentityUser { UserName = dto.Email, Email = dto.Email};
         var result = await userManager.CreateAsync(user, dto.Password);
         if (!result.Succeeded)

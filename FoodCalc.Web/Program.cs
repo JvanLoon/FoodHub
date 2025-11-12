@@ -23,6 +23,12 @@ public class Program
 		builder.Services.AddRazorComponents()
 			.AddInteractiveServerComponents();
 
+		builder.Services.AddServerSideBlazor()
+		.AddHubOptions(options =>
+		{
+			options.MaximumReceiveMessageSize = 10 * 1024 * 1024; // 10 MB
+		});
+
 		builder.Services.AddOutputCache();
 
 		builder.Services.AddBlazoredLocalStorage();
@@ -42,6 +48,7 @@ public class Program
 		builder.Services.AddScoped<LoginService>();
 		builder.Services.AddScoped<RecipeService>();
 		builder.Services.AddScoped<IngredientService>();
+		builder.Services.AddScoped<ImportExportService>();
 		builder.Services.AddSingleton<AggregatedIngredientService>();
 		builder.Services.AddSingleton<MessageService>();
 

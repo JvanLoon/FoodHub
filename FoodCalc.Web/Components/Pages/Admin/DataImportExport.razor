@@ -1,0 +1,79 @@
+﻿@using FoodCalc.Web.Components.Services.Admin
+@page "/admin/dataimportexport"
+@inject HttpClient Http
+@inject ImportExportService importExportService
+@inject MessageService messageService
+
+<h3>Data Import/Export</h3>
+
+<FoodCalc.Web.Components.Shared.MessageBox />
+
+<div>
+    <label>Export</label>
+    <button @onclick="ExportData">Export</button>
+</div>
+
+<div>
+    <label>Import File:</label>
+    <InputFile OnChange="OnFileSelected" />
+    <select @bind="importFormat">
+        <option value="json">JSON</option>
+        <option value="csv">CSV</option>
+    </select>
+    <button @onclick="ImportData" disabled="@(!canImport)">Import</button>
+</div>
+
+<script>
+    window.blazorDownloadFile = (fileName, contentType, base64Data) => {
+        try {
+            const link = document.createElement('a');
+            link.download = fileName;
+            link.href = `data:${contentType};base64,${base64Data}`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (e) {
+           alert("Download failed: " + e.message);
+        }
+    };
+</script>
+
+@code {
+    private string exportFormat = "json";
+    private string importFormat = "json";
+    private IBrowserFile? selectedFile = null;
+    private bool canImport => selectedFile != null;
+
+    private async Task ExportData()
+    {
+        await messageService.ShowMessageAsync("Preparing export...", false, 0);
+        var success = await importExportService.ExportAsync(exportFormat);
+        if (success)
+        {
+            await messageService.ShowMessageAsync("Downloading", false, 0);
+        }
+        else
+        {
+            await messageService.ShowMessageAsync("Error", false);
+        }
+    }
+
+    private void OnFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+    }
+
+    private async Task ImportData()
+    {
+        if (selectedFile == null) return;
+        try
+        {
+            await importExportService.ImportAsync(selectedFile);
+            await messageService.ShowMessageAsync("Import successful.", false);
+        }
+        catch (Exception ex)
+        {
+            await messageService.ShowMessageAsync($"Import failed: {ex.Message}", true);
+        }
+    }
+}
