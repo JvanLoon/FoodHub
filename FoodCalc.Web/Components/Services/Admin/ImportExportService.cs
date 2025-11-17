@@ -12,6 +12,7 @@ using static System.Net.WebRequestMethods;
 namespace FoodCalc.Web.Components.Services.Admin;
 public class ImportExportService(AuthenticatedHttpClientService httpClient, IJSRuntime js, MessageService messageService)
 {
+	private readonly int _maxFileSizeInBytes = 10 * 1024 * 1024; // 10 MB
 	private readonly string _exportFileName = $"export";
 
 	public async Task<bool> ImportAsync(IBrowserFile file)
@@ -24,7 +25,7 @@ public class ImportExportService(AuthenticatedHttpClientService httpClient, IJSR
 
 		try {
 			var content = new MultipartFormDataContent();
-			var streamContent = new StreamContent(file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024)); // 10MB limit
+			var streamContent = new StreamContent(file.OpenReadStream(maxAllowedSize: _maxFileSizeInBytes)); // 10MB limit
 			streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 			content.Add(streamContent, "file", file.Name);
 

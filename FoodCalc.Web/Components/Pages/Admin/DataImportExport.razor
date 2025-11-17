@@ -15,11 +15,11 @@
 
 <div>
     <label>Import File:</label>
-    <InputFile OnChange="OnFileSelected" />
-    <select @bind="importFormat">
-        <option value="json">JSON</option>
-        <option value="csv">CSV</option>
-    </select>
+    <InputFile OnChange="OnFileSelected" MaxFileSize="@MaxFileSizeInBytes" />
+    @* <select @bind="importFormat"> *@
+    @*     <option value="json">JSON</option> *@
+    @*     <option value="csv">CSV</option> *@
+    @* </select> *@
     <button @onclick="ImportData" disabled="@(!canImport)">Import</button>
 </div>
 
@@ -43,6 +43,7 @@
     private string importFormat = "json";
     private IBrowserFile selectedFile = null!;
     private bool canImport => selectedFile != null;
+    private int MaxFileSizeInBytes = 10 * 1024 * 1024; // 10 MB
 
     private async Task ExportData()
     {
@@ -65,9 +66,14 @@
         }
     }
 
-    private void OnFileSelected(InputFileChangeEventArgs e)
+    private async void OnFileSelected(InputFileChangeEventArgs e)
     {
-        if (e.File != null)
+        if (selectedFile.ContentType != "application/json" || selectedFile.ContentType != "text/plain") // && selectedFile.ContentType != "text/csv"
+        {
+            await messageService.ShowMessageAsync("Invalid file type.", true);
+            selectedFile = null!;
+        }
+        else if (e.FileCount > 0)
             selectedFile = e.File;
         else
             selectedFile = null!;
