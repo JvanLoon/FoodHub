@@ -23,8 +23,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FoodCalc.Features\FoodCalc.Features.csproj" />
-    <ProjectReference Include="..\FoodHub.DTOs\FoodHub.DTOs.csproj" />
-    <ProjectReference Include="..\FoodHub.ServiceDefaults\FoodHub.ServiceDefaults.csproj" />
   </ItemGroup>
 
 </Project>

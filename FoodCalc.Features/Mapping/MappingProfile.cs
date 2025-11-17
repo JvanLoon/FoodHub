@@ -8,40 +8,40 @@ namespace FoodCalc.Features.Mapping;
 
 public class MappingProfile : Profile
 {
-    public MappingProfile()
-    {
-        // Entity to DTO mappings
-        CreateMap<Recipe, RecipeDto>();
-        CreateMap<Ingredient, IngredientDto>();
-        CreateMap<RecipeIngredient, RecipeIngredientDto>();
-        CreateMap<IngredientAmountType, IngredientAmountTypeDto>();
+	public MappingProfile()
+	{
+		// Entity to DTO mappings
+		CreateMap<Recipe, RecipeDto>();
+		CreateMap<Ingredient, IngredientDto>();
+		CreateMap<RecipeIngredient, RecipeIngredientDto>();
+		CreateMap<IngredientAmountType, IngredientAmountTypeDto>();
 
-        // DTO to Entity mappings
-        CreateMap<RecipeDto, Recipe>();
-        CreateMap<IngredientDto, Ingredient>();
-        CreateMap<RecipeIngredientDto, RecipeIngredient>();
-        CreateMap<IngredientAmountTypeDto, IngredientAmountType>();
+		// DTO to Entity mappings
+		CreateMap<RecipeDto, Recipe>();
+		CreateMap<IngredientDto, Ingredient>();
+		CreateMap<RecipeIngredientDto, RecipeIngredient>();
+		CreateMap<IngredientAmountTypeDto, IngredientAmountType>();
 		CreateMap<UserDto, IdentityUser>();
 
-        // Command DTOs to Entity mappings
-        CreateMap<CreateRecipeDto, Recipe>()
-            .ForMember(dest => dest.Id, opt => opt.Ignore())
-            .ForMember(dest => dest.CreatedDate, opt => opt.Ignore())
-            .ForMember(dest => dest.ModifiedDate, opt => opt.Ignore())
-            .ForMember(dest => dest.RecipeIngredient, opt => opt.Ignore());
+		// Command DTOs to Entity mappings
+		CreateMap<CreateRecipeDto, Recipe>()
+			.ForMember(dest => dest.Id, opt => opt.Ignore())
+			.ForMember(dest => dest.CreatedDate, opt => opt.Ignore())
+			.ForMember(dest => dest.ModifiedDate, opt => opt.Ignore())
+			.ForMember(dest => dest.RecipeIngredient, opt => opt.Ignore());
 
-        CreateMap<UpdateRecipeDto, Recipe>()
-            .ForMember(dest => dest.CreatedDate, opt => opt.Ignore())
-            .ForMember(dest => dest.ModifiedDate, opt => opt.Ignore());
+		CreateMap<UpdateRecipeDto, Recipe>()
+			.ForMember(dest => dest.CreatedDate, opt => opt.Ignore())
+			.ForMember(dest => dest.ModifiedDate, opt => opt.Ignore());
 
-        CreateMap<CreateIngredientDto, Ingredient>()
-            .ForMember(dest => dest.Id, opt => opt.Ignore())
-            .ForMember(dest => dest.CreatedDate, opt => opt.Ignore())
-            .ForMember(dest => dest.ModifiedDate, opt => opt.Ignore());
+		CreateMap<CreateIngredientDto, Ingredient>()
+			.ForMember(dest => dest.Id, opt => opt.Ignore())
+			.ForMember(dest => dest.CreatedDate, opt => opt.Ignore())
+			.ForMember(dest => dest.ModifiedDate, opt => opt.Ignore());
 
-        CreateMap<UpdateIngredientDto, Ingredient>()
-            .ForMember(dest => dest.CreatedDate, opt => opt.Ignore())
-            .ForMember(dest => dest.ModifiedDate, opt => opt.Ignore());
+		CreateMap<UpdateIngredientDto, Ingredient>()
+			.ForMember(dest => dest.CreatedDate, opt => opt.Ignore())
+			.ForMember(dest => dest.ModifiedDate, opt => opt.Ignore());
 
 		CreateMap<UserDto, IdentityUser>()
 			.ForMember(dest => dest.PhoneNumber, opt => opt.Ignore())
@@ -64,6 +64,14 @@ public class MappingProfile : Profile
 			.ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.UserName))
 			.ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
 			.ForMember(dest => dest.Enabled, opt => opt.MapFrom(src => src.LockoutEnabled))
+			.ForMember(dest => dest.EmailConfirmed, opt => opt.MapFrom(src => src.EmailConfirmed))
 			.ForMember(dest => dest.Roles, opt => opt.Ignore());
+
+		//todo uitschrijven
+		CreateMap<IngredientAmountTypeDto, IngredientAmountType>()
+			.ConvertUsing(src => (IngredientAmountType) src);
+
+		CreateMap<IngredientAmountType, IngredientAmountTypeDto>()
+			.ConvertUsing(src => (IngredientAmountTypeDto) src);
 	}
 }

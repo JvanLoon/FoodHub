@@ -1,11 +1,5 @@
 ﻿using FoodCalc.Web.Components.Services.Auth;
-
 using FoodHub.DTOs;
-using FoodHub.ServiceDefaults;
-
-using Microsoft.AspNetCore.Components;
-
-using System.Net.Http.Json;
 
 namespace FoodCalc.Web.Components.Services;
 public class RecipeService(AuthenticatedHttpClientService httpClient)

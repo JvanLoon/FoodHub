@@ -8,7 +8,6 @@ using FoodCalc.Web.Components.Services.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.Json;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 public class Program
 {

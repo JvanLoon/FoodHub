@@ -1,16 +1,9 @@
-using FoodHub.Persistence.Persistence;
-using FoodHub.Persistence.Repositories;
-using FoodHub.Persistence.Repositories.Interface;
-
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
-
-using OpenTelemetry;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Trace;
+using Microsoft.Extensions.ServiceDiscovery;
 
 namespace Microsoft.Extensions.Hosting;
 
@@ -21,13 +14,21 @@ public static class Extensions
 {
     public static TBuilder AddServiceDefaults<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
     {
-        builder.ConfigureOpenTelemetry();
+        //builder.ConfigureOpenTelemetry();
 
         builder.AddDefaultHealthChecks();
 
-        builder.Services.AddServiceDiscovery();
 
-        builder.Services.ConfigureHttpClientDefaults(http =>
+		builder.Services.Configure<ServiceDiscoveryOptions>(options =>
+		{
+			options.AllowedSchemes = ["https"];
+			// You can set other options here, like discovery endpoints
+		});
+
+		builder.Services.AddServiceDiscovery();
+		
+
+		builder.Services.ConfigureHttpClientDefaults(http =>
         {
             // Turn on resilience by default
             http.AddStandardResilienceHandler();
@@ -45,48 +46,48 @@ public static class Extensions
         return builder;
     }
 
-    public static TBuilder ConfigureOpenTelemetry<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
-    {
-        builder.Logging.AddOpenTelemetry(logging =>
-        {
-            logging.IncludeFormattedMessage = true;
-            logging.IncludeScopes = true;
-        });
+	//public static TBuilder ConfigureOpenTelemetry<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
+	//{
+	//	builder.Logging.AddOpenTelemetry(logging =>
+	//	{
+	//		logging.IncludeFormattedMessage = true;
+	//		logging.IncludeScopes = true;
+	//	});
 
-        builder.Services.AddOpenTelemetry()
-            .WithMetrics(metrics =>
-            {
-                metrics.AddAspNetCoreInstrumentation()
-                    .AddHttpClientInstrumentation()
-                    .AddRuntimeInstrumentation();
-            })
-            .WithTracing(tracing =>
-            {
-                tracing.AddSource(builder.Environment.ApplicationName)
-                    .AddAspNetCoreInstrumentation()
-                    // Uncomment the following line to enable gRPC instrumentation (requires the OpenTelemetry.Instrumentation.GrpcNetClient package)
-                    //.AddGrpcClientInstrumentation()
-                    .AddHttpClientInstrumentation();
-            });
+	//	builder.Services.AddOpenTelemetry()
+	//		.WithMetrics(metrics =>
+	//		{
+	//			metrics.AddAspNetCoreInstrumentation()
+	//				.AddHttpClientInstrumentation()
+	//				.AddRuntimeInstrumentation();
+	//		})
+	//		.WithTracing(tracing =>
+	//		{
+	//			tracing.AddSource(builder.Environment.ApplicationName)
+	//				.AddAspNetCoreInstrumentation()
+	//				// Uncomment the following line to enable gRPC instrumentation (requires the OpenTelemetry.Instrumentation.GrpcNetClient package)
+	//				//.AddGrpcClientInstrumentation()
+	//				.AddHttpClientInstrumentation();
+	//		});
 
-        builder.AddOpenTelemetryExporters();
+	//	builder.AddOpenTelemetryExporters();
 
-        return builder;
-    }
+	//	return builder;
+	//}
 
-    private static TBuilder AddOpenTelemetryExporters<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
-    {
-        var useOtlpExporter = !string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]);
+	//private static TBuilder AddOpenTelemetryExporters<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
+	//{
+	//	var useOtlpExporter = !string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]);
 
-        if (useOtlpExporter)
-        {
-            builder.Services.AddOpenTelemetry().UseOtlpExporter();
-        }
+	//	if (useOtlpExporter)
+	//	{
+	//		builder.Services.AddOpenTelemetry().UseOtlpExporter();
+	//	}
 
-        return builder;
-    }
+	//	return builder;
+	//}
 
-    public static TBuilder AddDefaultHealthChecks<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
+	public static TBuilder AddDefaultHealthChecks<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
     {
         builder.Services.AddHealthChecks()
             // Add a default liveness check to ensure app is responsive
@@ -112,18 +113,6 @@ public static class Extensions
         }
 
         return app;
-    }
-
-    public static IServiceCollection AddCustomServices(this IServiceCollection services)
-    {
-        services.AddScoped<IRecipeRepository, RecipeRepository>();
-        services.AddScoped<IIngredientRepository, IngredientRepository>();
-		services.AddScoped<IUserRepository, UserRepository>();
-		services.AddScoped<IRoleRepository, RoleRepository>();
-
-		services.AddScoped<IUnitOfWork, UnitOfWork>();
-
-        return services;
     }
 
   //  public static IServiceCollection AddApplicationMediatR(this IServiceCollection services)

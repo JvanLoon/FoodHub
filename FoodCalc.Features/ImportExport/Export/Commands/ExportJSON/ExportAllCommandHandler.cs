@@ -36,8 +36,16 @@ public class ExportAllCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ILo
 			var recipeIngredients = new List<RecipeIngredient>();
 			foreach (var recipe in recipes)
 			{
-				if (recipe.RecipeIngredient != null)
+				if (recipe.RecipeIngredient != null && recipe.RecipeIngredient.Count > 0)
+				{
+					//remove all ingredients from recipe.RecipeIngredient
+					foreach (var recipeIngredient in recipe.RecipeIngredient)
+					{
+						recipeIngredient.Ingredient = null!;
+					}
+
 					recipeIngredients.AddRange(recipe.RecipeIngredient);
+				}
 			}
 
 			// Optionally fetch users with roles
@@ -49,11 +57,13 @@ public class ExportAllCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ILo
 				foreach (var user in users)
 				{
 					// You may need to implement a method to get roles for a user
-					var roles = await unitOfWork.RoleRepository.GetAllAsync(cancellationToken);
+					List<string> roles = await unitOfWork.RoleRepository.GetAllAsync(cancellationToken);
 					usersWithRoles.Add(new UserWithRolesDto
 					{
 						Id = user.Id,
 						Email = user.Email ?? "",
+						EmailConfirmed = user.EmailConfirmed,
+						LockoutEnabled = user.LockoutEnabled,
 						Roles = roles // Replace with actual user roles
 					});
 				}

@@ -45,7 +45,7 @@ namespace FoodHub.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Ingredients");
+                    b.ToTable("Ingredients", (string)null);
                 });
 
             modelBuilder.Entity("FoodHub.Persistence.Entities.Recipe", b =>
@@ -70,7 +70,7 @@ namespace FoodHub.Persistence.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Recipes");
+                    b.ToTable("Recipes", (string)null);
                 });
 
             modelBuilder.Entity("FoodHub.Persistence.Entities.RecipeBlackList", b =>
@@ -118,7 +118,7 @@ namespace FoodHub.Persistence.Migrations
                         .IsUnique()
                         .HasDatabaseName("UX_RecipeIngredient_RecipeId_IngredientId");
 
-                    b.ToTable("RecipeIngredients", t =>
+                    b.ToTable("RecipeIngredients", null, t =>
                         {
                             t.HasCheckConstraint("CK_RecipeIngredient_Amount", "Amount > 0");
 

@@ -5,10 +5,4 @@ public class Ingredient : BaseEntity
 	public required string Name { get; set; }
 
 	public bool ShouldBeAddedToShoppingCart { get; set; } = true;
-
-	public Ingredient() { }
-	public Ingredient(string name) 
-	{
-		Name = name;
-	}
 }

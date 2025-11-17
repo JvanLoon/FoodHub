@@ -1,8 +1,11 @@
 ﻿
+using AutoMapper;
+
 using ErrorOr;
 
 using FoodCalc.Features.ImportExport.Export.Commands.ExportJSON;
 
+using FoodHub.DTOs;
 using FoodHub.Persistence.Entities;
 using FoodHub.Persistence.Persistence;
 
@@ -12,7 +15,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Features.ImportExport.Import.Commands.ImportJSON;
-public class ImportAllCommandHandler(IUnitOfWork unitOfWork, ILogger<ImportAllCommandHandler> logger) : IRequestHandler<ImportAllCommand, ErrorOr<bool>>
+public class ImportAllCommandHandler(IUnitOfWork unitOfWork, ILogger<ImportAllCommandHandler> logger, IMapper mapper) : IRequestHandler<ImportAllCommand, ErrorOr<bool>>
 {
 	public async Task<ErrorOr<bool>> Handle(ImportAllCommand request, CancellationToken cancellationToken)
 	{
@@ -33,7 +36,7 @@ public class ImportAllCommandHandler(IUnitOfWork unitOfWork, ILogger<ImportAllCo
 					{
 						Id = ingredientDto.Id,
 						Name = ingredientDto.Name,
-						// Map other properties as needed
+						ShouldBeAddedToShoppingCart = ingredientDto.ShouldBeAddedToShoppingCart
 					};
 					await unitOfWork.IngredientRepository.AddAsync(ingredient, cancellationToken);
 				}
@@ -50,7 +53,6 @@ public class ImportAllCommandHandler(IUnitOfWork unitOfWork, ILogger<ImportAllCo
 					{
 						Id = recipeDto.Id,
 						Name = recipeDto.Name,
-						// Map other properties as needed
 					};
 					await unitOfWork.RecipeRepository.AddAsync(recipe, cancellationToken);
 				}
@@ -58,7 +60,7 @@ public class ImportAllCommandHandler(IUnitOfWork unitOfWork, ILogger<ImportAllCo
 			}
 
 			// Import RecipeIngredients
-			foreach (var riDto in data.RecipeIngredients)
+			foreach (RecipeIngredientDto riDto in data.RecipeIngredients)
 			{
 				// You may want to check for existence or just add
 				var recipeIngredient = new RecipeIngredient
@@ -66,7 +68,8 @@ public class ImportAllCommandHandler(IUnitOfWork unitOfWork, ILogger<ImportAllCo
 					Id = riDto.Id,
 					RecipeId = riDto.RecipeId,
 					IngredientId = riDto.IngredientId,
-					// Map other properties as needed
+					Amount = riDto.Amount,
+					IngredientAmount = mapper.Map<IngredientAmountType>(riDto.IngredientAmount)
 				};
 				await unitOfWork.RecipeRepository.AddRecipeIngredientAsync(recipeIngredient, cancellationToken);
 			}
@@ -74,7 +77,7 @@ public class ImportAllCommandHandler(IUnitOfWork unitOfWork, ILogger<ImportAllCo
 			// Import Users with Roles (optional)
 			if (data.Users != null)
 			{
-				foreach (var userDto in data.Users)
+				foreach (UserWithRolesDto userDto in data.Users)
 				{
 					var existing = await unitOfWork.UserRepository.GetByEmailAsync(userDto.Email, cancellationToken);
 					if (existing == null)
@@ -84,7 +87,8 @@ public class ImportAllCommandHandler(IUnitOfWork unitOfWork, ILogger<ImportAllCo
 							Id = userDto.Id,
 							Email = userDto.Email,
 							UserName = userDto.Email,
-							EmailConfirmed = true
+							EmailConfirmed = userDto.EmailConfirmed,
+							LockoutEnabled = userDto.LockoutEnabled
 						};
 						// You may need to set a default password or handle this elsewhere
 						await unitOfWork.UserRepository.UpdateAsync(user, cancellationToken);

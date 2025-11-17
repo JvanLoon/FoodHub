@@ -4,11 +4,6 @@ using FoodCalc.Web.Components.Services.Auth;
 
 using FoodHub.DTOs;
 
-using Microsoft.AspNetCore.Components;
-
-using System.Net.Http.Json;
-using System.Threading.Tasks;
-
 namespace FoodCalc.Web.Components.Services;
 public class LoginService//(AuthenticatedHttpClientService httpClient)
 {

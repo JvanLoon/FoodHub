@@ -8,7 +8,6 @@ public class RecipeIngredient : BaseEntity
 	[JsonIgnore]
 	public virtual Recipe Recipe { get; set; }
 	public Guid IngredientId { get; set; }
-
 	public virtual Ingredient Ingredient { get; set; }
 	public decimal Amount { get; set; }
 	public IngredientAmountType IngredientAmount { get; set; }

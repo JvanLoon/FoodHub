@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-
-//namespace FoodCalc.Web.Components.Services;
+﻿namespace FoodCalc.Web.Components.Services;
 public class MessageService
 {
 	public const int DefaultDisplayTimeInMs = 12000;

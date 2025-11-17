@@ -1,13 +1,6 @@
 using Blazored.LocalStorage;
-
-using ErrorOr;
-
-using Microsoft.JSInterop;
-
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Threading.Tasks;
+
 namespace FoodCalc.Web.Components.Services.Auth;
 
 public class AuthTokenService(ILocalStorageService localStorage)
