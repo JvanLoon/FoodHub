@@ -100,6 +100,15 @@ h1:focus {
 	padding: 4px 10px;
 }
 
+/* Alternate row colors for IngredientList custom row classes */
+.table-row-even td {
+	background-color: var(--bs-table-border-color);
+}
+
+.table-row-odd td {
+    background-color: #ffffff;
+}
+
 .login-btn, .logout-btn {
 	padding: 4px 16px;
 	border: none;
@@ -110,6 +119,11 @@ h1:focus {
 	cursor: pointer;
 	border-bottom: 2px solid #bdbdbd;
 	transition: background 0.2s;
+}
+
+/* Hover effect for li elements */
+li:hover {
+	background-color: var(--bs-list-group-action-active-bg);
 }
 
 	.login-btn:hover, .logout-btn:hover {
