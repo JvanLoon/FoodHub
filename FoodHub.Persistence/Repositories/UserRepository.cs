@@ -96,5 +96,14 @@ namespace FoodHub.Persistence.Repositories
 			context.RecipeBlackLists.Remove(new RecipeBlackList { RecipeId = recipeId, UserId = userId });
 			return context.SaveChangesAsync();
 		}
+        public async Task<IList<string>> GetRolesAsync(IdentityUser user, CancellationToken cancellationToken)
+        {
+            return await userManager.GetRolesAsync(user);
+        }
+
+        public async Task RemoveRoleFromUser(IdentityUser user, string role, CancellationToken cancellationToken)
+        {
+            await userManager.RemoveFromRoleAsync(user, role);
+        }
 	}
 }

@@ -81,6 +81,11 @@ public class RecipeRepository(ApplicationDbContext context) : IRecipeRepository
         }
     }
 
+	public async Task<RecipeIngredient?> GetRecipeIngredientByIdAsync(Guid id, CancellationToken cancellationToken)
+	{
+		return await context.RecipeIngredients.SingleOrDefaultAsync(ri => ri.Id == id, cancellationToken);
+	}
+
 	public async Task AddRecipeIngredientAsync(RecipeIngredient recipeIngredient, CancellationToken cancellationToken)
 	{
 		context.RecipeIngredients.Add(recipeIngredient);

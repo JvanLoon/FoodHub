@@ -16,6 +16,11 @@ public class IngredientRepository(ApplicationDbContext context) : IIngredientRep
         return await context.Ingredients.SingleOrDefaultAsync(i => i.Id == id, cancellationToken);
     }
 
+    public async Task<Ingredient?> GetByNameAsync(string name, CancellationToken cancellationToken)
+    {
+        return await context.Ingredients.SingleOrDefaultAsync(i => i.Name == name, cancellationToken);
+    }
+
     public async Task AddAsync(Ingredient ingredient, CancellationToken cancellationToken)
     {
         context.Ingredients.Add(ingredient);
