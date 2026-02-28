@@ -11,19 +11,27 @@
 <h1>list of recipes</h1>
 
 <div class="mb-3">
-    <button class="btn btn-success" @onclick="OpenAggregatedIngredientsPage" disabled="@(!SelectedRecipeIds.Any())">
-        Get Ingredients from Selected Recipes
-    </button>
+    <div class="d-flex align-items-center gap-2">
+        <button class="btn btn-success" @onclick="OpenAggregatedIngredientsPage" disabled="@(!SelectedRecipeIds.Any())">
+            Generate shopping list
+        </button>
+        <input type="text" class="form-control" style="max-width: 300px;" placeholder="Search recipes..." @bind-value="searchTerm" @bind-value:event="oninput" />
+    </div>
 </div>
 
 <div class="container-fluid ps-3">
-    @if (Recipes.Any())
+    @{
+        var filteredRecipes = string.IsNullOrWhiteSpace(searchTerm)
+            ? Recipes
+            : Recipes.Where(r => r.Name != null && r.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
+    }
+    @if (filteredRecipes.Any())
     {
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            @foreach (RecipeDto recipe in Recipes)
+            @foreach (RecipeDto recipe in filteredRecipes)
             {
                 <div class="col d-flex card-equal-width p-1">
-                    <div class="card h-100 w-100 shadow-sm @CardCssClass(recipe.Id)" draggable="false" onmousedown="() => ToggleRecipeSelection(recipe.Id, !SelectedRecipeIds.Contains(recipe.Id))">
+                    <div class="card h-100 w-100 shadow-sm @CardCssClass(recipe.Id)" draggable="false" @onmousedown="@(() => ToggleRecipeSelection(recipe.Id, !SelectedRecipeIds.Contains(recipe.Id)))">
                         <img src="https://placehold.co/400x200?text=Recipe\nImage" class="card-img-top" alt="Recipe image" draggable="false">
                         <div class="card-body">
                             <h5 class="card-title">@recipe.Name</h5>
@@ -65,6 +73,7 @@
 
 @code {
     List<RecipeDto> Recipes = new();
+    private string searchTerm = string.Empty;
     private HashSet<Guid> SelectedRecipeIds = new();
     private List<RecipeIngredientDto> AggregatedIngredients = new();
 
