@@ -112,7 +112,7 @@ else
 
     private async Task RemoveRole(string role)
     {
-        var result = await AdminService.UpdateUserRolesAsync(email, role);
+        var result = await AdminService.RemoveUserRoleAsync(email, role);
         if (result)
         {
             roles.Remove(role);

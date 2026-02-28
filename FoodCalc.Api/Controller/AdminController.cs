@@ -62,22 +62,30 @@ public class AdminController(IMediator mediator, UserManager<IdentityUser> userM
 	}
 
 	[HttpPost("userroles")]
-	public async Task<IActionResult> GetUsers([FromQuery] string email, [FromQuery] string role)
+	public async Task<IActionResult> AddUserRole([FromQuery] string email, [FromQuery] string role)
 	{
-		ErrorOr<List<UserDto>> result = await mediator.Send(new GetAllUsersQuery());
+		var user = await userManager.FindByEmailAsync(email);
+		if (user == null)
+			return NotFound("No user found");
 
-		return result.Match(
-			userList =>
-			{
-				var users = userList.Select(u => new UserDto
-				{
-					Email = u.Email,
-					Enabled = u.Enabled,
-					Roles = u.Roles
-				}).ToList();
-				return Ok(users);
-			},
-			errors => Problem(detail: string.Join(", ", errors.Select(e => e.ToString())))
-		);
+		var result = await userManager.AddToRoleAsync(user, role);
+		if (!result.Succeeded)
+			return Problem(detail: string.Join(", ", result.Errors.Select(e => e.Description)));
+
+		return Ok();
+	}
+
+	[HttpDelete("userroles")]
+	public async Task<IActionResult> RemoveUserRole([FromQuery] string email, [FromQuery] string role)
+	{
+		var user = await userManager.FindByEmailAsync(email);
+		if (user == null)
+			return NotFound("No user found");
+
+		var result = await userManager.RemoveFromRoleAsync(user, role);
+		if (!result.Succeeded)
+			return Problem(detail: string.Join(", ", result.Errors.Select(e => e.Description)));
+
+		return Ok();
 	}
 }

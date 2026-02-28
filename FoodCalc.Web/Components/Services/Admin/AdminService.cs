@@ -56,4 +56,10 @@ public class AdminService(AuthenticatedHttpClientService httpClient)
 		var response = await httpClient.PostAsync($"api/Admin/userroles?email={email}&role={newRole}");
 		return response.IsSuccessStatusCode;
 	}
+
+	public async Task<bool> RemoveUserRoleAsync(string email, string role)
+	{
+		var response = await httpClient.DeleteAsync($"api/Admin/userroles?email={email}&role={role}");
+		return response.IsSuccessStatusCode;
+	}
 }
