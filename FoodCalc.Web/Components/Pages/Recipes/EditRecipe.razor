@@ -72,7 +72,7 @@
 
             <div class="mb-3">
                 <label for="amountInput" class="form-label">Amount</label>
-                <InputNumber id="amountInput" @bind-Value="recipeIngredient.Amount" class="form-control" />
+                <InputNumber id="amountInput" @bind-Value="amountInput" class="form-control" />
             </div>
 
             <div class="mb-3">
@@ -124,6 +124,7 @@
         string.IsNullOrWhiteSpace(ingredientSearch)
             ? ingredients
             : ingredients.Where(i => i.Name.Contains(ingredientSearch, StringComparison.OrdinalIgnoreCase));
+    private decimal? amountInput;
     private bool dropdownOpen = false;
     private bool ingredientSearchFocused = false;
 
@@ -147,6 +148,7 @@
         try
         {
             recipeIngredient.RecipeId = RecipeId;
+            recipeIngredient.Amount = amountInput ?? 0;
             await RecipeService.AddIngredient(recipeIngredient);
             await MessageService.ShowMessageAsync("Ingredient added/updated successfully", false);
 
@@ -170,6 +172,7 @@
             Amount = ingredient.Amount,
             IngredientAmount = ingredient.IngredientAmount
         };
+        amountInput = ingredient.Amount == 0 ? null : ingredient.Amount;
         ingredientSearch = ingredient.Ingredient.Name;
     }
 
@@ -191,6 +194,7 @@
     private void ClearForm()
     {
         ingredientSearch = string.Empty;
+        amountInput = null;
         recipeIngredient = new RecipeIngredientDto { Id = Guid.NewGuid(), RecipeId = RecipeId, IngredientId = noIngredient };
     }
 

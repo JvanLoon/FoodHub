@@ -6,6 +6,5 @@ public enum IngredientAmountType
 	Kilogram = 2,
 	Liter = 3,
 	Milliliter = 4,
-	Piece = 5,
-	Kanker = 6
+	Piece = 5
 }
