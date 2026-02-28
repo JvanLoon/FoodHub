@@ -5,7 +5,13 @@
 @inject IngredientService IngredientService
 @inject MessageService MessageService
 
+
 <h3>Ingredients</h3>
+
+<div class="mb-3">
+    <input type="text" class="form-control" placeholder="Search ingredients..." @bind-value="searchTerm" @bind-value:event="oninput" />
+</div>
+
 
 @if (ingredients == null)
 {
@@ -13,47 +19,51 @@
 }
 else
 {
-    <table class="table table-hover">
+    var filteredIngredients = string.IsNullOrWhiteSpace(searchTerm)
+        ? ingredients
+        : ingredients.Where(i => i.Name != null && i.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
+
+    <table class="table table-hover ingredient-table">
         <thead>
             <tr>
-                <th>Name</th>
-                <th>Should Be Added To Shopping Cart</th>
-                <th>Actions</th>
+                <th class="w-100">Name</th>
+                <th class="text-end" style="white-space: nowrap;">Shopping Cart</th>
+                <th class="text-end" style="white-space: nowrap;">Actions</th>
             </tr>
         </thead>
         <tbody>
-            @if (ingredients != null)
+            @if (filteredIngredients != null)
             {
                 var index = 0;
-                @foreach (IngredientDto ingredient in ingredients)
+                @foreach (IngredientDto ingredient in filteredIngredients)
                 {
                     var rowClass = index % 2 == 0 ? "table-row-even" : "table-row-odd";
                     <tr class="@rowClass">
-                        <td>
+                        <td class="w-100 text-wrap">
                             @if (editingIngredientId == ingredient.Id)
                             {
-                                <input type="text" class="form-control" @bind="editingName" @onkeydown="(e) => OnEditInputKeyDown(e, ingredient)" />
+                                <input type="text" class="form-control form-control-sm" @bind="editingName" @onkeydown="(e) => OnEditInputKeyDown(e, ingredient)" />
                             }
                             else
                             {
                                 @ingredient.Name
                             }
                         </td>
-                        <td>
+                        <td class="text-center" style="white-space: nowrap;">
                             <input type="checkbox"
                             checked="@ingredient.ShouldBeAddedToShoppingCart"
                             @onchange="(e) => OnCheckboxChanged(ingredient, e)" />
                         </td>
-                        <td>
+                        <td class="text-end" style="white-space: nowrap;">
                             @if (editingIngredientId == ingredient.Id)
                             {
-                                <button class="btn btn-success btn-sm" @onclick="() => SaveEdit(ingredient)">Save</button>
+                                <button class="btn btn-success btn-sm ingredient-action-btn" @onclick="() => SaveEdit(ingredient)">Save</button>
                             }
                             else
                             {
-                                <button class="btn btn-primary btn-sm" @onclick="() => StartEdit(ingredient)">Edit</button>
+                                <button class="btn btn-primary btn-sm ingredient-action-btn" @onclick="() => StartEdit(ingredient)">Edit</button>
                             }
-                            <button class="btn btn-danger btn-sm" @onclick="() => DeleteIngredient(ingredient.Id)">Delete</button>
+                            <button class="btn btn-danger btn-sm ms-3" @onclick="() => DeleteIngredient(ingredient.Id)">Delete</button>
                         </td>
                     </tr>
                     index++;
@@ -69,6 +79,7 @@ else
     private List<IngredientDto> ingredients;
     private Guid? editingIngredientId = null;
     private string editingName = string.Empty;
+    private string searchTerm = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {

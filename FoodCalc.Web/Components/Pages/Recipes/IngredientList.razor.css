@@ -1,0 +1,10 @@
+.ingredient-table td, .ingredient-table th {
+    min-height: 38px;
+    height: 38px;
+    line-height: 1.5;
+    vertical-align: middle;
+}
+
+.ingredient-action-btn {
+    width: 50px;
+}
