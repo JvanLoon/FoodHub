@@ -23,8 +23,8 @@
             @foreach (RecipeDto recipe in Recipes)
             {
                 <div class="col d-flex card-equal-width p-1">
-                    <div class="card h-100 w-100 shadow-sm @(SelectedRecipeIds.Contains(recipe.Id) ? "border-primary border-3" : "")" style="cursor: pointer" @onclick="() => ToggleRecipeSelection(recipe.Id, !SelectedRecipeIds.Contains(recipe.Id))">
-                        <img src="https://placehold.co/400x200?text=Recipe\nImage" class="card-img-top" alt="Recipe image">
+                    <div class="card h-100 w-100 shadow-sm @CardCssClass(recipe.Id)" draggable="false" onmousedown="() => ToggleRecipeSelection(recipe.Id, !SelectedRecipeIds.Contains(recipe.Id))">
+                        <img src="https://placehold.co/400x200?text=Recipe\nImage" class="card-img-top" alt="Recipe image" draggable="false">
                         <div class="card-body">
                             <h5 class="card-title">@recipe.Name</h5>
                             <p class="card-text mb-1"><strong>Ingredients:</strong></p>
@@ -64,22 +64,22 @@
 
 
 @code {
-List<RecipeDto> Recipes = new();
-private HashSet<Guid> SelectedRecipeIds = new();
-private List<RecipeIngredientDto> AggregatedIngredients = new();
+    List<RecipeDto> Recipes = new();
+    private HashSet<Guid> SelectedRecipeIds = new();
+    private List<RecipeIngredientDto> AggregatedIngredients = new();
 
-protected override async Task OnInitializedAsync()
-{
-    try
+    protected override async Task OnInitializedAsync()
     {
-        Recipes = await recipeService.GetAllRecipesAsync();
+        try
+        {
+            Recipes = await recipeService.GetAllRecipesAsync();
+        }
+        catch (Exception ex)
+        {
+            Recipes = [];
+            await MessageService.ShowMessageAsync(ex.Message, true, 0);
+        }
     }
-    catch (Exception ex)
-    {
-        Recipes = [];
-        await MessageService.ShowMessageAsync(ex.Message, true, 0);
-    }
-}
 
     private async Task OpenAggregatedIngredientsPage()
     {
@@ -91,6 +91,9 @@ protected override async Task OnInitializedAsync()
         //clean list when new page is opened
         AggregatedIngredients = new();
     }
+
+    private string CardCssClass(Guid recipeId) =>
+        SelectedRecipeIds.Contains(recipeId) ? "border-primary border-3" : string.Empty;
 
     private void ToggleRecipeSelection(Guid recipeId, bool? isChecked)
     {
