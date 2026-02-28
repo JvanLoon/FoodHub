@@ -2,7 +2,7 @@
 @page "/admin/dataimportexport"
 @inject ImportExportService importExportService
 @inject MessageService messageService
-@inject IJSRuntime JS
+@inject IOptions<ImportExportSettings> ImportExportOptions
 
 <h3>Data Import/Export</h3>
 
@@ -15,13 +15,19 @@
 
 <div>
     <label>Import File (.json):</label>
-    <input type="file" id="importFileInput" accept=".json" />
+    <InputFile OnChange="HandleFileSelected" accept=".json" />
     <button @onclick="ImportData">Import</button>
 </div>
 
 
 @code {
     private const string ExportFormat = "json";
+    private IBrowserFile? _selectedFile;
+
+    private void HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        _selectedFile = e.File;
+    }
 
     private async Task ExportData()
     {
@@ -40,34 +46,30 @@
     {
         try
         {
-            var fileName = await JS.InvokeAsync<string?>("getFileName", "importFileInput");
-            if (string.IsNullOrEmpty(fileName))
+            if (_selectedFile == null)
             {
                 await messageService.ShowMessageAsync("Please select a file first.", true);
                 return;
             }
 
-            if (!fileName.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+            if (!_selectedFile.Name.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
             {
                 await messageService.ShowMessageAsync("Only .json files are accepted.", true);
                 return;
             }
 
-            var base64 = await JS.InvokeAsync<string?>("getFileBase64", "importFileInput");
-            if (base64 == null)
-            {
-                await messageService.ShowMessageAsync("Could not read the selected file.", true);
-                return;
-            }
+            using var stream = _selectedFile.OpenReadStream(maxAllowedSize: ImportExportSettings.DefaultMaxFileSizeInBytes);
+            using var ms = new MemoryStream();
+            await stream.CopyToAsync(ms);
+            var bytes = ms.ToArray();
 
-            var bytes = Convert.FromBase64String(base64);
             if (bytes.Length == 0)
             {
                 await messageService.ShowMessageAsync("Could not read the selected file.", true);
                 return;
             }
 
-            await importExportService.ImportAsync(bytes, fileName);
+            await importExportService.ImportAsync(bytes, _selectedFile.Name);
         }
         catch (Exception ex)
         {

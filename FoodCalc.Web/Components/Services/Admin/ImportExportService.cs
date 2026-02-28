@@ -1,7 +1,5 @@
 ﻿using FoodCalc.Web.Components.Services.Auth;
 
-using FoodHub.DTOs;
-
 using Microsoft.JSInterop;
 
 using System.Net.Http.Headers;
@@ -9,7 +7,6 @@ using System.Net.Http.Headers;
 namespace FoodCalc.Web.Components.Services.Admin;
 public class ImportExportService(AuthenticatedHttpClientService httpClient, IJSRuntime js, MessageService messageService)
 {
-	private readonly int _maxFileSizeInBytes = 10 * 1024 * 1024; // 10 MB
 	private readonly string _exportFileName = $"export";
 
 	public async Task<bool> ImportAsync(byte[] fileContent, string fileName)

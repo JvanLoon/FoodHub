@@ -20,13 +20,11 @@ public class Program
 
 		// Add services to the container.
 		builder.Services.AddRazorComponents()
-			.AddInteractiveServerComponents();
-
-		builder.Services.AddServerSideBlazor()
-		.AddHubOptions(options =>
-		{
-			options.MaximumReceiveMessageSize = 10 * 1024 * 1024; // 10 MB
-		});
+			.AddInteractiveServerComponents()
+			.AddHubOptions(options =>
+			{
+				options.MaximumReceiveMessageSize = ImportExportSettings.DefaultMaxFileSizeInBytes;
+			});
 
 		builder.Services.AddOutputCache();
 
