@@ -53,7 +53,7 @@ public class AdminService(AuthenticatedHttpClientService httpClient)
 
 	public async Task<bool> UpdateUserRolesAsync(string email, string newRole)
 	{
-		var response = await httpClient.PostAsync($"api/Admin/userroles?email={email}&role=newRole");
+		var response = await httpClient.PostAsync($"api/Admin/userroles?email={email}&role={newRole}");
 		return response.IsSuccessStatusCode;
 	}
 }

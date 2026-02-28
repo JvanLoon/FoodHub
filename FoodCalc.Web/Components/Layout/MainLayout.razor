@@ -1,7 +1,7 @@
 ﻿@using FoodCalc.Web.Components.Services.Auth
 @inherits LayoutComponentBase
 @implements IDisposable
-@inject AuthTokenService AuthTokenService
+@inject AuthStateService AuthStateService
 @inject MessageService MessageService
 @inject NavigationManager Navigation
 
@@ -27,7 +27,6 @@
             }
         </div>
         <article class="content px-4">
-            @* <FoodCalc.Web.Components.Shared.MessageBox /> *@
             @Body
         </article>
     </main>
@@ -39,39 +38,21 @@
     <a class="dismiss">🗙</a>
 </div>
 
-@code{
+@code {
     private string? userEmail;
 
     protected override async Task OnInitializedAsync()
     {
-        Navigation.LocationChanged += OnLocationChanged;
+        AuthStateService.OnAuthStateChanged += HandleAuthStateChangedAsync;
         try
         {
-            if (await AuthTokenService.IsTokenExpiredAsync())
+            if (!await AuthStateService.IsLoggedInAsync())
             {
-                await Logout();
+                await AuthStateService.SignOutAsync();
+                Navigation.NavigateTo("/login");
+                return;
             }
-        }
-        catch (Exception ex)
-        {
-            await MessageService.ShowMessageAsync(ex.Message, true, 20000);
-        }
-        await RefreshEmailAsync();
-    }
-
-    private void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
-    {
-        _ = InvokeAsync(HandleLocationChangedAsync);
-    }
-
-    private async Task HandleLocationChangedAsync()
-    {
-        try
-        {
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                await RefreshEmailAsync();
-            }
+            userEmail = await AuthStateService.GetEmailAsync();
         }
         catch (Exception ex)
         {
@@ -79,21 +60,22 @@
         }
     }
 
-    private async Task RefreshEmailAsync()
+    private async Task HandleAuthStateChangedAsync()
     {
-        userEmail = await AuthTokenService.GetEmailAsync() ?? string.Empty;
+        userEmail = await AuthStateService.IsLoggedInAsync()
+            ? await AuthStateService.GetEmailAsync()
+            : null;
         await InvokeAsync(StateHasChanged);
     }
 
     public void Dispose()
     {
-        Navigation.LocationChanged -= OnLocationChanged;
+        AuthStateService.OnAuthStateChanged -= HandleAuthStateChangedAsync;
     }
 
     private async Task Logout()
     {
-        await AuthTokenService.RemoveTokenAsync(); // Clear the cookie
-        await RefreshEmailAsync(); // Clear the email and update UI
+        await AuthStateService.SignOutAsync();
         Navigation.NavigateTo("/login");
     }
 }

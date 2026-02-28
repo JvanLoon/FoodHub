@@ -127,35 +127,18 @@
     private bool dropdownOpen = false;
     private bool ingredientSearchFocused = false;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            try
-            {
-                recipe = await RecipeService.GetRecipeByIdAsync(RecipeId) ?? new RecipeDto();
-                ingredients = await IngredientService.GetAllIngredientsAsync();
-                noIngredient = Guid.NewGuid();
-                recipeIngredient.IngredientId = noIngredient;
-                ClearForm();
-                StateHasChanged();
-            }
-            catch (Exception ex)
-            {
-                await MessageService.ShowMessageAsync(ex.Message, true, 20000);
-            }
-        }
-    }
-
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            
+            recipe = await RecipeService.GetRecipeByIdAsync(RecipeId) ?? new RecipeDto();
+            ingredients = await IngredientService.GetAllIngredientsAsync();
+            noIngredient = Guid.NewGuid();
+            ClearForm();
         }
         catch (Exception ex)
         {
-            
+            await MessageService.ShowMessageAsync(ex.Message, true, 20000);
         }
     }
 
@@ -168,7 +151,7 @@
             await MessageService.ShowMessageAsync("Ingredient added/updated successfully", false);
 
             // Clear form
-            recipeIngredient = new RecipeIngredientDto { RecipeId = RecipeId, IngredientId = Guid.Empty };
+            ClearForm();
             recipe = await RecipeService.GetRecipeByIdAsync(RecipeId); // Refresh the list
         }
         catch (Exception ex)
@@ -198,7 +181,6 @@
             await MessageService.ShowMessageAsync("Ingredient deleted successfully", false);
             ClearForm();
             recipe = await RecipeService.GetRecipeByIdAsync(RecipeId); // Refresh the list
-            StateHasChanged();
         }
         catch (Exception ex)
         {
@@ -237,11 +219,10 @@
 
             ingredients = await IngredientService.GetAllIngredientsAsync();
 
-            recipeIngredient.IngredientId = ingredients.Where(i => i.Name == ingredientSearch).FirstOrDefault().Id;
-            //ingredientSearch = string.Empty;
+            recipeIngredient.IngredientId = ingredients.FirstOrDefault(i => i.Name == ingredientSearch)?.Id ?? Guid.Empty;
+            ingredientSearch = string.Empty;
 
             await MessageService.ShowMessageAsync("Ingredient added", false);
-            StateHasChanged();
         }
         catch (Exception ex)
         {
@@ -254,7 +235,6 @@
         recipeIngredient.IngredientId = ingredient.Id;
         ingredientSearch = ingredient.Name;
         dropdownOpen = false;
-        StateHasChanged();
     }
 
     private async Task OnDropdownBlur()
@@ -262,7 +242,6 @@
         // Delay to allow click event to register before closing dropdown
         await Task.Delay(150);
         dropdownOpen = false;
-        StateHasChanged();
     }
 
     private void CancelEditName()

@@ -139,7 +139,6 @@ else
             {
                 await MessageService.ShowMessageAsync("Password reset successfully!", false);
                 resetModel.password = string.Empty;
-                StateHasChanged();
             }
             else
             {

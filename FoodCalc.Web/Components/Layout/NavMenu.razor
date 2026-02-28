@@ -1,5 +1,6 @@
 ﻿@using FoodCalc.Web.Components.Services.Auth
-@inject AuthTokenService AuthTokenService
+@implements IDisposable
+@inject AuthStateService AuthStateService
 @inject MessageService MessageService
 
 <div class="top-row ps-3 navbar navbar-dark">
@@ -12,26 +13,14 @@
 
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
     <nav class="nav flex-column">
-        @if (isLoggedIn || isAdmin)
+        @if (isLoggedIn)
         {
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
                     <span class="bi bi-house-door-fill" aria-hidden="true"></span> Home
                 </NavLink>
             </div>
-
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="/recipes/create">
-                    <span class="bi bi-list-nested" aria-hidden="true"></span> Add recipe
-	            </NavLink>
-            </div>
-
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="/ingredients">
-                    <span class="bi bi-list-nested" aria-hidden="true"></span> Edit Ingredients
-                </NavLink>
-            </div>
-
+            
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="/usersettings">
                     <span class="bi bi-person" aria-hidden="true"></span> User Settings
@@ -40,6 +29,18 @@
 
             @if (isAdmin)
             {
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="/recipes/create">
+                        <span class="bi bi-list-nested" aria-hidden="true"></span> Add recipe
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="/ingredients">
+                        <span class="bi bi-list-nested" aria-hidden="true"></span> Edit Ingredients
+                    </NavLink>
+                </div>
+
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="/admin">
                         <span class="bi bi-gear" aria-hidden="true"></span> Admin
@@ -53,35 +54,39 @@
             }
         }
     </nav>
-    @* <FoodCalc.Web.Components.Shared.MessageBox /> *@
 </div>
 
 @code {
-    private bool isAdmin = false;
-    private bool isLoggedIn = false;
-    private string userEmail = "";
+    private bool isAdmin;
+    private bool isLoggedIn;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if (firstRender)
-        {
-            try
-            {
-                var roles = await AuthTokenService.GetRolesAsync();
-                isLoggedIn = roles.Any();
-                isAdmin = roles?.Contains("Admin") == true;
-                StateHasChanged();
+        AuthStateService.OnAuthStateChanged += HandleAuthStateChangedAsync;
+        await RefreshStateAsync();
+    }
 
-                // TODO: Replace with actual role check from auth state
-                // isAdmin = await AuthService.IsUserInRoleAsync("Admin");
-                // TODO: Replace with actual login state and email from auth state
-                // isLoggedIn = await AuthService.IsLoggedInAsync();
-                // userEmail = await AuthService.GetUserEmailAsync();
-            }
-            catch (Exception ex)
-            {
-                await MessageService.ShowMessageAsync(ex.Message, true, 0);
-            }
+    private async Task HandleAuthStateChangedAsync()
+    {
+        await RefreshStateAsync();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task RefreshStateAsync()
+    {
+        try
+        {
+            isLoggedIn = await AuthStateService.IsLoggedInAsync();
+            isAdmin = isLoggedIn && await AuthStateService.IsAdminAsync();
         }
+        catch (Exception ex)
+        {
+            await MessageService.ShowMessageAsync(ex.Message, true, 0);
+        }
+    }
+
+    public void Dispose()
+    {
+        AuthStateService.OnAuthStateChanged -= HandleAuthStateChangedAsync;
     }
 }

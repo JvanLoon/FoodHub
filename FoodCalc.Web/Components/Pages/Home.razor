@@ -74,27 +74,22 @@
 
 
 @code {
-    List<RecipeDto> Recipes = new();
-    private HashSet<Guid> SelectedRecipeIds = new();
-    private List<RecipeIngredientDto> AggregatedIngredients = new();
+List<RecipeDto> Recipes = new();
+private HashSet<Guid> SelectedRecipeIds = new();
+private List<RecipeIngredientDto> AggregatedIngredients = new();
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+protected override async Task OnInitializedAsync()
+{
+    try
     {
-        if (firstRender)
-        {
-            try
-            {
-                Recipes = await recipeService.GetAllRecipesAsync();
-                StateHasChanged();
-            }
-            catch (Exception ex)
-            {
-                Recipes = [];
-                await MessageService.ShowMessageAsync(ex.Message, true, 0);
-                StateHasChanged();
-            }
-        }
+        Recipes = await recipeService.GetAllRecipesAsync();
     }
+    catch (Exception ex)
+    {
+        Recipes = [];
+        await MessageService.ShowMessageAsync(ex.Message, true, 0);
+    }
+}
 
     private async Task OpenAggregatedIngredientsPage()
     {
@@ -165,12 +160,10 @@
         {
             await recipeService.DeleteRecipe(recipeId);
             Recipes = await recipeService.GetAllRecipesAsync();
-            StateHasChanged();
         }
         catch (Exception ex)
         {
             await MessageService.ShowMessageAsync(ex.Message, true);
-            StateHasChanged();
         }
     }
 }

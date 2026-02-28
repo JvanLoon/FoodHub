@@ -39,28 +39,29 @@
 @code {
     private List<UserDto> users = new();
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if (firstRender)
+        await LoadUsersAsync();
+    }
+
+    private async Task LoadUsersAsync()
+    {
+        try
         {
-            try
-            {
-                users = await AdminService.GetUsersAsync();
-                StateHasChanged();
-            }
-            catch (Exception ex)
-            {
-                users = [];
-                await MessageService.ShowMessageAsync(ex.Message, true, 20000);
-                StateHasChanged();
-            }
+            users = await AdminService.GetUsersAsync();
+        }
+        catch (Exception ex)
+        {
+            users = [];
+            await MessageService.ShowMessageAsync(ex.Message, true, 20000);
         }
     }
 
     public async Task ToggleUserAsync(string email, bool enabled)
     {
         await AdminService.ToggleUserAsync(email, enabled);
-        users.Where(u => u.Email == email).SingleOrDefault(u => u.Enabled = enabled);
-        //StateHasChanged();
+        var user = users.FirstOrDefault(u => u.Email == email);
+        if (user != null)
+            user.Enabled = enabled;
     }
 }

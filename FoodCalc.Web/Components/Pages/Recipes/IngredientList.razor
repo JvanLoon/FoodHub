@@ -55,21 +55,21 @@ else
 @code {
     private List<IngredientDto> ingredients;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if (firstRender)
+        await LoadIngredientsAsync();
+    }
+
+    private async Task LoadIngredientsAsync()
+    {
+        try
         {
-            try
-            {
-                ingredients = await IngredientService.GetAllIngredientsAsync();
-                StateHasChanged();
-            }
-            catch (Exception ex)
-            {
-                ingredients = [];
-                await MessageService.ShowMessageAsync(ex.Message, true, 20000);
-                StateHasChanged();
-            }
+            ingredients = await IngredientService.GetAllIngredientsAsync();
+        }
+        catch (Exception ex)
+        {
+            ingredients = [];
+            await MessageService.ShowMessageAsync(ex.Message, true, 20000);
         }
     }
 
@@ -95,9 +95,7 @@ else
         var success = await IngredientService.DeleteIngredient(id);
         if (success)
         {
-            //ingredients = ingredients.Where(i => i.Id != id).ToList();
-            //reinitialize the list
-            await OnInitializedAsync();
+            await LoadIngredientsAsync();
             await MessageService.ShowMessageAsync("Ingredient deleted successfully!", false);
         }
         else

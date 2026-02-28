@@ -43,20 +43,22 @@ public class Program
 		.SetApplicationName("FoodHub");
 
 		builder.Services.AddScoped<AuthTokenService>();
+		builder.Services.AddScoped<AuthStateService>();
 		builder.Services.AddScoped<AdminService>();
 		builder.Services.AddScoped<LoginService>();
 		builder.Services.AddScoped<RecipeService>();
 		builder.Services.AddScoped<IngredientService>();
 		builder.Services.AddScoped<ImportExportService>();
+		builder.Services.AddScoped<UserService>();
 		builder.Services.AddSingleton<AggregatedIngredientService>();
-		builder.Services.AddSingleton<MessageService>();
+		builder.Services.AddScoped<MessageService>();
 
 		builder.Services.AddScoped<AuthenticatedHttpClientService>(sp =>
 		{
 			var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
-			var localStorage = sp.GetRequiredService<Blazored.LocalStorage.ILocalStorageService>();
+			var authTokenService = sp.GetRequiredService<AuthTokenService>();
 			var httpClient = httpClientFactory.CreateClient("ApiClient");
-			return new AuthenticatedHttpClientService(httpClient, localStorage);
+			return new AuthenticatedHttpClientService(httpClient, authTokenService);
 		});
 
 		// CORS config

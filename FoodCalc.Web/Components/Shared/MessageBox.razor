@@ -26,8 +26,13 @@
         MessageService.OnShowMessage += ShowMessage;
     }
 
-    private async Task ShowMessage(string msg, bool error, int timeInMs)
+    private async Task ShowMessage(string msg, bool error, int timeInMs, CancellationToken externalToken)
     {
+        // Cancel any in-progress auto-hide timer before showing the new message
+        await _cts.CancelAsync();
+        _cts.Dispose();
+        _cts = new CancellationTokenSource();
+
         message = msg;
         isError = error;
         showMessage = true;
@@ -35,11 +40,12 @@
 
         if (timeInMs != 0)
         {
+            using var linked = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token, externalToken);
             try
             {
-                await Task.Delay(timeInMs, _cts.Token);
+                await Task.Delay(timeInMs, linked.Token);
             }
-            catch (TaskCanceledException)
+            catch (OperationCanceledException)
             {
                 return;
             }

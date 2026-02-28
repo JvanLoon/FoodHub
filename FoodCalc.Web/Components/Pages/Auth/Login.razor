@@ -4,7 +4,7 @@
 @using Microsoft.AspNetCore.Components.Forms
 @inject LoginService LoginService
 @inject NavigationManager Navigation
-@inject AuthTokenService AuthTokenService
+@inject AuthStateService AuthStateService
 @inject MessageService MessageService
 
 <div class="container d-flex justify-content-center align-items-center">
@@ -40,10 +40,14 @@
         if (response.IsSuccessStatusCode)
         {
             var result = await response.Content.ReadFromJsonAsync<AuthResponseDto>();
-            // Store JWT token in a secure cookie
-            await AuthTokenService.SetTokenAsync(result.Token);
+            if (result?.Token == null)
+            {
+                await MessageService.ShowMessageAsync("Login failed: invalid server response.", true);
+                return;
+            }
+            await AuthStateService.SignInAsync(result.Token);
             Navigation.NavigateTo("/");
-        } 
+        }
         else
         {
             await MessageService.ShowMessageAsync("Failed to login. Invalid email or password.", true);

@@ -1,61 +1,44 @@
-﻿using Blazored.LocalStorage;
-
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 
 namespace FoodCalc.Web.Components.Services.Auth;
 
-public class AuthenticatedHttpClientService
+public class AuthenticatedHttpClientService(HttpClient httpClient, AuthTokenService authTokenService)
 {
-	private readonly string _tokenName = "Authorization";
-	private readonly HttpClient _httpClient;
-	private readonly ILocalStorageService _localStorage;
+    private async Task AttachTokenAsync()
+    {
+        var token = await authTokenService.GetTokenAsync();
+        httpClient.DefaultRequestHeaders.Authorization = !string.IsNullOrWhiteSpace(token)
+            ? new AuthenticationHeaderValue("Bearer", token)
+            : null;
+    }
 
-	public AuthenticatedHttpClientService(HttpClient httpClient, ILocalStorageService localStorage)
-	{
-		_httpClient = httpClient;
-		_localStorage = localStorage;
-	}
+    public async Task<HttpResponseMessage> GetAsync(string requestUri)
+    {
+        await AttachTokenAsync();
+        return await httpClient.GetAsync(requestUri);
+    }
 
-	private async Task AttachTokenAsync()
-	{
-		var token = await _localStorage.GetItemAsync<string>(_tokenName);
-		if (!string.IsNullOrWhiteSpace(token))
-		{
-			_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-		}
-		else
-		{
-			_httpClient.DefaultRequestHeaders.Authorization = null;
-		}
-	}
+    public async Task<HttpResponseMessage> PostAsJsonAsync<T>(string requestUri, T value)
+    {
+        await AttachTokenAsync();
+        return await httpClient.PostAsJsonAsync(requestUri, value);
+    }
 
-	public async Task<HttpResponseMessage> GetAsync(string requestUri)
-	{
-		await AttachTokenAsync();
-		return await _httpClient.GetAsync(requestUri);
-	}
+    public async Task<HttpResponseMessage> PostAsync(string requestUri, HttpContent? content = null)
+    {
+        await AttachTokenAsync();
+        return await httpClient.PostAsync(requestUri, content);
+    }
 
-	public async Task<HttpResponseMessage> PostAsJsonAsync<T>(string requestUri, T value)
-	{
-		await AttachTokenAsync();
-		return await _httpClient.PostAsJsonAsync(requestUri, value);
-	}
+    public async Task<HttpResponseMessage> PutAsJsonAsync<T>(string requestUri, T value)
+    {
+        await AttachTokenAsync();
+        return await httpClient.PutAsJsonAsync(requestUri, value);
+    }
 
-	public async Task<HttpResponseMessage> PostAsync(string requestUri, HttpContent? content = null)
-	{
-		await AttachTokenAsync();
-		return await _httpClient.PostAsync(requestUri, content);
-	}
-
-	public async Task<HttpResponseMessage> PutAsJsonAsync<T>(string requestUri, T value)
-	{
-		await AttachTokenAsync();
-		return await _httpClient.PutAsJsonAsync(requestUri, value);
-	}
-
-	public async Task<HttpResponseMessage> DeleteAsync(string requestUri)
-	{
-		await AttachTokenAsync();
-		return await _httpClient.DeleteAsync(requestUri);
-	}
+    public async Task<HttpResponseMessage> DeleteAsync(string requestUri)
+    {
+        await AttachTokenAsync();
+        return await httpClient.DeleteAsync(requestUri);
+    }
 }
