@@ -17,9 +17,13 @@ window.getFileName = (inputId) => {
     return input.files[0].name;
 };
 
-window.getFileBytes = async (inputId) => {
-    const input = document.getElementById(inputId);
-    if (!input || !input.files || input.files.length === 0) return null;
-    const buffer = await input.files[0].arrayBuffer();
-    return new Uint8Array(buffer);
+window.getFileBase64 = (inputId) => {
+    return new Promise((resolve, reject) => {
+        const input = document.getElementById(inputId);
+        if (!input || !input.files || input.files.length === 0) { resolve(null); return; }
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(input.files[0]);
+    });
 };

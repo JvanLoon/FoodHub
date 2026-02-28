@@ -19,6 +19,7 @@
     private string message = string.Empty;
     private bool isError;
     private bool showMessage;
+    private CancellationTokenSource _cts = new();
 
     protected override void OnInitialized()
     {
@@ -34,7 +35,15 @@
 
         if (timeInMs != 0)
         {
-            await Task.Delay(timeInMs);
+            try
+            {
+                await Task.Delay(timeInMs, _cts.Token);
+            }
+            catch (TaskCanceledException)
+            {
+                return;
+            }
+
             showMessage = false;
             message = string.Empty;
             isError = false;
@@ -44,6 +53,8 @@
 
     public void Dispose()
     {
+        _cts.Cancel();
+        _cts.Dispose();
         MessageService.OnShowMessage -= ShowMessage;
     }
 }

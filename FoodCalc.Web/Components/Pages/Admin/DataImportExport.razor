@@ -53,8 +53,15 @@
                 return;
             }
 
-            var bytes = await JS.InvokeAsync<byte[]>("getFileBytes", "importFileInput");
-            if (bytes == null || bytes.Length == 0)
+            var base64 = await JS.InvokeAsync<string?>("getFileBase64", "importFileInput");
+            if (base64 == null)
+            {
+                await messageService.ShowMessageAsync("Could not read the selected file.", true);
+                return;
+            }
+
+            var bytes = Convert.FromBase64String(base64);
+            if (bytes.Length == 0)
             {
                 await messageService.ShowMessageAsync("Could not read the selected file.", true);
                 return;

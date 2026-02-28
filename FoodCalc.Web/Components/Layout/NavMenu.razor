@@ -63,14 +63,15 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        //if (firstRender)
-        //{
+        if (firstRender)
+        {
             try
             {
                 var roles = await AuthTokenService.GetRolesAsync();
                 isLoggedIn = roles.Any();
                 isAdmin = roles?.Contains("Admin") == true;
                 StateHasChanged();
+
                 // TODO: Replace with actual role check from auth state
                 // isAdmin = await AuthService.IsUserInRoleAsync("Admin");
                 // TODO: Replace with actual login state and email from auth state
@@ -80,8 +81,7 @@
             catch (Exception ex)
             {
                 await MessageService.ShowMessageAsync(ex.Message, true, 0);
-                StateHasChanged();
             }
-        //}
+        }
     }
 }

@@ -55,7 +55,6 @@
         catch (Exception ex)
         {
             await MessageService.ShowMessageAsync(ex.Message, true, 20000);
-            StateHasChanged();
         }
         await RefreshEmailAsync();
     }
