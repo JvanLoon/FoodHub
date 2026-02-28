@@ -1,8 +1,8 @@
 ﻿@using FoodCalc.Web.Components.Services.Admin
 @page "/admin/dataimportexport"
-@inject HttpClient Http
 @inject ImportExportService importExportService
 @inject MessageService messageService
+@inject IJSRuntime JS
 
 <h3>Data Import/Export</h3>
 
@@ -14,51 +14,21 @@
 </div>
 
 <div>
-    <label>Import File:</label>
-    <InputFile OnChange="OnFileSelected" MaxFileSize="@MaxFileSizeInBytes" />
-    @* <select @bind="importFormat"> *@
-    @*     <option value="json">JSON</option> *@
-    @*     <option value="csv">CSV</option> *@
-    @* </select> *@
-    <button @onclick="ImportData" disabled="@(!canImport)">Import</button>
+    <label>Import File (.json):</label>
+    <input type="file" id="importFileInput" accept=".json" />
+    <button @onclick="ImportData">Import</button>
 </div>
 
-<script>
-    window.blazorDownloadFile = (fileName, contentType, base64Data) => {
-    try {
-    const link = document.createElement('a');
-    link.download = fileName;
-    link.href = `data:${contentType};base64,${base64Data}`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    } catch (e) {
-    alert("Download failed: " + e.message);
-    }
-    };
-</script>
 
 @code {
-    private string exportFormat = "json";
-    private string importFormat = "json";
-    private IBrowserFile selectedFile = null!;
-    private bool canImport => selectedFile != null;
-    private int MaxFileSizeInBytes = 10 * 1024 * 1024; // 10 MB
+    private const string ExportFormat = "json";
 
     private async Task ExportData()
     {
         try
         {
             await messageService.ShowMessageAsync("Preparing export...", false, 0);
-            var success = await importExportService.ExportAsync(exportFormat);
-            if (success)
-            {
-                await messageService.ShowMessageAsync("Downloading", false, 0);
-            }
-            else
-            {
-                await messageService.ShowMessageAsync("Error", false);
-            }
+            await importExportService.ExportAsync(ExportFormat);
         }
         catch (Exception ex)
         {
@@ -66,26 +36,31 @@
         }
     }
 
-    private async void OnFileSelected(InputFileChangeEventArgs e)
-    {
-        if (selectedFile.ContentType != "application/json" || selectedFile.ContentType != "text/plain") // && selectedFile.ContentType != "text/csv"
-        {
-            await messageService.ShowMessageAsync("Invalid file type.", true);
-            selectedFile = null!;
-        }
-        else if (e.FileCount > 0)
-            selectedFile = e.File;
-        else
-            selectedFile = null!;
-    }
-
     private async Task ImportData()
     {
-        if (selectedFile == null) return;
         try
         {
-            await importExportService.ImportAsync(selectedFile);
-            await messageService.ShowMessageAsync("Import successful.", false);
+            var fileName = await JS.InvokeAsync<string?>("getFileName", "importFileInput");
+            if (string.IsNullOrEmpty(fileName))
+            {
+                await messageService.ShowMessageAsync("Please select a file first.", true);
+                return;
+            }
+
+            if (!fileName.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+            {
+                await messageService.ShowMessageAsync("Only .json files are accepted.", true);
+                return;
+            }
+
+            var bytes = await JS.InvokeAsync<byte[]>("getFileBytes", "importFileInput");
+            if (bytes == null || bytes.Length == 0)
+            {
+                await messageService.ShowMessageAsync("Could not read the selected file.", true);
+                return;
+            }
+
+            await importExportService.ImportAsync(bytes, fileName);
         }
         catch (Exception ex)
         {

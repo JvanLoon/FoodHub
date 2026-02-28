@@ -136,7 +136,7 @@ public class Program
 		}
 
 		app.UseHttpsRedirection();
-		app.UseStaticFiles();
+		//app.UseStaticFiles();
 		app.UseRouting();
 		app.UseCors("AllowWebApp");
 		app.UseAuthentication();

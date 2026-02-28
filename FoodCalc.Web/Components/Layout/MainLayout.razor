@@ -1,5 +1,6 @@
 ﻿@using FoodCalc.Web.Components.Services.Auth
 @inherits LayoutComponentBase
+@implements IDisposable
 @inject AuthTokenService AuthTokenService
 @inject MessageService MessageService
 @inject NavigationManager Navigation
@@ -59,19 +60,30 @@
         await RefreshEmailAsync();
     }
 
-    private async void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    private void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
     {
-        if (string.IsNullOrEmpty(userEmail))
+        _ = InvokeAsync(HandleLocationChangedAsync);
+    }
+
+    private async Task HandleLocationChangedAsync()
+    {
+        try
         {
-            await RefreshEmailAsync();
+            if (string.IsNullOrEmpty(userEmail))
+            {
+                await RefreshEmailAsync();
+            }
         }
-        
+        catch (Exception ex)
+        {
+            await MessageService.ShowMessageAsync(ex.Message, true, 20000);
+        }
     }
 
     private async Task RefreshEmailAsync()
     {
         userEmail = await AuthTokenService.GetEmailAsync() ?? string.Empty;
-        StateHasChanged();
+        await InvokeAsync(StateHasChanged);
     }
 
     public void Dispose()

@@ -57,7 +57,7 @@ public class RecipeController(IMediator mediator) : ControllerBase
         var result = await mediator.Send(new AddRecipeCommand(recipe));
 
         return result.Match(
-			result => Ok(recipe),
+			Ok,
             errors => Problem(errors.First().Description));
     }
 

@@ -2,12 +2,9 @@
 
 using FoodHub.DTOs;
 
-using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 
 using System.Net.Http.Headers;
-
-using static System.Net.WebRequestMethods;
 
 namespace FoodCalc.Web.Components.Services.Admin;
 public class ImportExportService(AuthenticatedHttpClientService httpClient, IJSRuntime js, MessageService messageService)
@@ -15,21 +12,22 @@ public class ImportExportService(AuthenticatedHttpClientService httpClient, IJSR
 	private readonly int _maxFileSizeInBytes = 10 * 1024 * 1024; // 10 MB
 	private readonly string _exportFileName = $"export";
 
-	public async Task<bool> ImportAsync(IBrowserFile file)
+	public async Task<bool> ImportAsync(byte[] fileContent, string fileName)
 	{
-		if (file == null)
+		if (fileContent == null || fileContent.Length == 0)
 		{
-			await messageService.ShowMessageAsync("No file selected.", true);
+			await messageService.ShowMessageAsync("No file content.", true);
 			return false;
 		}
 
-		try {
+		try
+		{
 			var content = new MultipartFormDataContent();
-			var streamContent = new StreamContent(file.OpenReadStream(maxAllowedSize: _maxFileSizeInBytes)); // 10MB limit
+			var streamContent = new StreamContent(new MemoryStream(fileContent));
 			streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-			content.Add(streamContent, "file", file.Name);
+			content.Add(streamContent, "file", fileName);
 
-			var response = await httpClient.PostAsync($"api/importexport/import", content);
+			var response = await httpClient.PostAsync("api/importexport/import", content);
 
 			if (!response.IsSuccessStatusCode)
 			{
@@ -37,7 +35,8 @@ public class ImportExportService(AuthenticatedHttpClientService httpClient, IJSR
 				await messageService.ShowMessageAsync($"Import failed: {error}", true);
 				return false;
 			}
-			await messageService.ShowMessageAsync($"Import successful", true);
+
+			await messageService.ShowMessageAsync("Import successful.", false);
 			return true;
 		}
 		catch (Exception ex)

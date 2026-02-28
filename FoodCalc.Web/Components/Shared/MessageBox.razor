@@ -1,4 +1,5 @@
 ﻿@inject MessageService MessageService
+@implements IDisposable
 
 @* @if (showMessage) *@
 @* { *@
@@ -29,7 +30,7 @@
         message = msg;
         isError = error;
         showMessage = true;
-        StateHasChanged();
+        await InvokeAsync(StateHasChanged);
 
         if (timeInMs != 0)
         {
@@ -37,7 +38,7 @@
             showMessage = false;
             message = string.Empty;
             isError = false;
-            StateHasChanged();
+            await InvokeAsync(StateHasChanged);
         }
     }
 
