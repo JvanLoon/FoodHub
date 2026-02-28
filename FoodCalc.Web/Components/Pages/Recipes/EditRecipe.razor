@@ -220,7 +220,11 @@
             ingredients = await IngredientService.GetAllIngredientsAsync();
 
             recipeIngredient.IngredientId = ingredients.FirstOrDefault(i => i.Name == ingredientSearch)?.Id ?? Guid.Empty;
-            ingredientSearch = string.Empty;
+            if (recipeIngredient.IngredientId == Guid.Empty)
+            {
+                //only clear when failed
+                ingredientSearch = string.Empty;
+            }
 
             await MessageService.ShowMessageAsync("Ingredient added", false);
         }

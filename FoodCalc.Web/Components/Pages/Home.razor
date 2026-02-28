@@ -23,19 +23,9 @@
             @foreach (RecipeDto recipe in Recipes)
             {
                 <div class="col d-flex card-equal-width p-1">
-                    <div class="card h-100 w-100 shadow-sm">
+                    <div class="card h-100 w-100 shadow-sm @(SelectedRecipeIds.Contains(recipe.Id) ? "border-primary border-3" : "")" style="cursor: pointer" @onclick="() => ToggleRecipeSelection(recipe.Id, !SelectedRecipeIds.Contains(recipe.Id))">
                         <img src="https://placehold.co/400x200?text=Recipe\nImage" class="card-img-top" alt="Recipe image">
                         <div class="card-body">
-                            <div class="form-check mb-2">
-                                <input class="form-check-input"
-                                type="checkbox"
-                                id="select-@recipe.Id"
-                                @onchange="(e) => ToggleRecipeSelection(recipe.Id, e?.Value?.ToString() == true.ToString())"
-                                checked="@SelectedRecipeIds.Contains(recipe.Id)" />
-                                <label class="form-check-label" for="select-@recipe.Id">
-                                    Select
-                                </label>
-                            </div>
                             <h5 class="card-title">@recipe.Name</h5>
                             <p class="card-text mb-1"><strong>Ingredients:</strong></p>
                             <ul class="list-unstyled mb-0">
@@ -55,8 +45,8 @@
                             </ul>
                         </div>
                         <div class="card-footer bg-transparent border-0 text-end">
-                            <button class="btn btn-primary" @onclick="() => EditRecipe(recipe.Id)">Edit</button>
-                            <button class="btn btn-danger" @onclick="() => DeleteRecipe(recipe.Id)">Delete</button>
+                            <button class="btn btn-primary" @onclick="() => EditRecipe(recipe.Id)" @onclick:stopPropagation>Edit</button>
+                            <button class="btn btn-danger" @onclick="() => DeleteRecipe(recipe.Id)" @onclick:stopPropagation>Delete</button>
                         </div>
                     </div>
                 </div>
