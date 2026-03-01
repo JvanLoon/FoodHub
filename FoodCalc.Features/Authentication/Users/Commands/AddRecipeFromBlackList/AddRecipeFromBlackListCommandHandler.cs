@@ -8,14 +8,9 @@ using MediatR;
 
 using Microsoft.Extensions.Logging;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FoodCalc.Features.Authentication.Users.Commands.AddRecipeFromBlackList;
-public class AddRecipeFromBlackListCommandHandler(IUnitOfWork unitOfWork, ILogger<AddRecipeFromBlackListCommandHandler> logger) : IRequestHandler<AddRecipeFromBlackListCommand, ErrorOr<bool>>
+public class AddRecipeFromBlackListCommandHandler(UnitOfWork unitOfWork, ILogger<AddRecipeFromBlackListCommandHandler> logger) : IRequestHandler<AddRecipeFromBlackListCommand, ErrorOr<bool>>
 {
 	public async Task<ErrorOr<bool>> Handle(AddRecipeFromBlackListCommand request, CancellationToken cancellationToken)
 	{

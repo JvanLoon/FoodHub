@@ -1,29 +1,22 @@
 ﻿using FoodHub.Persistence.Entities;
-using FoodHub.Persistence.Repositories.Interface;
 using FoodHub.ServiceDefaults;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace FoodHub.Persistence.Repositories
 {
-	public class UserRepository(ApplicationDbContext context, UserManager<IdentityUser> userManager) : IUserRepository
+	public class UserRepository(ApplicationDbContext context, UserManager<IdentityUser> userManager)
 	{
-		public Task<List<IdentityUser>> GetAllAsync(CancellationToken cancellationToken)
+		public IQueryable<IdentityUser> GetAllAsync()
 		{
-			return userManager.Users.ToListAsync(cancellationToken);
+			return context.Users.AsQueryable();
 		}
 
 		public async Task<IdentityUser?> GetByEmailAsync(string email, CancellationToken cancellationToken)
 		{
 			IdentityUser? user = await context.Users.SingleOrDefaultAsync(u => u.Email == email, cancellationToken);
-			if(user != null)
+			if (user != null)
 			{
 				throw new Exception("User not found");
 			}
@@ -85,25 +78,25 @@ namespace FoodHub.Persistence.Repositories
 			return userManager.AddToRoleAsync(user, role);
 		}
 
-        public Task AddRecipeToBlackList(Guid userId, Guid recipeId)
-        {
-            context.RecipeBlackLists.Add(new RecipeBlackList { RecipeId = recipeId, UserId = userId });
-            return context.SaveChangesAsync();
-        }
+		public Task AddRecipeToBlackList(Guid userId, Guid recipeId)
+		{
+			context.RecipeBlackLists.Add(new RecipeBlackList { RecipeId = recipeId, UserId = userId });
+			return context.SaveChangesAsync();
+		}
 
 		public Task RemoveRecipeToBlackList(Guid userId, Guid recipeId)
 		{
 			context.RecipeBlackLists.Remove(new RecipeBlackList { RecipeId = recipeId, UserId = userId });
 			return context.SaveChangesAsync();
 		}
-        public async Task<IList<string>> GetRolesAsync(IdentityUser user, CancellationToken cancellationToken)
-        {
-            return await userManager.GetRolesAsync(user);
-        }
+		public async Task<IList<string>> GetRolesAsync(IdentityUser user, CancellationToken cancellationToken)
+		{
+			return await userManager.GetRolesAsync(user);
+		}
 
-        public async Task RemoveRoleFromUser(IdentityUser user, string role, CancellationToken cancellationToken)
-        {
-            await userManager.RemoveFromRoleAsync(user, role);
-        }
+		public async Task RemoveRoleFromUser(IdentityUser user, string role, CancellationToken cancellationToken)
+		{
+			await userManager.RemoveFromRoleAsync(user, role);
+		}
 	}
 }

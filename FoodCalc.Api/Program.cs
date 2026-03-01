@@ -1,10 +1,6 @@
 using FoodCalc.Api.Extensions;
 using FoodCalc.Features.Mapping;
 
-using FoodHub.Persistence.Entities;
-using FoodHub.Persistence.Repositories;
-using FoodHub.Persistence.Repositories.Interface;
-
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

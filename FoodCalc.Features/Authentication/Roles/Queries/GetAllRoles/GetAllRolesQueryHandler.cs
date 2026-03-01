@@ -20,20 +20,20 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FoodCalc.Features.Authentication.Roles.Queries.GetAllRoles;
-public class GetAllRolesQueryHandler(IUnitOfWork unitOfWork, ILogger<GetAllUsersQueryHandler> logger) : IRequestHandler<GetAllRolesQuery, ErrorOr<List<string>>>
+public class GetAllRolesQueryHandler(UnitOfWork unitOfWork, ILogger<GetAllUsersQueryHandler> logger) : IRequestHandler<GetAllRolesQuery, ErrorOr<List<string>>>
 {
-	public async Task<ErrorOr<List<string>>> Handle(GetAllRolesQuery request, CancellationToken cancellationToken)
+	public Task<ErrorOr<List<string>>> Handle(GetAllRolesQuery request, CancellationToken cancellationToken)
 	{
 		try
 		{
-			var roles = await unitOfWork.RoleRepository.GetAllAsync(cancellationToken);
+			var roles = unitOfWork.RoleRepository.GetAllAsync().ToPagedResult(request.Page, request.PageSize);
 
-			return roles;
+			return Task.FromResult<ErrorOr<List<string>>>(roles.Items.ToList());
 		}
 		catch (Exception ex)
 		{
 			logger.LogError(ex, "Failed to get all Users");
-			return Error.Failure("Failed to get all Users");
+			return Task.FromResult<ErrorOr<List<string>>>(Error.Failure("Failed to get all Users"));
 		}
 	}
 }

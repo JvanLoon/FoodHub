@@ -9,7 +9,7 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Features.Ingredients.Commands.DeleteIngredient;
-public class DeleteIngredientCommandHandler(IUnitOfWork unitOfWork, ILogger<DeleteIngredientCommandHandler> logger) : IRequestHandler<DeleteIngredientCommand, ErrorOr<bool>>
+public class DeleteIngredientCommandHandler(UnitOfWork unitOfWork, ILogger<DeleteIngredientCommandHandler> logger) : IRequestHandler<DeleteIngredientCommand, ErrorOr<bool>>
 {
 	public async Task<ErrorOr<bool>> Handle(DeleteIngredientCommand request, CancellationToken cancellationToken)
 	{

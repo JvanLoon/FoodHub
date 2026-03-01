@@ -36,6 +36,11 @@
 
     private async Task AddSelectedRecipe()
     {
+        if (string.IsNullOrEmpty(SelectedRecipeId))
+        {
+            return;
+        }
+
         var parsedId = new Guid(SelectedRecipeId);
         await UserService.AddRecipeToBlackList(parsedId);
 

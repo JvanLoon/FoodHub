@@ -1,14 +1,13 @@
 ﻿using FoodHub.Persistence.Entities;
-using FoodHub.Persistence.Repositories.Interface;
 using Microsoft.EntityFrameworkCore;
 
 namespace FoodHub.Persistence.Repositories;
 
-public class IngredientRepository(ApplicationDbContext context) : IIngredientRepository
+public class IngredientRepository(ApplicationDbContext context)
 {
-    public async Task<List<Ingredient>> GetAllAsync(CancellationToken cancellationToken)
+    public IQueryable<Ingredient> GetAllAsync()
     {
-        return await context.Ingredients.ToListAsync(cancellationToken);
+        return context.Ingredients.AsQueryable();
     }
 
     public async Task<Ingredient?> GetByIdAsync(Guid id, CancellationToken cancellationToken)

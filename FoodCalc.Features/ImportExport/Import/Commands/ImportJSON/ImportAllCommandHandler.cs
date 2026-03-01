@@ -3,8 +3,6 @@ using AutoMapper;
 
 using ErrorOr;
 
-using FoodCalc.Features.ImportExport.Export.Commands.ExportJSON;
-
 using FoodHub.DTOs;
 using FoodHub.Persistence.Entities;
 using FoodHub.Persistence.Persistence;
@@ -15,7 +13,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Features.ImportExport.Import.Commands.ImportJSON;
-public class ImportAllCommandHandler(IUnitOfWork unitOfWork, ILogger<ImportAllCommandHandler> logger, IMapper mapper) : IRequestHandler<ImportAllCommand, ErrorOr<bool>>
+public class ImportAllCommandHandler(UnitOfWork unitOfWork, ILogger<ImportAllCommandHandler> logger, IMapper mapper) : IRequestHandler<ImportAllCommand, ErrorOr<bool>>
 {
 	public async Task<ErrorOr<bool>> Handle(ImportAllCommand request, CancellationToken cancellationToken)
 	{
@@ -160,7 +158,7 @@ public class ImportAllCommandHandler(IUnitOfWork unitOfWork, ILogger<ImportAllCo
                         // You may need to set a default password or handle this elsewhere
                         await unitOfWork.UserRepository.UpdateAsync(user, cancellationToken);
                         // Add roles
-                        foreach (var role in userDto.Roles)
+                        foreach (var role in userDto.Roles!)
                         {
                             await unitOfWork.UserRepository.AddRoleToUser(user, role, cancellationToken);
                         }

@@ -6,16 +6,19 @@ using FoodHub.Persistence.Persistence;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
+using FoodCalc.Features;
+
 namespace FoodCalc.Feature.Ingredients.Queries.GetAllIngredients;
 
-public class GetAllIngredientsQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GetAllIngredientsQueryHandler> logger) : IRequestHandler<GetAllIngredientsQuery, ErrorOr<List<IngredientDto>>>
+public class GetAllIngredientsQueryHandler(UnitOfWork unitOfWork, IMapper mapper, ILogger<GetAllIngredientsQueryHandler> logger) : IRequestHandler<GetAllIngredientsQuery, ErrorOr<List<IngredientDto>>>
 {
 	public async Task<ErrorOr<List<IngredientDto>>> Handle(GetAllIngredientsQuery request, CancellationToken cancellationToken)
 	{
 		try
 		{
-			var ingredients = await unitOfWork.IngredientRepository.GetAllAsync(cancellationToken);
-			return mapper.Map<List<IngredientDto>>(ingredients.OrderBy(i => i.Name));
+			var ingredients = await unitOfWork.IngredientRepository.GetAllAsync().ToPagedResultAsync(request.Page, request.PageSize);
+
+			return mapper.Map<List<IngredientDto>>(ingredients.Items);
 		}
 		catch (Exception ex)
 		{

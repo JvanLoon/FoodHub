@@ -9,7 +9,7 @@ using FoodHub.Persistence.Persistence;
 using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Features.Recipes.Commands.AddIngredientToRecipe;
-public class AddIngredientToRecipeCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ILogger<AddIngredientToRecipeCommandHandler> logger) : IRequestHandler<AddIngredientToRecipeCommand, ErrorOr<RecipeIngredientDto>>
+public class AddIngredientToRecipeCommandHandler(UnitOfWork unitOfWork, IMapper mapper, ILogger<AddIngredientToRecipeCommandHandler> logger) : IRequestHandler<AddIngredientToRecipeCommand, ErrorOr<RecipeIngredientDto>>
 {
     public async Task<ErrorOr<RecipeIngredientDto>> Handle(AddIngredientToRecipeCommand request, CancellationToken cancellationToken)
     {

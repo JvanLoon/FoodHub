@@ -7,7 +7,7 @@ using FoodHub.Persistence.Persistence;
 using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Features.Recipes.Commands.UpdateRecipeName;
-public class UpdateRecipeNameCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ILogger<UpdateRecipeNameCommandHandler> logger) : IRequestHandler<UpdateRecipeNameCommand, ErrorOr<RecipeDto>>
+public class UpdateRecipeNameCommandHandler(UnitOfWork unitOfWork, IMapper mapper, ILogger<UpdateRecipeNameCommandHandler> logger) : IRequestHandler<UpdateRecipeNameCommand, ErrorOr<RecipeDto>>
 {
 	public async Task<ErrorOr<RecipeDto>> Handle(UpdateRecipeNameCommand request, CancellationToken cancellationToken)
 	{

@@ -1,17 +1,14 @@
-﻿using Azure.Core;
-
-using FoodHub.Persistence.Entities;
-using FoodHub.Persistence.Repositories.Interface;
+﻿using FoodHub.Persistence.Entities;
 
 using Microsoft.EntityFrameworkCore;
 
 namespace FoodHub.Persistence.Repositories;
 
-public class RecipeRepository(ApplicationDbContext context) : IRecipeRepository
+public class RecipeRepository(ApplicationDbContext context)
 {
-    public async Task<List<Recipe>> GetAllAsync(CancellationToken cancellationToken)
+    public IQueryable<Recipe> GetAllAsync()
     {
-        return await context.Recipes.ToListAsync(cancellationToken);
+        return context.Recipes.AsQueryable();
     }
 
     public async Task<Recipe?> GetByIdAsync(Guid id, CancellationToken cancellationToken)

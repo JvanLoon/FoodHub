@@ -2,15 +2,14 @@
 using AutoMapper;
 
 using FoodHub.DTOs;
-using FoodHub.Persistence.Entities;
-using FoodHub.Persistence.Repositories.Interface;
 
 using MediatR;
 
 using Microsoft.Extensions.Logging;
+using FoodHub.Persistence.Repositories;
 
 namespace FoodCalc.Features.Recipes.Queries.GetById;
-public class GetRecipeByIdQueryHandler(IRecipeRepository recipeRepository, IMapper mapper, ILogger<GetRecipeByIdQueryHandler> logger) : IRequestHandler<GetRecipeByIdQuery, ErrorOr<RecipeDto?>>
+public class GetRecipeByIdQueryHandler(RecipeRepository recipeRepository, IMapper mapper, ILogger<GetRecipeByIdQueryHandler> logger) : IRequestHandler<GetRecipeByIdQuery, ErrorOr<RecipeDto?>>
 {
 	public async Task<ErrorOr<RecipeDto?>> Handle(GetRecipeByIdQuery request, CancellationToken cancellationToken)
 	{

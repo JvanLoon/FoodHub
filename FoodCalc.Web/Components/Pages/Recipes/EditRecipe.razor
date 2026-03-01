@@ -114,7 +114,7 @@
 @code {
     [Parameter] public Guid RecipeId { get; set; }
 
-    private RecipeDto recipe;
+    private RecipeDto recipe = new();
     private List<IngredientDto> ingredients = new();
     private RecipeIngredientDto recipeIngredient = new();
     private Guid noIngredient;
@@ -173,7 +173,7 @@
             IngredientAmount = ingredient.IngredientAmount
         };
         amountInput = ingredient.Amount == 0 ? null : ingredient.Amount;
-        ingredientSearch = ingredient.Ingredient.Name;
+        ingredientSearch = ingredient.Ingredient!.Name;
     }
 
     private async Task DeleteIngredient(Guid recipeIngredientId)

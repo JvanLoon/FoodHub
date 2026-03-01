@@ -1,16 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage;
-using FoodHub.Persistence.Repositories.Interface;
+using FoodHub.Persistence.Repositories;
 
 namespace FoodHub.Persistence.Persistence;
 
-public class UnitOfWork(ApplicationDbContext context, IRecipeRepository recipeRepository, IIngredientRepository ingredientRepository, IUserRepository userRepository, IRoleRepository roleRepository) : IUnitOfWork
+public class UnitOfWork(ApplicationDbContext context, RecipeRepository recipeRepository, IngredientRepository ingredientRepository, UserRepository userRepository, RoleRepository roleRepository)
 {
 	private IDbContextTransaction? _currentTransaction;
 
-	public IRecipeRepository RecipeRepository => recipeRepository;
-	public IIngredientRepository IngredientRepository => ingredientRepository;
-	public IUserRepository UserRepository => userRepository;
-	public IRoleRepository RoleRepository => roleRepository;
+	public RecipeRepository RecipeRepository => recipeRepository;
+	public IngredientRepository IngredientRepository => ingredientRepository;
+	public UserRepository UserRepository => userRepository;
+	public RoleRepository RoleRepository => roleRepository;
 
 	public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

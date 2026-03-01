@@ -5,7 +5,7 @@ using FoodHub.Persistence.Persistence;
 using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Features.Recipes.Commands.DeleteRecipe;
-public class DeleteRecipeCommandHandler(IUnitOfWork unitOfWork, ILogger<DeleteRecipeCommandHandler> logger) : IRequestHandler<DeleteRecipeCommand, ErrorOr<bool>>
+public class DeleteRecipeCommandHandler(UnitOfWork unitOfWork, ILogger<DeleteRecipeCommandHandler> logger) : IRequestHandler<DeleteRecipeCommand, ErrorOr<bool>>
 {
 	public async Task<ErrorOr<bool>> Handle(DeleteRecipeCommand request, CancellationToken cancellationToken)
 	{

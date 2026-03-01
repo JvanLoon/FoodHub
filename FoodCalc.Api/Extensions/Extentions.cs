@@ -1,6 +1,5 @@
 ﻿using FoodHub.Persistence.Persistence;
 using FoodHub.Persistence.Repositories;
-using FoodHub.Persistence.Repositories.Interface;
 
 namespace FoodCalc.Api.Extensions
 {
@@ -8,12 +7,12 @@ namespace FoodCalc.Api.Extensions
 	{
 		public static IServiceCollection AddCustomServices(this IServiceCollection services)
 		{
-			services.AddScoped<IRecipeRepository, RecipeRepository>();
-			services.AddScoped<IIngredientRepository, IngredientRepository>();
-			services.AddScoped<IUserRepository, UserRepository>();
-			services.AddScoped<IRoleRepository, RoleRepository>();
+			services.AddScoped<RecipeRepository>();
+			services.AddScoped<IngredientRepository>();
+			services.AddScoped<UserRepository>();
+			services.AddScoped<RoleRepository>();
 
-			services.AddScoped<IUnitOfWork, UnitOfWork>();
+			services.AddScoped<UnitOfWork>();
 
 			return services;
 		}

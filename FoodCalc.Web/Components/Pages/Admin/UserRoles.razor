@@ -80,10 +80,11 @@ else
 <FoodCalc.Web.Components.Shared.MessageBox />
 
 @code {
-    [Parameter] public string email { get; set; }
-    private List<string> roles;
-    private List<string> allRoles;
-    private string selectedRole;
+    [Parameter] 
+    public string email { get; set; } = null!;
+    private List<string> roles = [];
+    private List<string> allRoles = [];
+    private string selectedRole = null!;
     public PasswordResetModel resetModel = new();
 
     protected override async Task OnInitializedAsync()
