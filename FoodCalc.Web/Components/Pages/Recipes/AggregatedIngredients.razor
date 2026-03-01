@@ -1,29 +1,82 @@
-﻿@page "/aggregated-ingredients"
-@layout FoodCalc.Web.Components.Layout.MinimalLayout
-@using FoodHub.DTOs;
-@inject FoodCalc.Web.Components.Services.AggregatedIngredientService AggregatedIngredientService
+﻿@using FoodHub.DTOs;
+@using FoodHub.ServiceDefaults;
 
-@if (AggregatedIngredientService.AggregatedIngredients.Any())
+<div class="add-item-bar no-print">
+    <div class="input-group">
+        <input type="text"
+               class="form-control"
+               placeholder="Add custom item..."
+               @bind="_newItem"
+               @bind:event="oninput"
+               @onkeydown="OnInputKeyDown" />
+        <button class="btn btn-outline-primary" @onclick="AddItem" disabled="@string.IsNullOrWhiteSpace(_newItem)">Add</button>
+    </div>
+</div>
+
+@if (_displayItems.Any())
 {
-    <ul>
-        @foreach (RecipeIngredientDto ingredient in AggregatedIngredientService.AggregatedIngredients.ToList())
+    <ul class="ingredient-print-list list-group list-group-flush">
+        @foreach (var (item, index) in _displayItems.Select((item, i) => (item, i)))
         {
-            <li>
-                @ingredient.Ingredient!.Name: @ingredient.Amount.ToFormattedString() @ingredient.IngredientAmount.ToString()
-                <button class="btn btn-sm btn-danger ms-2 no-print" @onclick="() => RemoveIngredient(ingredient)">Remove</button>
+            <li class="list-group-item d-flex justify-content-between align-items-center px-2 py-1">
+                <span class="ingredient-text">@item</span>
+                <button class="btn btn-sm btn-outline-danger ms-2 no-print" @onclick="() => RemoveItem(index)">✕</button>
             </li>
         }
     </ul>
 }
 else
 {
-    <p>No ingredients to display.</p>
+    <p class="text-muted fst-italic no-print">No ingredients to display.</p>
 }
 
 @code {
-    private void RemoveIngredient(RecipeIngredientDto ingredient)
+    [Parameter] public List<RecipeIngredientDto> Ingredients { get; set; } = new();
+    [Parameter] public List<string> InitialItems { get; set; } = new();
+    [Parameter] public EventCallback<List<string>> OnItemsChanged { get; set; }
+
+    private List<string> _displayItems = new();
+    private string _newItem = string.Empty;
+    private bool _initialized = false;
+
+    protected override async Task OnParametersSetAsync()
     {
-        AggregatedIngredientService.AggregatedIngredients.Remove(ingredient);
-        StateHasChanged();
+        if (_initialized) return;
+
+        if (Ingredients.Count > 0)
+        {
+            _initialized = true;
+            _displayItems = Ingredients
+                .Where(i => i.Ingredient is not null)
+                .Select(i => $"{i.Ingredient!.Name}: {i.Amount.ToFormattedString()} {i.IngredientAmount}")
+                .ToList();
+            await OnItemsChanged.InvokeAsync(_displayItems);
+        }
+        else if (InitialItems.Count > 0)
+        {
+            _initialized = true;
+            _displayItems = new List<string>(InitialItems);
+        }
+    }
+
+    private async Task AddItem()
+    {
+        if (!string.IsNullOrWhiteSpace(_newItem))
+        {
+            _displayItems.Add(_newItem.Trim());
+            _newItem = string.Empty;
+            await OnItemsChanged.InvokeAsync(_displayItems);
+        }
+    }
+
+    private async Task RemoveItem(int index)
+    {
+        _displayItems.RemoveAt(index);
+        await OnItemsChanged.InvokeAsync(_displayItems);
+    }
+
+    private async Task OnInputKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") await AddItem();
     }
 }

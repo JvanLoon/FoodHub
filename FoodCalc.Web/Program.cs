@@ -48,7 +48,6 @@ public class Program
 		builder.Services.AddScoped<IngredientService>();
 		builder.Services.AddScoped<ImportExportService>();
 		builder.Services.AddScoped<UserService>();
-		builder.Services.AddSingleton<AggregatedIngredientService>();
 		builder.Services.AddScoped<MessageService>();
 
 		builder.Services.AddScoped<AuthenticatedHttpClientService>(sp =>

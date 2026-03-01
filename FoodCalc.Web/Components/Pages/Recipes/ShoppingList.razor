@@ -1,0 +1,36 @@
+@page "/aggregated-ingredients"
+@layout FoodCalc.Web.Components.Layout.MinimalLayout
+@using Blazored.LocalStorage
+@inject ILocalStorageService LocalStorage
+
+<div class="shopping-list-page">
+    <AggregatedIngredients Ingredients="_ingredients" InitialItems="_initialItems" OnItemsChanged="SaveItemsAsync" />
+</div>
+
+@code {
+    private List<RecipeIngredientDto> _ingredients = new();
+    private List<string> _initialItems = new();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var newList = await LocalStorage.GetItemAsync<List<RecipeIngredientDto>>("aggregated-ingredients");
+            if (newList?.Count > 0)
+            {
+                _ingredients = newList;
+                _ = LocalStorage.RemoveItemAsync("aggregated-ingredients");
+            }
+            else
+            {
+                _initialItems = await LocalStorage.GetItemAsync<List<string>>("shopping-list-items") ?? new();
+            }
+            StateHasChanged();
+        }
+    }
+
+    private async Task SaveItemsAsync(List<string> items)
+    {
+        await LocalStorage.SetItemAsync("shopping-list-items", items);
+    }
+}

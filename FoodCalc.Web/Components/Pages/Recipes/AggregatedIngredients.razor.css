@@ -1,0 +1,51 @@
+.add-item-bar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: var(--bs-body-bg, #fff);
+    padding: 0.5rem 0;
+}
+
+.ingredient-text {
+    font-size: 0.95rem;
+}
+
+.ingredient-print-list .list-group-item:nth-child(even) {
+    background-color: rgba(0, 0, 0, 0.03);
+}
+
+/* ── Print styles ── */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+
+    .ingredient-print-list {
+        display: block !important; /* override Bootstrap list-group's display:flex so column-count works */
+        column-count: 3;
+        column-gap: 2rem;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        border: none !important;
+    }
+
+    .ingredient-print-list .list-group-item {
+        display: block !important;
+        break-inside: avoid;
+        border: none !important;
+        padding: 0.1rem 0;
+        font-size: 0.8rem;
+        background: transparent !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .ingredient-print-list .list-group-item:nth-child(even) {
+        background-color: #f0f0f0 !important;
+    }
+
+    .ingredient-text {
+        font-size: 0.8rem;
+    }
+}

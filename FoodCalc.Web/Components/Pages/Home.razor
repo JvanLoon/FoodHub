@@ -1,8 +1,9 @@
 ﻿@page "/"
 
+@using Blazored.LocalStorage
 @inject IJSRuntime JS
 @inject RecipeService recipeService
-@inject AggregatedIngredientService AggregatedIngredientService
+@inject ILocalStorageService LocalStorage
 @inject MessageService MessageService
 @inject NavigationManager NavigationManager
 
@@ -135,11 +136,8 @@
     private async Task OpenAggregatedIngredientsPage()
     {
         AggregateIngredients();
-        AggregatedIngredientService.AggregatedIngredients = AggregatedIngredients;
-
-        // Open the new page in a new tab
+        await LocalStorage.SetItemAsync("aggregated-ingredients", AggregatedIngredients);
         await JS.InvokeVoidAsync("window.open", "/aggregated-ingredients", "_blank");
-        //clean list when new page is opened
         AggregatedIngredients = new();
     }
 
