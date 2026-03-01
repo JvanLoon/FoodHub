@@ -19,9 +19,9 @@ public class IngredientController(IMediator mediator) : ControllerBase
 {
 	[HttpGet]
 	[Authorize]
-	public async Task<ActionResult<IEnumerable<IngredientDto>>> GetAllIngredients()
+	public async Task<ActionResult<PagedResultDto<IngredientDto>>> GetAllIngredients([FromQuery] int page = 1, [FromQuery] int pageSize = 25, [FromQuery] string? search = null)
 	{
-		var result = await mediator.Send(new GetAllIngredientsQuery());
+		var result = await mediator.Send(new GetAllIngredientsQuery { Page = page, PageSize = pageSize, Search = search });
 
 		return result.Match(
 			Ok,

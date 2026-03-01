@@ -9,15 +9,21 @@ using Microsoft.Extensions.Logging;
 
 
 namespace FoodCalc.Features.Authentication.Users.Queries.GetAllUsers;
-public class GetAllUsersQueryHandler(UnitOfWork unitOfWork, IMapper mapper, ILogger<GetAllUsersQueryHandler> logger, UserManager<IdentityUser> userManager) : IRequestHandler<GetAllUsersQuery, ErrorOr<List<UserDto>>>
+public class GetAllUsersQueryHandler(UnitOfWork unitOfWork, IMapper mapper, ILogger<GetAllUsersQueryHandler> logger, UserManager<IdentityUser> userManager) : IRequestHandler<GetAllUsersQuery, ErrorOr<PagedResultDto<UserDto>>>
 {
-    public async Task<ErrorOr<List<UserDto>>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<PagedResultDto<UserDto>>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            var users = unitOfWork.UserRepository.GetAllAsync().ToPagedResult(request.Page, request.PageSize);
+            var query = unitOfWork.UserRepository.GetAllAsync();
+
+            if (!string.IsNullOrWhiteSpace(request.Search))
+                query = query.Where(u => u.Email!.Contains(request.Search));
+
+            var paged = query.ToPagedResult(request.Page, request.PageSize);
+
             var userDtos = new List<UserDto>();
-            foreach (var user in users.Items)
+            foreach (var user in paged.Items)
             {
                 var roles = await userManager.GetRolesAsync(user);
                 var userDto = mapper.Map<UserDto>(user);
@@ -25,7 +31,14 @@ public class GetAllUsersQueryHandler(UnitOfWork unitOfWork, IMapper mapper, ILog
                 userDto.Roles = roles.ToList();
                 userDtos.Add(userDto);
             }
-            return userDtos;
+
+            return new PagedResultDto<UserDto>
+            {
+                Items = userDtos,
+                TotalCount = paged.TotalCount,
+                Page = paged.Page,
+                PageSize = paged.PageSize
+            };
         }
         catch (Exception ex)
         {

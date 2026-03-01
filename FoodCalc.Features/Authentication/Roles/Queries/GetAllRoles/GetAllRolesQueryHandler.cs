@@ -26,7 +26,12 @@ public class GetAllRolesQueryHandler(UnitOfWork unitOfWork, ILogger<GetAllUsersQ
 	{
 		try
 		{
-			var roles = unitOfWork.RoleRepository.GetAllAsync().ToPagedResult(request.Page, request.PageSize);
+			var query = unitOfWork.RoleRepository.GetAllAsync();
+
+			if (!string.IsNullOrWhiteSpace(request.Search))
+				query = query.Where(r => r.Contains(request.Search));
+
+			var roles = query.ToPagedResult(request.Page, request.PageSize);
 
 			return Task.FromResult<ErrorOr<List<string>>>(roles.Items.ToList());
 		}

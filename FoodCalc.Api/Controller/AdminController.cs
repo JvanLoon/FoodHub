@@ -20,25 +20,16 @@ using System.Linq;
 [Authorize("Admin,Moderator")]
 public class AdminController(IMediator mediator, UserManager<IdentityUser> userManager) : ControllerBase
 {
-    [HttpGet("users")]
-    public async Task<IActionResult> GetUsers()
-    {
-        ErrorOr<List<UserDto>> result = await mediator.Send(new GetAllUsersQuery());
+	[HttpGet("users")]
+	public async Task<ActionResult<PagedResultDto<UserDto>>> GetUsers([FromQuery] int page = 1, [FromQuery] int pageSize = 25, [FromQuery] string? search = null)
+	{
+		ErrorOr<PagedResultDto<UserDto>> result = await mediator.Send(new GetAllUsersQuery(page, pageSize, search));
 
-        return result.Match(
-            userList =>
-            {
-                var users = userList.Select(u => new UserDto
-                {
-                    Email = u.Email,
-                    Enabled = u.Enabled,
-					Roles = u.Roles
-				}).ToList();
-                return Ok(users);
-            },
-            errors => Problem(detail: string.Join(", ", errors.Select(e => e.ToString())))
-        );
-    }
+		return result.Match(
+			Ok,
+			errors => Problem(detail: string.Join(", ", errors.Select(e => e.ToString())))
+		);
+	}
 
 	[HttpGet("allroles")]
 	public async Task<IActionResult> GetAllUserRoles()

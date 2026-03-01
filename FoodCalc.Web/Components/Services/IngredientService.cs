@@ -4,11 +4,21 @@ using FoodHub.DTOs;
 namespace FoodCalc.Web.Components.Services;
 public class IngredientService(AuthenticatedHttpClientService httpClient)
 {
+	public async Task<PagedResultDto<IngredientDto>> GetPagedIngredientsAsync(int page, int pageSize, string? search = null)
+	{
+		var url = $"api/ingredient?page={page}&pageSize={pageSize}";
+		if (!string.IsNullOrWhiteSpace(search))
+			url += $"&search={Uri.EscapeDataString(search)}";
+
+		var response = await httpClient.GetAsync(url);
+		response.EnsureSuccessStatusCode();
+		return await response.Content.ReadFromJsonAsync<PagedResultDto<IngredientDto>>() ?? new();
+	}
+
 	public async Task<List<IngredientDto>> GetAllIngredientsAsync()
 	{
-		var response = await httpClient.GetAsync("api/ingredient");
-		response.EnsureSuccessStatusCode();
-		return await response.Content.ReadFromJsonAsync<List<IngredientDto>>() ?? [];
+		var paged = await GetPagedIngredientsAsync(1, int.MaxValue);
+		return [..paged.Items];
 	}
 
 	public async Task<HttpResponseMessage> UpdateIngredient(UpdateIngredientDto ingredient)

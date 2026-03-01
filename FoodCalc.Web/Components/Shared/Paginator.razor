@@ -1,0 +1,74 @@
+<div class="d-flex align-items-center gap-3 flex-wrap mt-3">
+    <nav aria-label="Page navigation">
+        <ul class="pagination mb-0">
+            <li class="page-item @(Page <= 1 ? "disabled" : "")">
+                <button class="page-link" @onclick="GoToFirstPage" title="First page">&#171;</button>
+            </li>
+            <li class="page-item @(Page <= 1 ? "disabled" : "")">
+                <button class="page-link" @onclick="GoToPreviousPage" title="Previous page">&#8249;</button>
+            </li>
+            @foreach (var pageNum in GetPageNumbers())
+            {
+                var p = pageNum;
+                <li class="page-item @(p == Page ? "active" : "")">
+                    <button class="page-link" @onclick="() => GoToPage(p)">@p</button>
+                </li>
+            }
+            <li class="page-item @(Page >= TotalPages ? "disabled" : "")">
+                <button class="page-link" @onclick="GoToNextPage" title="Next page">&#8250;</button>
+            </li>
+            <li class="page-item @(Page >= TotalPages ? "disabled" : "")">
+                <button class="page-link" @onclick="GoToLastPage" title="Last page">&#187;</button>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="d-flex align-items-center gap-2">
+        <label class="mb-0 text-nowrap small">Per page:</label>
+        <select class="form-select form-select-sm" style="width: auto;" value="@PageSize" @onchange="OnPageSizeChanged">
+            @foreach (var size in PageSizeOptions)
+            {
+                <option value="@size">@size</option>
+            }
+        </select>
+    </div>
+</div>
+
+@code {
+    [Parameter] public int TotalCount { get; set; }
+    [Parameter] public int Page { get; set; }
+    [Parameter] public int PageSize { get; set; }
+    [Parameter] public EventCallback<int> PageChanged { get; set; }
+    [Parameter] public EventCallback<int> PageSizeChanged { get; set; }
+
+    private static readonly int[] PageSizeOptions = [10, 25, 50, 100];
+
+    private int TotalPages => PageSize > 0 ? (int)Math.Ceiling((double)TotalCount / PageSize) : 1;
+
+    private IEnumerable<int> GetPageNumbers()
+    {
+        var total = TotalPages;
+        var start = Math.Max(1, Page - 2);
+        var end = Math.Min(total, start + 4);
+        start = Math.Max(1, end - 4);
+        return Enumerable.Range(start, end - start + 1);
+    }
+
+    private Task GoToFirstPage() => GoToPage(1);
+    private Task GoToPreviousPage() => GoToPage(Math.Max(1, Page - 1));
+    private Task GoToNextPage() => GoToPage(Math.Min(TotalPages, Page + 1));
+    private Task GoToLastPage() => GoToPage(TotalPages);
+
+    private Task GoToPage(int page)
+    {
+        if (page == Page) return Task.CompletedTask;
+        return PageChanged.InvokeAsync(page);
+    }
+
+    private Task OnPageSizeChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out var size))
+            return PageSizeChanged.InvokeAsync(size);
+        return Task.CompletedTask;
+    }
+}

@@ -10,15 +10,26 @@ using FoodCalc.Features;
 
 namespace FoodCalc.Feature.Ingredients.Queries.GetAllIngredients;
 
-public class GetAllIngredientsQueryHandler(UnitOfWork unitOfWork, IMapper mapper, ILogger<GetAllIngredientsQueryHandler> logger) : IRequestHandler<GetAllIngredientsQuery, ErrorOr<List<IngredientDto>>>
+public class GetAllIngredientsQueryHandler(UnitOfWork unitOfWork, IMapper mapper, ILogger<GetAllIngredientsQueryHandler> logger) : IRequestHandler<GetAllIngredientsQuery, ErrorOr<PagedResultDto<IngredientDto>>>
 {
-	public async Task<ErrorOr<List<IngredientDto>>> Handle(GetAllIngredientsQuery request, CancellationToken cancellationToken)
+	public async Task<ErrorOr<PagedResultDto<IngredientDto>>> Handle(GetAllIngredientsQuery request, CancellationToken cancellationToken)
 	{
 		try
 		{
-			var ingredients = await unitOfWork.IngredientRepository.GetAllAsync().ToPagedResultAsync(request.Page, request.PageSize);
+			var query = unitOfWork.IngredientRepository.GetAllAsync();
 
-			return mapper.Map<List<IngredientDto>>(ingredients.Items);
+			if (!string.IsNullOrWhiteSpace(request.Search))
+				query = query.Where(i => i.Name.Contains(request.Search));
+
+			var paged = await query.ToPagedResultAsync(request.Page, request.PageSize, cancellationToken);
+
+			return new PagedResultDto<IngredientDto>
+			{
+				Items = mapper.Map<List<IngredientDto>>(paged.Items),
+				TotalCount = paged.TotalCount,
+				Page = paged.Page,
+				PageSize = paged.PageSize
+			};
 		}
 		catch (Exception ex)
 		{

@@ -8,25 +8,17 @@ public class UserService(AuthenticatedHttpClientService httpClient)
 	{
 		var response = await httpClient.GetAsync("api/Admin/users");
 		if (!response.IsSuccessStatusCode)
-		{
-			// Optionally log or handle the error
-			var errorContent = await response.Content.ReadAsStringAsync();
-			// Handle 401, 403, 500, etc.
 			return [];
-		}
-		return await response.Content.ReadFromJsonAsync<List<UserDto>>() ?? [];
+		var paged = await response.Content.ReadFromJsonAsync<PagedResultDto<UserDto>>();
+		return paged?.Items.ToList() ?? [];
 	}
 
 	public async Task<List<UserDto>> RemoveRecipeToBlackList(Guid recipeId)
 	{
 		var response = await httpClient.GetAsync("api/Admin/users");
 		if (!response.IsSuccessStatusCode)
-		{
-			// Optionally log or handle the error
-			var errorContent = await response.Content.ReadAsStringAsync();
-			// Handle 401, 403, 500, etc.
 			return [];
-		}
-		return await response.Content.ReadFromJsonAsync<List<UserDto>>() ?? [];
+		var paged = await response.Content.ReadFromJsonAsync<PagedResultDto<UserDto>>();
+		return paged?.Items.ToList() ?? [];
 	}
 }

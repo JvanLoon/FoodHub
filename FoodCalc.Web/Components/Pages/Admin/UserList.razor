@@ -4,10 +4,19 @@
 
 <div class="container py-4">
     <h3 class="mb-4">User List</h3>
-    @if (users.Any())
+
+    <div class="mb-3">
+        <input type="text" class="form-control" placeholder="Search users..." value="@searchTerm" @oninput="OnSearchInput" />
+    </div>
+
+    @if (pagedResult == null)
+    {
+        <p>Loading...</p>
+    }
+    else if (pagedResult.Items.Any())
     {
         <div class="list-group">
-            @foreach (var user in users)
+            @foreach (var user in pagedResult.Items)
             {
                 <div class="list-group-item d-flex justify-content-between align-items-center">
                     <a class="text-decoration-none flex-grow-1" href="/admin/userroles/@user.Email">
@@ -27,17 +36,27 @@
                 </div>
             }
         </div>
+
+        <FoodCalc.Web.Components.Shared.Paginator
+            TotalCount="pagedResult.TotalCount"
+            Page="pagedResult.Page"
+            PageSize="pagedResult.PageSize"
+            PageChanged="OnPageChanged"
+            PageSizeChanged="OnPageSizeChanged" />
     }
     else
     {
-        <div class="alert alert-warning">No users, something went wrong</div>
+        <div class="alert alert-warning">No users found.</div>
     }
     <FoodCalc.Web.Components.Shared.MessageBox />
 </div>
 
 
 @code {
-    private List<UserDto> users = new();
+    private PagedResultDto<UserDto>? pagedResult;
+    private int currentPage = 1;
+    private int pageSize = 50;
+    private string searchTerm = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -48,19 +67,39 @@
     {
         try
         {
-            users = await AdminService.GetUsersAsync();
+            pagedResult = await AdminService.GetPagedUsersAsync(currentPage, pageSize, searchTerm);
         }
         catch (Exception ex)
         {
-            users = [];
+            pagedResult = new();
             await MessageService.ShowMessageAsync(ex.Message, true, 20000);
         }
+    }
+
+    private async Task OnPageChanged(int page)
+    {
+        currentPage = page;
+        await LoadUsersAsync();
+    }
+
+    private async Task OnPageSizeChanged(int size)
+    {
+        pageSize = size;
+        currentPage = 1;
+        await LoadUsersAsync();
+    }
+
+    private async Task OnSearchInput(ChangeEventArgs e)
+    {
+        searchTerm = e.Value?.ToString() ?? string.Empty;
+        currentPage = 1;
+        await LoadUsersAsync();
     }
 
     public async Task ToggleUserAsync(string email, bool enabled)
     {
         await AdminService.ToggleUserAsync(email, enabled);
-        var user = users.FirstOrDefault(u => u.Email == email);
+        var user = pagedResult?.Items.FirstOrDefault(u => u.Email == email);
         if (user != null)
             user.Enabled = enabled;
     }

@@ -9,18 +9,23 @@ using System.Threading.Tasks;
 namespace FoodCalc.Web.Components.Services.Admin;
 public class AdminService(AuthenticatedHttpClientService httpClient)
 {
-    public async Task<List<UserDto>> GetUsersAsync()
-    {
-        var response = await httpClient.GetAsync("api/Admin/users");
-        if (!response.IsSuccessStatusCode)
-        {
-            // Optionally log or handle the error
-            var errorContent = await response.Content.ReadAsStringAsync();
-            // Handle 401, 403, 500, etc.
-            return [];
-        }
-        return await response.Content.ReadFromJsonAsync<List<UserDto>>() ?? [];
-    }
+	public async Task<PagedResultDto<UserDto>> GetPagedUsersAsync(int page, int pageSize, string? search = null)
+	{
+		var url = $"api/Admin/users?page={page}&pageSize={pageSize}";
+		if (!string.IsNullOrWhiteSpace(search))
+			url += $"&search={Uri.EscapeDataString(search)}";
+
+		var response = await httpClient.GetAsync(url);
+		if (!response.IsSuccessStatusCode)
+			return new();
+		return await response.Content.ReadFromJsonAsync<PagedResultDto<UserDto>>() ?? new();
+	}
+
+	public async Task<List<UserDto>> GetUsersAsync()
+	{
+		var paged = await GetPagedUsersAsync(1, int.MaxValue);
+		return [..paged.Items];
+	}
 
     public async Task<bool> ToggleUserAsync(string email, bool enable = true)
     {

@@ -1,3 +1,16 @@
+.home-layout {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
+
+.home-body {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+}
+
 .card {
     user-select: none;
 }
