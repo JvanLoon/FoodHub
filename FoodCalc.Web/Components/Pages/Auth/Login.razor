@@ -15,7 +15,7 @@
         <span>FoodHub</span>
     </div>
     <h3 class="auth-card__title">Welcome back</h3>
-    <EditForm Model="loginModel" OnValidSubmit="HandleLogin">
+    <EditForm Model="loginModel" OnValidSubmit="HandleLogin" FormName="login-form">
         <DataAnnotationsValidator />
         <ValidationSummary class="mb-3" />
         <TextField Label="Email" Placeholder="Enter your email" Autocomplete="username" @bind-Value="loginModel.Email" />

@@ -13,7 +13,7 @@
         <span>FoodHub</span>
     </div>
     <h3 class="auth-card__title">Create your account</h3>
-    <EditForm Model="registerModel" OnValidSubmit="HandleRegister">
+    <EditForm Model="registerModel" OnValidSubmit="HandleRegister" FormName="register-form">
         <DataAnnotationsValidator />
         <ValidationSummary class="mb-3" />
         <TextField Label="Email" Placeholder="Enter your email" Autocomplete="username" @bind-Value="registerModel.Email" />

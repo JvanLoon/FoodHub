@@ -68,7 +68,7 @@
                 <AppCard>
                     <Header>Reset password</Header>
                     <Body>
-                        <EditForm Model="resetModel" OnValidSubmit="ResetPassword">
+                        <EditForm Model="resetModel" OnValidSubmit="ResetPassword" FormName="reset-password-form">
                             <DataAnnotationsValidator />
                             <ValidationSummary />
 
@@ -111,7 +111,7 @@
             }
             else
             {
-                await MessageService.ShowMessageAsync("Failed to add role.", true);
+                await MessageService.ShowMessageAsync($"Failed to add role.", true);
             }
         }
     }
