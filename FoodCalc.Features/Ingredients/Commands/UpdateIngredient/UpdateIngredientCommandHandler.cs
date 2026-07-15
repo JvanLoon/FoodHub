@@ -1,13 +1,13 @@
 ﻿using ErrorOr;
 using MediatR;
-using AutoMapper;
+using FoodCalc.Features.Mapping;
 using FoodHub.DTOs;
 using FoodHub.Persistence.Entities;
 using FoodHub.Persistence.Persistence;
 using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Features.Ingredients.Commands.UpdateIngredient;
-public class UpdateIngredientCommandHandler(UnitOfWork unitOfWork, IMapper mapper, ILogger<UpdateIngredientCommandHandler> logger) : IRequestHandler<UpdateIngredientCommand, ErrorOr<IngredientDto>>
+public class UpdateIngredientCommandHandler(UnitOfWork unitOfWork, ILogger<UpdateIngredientCommandHandler> logger) : IRequestHandler<UpdateIngredientCommand, ErrorOr<IngredientDto>>
 {
 	public async Task<ErrorOr<IngredientDto>> Handle(UpdateIngredientCommand request, CancellationToken cancellationToken)
 	{
@@ -21,7 +21,7 @@ public class UpdateIngredientCommandHandler(UnitOfWork unitOfWork, IMapper mappe
 
 			await unitOfWork.IngredientRepository.UpdateAsync(ingredient, cancellationToken);
 
-			return mapper.Map<IngredientDto>(ingredient);
+			return ingredient.ToDto();
 		}
 		catch (Exception ex)
 		{

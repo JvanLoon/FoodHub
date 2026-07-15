@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-
-using ErrorOr;
+﻿using ErrorOr;
 
 using FoodCalc.Features.Authentication.Roles.Queries.GetAllRoles;
 using FoodCalc.Features.Authentication.Users.Queries.GetAllUsers;

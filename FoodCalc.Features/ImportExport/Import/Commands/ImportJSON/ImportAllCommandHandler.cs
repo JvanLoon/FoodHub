@@ -1,6 +1,4 @@
 ﻿
-using AutoMapper;
-
 using ErrorOr;
 
 using FoodHub.DTOs;
@@ -13,7 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Features.ImportExport.Import.Commands.ImportJSON;
-public class ImportAllCommandHandler(UnitOfWork unitOfWork, ILogger<ImportAllCommandHandler> logger, IMapper mapper) : IRequestHandler<ImportAllCommand, ErrorOr<bool>>
+public class ImportAllCommandHandler(UnitOfWork unitOfWork, ILogger<ImportAllCommandHandler> logger) : IRequestHandler<ImportAllCommand, ErrorOr<bool>>
 {
 	public async Task<ErrorOr<bool>> Handle(ImportAllCommand request, CancellationToken cancellationToken)
 	{
@@ -115,7 +113,7 @@ public class ImportAllCommandHandler(UnitOfWork unitOfWork, ILogger<ImportAllCom
                         existingRi.Amount = riDto.Amount;
                         changed = true;
                     }
-                    var mappedAmountType = mapper.Map<IngredientAmountType>(riDto.IngredientAmount);
+                    var mappedAmountType = (IngredientAmountType)riDto.IngredientAmount;
                     if (!Equals(existingRi.IngredientAmount, mappedAmountType))
                     {
                         existingRi.IngredientAmount = mappedAmountType;
@@ -134,7 +132,7 @@ public class ImportAllCommandHandler(UnitOfWork unitOfWork, ILogger<ImportAllCom
                     RecipeId = riDto.RecipeId,
                     IngredientId = resolvedIngredientId,
                     Amount = riDto.Amount,
-                    IngredientAmount = mapper.Map<IngredientAmountType>(riDto.IngredientAmount)
+                    IngredientAmount = (IngredientAmountType)riDto.IngredientAmount
                 };
                 await unitOfWork.RecipeRepository.AddRecipeIngredientAsync(recipeIngredient, cancellationToken);
             }

@@ -36,8 +36,13 @@ public class Program
 			client.BaseAddress = new Uri(apiBaseAddress);
 		});
 
+		var keysPath = Path.Combine(
+			Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+			"FoodHub", "dataprotection-keys");
+		Directory.CreateDirectory(keysPath);
+
 		builder.Services.AddDataProtection()
-		.PersistKeysToFileSystem(new DirectoryInfo(@"/root/.aspnet/DataProtection-Keys"))
+		.PersistKeysToFileSystem(new DirectoryInfo(keysPath))
 		.SetApplicationName("FoodHub");
 
 		builder.Services.AddScoped<AuthTokenService>();

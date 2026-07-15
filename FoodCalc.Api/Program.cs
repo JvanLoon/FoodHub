@@ -1,5 +1,7 @@
+using FastEndpoints;
+using FastEndpoints.Swagger;
+
 using FoodCalc.Api.Extensions;
-using FoodCalc.Features.Mapping;
 
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Identity;
@@ -19,13 +21,8 @@ public class Program
 		// Add services to the container.
 		builder.Services.AddProblemDetails();
 
-		builder.Services.AddControllers();
-
-		builder.Services.AddEndpointsApiExplorer();
-		builder.Services.AddSwaggerGen();
-
-		// Add AutoMapper
-		builder.Services.AddAutoMapper(typeof(MappingProfile));
+		builder.Services.AddFastEndpoints();
+		builder.Services.SwaggerDocument();
 
 		builder.Services.Configure<JsonOptions>(options =>
 		{
@@ -127,8 +124,6 @@ public class Program
 		if (app.Environment.IsDevelopment())
 		{
 			app.UseDeveloperExceptionPage();
-			app.UseSwagger();
-			app.UseSwaggerUI();
 		}
 
 		app.UseHttpsRedirection();
@@ -137,7 +132,25 @@ public class Program
 		app.UseCors("AllowWebApp");
 		app.UseAuthentication();
 		app.UseAuthorization();
-		app.MapControllers();
+
+		app.UseFastEndpoints(c =>
+		{
+			// FastEndpoints honors the global Microsoft.AspNetCore.Http.Json
+			// options, which enable ReferenceHandler.Preserve. That serializes
+			// collections as { "$id":.., "$values":[..] }, which the Blazor
+			// clients cannot deserialize into PagedResultDto<T>. The old MVC
+			// controllers serialized via Mvc.JsonOptions (plain web defaults, no
+			// Preserve), so match that wire format to keep the clients working.
+			c.Serializer.Options.ReferenceHandler = null;
+			c.Serializer.Options.WriteIndented = false;
+		});
+		if (app.Environment.IsDevelopment())
+		{
+			// FastEndpoints/NSwag Swagger is now the only Swagger provider, served
+			// at the conventional /swagger.
+			app.UseSwaggerGen();
+		}
+
 		app.MapDefaultEndpoints();
 
 		app.Run();
