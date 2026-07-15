@@ -1,0 +1,273 @@
+/* ==========================================================================
+   FoodHub → Bootstrap theme bridge
+   Maps --fh-* tokens onto Bootstrap 5.3 CSS variables so existing Bootstrap
+   markup restyles itself.
+
+   IMPORTANT: Bootstrap bakes literal colors into each component's own
+   variables (.btn-primary defines --bs-btn-bg directly and never reads
+   --bs-primary), so root remaps alone are not enough — every component type
+   we use gets its own override block below. Dark mode needs no duplication
+   here: the --fh-* tokens already switch under [data-bs-theme="dark"].
+   ========================================================================== */
+
+/* --- Root ---------------------------------------------------------------- */
+
+:root,
+[data-bs-theme="light"],
+[data-bs-theme="dark"] {
+    --bs-primary: var(--fh-green-600);
+    --bs-success: var(--fh-success);
+    --bs-danger: var(--fh-danger);
+    --bs-warning: var(--fh-warning);
+    --bs-info: var(--fh-info);
+
+    --bs-body-bg: var(--fh-bg);
+    --bs-body-color: var(--fh-text);
+    --bs-secondary-color: var(--fh-text-muted);
+    --bs-tertiary-color: var(--fh-text-faint);
+    --bs-secondary-bg: var(--fh-surface-sunken);
+    --bs-tertiary-bg: var(--fh-surface);
+    --bs-emphasis-color: var(--fh-text);
+
+    --bs-border-color: var(--fh-border);
+    --bs-border-radius: var(--fh-radius-md);
+    --bs-border-radius-sm: var(--fh-radius-sm);
+    --bs-border-radius-lg: var(--fh-radius-lg);
+    --bs-border-radius-pill: var(--fh-radius-pill);
+
+    --bs-body-font-family: var(--fh-font-sans);
+
+    --bs-link-color: var(--fh-green-600);
+    --bs-link-hover-color: var(--fh-green-700);
+    --bs-link-color-rgb: 45, 122, 62;
+    --bs-link-hover-color-rgb: 38, 98, 52;
+
+    --bs-focus-ring-color: rgba(61, 151, 80, 0.35);
+}
+
+[data-bs-theme="dark"] {
+    --bs-primary: var(--fh-green-400);
+    --bs-link-color: var(--fh-green-300);
+    --bs-link-hover-color: var(--fh-green-200);
+    --bs-link-color-rgb: 144, 205, 155;
+    --bs-link-hover-color-rgb: 188, 226, 194;
+    --bs-focus-ring-color: rgba(95, 178, 111, 0.4);
+}
+
+/* --- Buttons ------------------------------------------------------------- */
+
+.btn {
+    --bs-btn-border-radius: var(--fh-radius-md);
+    --bs-btn-font-weight: var(--fh-weight-medium);
+}
+
+.btn-primary {
+    --bs-btn-bg: var(--fh-green-600);
+    --bs-btn-border-color: var(--fh-green-600);
+    --bs-btn-color: #fff;
+    --bs-btn-hover-bg: var(--fh-green-700);
+    --bs-btn-hover-border-color: var(--fh-green-700);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-active-bg: var(--fh-green-800);
+    --bs-btn-active-border-color: var(--fh-green-800);
+    --bs-btn-active-color: #fff;
+    --bs-btn-disabled-bg: var(--fh-green-600);
+    --bs-btn-disabled-border-color: var(--fh-green-600);
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-focus-shadow-rgb: 61, 151, 80;
+}
+
+.btn-outline-primary {
+    --bs-btn-color: var(--fh-green-600);
+    --bs-btn-border-color: var(--fh-green-500);
+    --bs-btn-hover-bg: var(--fh-green-600);
+    --bs-btn-hover-border-color: var(--fh-green-600);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-active-bg: var(--fh-green-700);
+    --bs-btn-active-border-color: var(--fh-green-700);
+    --bs-btn-active-color: #fff;
+    --bs-btn-focus-shadow-rgb: 61, 151, 80;
+}
+
+[data-bs-theme="dark"] .btn-outline-primary {
+    --bs-btn-color: var(--fh-green-300);
+    --bs-btn-border-color: var(--fh-green-400);
+}
+
+.btn-secondary {
+    --bs-btn-bg: var(--fh-surface-sunken);
+    --bs-btn-border-color: var(--fh-border-strong);
+    --bs-btn-color: var(--fh-text);
+    --bs-btn-hover-bg: var(--fh-border);
+    --bs-btn-hover-border-color: var(--fh-border-strong);
+    --bs-btn-hover-color: var(--fh-text);
+    --bs-btn-active-bg: var(--fh-border);
+    --bs-btn-active-border-color: var(--fh-border-strong);
+    --bs-btn-active-color: var(--fh-text);
+}
+
+.btn-success {
+    --bs-btn-bg: var(--fh-success);
+    --bs-btn-border-color: var(--fh-success);
+    --bs-btn-hover-bg: var(--fh-green-700);
+    --bs-btn-hover-border-color: var(--fh-green-700);
+    --bs-btn-focus-shadow-rgb: 61, 151, 80;
+}
+
+.btn-danger {
+    --bs-btn-bg: var(--fh-danger);
+    --bs-btn-border-color: var(--fh-danger);
+    --bs-btn-hover-bg: #b32f2f;
+    --bs-btn-hover-border-color: #b32f2f;
+    --bs-btn-focus-shadow-rgb: 206, 59, 59;
+}
+
+[data-bs-theme="dark"] .btn-danger {
+    --bs-btn-hover-bg: #d15858;
+    --bs-btn-hover-border-color: #d15858;
+}
+
+/* --- Forms --------------------------------------------------------------- */
+
+.form-control,
+.form-select {
+    background-color: var(--fh-surface);
+    border-color: var(--fh-border-strong);
+    border-radius: var(--fh-radius-md);
+    color: var(--fh-text);
+    transition: border-color var(--fh-transition), box-shadow var(--fh-transition);
+}
+
+.form-control:focus,
+.form-select:focus {
+    background-color: var(--fh-surface);
+    border-color: var(--fh-green-500);
+    box-shadow: var(--fh-focus-ring);
+    color: var(--fh-text);
+}
+
+.form-control::placeholder {
+    color: var(--fh-text-faint);
+}
+
+.form-check-input:checked {
+    background-color: var(--fh-green-600);
+    border-color: var(--fh-green-600);
+}
+
+.form-check-input:focus {
+    border-color: var(--fh-green-500);
+    box-shadow: var(--fh-focus-ring);
+}
+
+/* --- Cards --------------------------------------------------------------- */
+
+.card {
+    --bs-card-bg: var(--fh-surface);
+    --bs-card-border-color: var(--fh-border);
+    --bs-card-border-radius: var(--fh-radius-lg);
+    --bs-card-inner-border-radius: calc(var(--fh-radius-lg) - 1px);
+    --bs-card-cap-bg: transparent;
+    box-shadow: var(--fh-shadow-sm);
+}
+
+/* --- Tables -------------------------------------------------------------- */
+
+.table {
+    --bs-table-bg: var(--fh-surface);
+    --bs-table-color: var(--fh-text);
+    --bs-table-border-color: var(--fh-border);
+    --bs-table-striped-bg: var(--fh-surface-sunken);
+    --bs-table-striped-color: var(--fh-text);
+    --bs-table-hover-bg: var(--fh-green-50);
+    --bs-table-hover-color: var(--fh-text);
+}
+
+[data-bs-theme="dark"] .table {
+    --bs-table-hover-bg: var(--fh-surface-raised);
+}
+
+/* --- Alerts -------------------------------------------------------------- */
+
+.alert-success {
+    --bs-alert-bg: var(--fh-green-50);
+    --bs-alert-border-color: var(--fh-green-200);
+    --bs-alert-color: var(--fh-green-800);
+}
+
+[data-bs-theme="dark"] .alert-success {
+    --bs-alert-bg: #1a2e20;
+    --bs-alert-border-color: var(--fh-green-800);
+    --bs-alert-color: var(--fh-green-200);
+}
+
+.alert-danger {
+    --bs-alert-bg: #fbeaea;
+    --bs-alert-border-color: #f0bcbc;
+    --bs-alert-color: #8f2424;
+}
+
+[data-bs-theme="dark"] .alert-danger {
+    --bs-alert-bg: #331a1a;
+    --bs-alert-border-color: #6e2c2c;
+    --bs-alert-color: #eda2a2;
+}
+
+/* --- Nav / badges / pagination ------------------------------------------- */
+
+.nav-pills {
+    --bs-nav-pills-link-active-bg: var(--fh-green-600);
+    --bs-nav-pills-link-active-color: #fff;
+    --bs-nav-pills-border-radius: var(--fh-radius-md);
+}
+
+.nav-tabs {
+    --bs-nav-tabs-link-active-color: var(--fh-green-700);
+    --bs-nav-tabs-link-active-bg: var(--fh-surface);
+    --bs-nav-tabs-link-active-border-color: var(--fh-border) var(--fh-border) var(--fh-surface);
+    --bs-nav-tabs-border-color: var(--fh-border);
+}
+
+.badge.text-bg-primary {
+    background-color: var(--fh-green-600) !important;
+}
+
+.pagination {
+    --bs-pagination-active-bg: var(--fh-green-600);
+    --bs-pagination-active-border-color: var(--fh-green-600);
+    --bs-pagination-color: var(--fh-green-700);
+    --bs-pagination-hover-color: var(--fh-green-800);
+    --bs-pagination-focus-color: var(--fh-green-800);
+    --bs-pagination-bg: var(--fh-surface);
+    --bs-pagination-border-color: var(--fh-border);
+    --bs-pagination-hover-bg: var(--fh-surface-sunken);
+    --bs-pagination-focus-bg: var(--fh-surface-sunken);
+    --bs-pagination-disabled-bg: var(--fh-surface);
+    --bs-pagination-disabled-color: var(--fh-text-faint);
+    --bs-pagination-disabled-border-color: var(--fh-border);
+}
+
+[data-bs-theme="dark"] .pagination {
+    --bs-pagination-color: var(--fh-green-300);
+    --bs-pagination-hover-color: var(--fh-green-200);
+    --bs-pagination-focus-color: var(--fh-green-200);
+}
+
+/* --- Modal / toast ------------------------------------------------------- */
+
+.modal {
+    --bs-modal-bg: var(--fh-surface-raised);
+    --bs-modal-border-color: var(--fh-border);
+    --bs-modal-border-radius: var(--fh-radius-lg);
+    --bs-modal-header-border-color: var(--fh-border);
+    --bs-modal-footer-border-color: var(--fh-border);
+}
+
+.toast {
+    --bs-toast-bg: var(--fh-surface-raised);
+    --bs-toast-border-color: var(--fh-border);
+    --bs-toast-border-radius: var(--fh-radius-md);
+    --bs-toast-header-bg: transparent;
+    --bs-toast-header-color: var(--fh-text);
+    box-shadow: var(--fh-shadow-md);
+}
