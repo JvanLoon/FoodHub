@@ -4,21 +4,17 @@ using FoodHub.DTOs;
 namespace FoodCalc.Web.Components.Services;
 public class UserService(AuthenticatedHttpClientService httpClient)
 {
+	// TODO(blacklist): these are stubs — they ignore recipeId and just refetch users.
+	// Wire them to real add/remove blacklist endpoints when the blacklist feature is built.
 	public async Task<List<UserDto>> AddRecipeToBlackList(Guid recipeId)
 	{
-		var response = await httpClient.GetAsync("api/admin/users");
-		if (!response.IsSuccessStatusCode)
-			return [];
-		var paged = await response.Content.ReadFromJsonAsync<PagedResultDto<UserDto>>();
-		return paged?.Items.ToList() ?? [];
+		var result = await httpClient.GetAsync<PagedResultDto<UserDto>>("api/admin/users");
+		return result.Success ? result.Data!.Items.ToList() : [];
 	}
 
 	public async Task<List<UserDto>> RemoveRecipeToBlackList(Guid recipeId)
 	{
-		var response = await httpClient.GetAsync("api/admin/users");
-		if (!response.IsSuccessStatusCode)
-			return [];
-		var paged = await response.Content.ReadFromJsonAsync<PagedResultDto<UserDto>>();
-		return paged?.Items.ToList() ?? [];
+		var result = await httpClient.GetAsync<PagedResultDto<UserDto>>("api/admin/users");
+		return result.Success ? result.Data!.Items.ToList() : [];
 	}
 }

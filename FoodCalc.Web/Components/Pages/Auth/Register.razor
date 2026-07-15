@@ -39,7 +39,7 @@
         }
         else
         {
-            await MessageService.ShowMessageAsync(response.ErrorMessage ?? "Error registering", true, 0);
+            await MessageService.ShowMessageAsync(response.Error ?? "Error registering", true, 0);
         }
     }
 }

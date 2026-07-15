@@ -2,69 +2,48 @@ using FoodCalc.Web.Components.Services.Auth;
 
 using FoodHub.DTOs;
 
-using System.Collections.Generic;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
-
 namespace FoodCalc.Web.Components.Services.Admin;
 public class AdminService(AuthenticatedHttpClientService httpClient)
 {
-	public async Task<PagedResultDto<UserDto>> GetPagedUsersAsync(int page, int pageSize, string? search = null)
+	public Task<ApiResult<PagedResultDto<UserDto>>> GetPagedUsersAsync(int page, int pageSize, string? search = null)
 	{
 		var url = $"api/admin/users?page={page}&pageSize={pageSize}";
 		if (!string.IsNullOrWhiteSpace(search))
 			url += $"&search={Uri.EscapeDataString(search)}";
 
-		var response = await httpClient.GetAsync(url);
-		if (!response.IsSuccessStatusCode)
-			return new();
-		return await response.Content.ReadFromJsonAsync<PagedResultDto<UserDto>>() ?? new();
+		return httpClient.GetAsync<PagedResultDto<UserDto>>(url);
 	}
 
-	public async Task<List<UserDto>> GetUsersAsync()
+	public async Task<ApiResult<List<UserDto>>> GetUsersAsync()
 	{
 		var paged = await GetPagedUsersAsync(1, int.MaxValue);
-		return [..paged.Items];
+		if (!paged.Success)
+			return ApiResult<List<UserDto>>.Fail(paged.Error!, paged.StatusCode);
+
+		return ApiResult<List<UserDto>>.Ok([.. paged.Data!.Items], paged.StatusCode);
 	}
 
-    public async Task<bool> ToggleUserAsync(string email, bool enable = true)
-    {
-        // Specify the type argument explicitly to resolve CS0411
-        var response = await httpClient.PostAsync($"api/authentication/toggleUser?email={email}&enable={enable}", null);
-        if (!response.IsSuccessStatusCode)
-        {
-            return false;
-        }
-        return true;
-    }
+	public Task<ApiResult> ToggleUserAsync(string email, bool enable = true) =>
+		httpClient.PostAsync($"api/authentication/toggleUser?email={email}&enable={enable}");
 
-	public async Task<List<string>> GetAllRolesAsync()
+	public async Task<ApiResult<List<string>>> GetAllRolesAsync()
 	{
-		var response = await httpClient.GetAsync("api/admin/allroles");
-		if (!response.IsSuccessStatusCode)
-			return [];
+		var result = await httpClient.GetAsync<string>("api/admin/allroles");
+		if (!result.Success)
+			return ApiResult<List<string>>.Fail(result.Error!, result.StatusCode);
 
-		var roles = await response.Content.ReadAsStringAsync();
-		return roles.Split(",").ToList();
+		var roles = (result.Data ?? string.Empty)
+			.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+			.ToList();
+		return ApiResult<List<string>>.Ok(roles, result.StatusCode);
 	}
 
-	public async Task<List<string>> GetUserRolesAsync(string email)
-	{
-		var response = await httpClient.GetAsync($"api/admin/userroles?email={email}");
-		if (!response.IsSuccessStatusCode)
-			return [];
-		return await response.Content.ReadFromJsonAsync<List<string>>() ?? [];
-	}
+	public Task<ApiResult<List<string>>> GetUserRolesAsync(string email) =>
+		httpClient.GetAsync<List<string>>($"api/admin/userroles?email={email}");
 
-	public async Task<bool> UpdateUserRolesAsync(string email, string newRole)
-	{
-		var response = await httpClient.PostAsync($"api/admin/userroles?email={email}&role={newRole}");
-		return response.IsSuccessStatusCode;
-	}
+	public Task<ApiResult> UpdateUserRolesAsync(string email, string newRole) =>
+		httpClient.PostAsync($"api/admin/userroles?email={email}&role={newRole}");
 
-	public async Task<bool> RemoveUserRoleAsync(string email, string role)
-	{
-		var response = await httpClient.DeleteAsync($"api/admin/userroles?email={email}&role={role}");
-		return response.IsSuccessStatusCode;
-	}
+	public Task<ApiResult> RemoveUserRoleAsync(string email, string role) =>
+		httpClient.DeleteAsync($"api/admin/userroles?email={email}&role={role}");
 }

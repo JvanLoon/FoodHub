@@ -60,7 +60,8 @@ public class Program
 			var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
 			var authTokenService = sp.GetRequiredService<AuthTokenService>();
 			var httpClient = httpClientFactory.CreateClient("ApiClient");
-			return new AuthenticatedHttpClientService(httpClient, authTokenService);
+			return new AuthenticatedHttpClientService(httpClient, authTokenService,
+					sp.GetRequiredService<ILogger<AuthenticatedHttpClientService>>());
 		});
 
 		// CORS config

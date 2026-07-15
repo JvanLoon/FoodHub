@@ -1,91 +1,56 @@
-﻿using FoodCalc.Web.Components.Services.Auth;
+using FoodCalc.Web.Components.Services.Auth;
 
 using Microsoft.JSInterop;
 
 using System.Net.Http.Headers;
 
 namespace FoodCalc.Web.Components.Services.Admin;
-public class ImportExportService(AuthenticatedHttpClientService httpClient, IJSRuntime js, MessageService messageService)
+public class ImportExportService(AuthenticatedHttpClientService httpClient, IJSRuntime js)
 {
 	private readonly string _exportFileName = $"export";
 
-	public async Task<bool> ImportAsync(byte[] fileContent, string fileName)
+	public async Task<ApiResult> ImportAsync(byte[] fileContent, string fileName)
 	{
 		if (fileContent == null || fileContent.Length == 0)
-		{
-			await messageService.ShowMessageAsync("No file content.", true);
-			return false;
-		}
+			return ApiResult.Fail("No file content.");
 
-		try
-		{
-			var content = new MultipartFormDataContent();
-			var streamContent = new StreamContent(new MemoryStream(fileContent));
-			streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-			content.Add(streamContent, "file", fileName);
+		using var content = new MultipartFormDataContent();
+		var streamContent = new StreamContent(new MemoryStream(fileContent));
+		streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+		content.Add(streamContent, "file", fileName);
 
-			var response = await httpClient.PostAsync("api/importexport/import", content);
-
-			if (!response.IsSuccessStatusCode)
-			{
-				var error = await response.Content.ReadAsStringAsync();
-				await messageService.ShowMessageAsync($"Import failed: {error}", true);
-				return false;
-			}
-
-			await messageService.ShowMessageAsync("Import successful.", false);
-			return true;
-		}
-		catch (Exception ex)
-		{
-			await messageService.ShowMessageAsync(ex.Message, true);
-			return false;
-		}
+		return await httpClient.PostAsync("api/importexport/import", content);
 	}
 
-	public async Task<bool> ExportAsync(string exportFormat)
+	public async Task<ApiResult> ExportAsync(string exportFormat)
 	{
+		var result = await httpClient.GetAsync<string>($"api/importexport/export?format={exportFormat}");
+		if (!result.Success)
+			return result;
+
+		var fileName = string.Format(_exportFileName) + $".{exportFormat.ToLower()}";
+
+		string? base64;
+		string mimeType;
 		try
 		{
-			var response = await httpClient.GetAsync($"api/importexport/export?format={exportFormat}");
-			var fileName = string.Format(_exportFileName) + $".{exportFormat.ToLower()}";
+			using var doc = System.Text.Json.JsonDocument.Parse(result.Data!);
 
-			if (response.IsSuccessStatusCode)
-			{
-				var json = await response.Content.ReadAsStringAsync();
-
-				using var doc = System.Text.Json.JsonDocument.Parse(json);
-
-				// Extract the base64 file contents and content type
-				var base64 = doc.RootElement.GetProperty("fileContents").GetString();
-				var mimeType = doc.RootElement.TryGetProperty("contentType", out var ct)
-					? ct.GetString() ?? "application/octet-stream"
-					: "application/octet-stream";
-
-				if (string.IsNullOrWhiteSpace(base64))
-				{
-					await messageService.ShowMessageAsync("Export failed: file content is empty.", true);
-					return false;
-				}
-
-				await js.InvokeVoidAsync("blazorDownloadFile", fileName, mimeType, base64);
-				return true;
-			}
-			else
-			{
-				await messageService.ShowMessageAsync("Export failed.", true);
-				return false;
-			}
-
+			// Extract the base64 file contents and content type
+			base64 = doc.RootElement.GetProperty("fileContents").GetString();
+			mimeType = doc.RootElement.TryGetProperty("contentType", out var ct)
+				? ct.GetString() ?? "application/octet-stream"
+				: "application/octet-stream";
 		}
-		catch (Exception ex)
+		catch (Exception)
 		{
-			await messageService.ShowMessageAsync(ex.Message, true);
-			return false;
+			return ApiResult.Fail("Export failed: the server returned an unexpected response.");
 		}
 
+		if (string.IsNullOrWhiteSpace(base64))
+			return ApiResult.Fail("Export failed: file content is empty.");
 
+		await js.InvokeVoidAsync("blazorDownloadFile", fileName, mimeType, base64);
+		return ApiResult.Ok(result.StatusCode);
 	}
-
-
 }

@@ -93,14 +93,15 @@
 
     private async Task LoadRecipesAsync()
     {
-        try
+        var result = await recipeService.GetPagedRecipesAsync(currentPage, pageSize, searchTerm);
+        if (result.Success)
         {
-            pagedResult = await recipeService.GetPagedRecipesAsync(currentPage, pageSize, searchTerm);
+            pagedResult = result.Data;
         }
-        catch (Exception ex)
+        else
         {
             pagedResult = new();
-            await MessageService.ShowMessageAsync(ex.Message, true, 0);
+            await MessageService.ShowMessageAsync(result.Error!, true, 0);
         }
     }
 
@@ -187,14 +188,10 @@
         if (!confirmed)
             return;
 
-        try
-        {
-            await recipeService.DeleteRecipe(recipeId);
+        var result = await recipeService.DeleteRecipe(recipeId);
+        if (result.Success)
             await LoadRecipesAsync();
-        }
-        catch (Exception ex)
-        {
-            await MessageService.ShowMessageAsync(ex.Message, true);
-        }
+        else
+            await MessageService.ShowMessageAsync(result.Error!, true);
     }
 }

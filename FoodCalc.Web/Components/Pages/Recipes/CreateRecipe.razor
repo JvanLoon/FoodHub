@@ -29,23 +29,16 @@
 
     private async Task CreateRecipeAsync()
     {
-        try
-        {
-            var createdRecipe = await RecipeService.AddRecipe(recipe);
+        var result = await RecipeService.AddRecipe(recipe);
 
-            if (createdRecipe?.Id != Guid.Empty)
-            {
-                // Navigate to EditRecipe page with the new recipe's ID
-                NavigationManager.NavigateTo($"/recipes/edit/{createdRecipe!.Id}");
-            }
-            else
-            {
-                await MessageService.ShowMessageAsync("Failed to create recipe.", true);
-            }
-        }
-        catch (Exception ex)
+        if (result.Success && result.Data?.Id is Guid id && id != Guid.Empty)
         {
-            await MessageService.ShowMessageAsync("Error creating recipe.", true);
+            // Navigate to EditRecipe page with the new recipe's ID
+            NavigationManager.NavigateTo($"/recipes/edit/{id}");
+        }
+        else
+        {
+            await MessageService.ShowMessageAsync(result.Error ?? "Failed to create recipe.", true);
         }
     }
 }

@@ -94,8 +94,17 @@
 
     protected override async Task OnInitializedAsync()
     {
-        roles = await AdminService.GetUserRolesAsync(email);
-        allRoles = await AdminService.GetAllRolesAsync();
+        var rolesResult = await AdminService.GetUserRolesAsync(email);
+        if (rolesResult.Success)
+            roles = rolesResult.Data!;
+        else
+            await MessageService.ShowMessageAsync(rolesResult.Error!, true);
+
+        var allRolesResult = await AdminService.GetAllRolesAsync();
+        if (allRolesResult.Success)
+            allRoles = allRolesResult.Data!;
+        else
+            await MessageService.ShowMessageAsync(allRolesResult.Error!, true);
     }
 
     private async Task AddRole()
@@ -103,7 +112,7 @@
         if (!string.IsNullOrEmpty(selectedRole) && !roles.Contains(selectedRole))
         {
             var result = await AdminService.UpdateUserRolesAsync(email, selectedRole);
-            if (result)
+            if (result.Success)
             {
                 roles.Add(selectedRole);
                 selectedRole = string.Empty;
@@ -111,7 +120,7 @@
             }
             else
             {
-                await MessageService.ShowMessageAsync($"Failed to add role.", true);
+                await MessageService.ShowMessageAsync(result.Error!, true);
             }
         }
     }
@@ -119,14 +128,14 @@
     private async Task RemoveRole(string role)
     {
         var result = await AdminService.RemoveUserRoleAsync(email, role);
-        if (result)
+        if (result.Success)
         {
             roles.Remove(role);
             await MessageService.ShowMessageAsync("Role removed successfully!", false);
         }
         else
         {
-            await MessageService.ShowMessageAsync("Failed to remove role.", true);
+            await MessageService.ShowMessageAsync(result.Error!, true);
         }
     }
 
@@ -134,27 +143,19 @@
 
     private async Task ResetPassword()
     {
-        try
+        resetPasswordDto.Email = email;
+        resetPasswordDto.Password = resetModel.password;
+
+        var resetResponse = await LoginService.ResetPassword(resetPasswordDto);
+
+        if (resetResponse.Success)
         {
-            resetPasswordDto.Email = email;
-            resetPasswordDto.Password = resetModel.password;
-
-            var resetResponse = await LoginService.ResetPassword(resetPasswordDto);
-
-            if (resetResponse.IsSuccessStatusCode)
-            {
-                await MessageService.ShowMessageAsync("Password reset successfully!", false);
-                resetModel.password = string.Empty;
-            }
-            else
-            {
-                string message = resetResponse.ReasonPhrase ?? string.Empty;
-                await MessageService.ShowMessageAsync(message, true);
-            }
+            await MessageService.ShowMessageAsync("Password reset successfully!", false);
+            resetModel.password = string.Empty;
         }
-        catch (Exception ex)
+        else
         {
-            await MessageService.ShowMessageAsync($"Error resetting password. error: {ex.Message}", true);
+            await MessageService.ShowMessageAsync(resetResponse.Error!, true);
         }
     }
 

@@ -34,20 +34,19 @@
     {
         var response = await LoginService.LoginAsync(loginModel);
 
-        if (response.IsSuccessStatusCode)
-        {
-            var result = await response.Content.ReadFromJsonAsync<AuthResponseDto>();
-            if (result?.Token == null)
-            {
-                await MessageService.ShowMessageAsync("Login failed: invalid server response.", true);
-                return;
-            }
-            await AuthStateService.SignInAsync(result.Token);
-            Navigation.NavigateTo("/");
-        }
-        else
+        if (!response.Success)
         {
             await MessageService.ShowMessageAsync("Failed to login. Invalid email or password.", true);
+            return;
         }
+
+        if (response.Data?.Token == null)
+        {
+            await MessageService.ShowMessageAsync("Login failed: invalid server response.", true);
+            return;
+        }
+
+        await AuthStateService.SignInAsync(response.Data.Token);
+        Navigation.NavigateTo("/");
     }
 }

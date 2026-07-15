@@ -68,14 +68,15 @@
 
     private async Task LoadUsersAsync()
     {
-        try
+        var result = await AdminService.GetPagedUsersAsync(currentPage, pageSize, searchTerm);
+        if (result.Success)
         {
-            pagedResult = await AdminService.GetPagedUsersAsync(currentPage, pageSize, searchTerm);
+            pagedResult = result.Data;
         }
-        catch (Exception ex)
+        else
         {
             pagedResult = new();
-            await MessageService.ShowMessageAsync(ex.Message, true, 20000);
+            await MessageService.ShowMessageAsync(result.Error!, true, 20000);
         }
     }
 
@@ -101,7 +102,13 @@
 
     public async Task ToggleUserAsync(string email, bool enabled)
     {
-        await AdminService.ToggleUserAsync(email, enabled);
+        var result = await AdminService.ToggleUserAsync(email, enabled);
+        if (!result.Success)
+        {
+            await MessageService.ShowMessageAsync(result.Error!, true);
+            return;
+        }
+
         var user = pagedResult?.Items.FirstOrDefault(u => u.Email == email);
         if (user != null)
             user.Enabled = enabled;
