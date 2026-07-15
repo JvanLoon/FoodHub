@@ -1,19 +1,32 @@
-﻿@page "/usersettings"
+@page "/usersettings"
 @using FoodCalc.Web.Components.Services.Auth
 @inject AuthTokenService AuthTokenService
 
-<h3>User Settings</h3>
+<PageTitle>User Settings</PageTitle>
 
-@if (string.IsNullOrEmpty(email))
-{
-    <p>Loading...</p>
-}
-else
-{
-    <div class="card p-3" style="max-width: 400px;">
-        <div class="mb-2"><strong>Email:</strong> @email</div>
-    </div>
-}
+<div class="fh-stack">
+    <PageHeader Title="User Settings" />
+
+    @if (string.IsNullOrEmpty(email))
+    {
+        <LoadingSpinner Label="Loading settings..." />
+    }
+    else
+    {
+        <div class="settings-card">
+            <AppCard>
+                <Header>Account</Header>
+                <Body>
+                    <div class="settings-row">
+                        <i class="bi bi-envelope" aria-hidden="true"></i>
+                        <span class="fh-muted">Email</span>
+                        <span class="settings-row__value fh-truncate" title="@email">@email</span>
+                    </div>
+                </Body>
+            </AppCard>
+        </div>
+    }
+</div>
 
 @code {
     private string? email;

@@ -2,55 +2,58 @@
 @inject AdminService AdminService
 @inject MessageService MessageService
 
-<div class="container py-4">
-    <h3 class="mb-4">User List</h3>
-
-    <div class="mb-3">
-        <input type="text" class="form-control" placeholder="Search users..." value="@searchTerm" @oninput="OnSearchInput" />
+<div class="fh-stack">
+    <div class="user-search">
+        <SearchBox Placeholder="Search users..." Value="@searchTerm" ValueChanged="OnSearchChanged" />
     </div>
 
     @if (pagedResult == null)
     {
-        <p>Loading...</p>
+        <LoadingSpinner Label="Loading users..." />
     }
     else if (pagedResult.Items.Any())
     {
-        <div class="list-group">
+        <ul class="user-list">
             @foreach (var user in pagedResult.Items)
             {
-                <div class="list-group-item d-flex justify-content-between align-items-center">
-                    <a class="text-decoration-none flex-grow-1" href="/admin/userroles/@user.Email">
-                        <strong>@user.Email</strong>
-                        <span class="badge ms-2 @(user.Enabled ? "bg-success" : "bg-danger")">@(user.Enabled ? "Enabled" : "Disabled")</span>
-                    </a>
-                    <div>
+                <li>
+                    <a class="user-list__link" href="/admin/userroles/@user.Email">
+                        <i class="bi bi-person-circle" aria-hidden="true"></i>
+                        <span class="user-list__email fh-truncate">@user.Email</span>
                         @if (user.Enabled)
                         {
-                            <button class="btn btn-sm btn-outline-danger" @onclick='async () => await ToggleUserAsync(user.Email, false)'>Disable</button>
+                            <Badge Variant="Badge.BadgeVariant.Success" Icon="check-circle">Enabled</Badge>
                         }
                         else
                         {
-                            <button class="btn btn-sm btn-outline-success" @onclick='async () => await ToggleUserAsync(user.Email, true)'>Enable</button>
+                            <Badge Variant="Badge.BadgeVariant.Danger" Icon="slash-circle">Disabled</Badge>
                         }
-                    </div>
-                </div>
+                    </a>
+                    @if (user.Enabled)
+                    {
+                        <AppButton Variant="ButtonVariant.OutlineDanger" Size="ButtonSize.Small"
+                                   OnClick='async () => await ToggleUserAsync(user.Email, false)'>Disable</AppButton>
+                    }
+                    else
+                    {
+                        <AppButton Variant="ButtonVariant.OutlineSuccess" Size="ButtonSize.Small"
+                                   OnClick='async () => await ToggleUserAsync(user.Email, true)'>Enable</AppButton>
+                    }
+                </li>
             }
-        </div>
+        </ul>
 
-        <FoodCalc.Web.Components.Shared.Paginator
-            TotalCount="pagedResult.TotalCount"
-            Page="pagedResult.Page"
-            PageSize="pagedResult.PageSize"
-            PageChanged="OnPageChanged"
-            PageSizeChanged="OnPageSizeChanged" />
+        <Paginator TotalCount="pagedResult.TotalCount"
+                   Page="pagedResult.Page"
+                   PageSize="pagedResult.PageSize"
+                   PageChanged="OnPageChanged"
+                   PageSizeChanged="OnPageSizeChanged" />
     }
     else
     {
-        <div class="alert alert-warning">No users found.</div>
+        <EmptyState Icon="people" Title="No users found." />
     }
-    <FoodCalc.Web.Components.Shared.MessageBox />
 </div>
-
 
 @code {
     private PagedResultDto<UserDto>? pagedResult;
@@ -89,9 +92,9 @@
         await LoadUsersAsync();
     }
 
-    private async Task OnSearchInput(ChangeEventArgs e)
+    private async Task OnSearchChanged(string value)
     {
-        searchTerm = e.Value?.ToString() ?? string.Empty;
+        searchTerm = value;
         currentPage = 1;
         await LoadUsersAsync();
     }

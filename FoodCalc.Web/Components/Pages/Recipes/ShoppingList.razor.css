@@ -1,3 +1,4 @@
 .shopping-list-page {
-    margin-top: -1.5rem; /* cancel MinimalLayout's mt-4 */
+    max-width: 48rem;
+    margin: 0 auto;
 }

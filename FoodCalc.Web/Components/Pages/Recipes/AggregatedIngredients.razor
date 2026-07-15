@@ -1,4 +1,4 @@
-﻿@using FoodHub.DTOs;
+@using FoodHub.DTOs;
 @using FoodHub.ServiceDefaults;
 
 <div class="add-item-bar no-print">
@@ -9,25 +9,31 @@
                @bind="_newItem"
                @bind:event="oninput"
                @onkeydown="OnInputKeyDown" />
-        <button class="btn btn-outline-primary" @onclick="AddItem" disabled="@string.IsNullOrWhiteSpace(_newItem)">Add</button>
+        <AppButton Variant="ButtonVariant.OutlinePrimary" Icon="plus-lg"
+                   Disabled="@string.IsNullOrWhiteSpace(_newItem)" OnClick="AddItem">Add</AppButton>
     </div>
 </div>
 
 @if (_displayItems.Any())
 {
-    <ul class="ingredient-print-list list-group list-group-flush">
+    <ul class="ingredient-print-list">
         @foreach (var (item, index) in _displayItems.Select((item, i) => (item, i)))
         {
-            <li class="list-group-item d-flex justify-content-between align-items-center px-2 py-1">
+            <li>
                 <span class="ingredient-text">@item</span>
-                <button class="btn btn-sm btn-outline-danger ms-2 no-print" @onclick="() => RemoveItem(index)">✕</button>
+                <IconButton Icon="x-lg" Title="Remove item" Size="ButtonSize.Small"
+                            Variant="ButtonVariant.Danger" CssClass="no-print"
+                            OnClick="() => RemoveItem(index)" />
             </li>
         }
     </ul>
 }
 else
 {
-    <p class="text-muted fst-italic no-print">No ingredients to display.</p>
+    <div class="no-print">
+        <EmptyState Icon="cart" Title="No ingredients to display."
+                    Message="Select recipes on the Home page or add custom items above." />
+    </div>
 }
 
 @code {

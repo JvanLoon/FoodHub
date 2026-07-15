@@ -1,5 +1,16 @@
 @page "/admin"
 
-<h3>Admin Panel</h3>
+<PageTitle>Admin</PageTitle>
 
-<UserList />
+<div class="fh-stack">
+    <PageHeader Title="Admin Panel" />
+
+    <TabSet>
+        <Tab Title="Users" Icon="people">
+            <UserList />
+        </Tab>
+        <Tab Title="Import/Export" Icon="arrow-down-up">
+            <DataImportExport />
+        </Tab>
+    </TabSet>
+</div>

@@ -1,24 +1,39 @@
-﻿@using FoodCalc.Web.Components.Services.Admin
+@using FoodCalc.Web.Components.Services.Admin
 @page "/admin/dataimportexport"
 @inject ImportExportService importExportService
 @inject MessageService messageService
 @inject IOptions<ImportExportSettings> ImportExportOptions
 
-<h3>Data Import/Export</h3>
+<PageTitle>Data Import/Export</PageTitle>
 
-<FoodCalc.Web.Components.Shared.MessageBox />
+<div class="fh-stack">
+    <PageHeader Title="Data Import/Export" />
 
-<div>
-    <label>Export</label>
-    <button @onclick="ExportData">Export</button>
+    <div class="row g-4">
+        <div class="col-md-6">
+            <AppCard>
+                <Header>Export</Header>
+                <Body>
+                    <p class="fh-muted">Download all data as a .json file.</p>
+                    <AppButton Icon="download" OnClick="ExportData">Export</AppButton>
+                </Body>
+            </AppCard>
+        </div>
+
+        <div class="col-md-6">
+            <AppCard>
+                <Header>Import</Header>
+                <Body>
+                    <div class="fh-field">
+                        <label class="form-label" for="importFile">Import file (.json)</label>
+                        <InputFile id="importFile" class="form-control" OnChange="HandleFileSelected" accept=".json" />
+                    </div>
+                    <AppButton Icon="upload" OnClick="ImportData">Import</AppButton>
+                </Body>
+            </AppCard>
+        </div>
+    </div>
 </div>
-
-<div>
-    <label>Import File (.json):</label>
-    <InputFile OnChange="HandleFileSelected" accept=".json" />
-    <button @onclick="ImportData">Import</button>
-</div>
-
 
 @code {
     private const string ExportFormat = "json";
