@@ -1,3 +1,13 @@
+window.themeInterop = {
+    // The theme key is written as a plain string (not JSON) so the inline
+    // bootstrap script in App.razor <head> can read it without deserializing.
+    get: () => document.documentElement.getAttribute('data-bs-theme') || 'light',
+    set: (theme) => {
+        document.documentElement.setAttribute('data-bs-theme', theme);
+        localStorage.setItem('foodhub-theme', theme);
+    }
+};
+
 window.blazorDownloadFile = (fileName, contentType, base64Data) => {
     try {
         const link = document.createElement('a');
