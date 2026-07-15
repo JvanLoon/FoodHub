@@ -2,6 +2,8 @@ using System.Text;
 
 using FastEndpoints;
 
+using FluentValidation;
+
 using FoodCalc.Features.ImportExport.Export.Commands.ExportJSON;
 
 using MediatR;
@@ -12,6 +14,15 @@ public class ExportRequest
 {
 	[BindFrom("format")]
 	public string Format { get; set; } = string.Empty;
+}
+
+/// <summary>Hardening: require an export format.</summary>
+public class ExportRequestValidator : Validator<ExportRequest>
+{
+	public ExportRequestValidator()
+	{
+		RuleFor(x => x.Format).NotEmpty();
+	}
 }
 
 /// <summary>

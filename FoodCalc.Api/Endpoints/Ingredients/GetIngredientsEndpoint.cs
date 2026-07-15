@@ -1,5 +1,7 @@
 using FastEndpoints;
 
+using FluentValidation;
+
 using FoodCalc.Feature.Ingredients.Queries.GetAllIngredients;
 
 using FoodHub.DTOs;
@@ -19,6 +21,16 @@ public class GetIngredientsRequest
 
 	[BindFrom("search")]
 	public string? Search { get; set; }
+}
+
+/// <summary>Paging guard (PageSize lower-bounded only; see GetRecipesRequestValidator).</summary>
+public class GetIngredientsRequestValidator : Validator<GetIngredientsRequest>
+{
+	public GetIngredientsRequestValidator()
+	{
+		RuleFor(x => x.Page).GreaterThanOrEqualTo(1);
+		RuleFor(x => x.PageSize).GreaterThanOrEqualTo(1);
+	}
 }
 
 /// <summary>GET api/ingredient — any authenticated user.</summary>

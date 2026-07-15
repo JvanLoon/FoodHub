@@ -1,5 +1,7 @@
 using FastEndpoints;
 
+using FluentValidation;
+
 using FoodCalc.Features.Authentication.Roles.Queries.GetAllRoles;
 using FoodCalc.Features.Authentication.Users.Queries.GetAllUsers;
 
@@ -19,6 +21,16 @@ public class GetUsersRequest
 
 	[BindFrom("search")]
 	public string? Search { get; set; }
+}
+
+/// <summary>Paging guard (PageSize lower-bounded only; see GetRecipesRequestValidator).</summary>
+public class GetUsersRequestValidator : Validator<GetUsersRequest>
+{
+	public GetUsersRequestValidator()
+	{
+		RuleFor(x => x.Page).GreaterThanOrEqualTo(1);
+		RuleFor(x => x.PageSize).GreaterThanOrEqualTo(1);
+	}
 }
 
 /// <summary>GET api/user/users — Admin, Moderator or User.</summary>
