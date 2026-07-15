@@ -1,9 +1,8 @@
-﻿using AutoMapper;
-
-using ErrorOr;
+﻿using ErrorOr;
 
 using FoodCalc.Features.Authentication.Users.Commands.RemoveRecipeFromBlackList;
 using FoodCalc.Features.ImportExport.Import.Commands.ImportJSON;
+using FoodCalc.Features.Mapping;
 
 using FoodHub.DTOs;
 using FoodHub.Persistence.Entities;
@@ -19,7 +18,7 @@ using System.Text.Json;
 
 namespace FoodCalc.Features.ImportExport.Export.Commands.ExportJSON;
 
-public class ExportAllCommandHandler(UnitOfWork unitOfWork, IMapper mapper, ILogger<ExportAllCommandHandler> logger) : IRequestHandler<ExportAllCommand, ErrorOr<string>>
+public class ExportAllCommandHandler(UnitOfWork unitOfWork, ILogger<ExportAllCommandHandler> logger) : IRequestHandler<ExportAllCommand, ErrorOr<string>>
 {
 	public async Task<ErrorOr<string>> Handle(ExportAllCommand request, CancellationToken cancellationToken)
 	{
@@ -68,9 +67,9 @@ public class ExportAllCommandHandler(UnitOfWork unitOfWork, IMapper mapper, ILog
 
 			var exportData = new ImportExportAllDataDto
 			{
-				Recipes = mapper.Map<List<RecipeDto>>(recipes.OrderBy(r => r.Name)),
-				Ingredients = mapper.Map<List<IngredientDto>>(ingredients.OrderBy(i => i.Name)),
-				RecipeIngredients = mapper.Map<List<RecipeIngredientDto>>(recipeIngredients),
+				Recipes = recipes.OrderBy(r => r.Name).ToDtoList(),
+				Ingredients = ingredients.OrderBy(i => i.Name).ToDtoList(),
+				RecipeIngredients = recipeIngredients.ToDtoList(),
 				Users = usersWithRoles
 			};
 

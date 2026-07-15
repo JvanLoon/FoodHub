@@ -1,6 +1,6 @@
 ﻿using ErrorOr;
 using MediatR;
-using AutoMapper;
+using FoodCalc.Features.Mapping;
 
 using FoodHub.DTOs;
 using FoodHub.Persistence.Entities;
@@ -9,7 +9,7 @@ using FoodHub.Persistence.Persistence;
 using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Features.Recipes.Commands.AddIngredientToRecipe;
-public class AddIngredientToRecipeCommandHandler(UnitOfWork unitOfWork, IMapper mapper, ILogger<AddIngredientToRecipeCommandHandler> logger) : IRequestHandler<AddIngredientToRecipeCommand, ErrorOr<RecipeIngredientDto>>
+public class AddIngredientToRecipeCommandHandler(UnitOfWork unitOfWork, ILogger<AddIngredientToRecipeCommandHandler> logger) : IRequestHandler<AddIngredientToRecipeCommand, ErrorOr<RecipeIngredientDto>>
 {
     public async Task<ErrorOr<RecipeIngredientDto>> Handle(AddIngredientToRecipeCommand request, CancellationToken cancellationToken)
     {
@@ -20,16 +20,16 @@ public class AddIngredientToRecipeCommandHandler(UnitOfWork unitOfWork, IMapper 
 			if (recipeIngredient != null)
 			{
 				recipeIngredient.Amount = request.RecipeIngredient.Amount;
-				recipeIngredient.IngredientAmount = mapper.Map<IngredientAmountType>(request.RecipeIngredient.IngredientAmount);
+				recipeIngredient.IngredientAmount = (IngredientAmountType)request.RecipeIngredient.IngredientAmount;
 
 				await unitOfWork.IngredientRepository.UpdateAsync(recipeIngredient.Ingredient, cancellationToken);
-				return mapper.Map<RecipeIngredientDto>(recipeIngredient);
+				return recipeIngredient.ToDto();
 			}
 			else
 			{
-				RecipeIngredient mappedRecipeIngredient = mapper.Map<RecipeIngredient>(request.RecipeIngredient);
+				RecipeIngredient mappedRecipeIngredient = request.RecipeIngredient.ToEntity();
 				await unitOfWork.RecipeRepository.AddRecipeIngredientAsync(mappedRecipeIngredient, cancellationToken);
-				return mapper.Map<RecipeIngredientDto>(mappedRecipeIngredient);
+				return mappedRecipeIngredient.ToDto();
 			}
 		}
 	    catch (Exception ex)

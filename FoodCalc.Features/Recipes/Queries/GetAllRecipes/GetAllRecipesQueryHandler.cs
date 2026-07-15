@@ -1,13 +1,13 @@
 ﻿using ErrorOr;
 using MediatR;
-using AutoMapper;
+using FoodCalc.Features.Mapping;
 using FoodHub.DTOs;
 using FoodHub.Persistence.Entities;
 using FoodHub.Persistence.Persistence;
 using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Features.Recipes.Queries.GetAllRecipes;
-public class GetAllRecipesQueryHandler(UnitOfWork unitOfWork, IMapper mapper, ILogger<GetAllRecipesQueryHandler> logger) : IRequestHandler<GetAllRecipesQuery, ErrorOr<PagedResultDto<RecipeDto>>>
+public class GetAllRecipesQueryHandler(UnitOfWork unitOfWork, ILogger<GetAllRecipesQueryHandler> logger) : IRequestHandler<GetAllRecipesQuery, ErrorOr<PagedResultDto<RecipeDto>>>
 {
 	public Task<ErrorOr<PagedResultDto<RecipeDto>>> Handle(GetAllRecipesQuery request, CancellationToken cancellationToken)
 	{
@@ -30,7 +30,7 @@ public class GetAllRecipesQueryHandler(UnitOfWork unitOfWork, IMapper mapper, IL
 
 			return Task.FromResult<ErrorOr<PagedResultDto<RecipeDto>>>(new PagedResultDto<RecipeDto>
 			{
-				Items = mapper.Map<List<RecipeDto>>(paged.Items),
+				Items = paged.Items.ToDtoList(),
 				TotalCount = paged.TotalCount,
 				Page = paged.Page,
 				PageSize = paged.PageSize

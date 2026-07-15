@@ -2,7 +2,6 @@ using FastEndpoints;
 using FastEndpoints.Swagger;
 
 using FoodCalc.Api.Extensions;
-using FoodCalc.Features.Mapping;
 
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Identity;
@@ -24,9 +23,6 @@ public class Program
 
 		builder.Services.AddFastEndpoints();
 		builder.Services.SwaggerDocument();
-
-		// Add AutoMapper
-		builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 		builder.Services.Configure<JsonOptions>(options =>
 		{

@@ -1,5 +1,5 @@
 ﻿using ErrorOr;
-using AutoMapper;
+using FoodCalc.Features.Mapping;
 using FoodHub.DTOs;
 using FoodHub.Persistence.Entities;
 using FoodHub.Persistence.Persistence;
@@ -10,7 +10,7 @@ using FoodCalc.Features;
 
 namespace FoodCalc.Feature.Ingredients.Queries.GetAllIngredients;
 
-public class GetAllIngredientsQueryHandler(UnitOfWork unitOfWork, IMapper mapper, ILogger<GetAllIngredientsQueryHandler> logger) : IRequestHandler<GetAllIngredientsQuery, ErrorOr<PagedResultDto<IngredientDto>>>
+public class GetAllIngredientsQueryHandler(UnitOfWork unitOfWork, ILogger<GetAllIngredientsQueryHandler> logger) : IRequestHandler<GetAllIngredientsQuery, ErrorOr<PagedResultDto<IngredientDto>>>
 {
 	public async Task<ErrorOr<PagedResultDto<IngredientDto>>> Handle(GetAllIngredientsQuery request, CancellationToken cancellationToken)
 	{
@@ -25,7 +25,7 @@ public class GetAllIngredientsQueryHandler(UnitOfWork unitOfWork, IMapper mapper
 
 			return new PagedResultDto<IngredientDto>
 			{
-				Items = mapper.Map<List<IngredientDto>>(paged.Items),
+				Items = paged.Items.ToDtoList(),
 				TotalCount = paged.TotalCount,
 				Page = paged.Page,
 				PageSize = paged.PageSize

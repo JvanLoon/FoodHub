@@ -1,5 +1,5 @@
-﻿using AutoMapper;
-using ErrorOr;
+﻿using ErrorOr;
+using FoodCalc.Features.Mapping;
 using FoodHub.DTOs;
 using FoodHub.Persistence.Entities;
 using FoodHub.Persistence.Persistence;
@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 
 namespace FoodCalc.Features.Authentication.Users.Queries.GetAllUsers;
-public class GetAllUsersQueryHandler(UnitOfWork unitOfWork, IMapper mapper, ILogger<GetAllUsersQueryHandler> logger, UserManager<IdentityUser> userManager) : IRequestHandler<GetAllUsersQuery, ErrorOr<PagedResultDto<UserDto>>>
+public class GetAllUsersQueryHandler(UnitOfWork unitOfWork, ILogger<GetAllUsersQueryHandler> logger, UserManager<IdentityUser> userManager) : IRequestHandler<GetAllUsersQuery, ErrorOr<PagedResultDto<UserDto>>>
 {
     public async Task<ErrorOr<PagedResultDto<UserDto>>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
     {
@@ -26,7 +26,7 @@ public class GetAllUsersQueryHandler(UnitOfWork unitOfWork, IMapper mapper, ILog
             foreach (var user in paged.Items)
             {
                 var roles = await userManager.GetRolesAsync(user);
-                var userDto = mapper.Map<UserDto>(user);
+                var userDto = user.ToUserDto();
                 userDto.Enabled = user.EmailConfirmed;
                 userDto.Roles = roles.ToList();
                 userDtos.Add(userDto);

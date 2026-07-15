@@ -1,7 +1,6 @@
-﻿using AutoMapper;
+﻿using ErrorOr;
 
-using ErrorOr;
-
+using FoodCalc.Features.Mapping;
 using FoodCalc.Features.Recipes.Queries.GetAllRecipes;
 
 using FoodHub.DTOs;
@@ -13,7 +12,7 @@ using Microsoft.Extensions.Logging;
 
 
 namespace FoodCalc.Features.Authentication.Users.Queries.GetUserByEmail;
-public class GetUserByEmailQueryHandler(UnitOfWork unitOfWork, IMapper mapper, ILogger<GetAllRecipesQueryHandler> logger) : IRequestHandler<GetUserByEmailQuery, ErrorOr<UserDto>>
+public class GetUserByEmailQueryHandler(UnitOfWork unitOfWork, ILogger<GetAllRecipesQueryHandler> logger) : IRequestHandler<GetUserByEmailQuery, ErrorOr<UserDto>>
 {
 	public async Task<ErrorOr<UserDto>> Handle(GetUserByEmailQuery request, CancellationToken cancellationToken)
 	{
@@ -21,7 +20,10 @@ public class GetUserByEmailQueryHandler(UnitOfWork unitOfWork, IMapper mapper, I
 		{
 			var user = await unitOfWork.UserRepository.GetByEmailAsync(request.Email, cancellationToken);
 
-			return mapper.Map<UserDto>(user);
+			if (user is null)
+				return Error.Failure("User not found");
+
+			return user.ToUserDto();
 		}
 		catch (Exception ex)
 		{
