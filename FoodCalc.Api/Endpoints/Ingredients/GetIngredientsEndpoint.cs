@@ -39,7 +39,7 @@ public class GetIngredientsEndpoint(IMediator mediator)
 {
 	public override void Configure()
 	{
-		Get("api/ingredient");
+		Get(ApiRoutes.Ingredient.GetAll);
 		// [Authorize] on the original action: authenticated user, any role.
 	}
 

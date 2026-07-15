@@ -7,7 +7,7 @@ public class AdminService(AuthenticatedHttpClientService httpClient)
 {
 	public Task<ApiResult<PagedResultDto<UserDto>>> GetPagedUsersAsync(int page, int pageSize, string? search = null)
 	{
-		var url = $"api/admin/users?page={page}&pageSize={pageSize}";
+		var url = $"{ApiRoutes.Admin.Users}?page={page}&pageSize={pageSize}";
 		if (!string.IsNullOrWhiteSpace(search))
 			url += $"&search={Uri.EscapeDataString(search)}";
 
@@ -24,11 +24,11 @@ public class AdminService(AuthenticatedHttpClientService httpClient)
 	}
 
 	public Task<ApiResult> ToggleUserAsync(string email, bool enable = true) =>
-		httpClient.PostAsync($"api/authentication/toggleUser?email={email}&enable={enable}");
+		httpClient.PostAsync($"{ApiRoutes.Authentication.ToggleUser}?email={email}&enable={enable}");
 
 	public async Task<ApiResult<List<string>>> GetAllRolesAsync()
 	{
-		var result = await httpClient.GetAsync<string>("api/admin/allroles");
+		var result = await httpClient.GetAsync<string>(ApiRoutes.Admin.AllRoles);
 		if (!result.Success)
 			return ApiResult<List<string>>.Fail(result.Error!, result.StatusCode);
 
@@ -39,11 +39,11 @@ public class AdminService(AuthenticatedHttpClientService httpClient)
 	}
 
 	public Task<ApiResult<List<string>>> GetUserRolesAsync(string email) =>
-		httpClient.GetAsync<List<string>>($"api/admin/userroles?email={email}");
+		httpClient.GetAsync<List<string>>($"{ApiRoutes.Admin.UserRoles}?email={email}");
 
 	public Task<ApiResult> UpdateUserRolesAsync(string email, string newRole) =>
-		httpClient.PostAsync($"api/admin/userroles?email={email}&role={newRole}");
+		httpClient.PostAsync($"{ApiRoutes.Admin.UserRoles}?email={email}&role={newRole}");
 
 	public Task<ApiResult> RemoveUserRoleAsync(string email, string role) =>
-		httpClient.DeleteAsync($"api/admin/userroles?email={email}&role={role}");
+		httpClient.DeleteAsync($"{ApiRoutes.Admin.UserRoles}?email={email}&role={role}");
 }

@@ -22,7 +22,7 @@ public class ImportEndpoint(IMediator mediator)
 {
 	public override void Configure()
 	{
-		Post("api/importexport/import");
+		Post(ApiRoutes.ImportExport.Import);
 		Policies("Admin");
 		AllowFileUploads();
 	}

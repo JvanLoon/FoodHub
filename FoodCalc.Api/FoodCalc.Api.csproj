@@ -24,4 +24,9 @@
     <ProjectReference Include="..\FoodCalc.Features\FoodCalc.Features.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Shared route constants + DTOs available to every endpoint. -->
+    <Using Include="FoodHub.DTOs" />
+  </ItemGroup>
+
 </Project>

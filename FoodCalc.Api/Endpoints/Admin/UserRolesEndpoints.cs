@@ -25,7 +25,7 @@ public class GetUserRolesEndpoint(UserManager<IdentityUser> userManager)
 {
 	public override void Configure()
 	{
-		Get("api/admin/userroles");
+		Get(ApiRoutes.Admin.UserRoles);
 		Policies("Admin,Moderator");
 	}
 
@@ -48,7 +48,7 @@ public class AddUserRoleEndpoint(UserManager<IdentityUser> userManager)
 {
 	public override void Configure()
 	{
-		Post("api/admin/userroles");
+		Post(ApiRoutes.Admin.UserRoles);
 		Policies("Admin,Moderator");
 	}
 
@@ -79,7 +79,7 @@ public class RemoveUserRoleEndpoint(UserManager<IdentityUser> userManager)
 {
 	public override void Configure()
 	{
-		Delete("api/admin/userroles");
+		Delete(ApiRoutes.Admin.UserRoles);
 		Policies("Admin,Moderator");
 	}
 

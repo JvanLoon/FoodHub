@@ -16,7 +16,7 @@ public class GetAllRolesEndpoint(IMediator mediator) : EndpointWithoutRequest
 {
 	public override void Configure()
 	{
-		Get("api/admin/allroles");
+		Get(ApiRoutes.Admin.AllRoles);
 		Policies("Admin,Moderator");
 	}
 

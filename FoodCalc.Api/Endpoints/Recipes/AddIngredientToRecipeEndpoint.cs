@@ -14,7 +14,7 @@ public class AddIngredientToRecipeEndpoint(IMediator mediator)
 {
 	public override void Configure()
 	{
-		Post("api/recipe/ingredient");
+		Post(ApiRoutes.Recipe.AddIngredient);
 		Roles("Admin");
 	}
 

@@ -30,7 +30,7 @@ public class UpdateIngredientEndpoint(IMediator mediator)
 {
 	public override void Configure()
 	{
-		Put("api/ingredient");
+		Put(ApiRoutes.Ingredient.Update);
 		Roles("Admin");
 	}
 

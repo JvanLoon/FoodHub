@@ -12,7 +12,7 @@ public class ResetPasswordEndpoint(UserManager<IdentityUser> userManager)
 {
 	public override void Configure()
 	{
-		Post("api/authentication/resetpassword");
+		Post(ApiRoutes.Authentication.ResetPassword);
 		Policies("Admin");
 	}
 

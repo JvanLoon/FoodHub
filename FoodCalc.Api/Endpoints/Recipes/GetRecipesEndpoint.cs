@@ -14,7 +14,7 @@ public class GetRecipesEndpoint(IMediator mediator)
 {
 	public override void Configure()
 	{
-		Get("api/recipe/getallrecipes");
+		Get(ApiRoutes.Recipe.GetAll);
 		// [Authorize] on the original action: authenticated user, any role.
 	}
 

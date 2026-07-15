@@ -21,7 +21,7 @@ public class DeleteIngredientEndpoint(IMediator mediator)
 {
 	public override void Configure()
 	{
-		Delete("api/ingredient/deleteingredient/{id}");
+		Delete(ApiRoutes.Ingredient.DeleteTemplate);
 		Roles("Admin");
 	}
 

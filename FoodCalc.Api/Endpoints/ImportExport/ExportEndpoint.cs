@@ -46,7 +46,7 @@ public class ExportEndpoint(IMediator mediator)
 
 	public override void Configure()
 	{
-		Get("api/importexport/export");
+		Get(ApiRoutes.ImportExport.Export);
 		Policies("Admin");
 	}
 

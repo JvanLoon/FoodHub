@@ -14,7 +14,7 @@ public class UpdateRecipeNameEndpoint(IMediator mediator)
 {
 	public override void Configure()
 	{
-		Put("api/recipe/name");
+		Put(ApiRoutes.Recipe.UpdateName);
 		Roles("Admin");
 	}
 

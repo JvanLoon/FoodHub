@@ -14,7 +14,7 @@ public class UpdateRecipeEndpoint(IMediator mediator)
 {
 	public override void Configure()
 	{
-		Put("api/recipe");
+		Put(ApiRoutes.Recipe.Update);
 		Roles("Admin");
 	}
 

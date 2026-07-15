@@ -6,7 +6,7 @@ public class IngredientService(AuthenticatedHttpClientService httpClient)
 {
 	public Task<ApiResult<PagedResultDto<IngredientDto>>> GetPagedIngredientsAsync(int page, int pageSize, string? search = null)
 	{
-		var url = $"api/ingredient?page={page}&pageSize={pageSize}";
+		var url = $"{ApiRoutes.Ingredient.GetAll}?page={page}&pageSize={pageSize}";
 		if (!string.IsNullOrWhiteSpace(search))
 			url += $"&search={Uri.EscapeDataString(search)}";
 
@@ -23,11 +23,11 @@ public class IngredientService(AuthenticatedHttpClientService httpClient)
 	}
 
 	public Task<ApiResult> UpdateIngredient(UpdateIngredientDto ingredient) =>
-		httpClient.PutAsync("api/ingredient", ingredient);
+		httpClient.PutAsync(ApiRoutes.Ingredient.Update, ingredient);
 
 	public Task<ApiResult> DeleteIngredient(Guid ingredientId) =>
-		httpClient.DeleteAsync($"api/ingredient/deleteingredient/{ingredientId}");
+		httpClient.DeleteAsync(ApiRoutes.Ingredient.Delete(ingredientId));
 
 	public Task<ApiResult> AddIngredientAsync(CreateIngredientDto ingredient) =>
-		httpClient.PostAsync("api/ingredient", ingredient);
+		httpClient.PostAsync(ApiRoutes.Ingredient.Create, ingredient);
 }

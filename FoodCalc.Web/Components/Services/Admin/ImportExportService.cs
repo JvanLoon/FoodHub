@@ -1,5 +1,7 @@
 using FoodCalc.Web.Components.Services.Auth;
 
+using FoodHub.DTOs;
+
 using Microsoft.JSInterop;
 
 using System.Net.Http.Headers;
@@ -19,12 +21,12 @@ public class ImportExportService(AuthenticatedHttpClientService httpClient, IJSR
 		streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 		content.Add(streamContent, "file", fileName);
 
-		return await httpClient.PostAsync("api/importexport/import", content);
+		return await httpClient.PostAsync(ApiRoutes.ImportExport.Import, content);
 	}
 
 	public async Task<ApiResult> ExportAsync(string exportFormat)
 	{
-		var result = await httpClient.GetAsync<string>($"api/importexport/export?format={exportFormat}");
+		var result = await httpClient.GetAsync<string>($"{ApiRoutes.ImportExport.Export}?format={exportFormat}");
 		if (!result.Success)
 			return result;
 

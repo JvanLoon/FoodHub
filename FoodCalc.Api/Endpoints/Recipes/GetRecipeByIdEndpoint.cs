@@ -14,7 +14,7 @@ public class GetRecipeByIdEndpoint(IMediator mediator)
 {
 	public override void Configure()
 	{
-		Get("api/recipe/{id}");
+		Get(ApiRoutes.Recipe.GetByIdTemplate);
 		Roles("Admin");
 	}
 

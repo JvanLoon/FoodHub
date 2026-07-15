@@ -8,13 +8,13 @@ public class UserService(AuthenticatedHttpClientService httpClient)
 	// Wire them to real add/remove blacklist endpoints when the blacklist feature is built.
 	public async Task<List<UserDto>> AddRecipeToBlackList(Guid recipeId)
 	{
-		var result = await httpClient.GetAsync<PagedResultDto<UserDto>>("api/admin/users");
+		var result = await httpClient.GetAsync<PagedResultDto<UserDto>>(ApiRoutes.Admin.Users);
 		return result.Success ? result.Data!.Items.ToList() : [];
 	}
 
 	public async Task<List<UserDto>> RemoveRecipeToBlackList(Guid recipeId)
 	{
-		var result = await httpClient.GetAsync<PagedResultDto<UserDto>>("api/admin/users");
+		var result = await httpClient.GetAsync<PagedResultDto<UserDto>>(ApiRoutes.Admin.Users);
 		return result.Success ? result.Data!.Items.ToList() : [];
 	}
 }

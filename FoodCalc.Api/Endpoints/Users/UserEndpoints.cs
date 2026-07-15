@@ -39,7 +39,7 @@ public class GetUsersEndpoint(IMediator mediator)
 {
 	public override void Configure()
 	{
-		Get("api/user/users");
+		Get(ApiRoutes.User.Users);
 		Policies("Admin,Moderator,User");
 	}
 
@@ -62,7 +62,7 @@ public class GetAllRolesEndpoint(IMediator mediator) : EndpointWithoutRequest
 {
 	public override void Configure()
 	{
-		Get("api/user/allroles");
+		Get(ApiRoutes.User.AllRoles);
 		Policies("Admin,Moderator,User");
 	}
 

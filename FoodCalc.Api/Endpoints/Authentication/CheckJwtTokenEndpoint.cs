@@ -19,7 +19,7 @@ public class CheckJwtTokenEndpoint(IConfiguration configuration)
 {
 	public override void Configure()
 	{
-		Post("api/authentication/checkjwttoken");
+		Post(ApiRoutes.Authentication.CheckJwtToken);
 		AllowAnonymous();
 	}
 

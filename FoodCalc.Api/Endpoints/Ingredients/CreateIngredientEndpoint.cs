@@ -29,7 +29,7 @@ public class CreateIngredientEndpoint(IMediator mediator)
 {
 	public override void Configure()
 	{
-		Post("api/ingredient");
+		Post(ApiRoutes.Ingredient.Create);
 		Roles("Admin");
 	}
 

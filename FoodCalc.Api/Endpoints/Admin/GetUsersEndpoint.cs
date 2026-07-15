@@ -27,7 +27,7 @@ public class GetUsersEndpoint(IMediator mediator)
 {
 	public override void Configure()
 	{
-		Get("api/admin/users");
+		Get(ApiRoutes.Admin.Users);
 		Policies("Admin,Moderator");
 	}
 

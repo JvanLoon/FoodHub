@@ -19,7 +19,7 @@ public class ToggleUserEndpoint(UserManager<IdentityUser> userManager)
 {
 	public override void Configure()
 	{
-		Post("api/authentication/toggleUser");
+		Post(ApiRoutes.Authentication.ToggleUser);
 		Policies("Admin");
 	}
 

@@ -2,6 +2,8 @@ using FastEndpoints;
 
 using FoodCalc.Features.Recipes.Commands.DeleteRecipe;
 
+using FoodHub.DTOs;
+
 using MediatR;
 
 namespace FoodCalc.Api.Endpoints.Recipes;
@@ -12,7 +14,7 @@ public class DeleteRecipeEndpoint(IMediator mediator)
 {
 	public override void Configure()
 	{
-		Delete("api/recipe/deleterecipe/{id}");
+		Delete(ApiRoutes.Recipe.DeleteRecipeTemplate);
 		Roles("Admin");
 	}
 

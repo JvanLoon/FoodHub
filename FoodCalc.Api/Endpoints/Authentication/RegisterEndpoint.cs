@@ -12,7 +12,7 @@ public class RegisterEndpoint(UserManager<IdentityUser> userManager)
 {
 	public override void Configure()
 	{
-		Post("api/authentication/register");
+		Post(ApiRoutes.Authentication.Register);
 		AllowAnonymous();
 	}
 

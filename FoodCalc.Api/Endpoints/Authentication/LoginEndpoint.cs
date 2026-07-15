@@ -20,7 +20,7 @@ public class LoginEndpoint(
 {
 	public override void Configure()
 	{
-		Post("api/authentication/login");
+		Post(ApiRoutes.Authentication.Login);
 		AllowAnonymous();
 	}
 
