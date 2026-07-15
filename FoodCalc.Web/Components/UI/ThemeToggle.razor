@@ -1,0 +1,34 @@
+@* Light/dark switch. The persisted theme is applied before first paint by the
+   inline script in App.razor; this component only reads and toggles it. *@
+@inject IJSRuntime JS
+
+<button type="button"
+        class="fh-theme-toggle"
+        title="@(_isDark ? "Switch to light mode" : "Switch to dark mode")"
+        aria-label="@(_isDark ? "Switch to light mode" : "Switch to dark mode")"
+        @onclick="ToggleAsync">
+    <i class="bi @(_isDark ? "bi-sun" : "bi-moon-stars")" aria-hidden="true"></i>
+</button>
+
+@code {
+    private bool _isDark;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        var theme = await JS.InvokeAsync<string>("themeInterop.get");
+        var isDark = theme == "dark";
+        if (isDark != _isDark)
+        {
+            _isDark = isDark;
+            StateHasChanged();
+        }
+    }
+
+    private async Task ToggleAsync()
+    {
+        _isDark = !_isDark;
+        await JS.InvokeVoidAsync("themeInterop.set", _isDark ? "dark" : "light");
+    }
+}

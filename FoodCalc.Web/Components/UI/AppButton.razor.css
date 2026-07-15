@@ -1,0 +1,20 @@
+button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--fh-space-2);
+    white-space: nowrap;
+    transition: background-color var(--fh-transition), border-color var(--fh-transition), color var(--fh-transition);
+}
+
+.fh-btn-ghost {
+    --bs-btn-bg: transparent;
+    --bs-btn-border-color: transparent;
+    --bs-btn-color: var(--fh-text-muted);
+    --bs-btn-hover-bg: var(--fh-surface-sunken);
+    --bs-btn-hover-border-color: transparent;
+    --bs-btn-hover-color: var(--fh-text);
+    --bs-btn-active-bg: var(--fh-border);
+    --bs-btn-active-border-color: transparent;
+    --bs-btn-active-color: var(--fh-text);
+}

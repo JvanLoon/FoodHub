@@ -1,0 +1,21 @@
+@* Page title row with optional action toolbar on the right. *@
+
+<div class="fh-page-header">
+    <div class="fh-page-header__titles">
+        <h1 class="fh-heading">@Title</h1>
+        @if (!string.IsNullOrEmpty(Subtitle))
+        {
+            <p class="fh-muted fh-page-header__subtitle">@Subtitle</p>
+        }
+    </div>
+    @if (ChildContent is not null)
+    {
+        <div class="fh-toolbar">@ChildContent</div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
+    [Parameter] public string? Subtitle { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

@@ -1,0 +1,76 @@
+.fh-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 15, 12, 0.5);
+    z-index: 1050;
+    animation: fh-fade-in var(--fh-transition) both;
+}
+
+.fh-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1055;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--fh-space-5);
+    pointer-events: none;
+}
+
+.fh-modal__dialog {
+    pointer-events: auto;
+    width: 100%;
+    max-width: 28rem;
+    max-height: calc(100vh - 2 * var(--fh-space-5));
+    display: flex;
+    flex-direction: column;
+    background: var(--fh-surface-raised);
+    border: 1px solid var(--fh-border);
+    border-radius: var(--fh-radius-lg);
+    box-shadow: var(--fh-shadow-lg);
+    animation: fh-modal-in var(--fh-transition-slow) both;
+}
+
+.fh-modal__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--fh-space-3);
+    padding: var(--fh-space-4) var(--fh-space-5);
+    border-bottom: 1px solid var(--fh-border);
+}
+
+.fh-modal__title {
+    margin: 0;
+    font-size: var(--fh-text-lg);
+    font-weight: var(--fh-weight-semibold);
+}
+
+.fh-modal__body {
+    padding: var(--fh-space-5);
+    overflow-y: auto;
+}
+
+.fh-modal__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--fh-space-3);
+    padding: var(--fh-space-4) var(--fh-space-5);
+    border-top: 1px solid var(--fh-border);
+}
+
+@keyframes fh-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fh-modal-in {
+    from {
+        opacity: 0;
+        transform: translateY(0.75rem) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}

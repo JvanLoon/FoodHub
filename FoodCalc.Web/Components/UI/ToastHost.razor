@@ -1,0 +1,69 @@
+@* Single toast host per layout. Subscribes to MessageService and stacks
+   toasts bottom-right; timeInMs = 0 means the toast stays until dismissed. *@
+@implements IDisposable
+@inject MessageService MessageService
+
+<div class="fh-toast-host" aria-live="polite">
+    @foreach (var toast in _toasts)
+    {
+        <div class="fh-toast @(toast.IsError ? "fh-toast--error" : "fh-toast--success")" role="status">
+            <i class="bi @(toast.IsError ? "bi-exclamation-triangle-fill" : "bi-check-circle-fill")" aria-hidden="true"></i>
+            <div class="fh-toast__message">@toast.Message</div>
+            <button type="button" class="fh-toast__close" aria-label="Dismiss" @onclick="() => Dismiss(toast)">
+                <i class="bi bi-x-lg" aria-hidden="true"></i>
+            </button>
+        </div>
+    }
+</div>
+
+@code {
+    private sealed record ToastItem(string Message, bool IsError)
+    {
+        public CancellationTokenSource Cts { get; } = new();
+    }
+
+    private readonly List<ToastItem> _toasts = new();
+
+    protected override void OnInitialized()
+    {
+        MessageService.OnShowMessage += ShowToastAsync;
+    }
+
+    private async Task ShowToastAsync(string message, bool isError, int timeInMs, CancellationToken externalToken)
+    {
+        var toast = new ToastItem(message, isError);
+        _toasts.Add(toast);
+        await InvokeAsync(StateHasChanged);
+
+        if (timeInMs == 0) return;
+
+        using var linked = CancellationTokenSource.CreateLinkedTokenSource(toast.Cts.Token, externalToken);
+        try
+        {
+            await Task.Delay(timeInMs, linked.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+
+        _toasts.Remove(toast);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void Dismiss(ToastItem toast)
+    {
+        toast.Cts.Cancel();
+        _toasts.Remove(toast);
+    }
+
+    public void Dispose()
+    {
+        MessageService.OnShowMessage -= ShowToastAsync;
+        foreach (var toast in _toasts)
+        {
+            toast.Cts.Cancel();
+            toast.Cts.Dispose();
+        }
+    }
+}

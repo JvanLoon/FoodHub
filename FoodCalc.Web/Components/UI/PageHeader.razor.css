@@ -1,0 +1,10 @@
+.fh-page-header__titles {
+    display: flex;
+    flex-direction: column;
+    gap: var(--fh-space-1);
+}
+
+.fh-page-header__subtitle {
+    margin: 0;
+    font-size: var(--fh-text-sm);
+}
