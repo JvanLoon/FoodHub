@@ -1,6 +1,6 @@
-﻿# 🍽️ FoodHub
+# 🍽️ FoodHub
 
-**A recipe and ingredient management system built with .NET 8 and Blazor Server**
+**A recipe and ingredient management system built with .NET 10 and Blazor Server**
 
 FoodHub is a modern web application that helps you manage recipes, track ingredients, and generate shopping lists. Whether you're a home cook or managing a kitchen, FoodHub makes meal planning and ingredient management effortless.
 
@@ -12,24 +12,35 @@ FoodHub will become more than just a recipe app. It will evolve into a comprehen
 - 🥘 **Ingredient Management**: Manage ingredients with quantities and measurement units
 - 🛒 **Shopping List Generation**: Automatically generate shopping lists from selected recipes
 - 📊 **Ingredient Aggregation**: Combine ingredients across multiple recipes to avoid duplicates
-- 🌐 **Modern Web Interface**: Responsive Blazor Server UI with real-time updates
-- 🔄 **API**: Clean API architecture for integration possibilities
+- 🔐 **Authentication & Roles**: JWT-based login with admin user/role management
+- 🌗 **Light & Dark Mode**: Persisted theme toggle, defaults to your system preference
+- 🌐 **Modern Web Interface**: Responsive Blazor Server UI with a custom component library
+- 🔄 **API**: Fast, minimal HTTP API built on FastEndpoints
 
 ## 🛠️ Technology Stack
 
-- **Backend**: .NET 8, ASP.NET Core Web API
-- **Frontend**: Blazor Server, Bootstrap 5
-- **Database**: SQL Server with Entity Framework Core
-- **Architecture**: Clean Architecture with CQRS pattern using MediatR
-- **ORM**: Entity Framework Core with Code-First migrations
+- **Backend**: .NET 10, [FastEndpoints](https://fast-endpoints.com/) (REPR pattern), FluentValidation
+- **Frontend**: Blazor Server (interactive server rendering), Bootstrap 5.3, Bootstrap Icons
+- **Database**: SQL Server with Entity Framework Core (Code-First migrations)
+- **Orchestration**: .NET Aspire AppHost
+- **Mapping**: Hand-written mapping (no AutoMapper)
 - **Dependency Injection**: Built-in .NET DI container
-- **Mapping**: AutoMapper for object-to-object mapping
+
+### Frontend design
+
+The UI is a self-authored component library (`FoodCalc.Web/Components/UI/`) — buttons, cards, form fields, data table, tabs, toasts, modals — each with scoped CSS. Theming is token-driven:
+
+- `wwwroot/css/tokens.css` — design tokens (colors, spacing, radius, shadows, type) with dark-mode overrides under `[data-bs-theme="dark"]`
+- `wwwroot/css/theme.css` — maps the tokens onto Bootstrap 5.3 CSS variables (including per-component overrides) so plain Bootstrap markup picks up the theme
+- `wwwroot/css/utilities.css` — small `fh-`prefixed layout/utility layer
+
+Dark mode uses Bootstrap 5.3's `data-bs-theme`; an inline script in `App.razor` applies the persisted theme before first paint, so there is no flash of the wrong theme. No Bootstrap JavaScript is used — all interactive components are Blazor-state-driven.
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
-- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+- [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
 - [SQL Server](https://www.microsoft.com/en-us/sql-server/sql-server-downloads) or [SQL Server Express](https://www.microsoft.com/en-us/sql-server/sql-server-editions-express)
 
 ### Getting Started
@@ -60,7 +71,7 @@ FoodHub will become more than just a recipe app. It will evolve into a comprehen
 
 6. **Access the application**
    - Web Application: The URL will be displayed in the console (typically https://localhost:7xxx)
-   - API Documentation: Available at the API's swagger endpoint (typically https://localhost:7426/swagger)
+   - API Documentation: Available at the API's `/swagger` endpoint in development
 
 ## 🔧 Development
 
@@ -98,8 +109,7 @@ Update-Database -Context ApplicationDbContext -Project FoodHub.Persistence -Star
 
 ### API Documentation
 
-When running the application, Swagger documentation is available at:
-- Local development: `https://localhost:7426/swagger` (or the port shown in your console)
+When running the API in development, Swagger (NSwag via FastEndpoints) is available at `/swagger`.
 
 ## 🤝 Contributing
 
@@ -119,7 +129,8 @@ If you encounter any issues or have questions:
 
 ## 🔮 Roadmap
 
-- [ ] User authentication and authorization
+- [x] User authentication and authorization
+- [x] Dark mode and revamped UI (design tokens + custom component library)
 - [ ] Recipe categories and tags
 - [ ] Nutritional information tracking
 - [ ] Recipe sharing and community features
