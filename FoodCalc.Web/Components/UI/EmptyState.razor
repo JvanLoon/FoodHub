@@ -1,0 +1,17 @@
+<div class="fh-empty @CssClass">
+    <i class="bi bi-@Icon" aria-hidden="true"></i>
+    <p class="fh-empty__title">@Title</p>
+    @if (!string.IsNullOrEmpty(Message))
+    {
+        <p class="fh-empty__message">@Message</p>
+    }
+    @ChildContent
+</div>
+
+@code {
+    [Parameter] public string Icon { get; set; } = "inbox";
+    [Parameter] public string Title { get; set; } = "Nothing here yet.";
+    [Parameter] public string? Message { get; set; }
+    [Parameter] public string? CssClass { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

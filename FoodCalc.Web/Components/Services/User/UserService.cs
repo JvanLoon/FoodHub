@@ -6,7 +6,7 @@ public class UserService(AuthenticatedHttpClientService httpClient)
 {
 	public async Task<List<UserDto>> AddRecipeToBlackList(Guid recipeId)
 	{
-		var response = await httpClient.GetAsync("api/Admin/users");
+		var response = await httpClient.GetAsync("api/admin/users");
 		if (!response.IsSuccessStatusCode)
 			return [];
 		var paged = await response.Content.ReadFromJsonAsync<PagedResultDto<UserDto>>();
@@ -15,7 +15,7 @@ public class UserService(AuthenticatedHttpClientService httpClient)
 
 	public async Task<List<UserDto>> RemoveRecipeToBlackList(Guid recipeId)
 	{
-		var response = await httpClient.GetAsync("api/Admin/users");
+		var response = await httpClient.GetAsync("api/admin/users");
 		if (!response.IsSuccessStatusCode)
 			return [];
 		var paged = await response.Content.ReadFromJsonAsync<PagedResultDto<UserDto>>();

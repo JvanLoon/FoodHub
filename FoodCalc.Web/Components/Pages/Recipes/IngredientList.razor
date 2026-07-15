@@ -1,91 +1,75 @@
-﻿@page "/ingredients"
+@page "/ingredients"
 
 @using FoodCalc.Web.Components.Services
 @using FoodHub.DTOs
 @inject IngredientService IngredientService
 @inject MessageService MessageService
 
+<PageTitle>Ingredients</PageTitle>
 
 <div class="ingredient-layout">
     <div class="ingredient-header">
-        <h3>Ingredients</h3>
-        <div class="mb-3">
-            <input type="text" class="form-control" placeholder="Search ingredients..." value="@searchTerm" @oninput="OnSearchInput" />
-        </div>
+        <PageHeader Title="Ingredients">
+            <SearchBox Placeholder="Search ingredients..." Value="@searchTerm" ValueChanged="OnSearchChanged" />
+        </PageHeader>
     </div>
 
     <div class="ingredient-body">
-        @if (pagedResult == null)
-        {
-            <p>Loading...</p>
-        }
-        else
-        {
-            <table class="table table-hover ingredient-table">
-                <thead>
-                    <tr>
-                        <th class="w-100">Name</th>
-                        <th class="text-end" style="white-space: nowrap;">Shopping Cart</th>
-                        <th class="text-end" style="white-space: nowrap;">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (pagedResult.Items.Any())
+        <DataTable TItem="IngredientDto"
+                   Items="pagedResult?.Items"
+                   EmptyText="No ingredients found."
+                   LoadingText="Loading ingredients...">
+            <HeaderContent>
+                <th class="w-100">Name</th>
+                <th class="text-center text-nowrap">Shopping Cart</th>
+                <th class="text-end text-nowrap">Actions</th>
+            </HeaderContent>
+            <RowTemplate Context="ingredient">
+                <td class="w-100 text-wrap">
+                    @if (editingIngredientId == ingredient.Id)
                     {
-                        var index = 0;
-                        @foreach (IngredientDto ingredient in pagedResult.Items)
-                        {
-                            var rowClass = index % 2 == 0 ? "table-row-even" : "table-row-odd";
-                            <tr class="@rowClass">
-                                <td class="w-100 text-wrap">
-                                    @if (editingIngredientId == ingredient.Id)
-                                    {
-                                        <input type="text" class="form-control form-control-sm" @bind="editingName" @onkeydown="(e) => OnEditInputKeyDown(e, ingredient)" />
-                                    }
-                                    else
-                                    {
-                                        @ingredient.Name
-                                    }
-                                </td>
-                                <td class="text-center" style="white-space: nowrap;">
-                                    <input type="checkbox"
-                                    checked="@ingredient.ShouldBeAddedToShoppingCart"
-                                    @onchange="(e) => OnCheckboxChanged(ingredient, e)" />
-                                </td>
-                                <td class="text-end" style="white-space: nowrap;">
-                                    @if (editingIngredientId == ingredient.Id)
-                                    {
-                                        <button class="btn btn-success btn-sm ingredient-action-btn" @onclick="() => SaveEdit(ingredient)">Save</button>
-                                    }
-                                    else
-                                    {
-                                        <button class="btn btn-primary btn-sm ingredient-action-btn" @onclick="() => StartEdit(ingredient)">Edit</button>
-                                    }
-                                    <button class="btn btn-danger btn-sm ms-3" @onclick="() => DeleteIngredient(ingredient.Id)">Delete</button>
-                                </td>
-                            </tr>
-                            index++;
-                        }
+                        <input type="text" class="form-control form-control-sm" @bind="editingName"
+                               @onkeydown="(e) => OnEditInputKeyDown(e, ingredient)" />
                     }
-                </tbody>
-            </table>
-        }
+                    else
+                    {
+                        @ingredient.Name
+                    }
+                </td>
+                <td class="text-center text-nowrap">
+                    <input type="checkbox" class="form-check-input"
+                           checked="@ingredient.ShouldBeAddedToShoppingCart"
+                           @onchange="(e) => OnCheckboxChanged(ingredient, e)" />
+                </td>
+                <td class="text-end text-nowrap">
+                    @if (editingIngredientId == ingredient.Id)
+                    {
+                        <AppButton Variant="ButtonVariant.Success" Size="ButtonSize.Small" Icon="check-lg"
+                                   OnClick="() => SaveEdit(ingredient)">Save</AppButton>
+                    }
+                    else
+                    {
+                        <AppButton Variant="ButtonVariant.OutlineSecondary" Size="ButtonSize.Small" Icon="pencil"
+                                   OnClick="() => StartEdit(ingredient)">Edit</AppButton>
+                    }
+                    <AppButton Variant="ButtonVariant.OutlineDanger" Size="ButtonSize.Small" Icon="trash"
+                               CssClass="ms-2" OnClick="() => DeleteIngredient(ingredient.Id)">Delete</AppButton>
+                </td>
+            </RowTemplate>
+        </DataTable>
     </div>
 
     <div class="ingredient-footer">
         @if (pagedResult != null)
         {
-            <FoodCalc.Web.Components.Shared.Paginator
-                TotalCount="pagedResult.TotalCount"
-                Page="pagedResult.Page"
-                PageSize="pagedResult.PageSize"
-                PageChanged="OnPageChanged"
-                PageSizeChanged="OnPageSizeChanged" />
+            <Paginator TotalCount="pagedResult.TotalCount"
+                       Page="pagedResult.Page"
+                       PageSize="pagedResult.PageSize"
+                       PageChanged="OnPageChanged"
+                       PageSizeChanged="OnPageSizeChanged" />
         }
     </div>
 </div>
-
-<FoodCalc.Web.Components.Shared.MessageBox />
 
 @code {
     private PagedResultDto<IngredientDto>? pagedResult;
@@ -126,9 +110,9 @@
         await LoadIngredientsAsync();
     }
 
-    private async Task OnSearchInput(ChangeEventArgs e)
+    private async Task OnSearchChanged(string value)
     {
-        searchTerm = e.Value?.ToString() ?? string.Empty;
+        searchTerm = value;
         currentPage = 1;
         await LoadIngredientsAsync();
     }
@@ -137,11 +121,11 @@
     {
         ingredient.ShouldBeAddedToShoppingCart = (bool)e.Value!;
 
-        var updateDto = new UpdateIngredientDto 
-        { 
-            Id = ingredient.Id, 
-            Name = ingredient.Name, 
-            ShouldBeAddedToShoppingCart = ingredient.ShouldBeAddedToShoppingCart 
+        var updateDto = new UpdateIngredientDto
+        {
+            Id = ingredient.Id,
+            Name = ingredient.Name,
+            ShouldBeAddedToShoppingCart = ingredient.ShouldBeAddedToShoppingCart
         };
         await IngredientService.UpdateIngredient(updateDto);
 

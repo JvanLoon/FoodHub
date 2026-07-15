@@ -1,0 +1,31 @@
+.fh-nav-item {
+    padding: 0 var(--fh-space-3);
+}
+
+.fh-nav-item ::deep .nav-link {
+    display: flex;
+    align-items: center;
+    gap: var(--fh-space-3);
+    height: 2.75rem;
+    padding: 0 var(--fh-space-3);
+    border-radius: var(--fh-radius-md);
+    color: var(--fh-sidebar-text);
+    font-size: var(--fh-text-sm);
+    font-weight: var(--fh-weight-medium);
+    transition: background-color var(--fh-transition), color var(--fh-transition);
+}
+
+.fh-nav-item ::deep .nav-link .bi {
+    font-size: 1.1rem;
+    line-height: 1;
+}
+
+.fh-nav-item ::deep .nav-link:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+.fh-nav-item ::deep .nav-link.active {
+    background: rgba(255, 255, 255, 0.16);
+    color: #fff;
+}

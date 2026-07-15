@@ -1,27 +1,42 @@
-﻿@inject RecipeService RecipeService
+@inject RecipeService RecipeService
 @inject UserService UserService
 
-<div class="recipe-blacklist card p-4" style="max-width: 500px; margin: 2rem auto; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-    <h4 class="mb-3">Recipes you don't want to see</h4>
-    <ul class="list-group mb-3">
-        @foreach (var recipe in BlacklistedRecipes)
-        {
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                <span>@recipe.Name</span>
-                <button class="btn btn-sm btn-danger" @onclick="() => RemoveRecipe(recipe.Id)">Remove</button>
-            </li>
-        }
-    </ul>
-    <div class="d-flex gap-2 align-items-center">
-        <select class="form-select" @bind="SelectedRecipeId">
-            <option value="">Select recipe...</option>
-            @foreach (var recipe in AllRecipes.Where(r => !BlacklistedRecipes.Any(b => b.Id == r.Id)))
+<div class="blacklist-card">
+    <AppCard>
+        <Header>Recipes you don't want to see</Header>
+        <Body>
+            @if (BlacklistedRecipes.Any())
             {
-                <option value="@recipe.Id">@recipe.Name</option>
+                <ul class="blacklist">
+                    @foreach (var recipe in BlacklistedRecipes)
+                    {
+                        <li>
+                            <span>@recipe.Name</span>
+                            <AppButton Variant="ButtonVariant.OutlineDanger" Size="ButtonSize.Small" Icon="trash"
+                                       OnClick="() => RemoveRecipe(recipe.Id)">Remove</AppButton>
+                        </li>
+                    }
+                </ul>
             }
-        </select>
-        <button class="btn btn-primary" @onclick="AddSelectedRecipe" disabled="@(string.IsNullOrEmpty(SelectedRecipeId))">Add</button>
-    </div>
+            else
+            {
+                <EmptyState Icon="eye-slash" Title="No hidden recipes." />
+            }
+        </Body>
+        <Footer>
+            <div class="blacklist-add">
+                <select class="form-select" @bind="SelectedRecipeId">
+                    <option value="">Select recipe...</option>
+                    @foreach (var recipe in AllRecipes.Where(r => !BlacklistedRecipes.Any(b => b.Id == r.Id)))
+                    {
+                        <option value="@recipe.Id">@recipe.Name</option>
+                    }
+                </select>
+                <AppButton Icon="plus-lg" Disabled="@(string.IsNullOrEmpty(SelectedRecipeId))"
+                           OnClick="AddSelectedRecipe">Add</AppButton>
+            </div>
+        </Footer>
+    </AppCard>
 </div>
 
 @code {
@@ -52,12 +67,12 @@
         }
     }
 
-    private async void RemoveRecipe(Guid recipeId)
+    private async Task RemoveRecipe(Guid recipeId)
     {
         await UserService.RemoveRecipeToBlackList(recipeId);
 
-        var selected = AllRecipes.FirstOrDefault(r => r.Id == recipeId);
-        if (selected != null && !BlacklistedRecipes.Any(r => r.Id == selected.Id))
+        var selected = BlacklistedRecipes.FirstOrDefault(r => r.Id == recipeId);
+        if (selected != null)
         {
             BlacklistedRecipes.Remove(selected);
         }

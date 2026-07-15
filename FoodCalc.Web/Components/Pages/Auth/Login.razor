@@ -7,26 +7,23 @@
 @inject AuthStateService AuthStateService
 @inject MessageService MessageService
 
-<div class="container d-flex justify-content-center align-items-center">
-    <div class="card shadow p-4" style="max-width: 400px; width: 100%;">
-        <h3 class="mb-4 text-center">Login</h3>
-        <EditForm Model="loginModel" OnValidSubmit="HandleLogin">
-            <DataAnnotationsValidator />
-            <ValidationSummary class="mb-3" />
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <InputText id="email" class="form-control" @bind-Value="loginModel.Email" placeholder="Enter your email" />
-            </div>
-            <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <InputText id="password" class="form-control" @bind-Value="loginModel.Password" type="password" placeholder="Enter your password" />
-            </div>
-            <button type="submit" class="btn btn-primary w-100">Login</button>
-        </EditForm>
-        <div class="mt-3 text-center">
-            <a href="/register">Create an account</a>
-        </div>
-        <FoodCalc.Web.Components.Shared.MessageBox />
+<PageTitle>Login</PageTitle>
+
+<div class="auth-card">
+    <div class="auth-card__brand">
+        <i class="bi bi-basket2-fill" aria-hidden="true"></i>
+        <span>FoodHub</span>
+    </div>
+    <h3 class="auth-card__title">Welcome back</h3>
+    <EditForm Model="loginModel" OnValidSubmit="HandleLogin" FormName="login-form">
+        <DataAnnotationsValidator />
+        <ValidationSummary class="mb-3" />
+        <TextField Label="Email" Placeholder="Enter your email" Autocomplete="username" @bind-Value="loginModel.Email" />
+        <TextField Label="Password" Type="password" Placeholder="Enter your password" Autocomplete="current-password" @bind-Value="loginModel.Password" />
+        <AppButton Type="submit" Icon="box-arrow-in-right" CssClass="w-100">Login</AppButton>
+    </EditForm>
+    <div class="auth-card__alt">
+        <a href="/register">Create an account</a>
     </div>
 </div>
 

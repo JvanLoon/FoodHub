@@ -1,0 +1,36 @@
+.error-page {
+    max-width: 36rem;
+    margin: var(--fh-space-8) auto 0;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: var(--fh-space-3);
+    align-items: center;
+}
+
+.error-page > .bi {
+    font-size: 3rem;
+    color: var(--fh-danger);
+}
+
+.error-page h1 {
+    font-size: var(--fh-text-2xl);
+    font-weight: var(--fh-weight-bold);
+    margin: 0;
+}
+
+.error-page p {
+    margin: 0;
+    color: var(--fh-text-muted);
+}
+
+.error-page__request code {
+    color: var(--fh-accent);
+}
+
+.error-page__hint {
+    font-size: var(--fh-text-sm);
+    border-top: 1px solid var(--fh-border);
+    padding-top: var(--fh-space-4);
+    margin-top: var(--fh-space-3);
+}

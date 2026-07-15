@@ -1,0 +1,24 @@
+.fh-theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 1px solid var(--fh-border);
+    border-radius: var(--fh-radius-pill);
+    background: var(--fh-surface);
+    color: var(--fh-text-muted);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color var(--fh-transition), color var(--fh-transition), border-color var(--fh-transition);
+}
+
+.fh-theme-toggle:hover {
+    background: var(--fh-surface-sunken);
+    color: var(--fh-text);
+}
+
+.fh-theme-toggle:focus-visible {
+    outline: none;
+    box-shadow: var(--fh-focus-ring);
+}

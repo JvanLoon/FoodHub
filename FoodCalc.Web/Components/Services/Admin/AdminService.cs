@@ -11,7 +11,7 @@ public class AdminService(AuthenticatedHttpClientService httpClient)
 {
 	public async Task<PagedResultDto<UserDto>> GetPagedUsersAsync(int page, int pageSize, string? search = null)
 	{
-		var url = $"api/Admin/users?page={page}&pageSize={pageSize}";
+		var url = $"api/admin/users?page={page}&pageSize={pageSize}";
 		if (!string.IsNullOrWhiteSpace(search))
 			url += $"&search={Uri.EscapeDataString(search)}";
 
@@ -40,7 +40,7 @@ public class AdminService(AuthenticatedHttpClientService httpClient)
 
 	public async Task<List<string>> GetAllRolesAsync()
 	{
-		var response = await httpClient.GetAsync("api/Admin/allroles");
+		var response = await httpClient.GetAsync("api/admin/allroles");
 		if (!response.IsSuccessStatusCode)
 			return [];
 
@@ -50,7 +50,7 @@ public class AdminService(AuthenticatedHttpClientService httpClient)
 
 	public async Task<List<string>> GetUserRolesAsync(string email)
 	{
-		var response = await httpClient.GetAsync($"api/Admin/userroles?email={email}");
+		var response = await httpClient.GetAsync($"api/admin/userroles?email={email}");
 		if (!response.IsSuccessStatusCode)
 			return [];
 		return await response.Content.ReadFromJsonAsync<List<string>>() ?? [];
@@ -58,13 +58,13 @@ public class AdminService(AuthenticatedHttpClientService httpClient)
 
 	public async Task<bool> UpdateUserRolesAsync(string email, string newRole)
 	{
-		var response = await httpClient.PostAsync($"api/Admin/userroles?email={email}&role={newRole}");
+		var response = await httpClient.PostAsync($"api/admin/userroles?email={email}&role={newRole}");
 		return response.IsSuccessStatusCode;
 	}
 
 	public async Task<bool> RemoveUserRoleAsync(string email, string role)
 	{
-		var response = await httpClient.DeleteAsync($"api/Admin/userroles?email={email}&role={role}");
+		var response = await httpClient.DeleteAsync($"api/admin/userroles?email={email}&role={role}");
 		return response.IsSuccessStatusCode;
 	}
 }

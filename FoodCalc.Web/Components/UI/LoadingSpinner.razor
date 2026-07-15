@@ -1,0 +1,9 @@
+<div class="fh-loading @CssClass" role="status">
+    <span class="spinner-border" aria-hidden="true"></span>
+    <span class="fh-loading__label">@Label</span>
+</div>
+
+@code {
+    [Parameter] public string Label { get; set; } = "Loading...";
+    [Parameter] public string? CssClass { get; set; }
+}

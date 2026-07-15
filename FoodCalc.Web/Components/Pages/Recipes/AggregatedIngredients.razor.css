@@ -2,16 +2,34 @@
     position: sticky;
     top: 0;
     z-index: 10;
-    background-color: var(--bs-body-bg, #fff);
-    padding: 0.5rem 0;
+    background-color: var(--fh-bg);
+    padding: var(--fh-space-2) 0 var(--fh-space-4);
+}
+
+.ingredient-print-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    background: var(--fh-surface);
+    border: 1px solid var(--fh-border);
+    border-radius: var(--fh-radius-lg);
+    overflow: hidden;
+}
+
+.ingredient-print-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--fh-space-3);
+    padding: var(--fh-space-1) var(--fh-space-3);
+}
+
+.ingredient-print-list li:nth-child(even) {
+    background-color: var(--fh-surface-sunken);
 }
 
 .ingredient-text {
     font-size: 0.95rem;
-}
-
-.ingredient-print-list .list-group-item:nth-child(even) {
-    background-color: rgba(0, 0, 0, 0.03);
 }
 
 /* ── Print styles ── */
@@ -21,16 +39,18 @@
     }
 
     .ingredient-print-list {
-        display: block !important; /* override Bootstrap list-group's display:flex so column-count works */
+        display: block !important;
         column-count: 3;
         column-gap: 2rem;
         width: 100%;
         padding: 0;
         margin: 0;
+        background: transparent;
         border: none !important;
+        border-radius: 0;
     }
 
-    .ingredient-print-list .list-group-item {
+    .ingredient-print-list li {
         display: block !important;
         break-inside: avoid;
         border: none !important;
@@ -41,7 +61,7 @@
         print-color-adjust: exact;
     }
 
-    .ingredient-print-list .list-group-item:nth-child(even) {
+    .ingredient-print-list li:nth-child(even) {
         background-color: #f0f0f0 !important;
     }
 

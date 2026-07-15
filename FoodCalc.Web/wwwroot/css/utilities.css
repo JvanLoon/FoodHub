@@ -1,0 +1,133 @@
+/* ==========================================================================
+   FoodHub utility & layout layer
+   Thin, fh-prefixed to avoid clashing with Bootstrap. Page skeleton classes
+   plus a few composition helpers; anything component-specific belongs in
+   that component's scoped .razor.css.
+   ========================================================================== */
+
+/* --- Page skeleton -------------------------------------------------------- */
+
+.fh-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--fh-space-5);
+    padding: var(--fh-space-5) 0;
+}
+
+.fh-page-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--fh-space-3);
+}
+
+.fh-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--fh-space-3);
+}
+
+.fh-page-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--fh-space-4);
+}
+
+.fh-page-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--fh-space-3);
+    padding-top: var(--fh-space-4);
+    border-top: 1px solid var(--fh-border);
+}
+
+/* --- Surfaces ------------------------------------------------------------- */
+
+.fh-surface {
+    background: var(--fh-surface);
+    border: 1px solid var(--fh-border);
+    border-radius: var(--fh-radius-lg);
+    padding: var(--fh-space-5);
+}
+
+.fh-surface--raised {
+    background: var(--fh-surface-raised);
+    box-shadow: var(--fh-shadow-md);
+}
+
+/* --- Text ------------------------------------------------------------------ */
+
+.fh-heading {
+    font-size: var(--fh-text-2xl);
+    font-weight: var(--fh-weight-bold);
+    color: var(--fh-text);
+    margin: 0;
+}
+
+.fh-subheading {
+    font-size: var(--fh-text-lg);
+    font-weight: var(--fh-weight-semibold);
+    color: var(--fh-text);
+    margin: 0;
+}
+
+.fh-muted {
+    color: var(--fh-text-muted);
+}
+
+.fh-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* --- Form field wrapper ------------------------------------------------------ */
+
+.fh-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--fh-space-1);
+    margin-bottom: var(--fh-space-4);
+}
+
+.fh-field .form-label {
+    margin-bottom: 0;
+    font-size: var(--fh-text-sm);
+    font-weight: var(--fh-weight-medium);
+    color: var(--fh-text-muted);
+}
+
+/* --- Composition ------------------------------------------------------------ */
+
+/* Vertical stack with a consistent gap */
+.fh-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--fh-space-4);
+}
+
+.fh-stack--tight {
+    gap: var(--fh-space-2);
+}
+
+/* Horizontal cluster that wraps */
+.fh-cluster {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--fh-space-3);
+}
+
+.fh-cluster--end {
+    justify-content: flex-end;
+}
+
+/* Responsive card grid (recipe cards etc.) */
+.fh-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+    gap: var(--fh-space-5);
+}

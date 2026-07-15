@@ -3,6 +3,7 @@
     flex-direction: column;
     flex: 1;
     min-height: 0;
+    gap: var(--fh-space-5);
 }
 
 .ingredient-body {
@@ -11,13 +12,6 @@
     min-height: 0;
 }
 
-.ingredient-table td, .ingredient-table th {
-    min-height: 38px;
-    height: 38px;
-    line-height: 1.5;
-    vertical-align: middle;
-}
-
-.ingredient-action-btn {
-    width: 50px;
+.ingredient-footer {
+    padding-top: var(--fh-space-3);
 }

@@ -1,0 +1,27 @@
+.fh-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--fh-space-2);
+    padding: var(--fh-space-7) var(--fh-space-5);
+    text-align: center;
+    color: var(--fh-text-muted);
+}
+
+.fh-empty > .bi {
+    font-size: 2.5rem;
+    color: var(--fh-text-faint);
+}
+
+.fh-empty__title {
+    margin: 0;
+    font-size: var(--fh-text-lg);
+    font-weight: var(--fh-weight-semibold);
+    color: var(--fh-text);
+}
+
+.fh-empty__message {
+    margin: 0;
+    font-size: var(--fh-text-sm);
+}

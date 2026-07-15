@@ -1,4 +1,4 @@
-﻿@using FoodCalc.Web.Components.Services.Auth
+@using FoodCalc.Web.Components.Services.Auth
 @inherits LayoutComponentBase
 @implements IDisposable
 @inject AuthStateService AuthStateService
@@ -11,26 +11,34 @@
     </div>
 
     <main>
-        <div class="auth-bar">
-            @if (!string.IsNullOrEmpty(userEmail))
-            {
-                <div class="auth-info">
-                    <span class="user-email">@userEmail</span>
-                    <button class="logout-btn" @onclick="Logout">Logout</button>
-                </div>
-            }
-            else
-            {
-                <div class="auth-info">
-                    <button class="login-btn" @onclick='() => Navigation.NavigateTo("/login")'>Login</button>
-                </div>
-            }
-        </div>
-        <article class="content px-4">
-            @Body
+        <header class="topbar">
+            <div class="topbar__actions">
+                <ThemeToggle />
+                @if (!string.IsNullOrEmpty(userEmail))
+                {
+                    <span class="topbar__email fh-truncate" title="@userEmail">
+                        <i class="bi bi-person-circle" aria-hidden="true"></i>
+                        @userEmail
+                    </span>
+                    <AppButton Variant="ButtonVariant.OutlineSecondary" Size="ButtonSize.Small"
+                               Icon="box-arrow-right" OnClick="Logout">Logout</AppButton>
+                }
+                else
+                {
+                    <AppButton Variant="ButtonVariant.Primary" Size="ButtonSize.Small"
+                               Icon="box-arrow-in-right" OnClick='() => Navigation.NavigateTo("/login")'>Login</AppButton>
+                }
+            </div>
+        </header>
+        <article class="content">
+            <div class="content__inner">
+                @Body
+            </div>
         </article>
     </main>
 </div>
+
+<ToastHost />
 
 <div id="blazor-error-ui">
     An unhandled error has occurred.

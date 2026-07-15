@@ -1,4 +1,4 @@
-﻿@page "/recipes/create"
+@page "/recipes/create"
 @using FoodCalc.Web.Components.Services
 @using FoodHub.DTOs
 @inject RecipeService RecipeService
@@ -7,21 +7,22 @@
 
 <PageTitle>Create Recipe</PageTitle>
 
-<h2>Create a New Recipe</h2>
+<div class="fh-stack">
+    <PageHeader Title="Create a New Recipe" />
 
-<EditForm Model="recipe" OnValidSubmit="CreateRecipeAsync">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+    <div class="create-card">
+        <AppCard>
+            <EditForm Model="recipe" OnValidSubmit="CreateRecipeAsync" FormName="create-recipe-form">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
 
-    <div class="mb-3">
-        <label for="recipeName" class="form-label">Recipe Name</label>
-        <InputText id="recipeName" class="form-control" @bind-Value="recipe.Name" required />
+                <TextField Label="Recipe Name" Placeholder="e.g. Spaghetti Bolognese" @bind-Value="recipe.Name" />
+
+                <AppButton Type="submit" Icon="plus-lg">Create</AppButton>
+            </EditForm>
+        </AppCard>
     </div>
-
-    <button class="btn btn-primary" type="submit">Create</button>
-</EditForm>
-
-<FoodCalc.Web.Components.Shared.MessageBox />
+</div>
 
 @code {
     private CreateRecipeDto recipe = new();
@@ -30,7 +31,6 @@
     {
         try
         {
-            // Create the recipe (assumes RecipeService.AddRecipeAsync returns the created Recipe with Id)
             var createdRecipe = await RecipeService.AddRecipe(recipe);
 
             if (createdRecipe?.Id != Guid.Empty)

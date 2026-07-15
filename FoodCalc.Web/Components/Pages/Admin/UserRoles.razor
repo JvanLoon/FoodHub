@@ -1,86 +1,91 @@
-﻿@page "/admin/userroles/{email}"
+@page "/admin/userroles/{email}"
 @using FoodCalc.Web.Components.Services.Admin
 @inject AdminService AdminService
 @inject LoginService LoginService
 @inject MessageService MessageService
 @inject NavigationManager Navigation
 
-<h4 class="mb-4">Manage Roles for @email</h4>
+<PageTitle>User Roles</PageTitle>
 
-@if (roles == null || allRoles == null)
-{
-    <p>Loading roles...</p>
-}
-else
-{
-    <div class="row">
-        <div class="col-md-6">
-            <label for="addRole" class="form-label">Add Role</label>
-            <div class="input-group mb-3">
-                <select id="addRole" class="form-select" @bind="selectedRole">
-                    <option value="">Select a role...</option>
-                    @foreach (var role in allRoles.Except(roles))
-                    {
-                        <option value="@role">@role</option>
-                    }
-                </select>
-                <button class="btn btn-success" @onclick="AddRole" disabled="@(string.IsNullOrEmpty(selectedRole))">Add</button>
+<div class="fh-stack">
+    <PageHeader Title="Manage Roles" Subtitle="@email" />
+
+    @if (roles == null || allRoles == null)
+    {
+        <LoadingSpinner Label="Loading roles..." />
+    }
+    else
+    {
+        <div class="row g-4">
+            <div class="col-md-6">
+                <AppCard>
+                    <Header>Add role</Header>
+                    <Body>
+                        <label for="addRole" class="form-label">Role</label>
+                        <div class="input-group">
+                            <select id="addRole" class="form-select" @bind="selectedRole">
+                                <option value="">Select a role...</option>
+                                @foreach (var role in allRoles.Except(roles))
+                                {
+                                    <option value="@role">@role</option>
+                                }
+                            </select>
+                            <AppButton Variant="ButtonVariant.Success" Icon="plus-lg"
+                                       Disabled="@(string.IsNullOrEmpty(selectedRole))" OnClick="AddRole">Add</AppButton>
+                        </div>
+                    </Body>
+                </AppCard>
+            </div>
+
+            <div class="col-md-6">
+                <AppCard>
+                    <Header>Assigned roles</Header>
+                    <Body>
+                        @if (roles.Any())
+                        {
+                            <ul class="role-list">
+                                @foreach (var role in roles)
+                                {
+                                    <li>
+                                        <Badge Icon="shield-check">@role</Badge>
+                                        <IconButton Icon="trash" Title="Remove role" Size="ButtonSize.Small"
+                                                    Variant="ButtonVariant.Danger" OnClick="() => RemoveRole(role)" />
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <EmptyState Icon="shield" Title="No roles assigned" />
+                        }
+                    </Body>
+                </AppCard>
             </div>
         </div>
 
-        <div class="col-md-6">
-            <ul class="list-group">
-                @if (roles.Any())
-                {
-                    @foreach (var role in roles)
-                    {
-                        <li class="list-group-item d-flex align-items-center">
-                            <span>
-                                @role
-                            </span>
-                            <span class="ms-auto">
-                                <button class="btn btn-danger btn-sm" @onclick="() => RemoveRole(role)">Delete</button>
-                            </span>
-                        </li>
-                    }
-                }
-                else
-                {
-                    <li class="list-group-item d-flex align-items-center">
-                        <span>No roles assigned</span>
-                        <span class="ms-auto">
-                            <button class="btn btn-danger btn-sm d-none">x</button>
-                        </span>
-                    </li>
-                }
-
-            </ul>
-        </div>
-    </div>
-
-    @if (true) //todo: check if loggedin user is admin
-    {
         <div class="row">
             <div class="col-md-6">
-                <EditForm Model="resetModel" OnValidSubmit="ResetPassword">
-                    <DataAnnotationsValidator />
-                    <ValidationSummary />
+                <AppCard>
+                    <Header>Reset password</Header>
+                    <Body>
+                        <EditForm Model="resetModel" OnValidSubmit="ResetPassword" FormName="reset-password-form">
+                            <DataAnnotationsValidator />
+                            <ValidationSummary />
 
-                    <div class="mb-3">
-                        <label for="bewachtewoord" class="form-label">Reset password</label>
-                        <InputText id="bewachtewoord" class="form-control" @bind-Value="resetModel.password" required />
-                    </div>
+                            <TextField Label="New password" Type="password" Autocomplete="new-password"
+                                       @bind-Value="resetModel.password" />
 
-                    <button class="btn btn-primary" type="submit">Reset</button>
-                </EditForm>
+                            <AppButton Type="submit" Icon="key">Reset</AppButton>
+                        </EditForm>
+                    </Body>
+                </AppCard>
             </div>
         </div>
     }
-}
-<FoodCalc.Web.Components.Shared.MessageBox />
+</div>
 
 @code {
-    [Parameter] 
+    [Parameter]
     public string email { get; set; } = null!;
     private List<string> roles = [];
     private List<string> allRoles = [];
@@ -106,7 +111,7 @@ else
             }
             else
             {
-                await MessageService.ShowMessageAsync("Failed to add role.", true);
+                await MessageService.ShowMessageAsync($"Failed to add role.", true);
             }
         }
     }
@@ -143,7 +148,7 @@ else
             }
             else
             {
-                string message = resetResponse.ReasonPhrase ?? string.Empty;//await resetResponse.Content.ReadAsStringAsync();
+                string message = resetResponse.ReasonPhrase ?? string.Empty;
                 await MessageService.ShowMessageAsync(message, true);
             }
         }
