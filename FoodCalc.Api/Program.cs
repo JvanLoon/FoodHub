@@ -22,11 +22,6 @@ public class Program
 		// Add services to the container.
 		builder.Services.AddProblemDetails();
 
-		builder.Services.AddControllers();
-
-		builder.Services.AddEndpointsApiExplorer();
-		builder.Services.AddSwaggerGen();
-
 		builder.Services.AddFastEndpoints();
 		builder.Services.SwaggerDocument();
 
@@ -133,8 +128,6 @@ public class Program
 		if (app.Environment.IsDevelopment())
 		{
 			app.UseDeveloperExceptionPage();
-			app.UseSwagger();
-			app.UseSwaggerUI();
 		}
 
 		app.UseHttpsRedirection();
@@ -149,29 +142,19 @@ public class Program
 			// FastEndpoints honors the global Microsoft.AspNetCore.Http.Json
 			// options, which enable ReferenceHandler.Preserve. That serializes
 			// collections as { "$id":.., "$values":[..] }, which the Blazor
-			// client (RecipeService) cannot deserialize into
-			// PagedResultDto<RecipeDto>. The old MVC RecipeController serialized
-			// via Mvc.JsonOptions (plain web defaults, no Preserve), so match
-			// that wire format to keep the client working.
+			// clients cannot deserialize into PagedResultDto<T>. The old MVC
+			// controllers serialized via Mvc.JsonOptions (plain web defaults, no
+			// Preserve), so match that wire format to keep the clients working.
 			c.Serializer.Options.ReferenceHandler = null;
 			c.Serializer.Options.WriteIndented = false;
 		});
 		if (app.Environment.IsDevelopment())
 		{
-			// Mount the FastEndpoints/NSwag Swagger on a distinct path so it does not
-			// collide with the existing Swashbuckle UI, which stays on /swagger for the
-			// controllers that have not been migrated yet (both default to /swagger and
-			// /swagger/v1/swagger.json). Browse the migrated endpoints at /swagger-fe.
-			app.UseSwaggerGen(
-				c => c.Path = "/swagger-fe/{documentName}/swagger.json",
-				c =>
-				{
-					c.Path = "/swagger-fe";
-					c.DocumentPath = "/swagger-fe/{documentName}/swagger.json";
-				});
+			// FastEndpoints/NSwag Swagger is now the only Swagger provider, served
+			// at the conventional /swagger.
+			app.UseSwaggerGen();
 		}
 
-		app.MapControllers();
 		app.MapDefaultEndpoints();
 
 		app.Run();
