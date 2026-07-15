@@ -19,7 +19,7 @@ public class CreateIngredientValidator : Validator<CreateIngredientDto>
 	{
 		RuleFor(x => x.Name)
 			.NotEmpty()
-			.WithMessage("No name provided");
+			.WithMessage(ValidationMessages.NameRequired);
 	}
 }
 

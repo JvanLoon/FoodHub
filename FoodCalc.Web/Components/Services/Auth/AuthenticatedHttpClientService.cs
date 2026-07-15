@@ -76,7 +76,7 @@ public class AuthenticatedHttpClientService(
         catch (Exception ex)
         {
             logger.LogError(ex, "Request {Method} {Uri} failed", method, requestUri);
-            return ApiResult.Fail("Something went wrong. Please try again.");
+            return ApiResult.Fail(WebConstants.Messages.GenericFailure);
         }
     }
 
@@ -97,7 +97,7 @@ public class AuthenticatedHttpClientService(
         catch (Exception ex)
         {
             logger.LogError(ex, "Request {Method} {Uri} failed", method, requestUri);
-            return ApiResult<T>.Fail("Something went wrong. Please try again.");
+            return ApiResult<T>.Fail(WebConstants.Messages.GenericFailure);
         }
     }
 
@@ -211,12 +211,12 @@ public class AuthenticatedHttpClientService(
 
     private static string StatusFallback(HttpStatusCode status) => status switch
     {
-        HttpStatusCode.Unauthorized => "You are not signed in, or your session has expired.",
-        HttpStatusCode.Forbidden => "You don't have permission to do that.",
-        HttpStatusCode.NotFound => "The requested item was not found.",
-        HttpStatusCode.BadRequest => "The request was invalid.",
-        HttpStatusCode.Conflict => "That action conflicts with the current state.",
-        >= (HttpStatusCode)500 => "The server encountered an error. Please try again later.",
-        _ => $"Request failed ({(int)status})."
+        HttpStatusCode.Unauthorized => WebConstants.Messages.Unauthorized,
+        HttpStatusCode.Forbidden => WebConstants.Messages.Forbidden,
+        HttpStatusCode.NotFound => WebConstants.Messages.NotFound,
+        HttpStatusCode.BadRequest => WebConstants.Messages.BadRequest,
+        HttpStatusCode.Conflict => WebConstants.Messages.Conflict,
+        >= (HttpStatusCode)500 => WebConstants.Messages.ServerError,
+        _ => WebConstants.Messages.RequestFailed((int)status)
     };
 }

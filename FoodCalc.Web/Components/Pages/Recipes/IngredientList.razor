@@ -130,7 +130,7 @@
         };
         var result = await IngredientService.UpdateIngredient(updateDto);
         if (result.Success)
-            await MessageService.ShowMessageAsync("Ingredient updated successfully!", false);
+            await MessageService.ShowMessageAsync(WebConstants.Messages.IngredientUpdated, false);
         else
             await MessageService.ShowMessageAsync(result.Error!, true);
     }
@@ -154,7 +154,7 @@
             };
             var result = await IngredientService.UpdateIngredient(updateDto);
             if (result.Success)
-                await MessageService.ShowMessageAsync("Ingredient name updated successfully!", false);
+                await MessageService.ShowMessageAsync(WebConstants.Messages.IngredientNameUpdated, false);
             else
                 await MessageService.ShowMessageAsync(result.Error!, true);
         }
@@ -176,7 +176,7 @@
         if (result.Success)
         {
             await LoadIngredientsAsync();
-            await MessageService.ShowMessageAsync("Ingredient deleted successfully!", false);
+            await MessageService.ShowMessageAsync(WebConstants.Messages.IngredientDeletedWithReload, false);
         }
         else
         {

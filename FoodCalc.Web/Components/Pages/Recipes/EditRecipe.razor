@@ -172,7 +172,7 @@
             return;
         }
 
-        await MessageService.ShowMessageAsync("Ingredient added/updated successfully", false);
+        await MessageService.ShowMessageAsync(WebConstants.Messages.IngredientAddedOrUpdated, false);
         ClearForm();
         await RefreshRecipeAsync(); // Refresh the list
     }
@@ -199,7 +199,7 @@
             return;
         }
 
-        await MessageService.ShowMessageAsync("Ingredient deleted successfully", false);
+        await MessageService.ShowMessageAsync(WebConstants.Messages.IngredientDeleted, false);
         ClearForm();
         await RefreshRecipeAsync(); // Refresh the list
     }
@@ -222,7 +222,7 @@
 
         isEditingName = false;
         await RefreshRecipeAsync(); // Refresh
-        await MessageService.ShowMessageAsync("Recipe name updated", false);
+        await MessageService.ShowMessageAsync(WebConstants.Messages.RecipeNameUpdated, false);
     }
 
     private async Task AddIngredient()
@@ -251,7 +251,7 @@
             ingredientSearch = string.Empty;
         }
 
-        await MessageService.ShowMessageAsync("Ingredient added", false);
+        await MessageService.ShowMessageAsync(WebConstants.Messages.IngredientAdded, false);
     }
 
     private void SelectIngredient(IngredientDto ingredient)

@@ -17,4 +17,9 @@
     <ProjectReference Include="..\FoodHub.ServiceDefaults\FoodHub.ServiceDefaults.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- User-facing message + key constants available to services and components. -->
+    <Using Include="FoodCalc.Web.Components.Constants" />
+  </ItemGroup>
+
 </Project>

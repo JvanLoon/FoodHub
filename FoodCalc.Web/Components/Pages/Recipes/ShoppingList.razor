@@ -15,15 +15,15 @@
     {
         if (firstRender)
         {
-            var newList = await LocalStorage.GetItemAsync<List<RecipeIngredientDto>>("aggregated-ingredients");
+            var newList = await LocalStorage.GetItemAsync<List<RecipeIngredientDto>>(WebConstants.Storage.AggregatedIngredients);
             if (newList?.Count > 0)
             {
                 _ingredients = newList;
-                _ = LocalStorage.RemoveItemAsync("aggregated-ingredients");
+                _ = LocalStorage.RemoveItemAsync(WebConstants.Storage.AggregatedIngredients);
             }
             else
             {
-                _initialItems = await LocalStorage.GetItemAsync<List<string>>("shopping-list-items") ?? new();
+                _initialItems = await LocalStorage.GetItemAsync<List<string>>(WebConstants.Storage.ShoppingListItems) ?? new();
             }
             StateHasChanged();
         }

@@ -38,7 +38,7 @@
         }
         else
         {
-            await MessageService.ShowMessageAsync(result.Error ?? "Failed to create recipe.", true);
+            await MessageService.ShowMessageAsync(result.Error ?? WebConstants.Messages.CreateRecipeFailed, true);
         }
     }
 }

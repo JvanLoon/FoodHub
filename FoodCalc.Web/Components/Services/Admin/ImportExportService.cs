@@ -9,12 +9,12 @@ using System.Net.Http.Headers;
 namespace FoodCalc.Web.Components.Services.Admin;
 public class ImportExportService(AuthenticatedHttpClientService httpClient, IJSRuntime js)
 {
-	private readonly string _exportFileName = $"export";
+	private readonly string _exportFileName = WebConstants.Files.ExportBaseName;
 
 	public async Task<ApiResult> ImportAsync(byte[] fileContent, string fileName)
 	{
 		if (fileContent == null || fileContent.Length == 0)
-			return ApiResult.Fail("No file content.");
+			return ApiResult.Fail(WebConstants.Messages.NoFileContent);
 
 		using var content = new MultipartFormDataContent();
 		var streamContent = new StreamContent(new MemoryStream(fileContent));
@@ -46,11 +46,11 @@ public class ImportExportService(AuthenticatedHttpClientService httpClient, IJSR
 		}
 		catch (Exception)
 		{
-			return ApiResult.Fail("Export failed: the server returned an unexpected response.");
+			return ApiResult.Fail(WebConstants.Messages.ExportUnexpectedResponse);
 		}
 
 		if (string.IsNullOrWhiteSpace(base64))
-			return ApiResult.Fail("Export failed: file content is empty.");
+			return ApiResult.Fail(WebConstants.Messages.ExportEmpty);
 
 		await js.InvokeVoidAsync("blazorDownloadFile", fileName, mimeType, base64);
 		return ApiResult.Ok(result.StatusCode);

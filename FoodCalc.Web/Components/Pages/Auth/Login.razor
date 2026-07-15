@@ -36,13 +36,13 @@
 
         if (!response.Success)
         {
-            await MessageService.ShowMessageAsync("Failed to login. Invalid email or password.", true);
+            await MessageService.ShowMessageAsync(WebConstants.Messages.LoginFailed, true);
             return;
         }
 
         if (response.Data?.Token == null)
         {
-            await MessageService.ShowMessageAsync("Login failed: invalid server response.", true);
+            await MessageService.ShowMessageAsync(WebConstants.Messages.LoginInvalidResponse, true);
             return;
         }
 

@@ -27,6 +27,8 @@
   <ItemGroup>
     <!-- Shared route constants + DTOs available to every endpoint. -->
     <Using Include="FoodHub.DTOs" />
+    <!-- Request-validation message constants. -->
+    <Using Include="FoodCalc.Api.Constants" />
   </ItemGroup>
 
 </Project>

@@ -116,7 +116,7 @@
             {
                 roles.Add(selectedRole);
                 selectedRole = string.Empty;
-                await MessageService.ShowMessageAsync("Role added successfully!", false);
+                await MessageService.ShowMessageAsync(WebConstants.Messages.RoleAdded, false);
             }
             else
             {
@@ -131,7 +131,7 @@
         if (result.Success)
         {
             roles.Remove(role);
-            await MessageService.ShowMessageAsync("Role removed successfully!", false);
+            await MessageService.ShowMessageAsync(WebConstants.Messages.RoleRemoved, false);
         }
         else
         {
@@ -150,7 +150,7 @@
 
         if (resetResponse.Success)
         {
-            await MessageService.ShowMessageAsync("Password reset successfully!", false);
+            await MessageService.ShowMessageAsync(WebConstants.Messages.PasswordReset, false);
             resetModel.password = string.Empty;
         }
         else

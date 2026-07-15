@@ -17,4 +17,9 @@
     <ProjectReference Include="..\FoodHub.Persistence\FoodHub.Persistence.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Shared error/log message constants available to every handler. -->
+    <Using Include="FoodCalc.Features.Constants" />
+  </ItemGroup>
+
 </Project>

@@ -128,7 +128,7 @@
     private async Task OpenAggregatedIngredientsPage()
     {
         AggregateIngredients();
-        await LocalStorage.SetItemAsync("aggregated-ingredients", AggregatedIngredients);
+        await LocalStorage.SetItemAsync(WebConstants.Storage.AggregatedIngredients, AggregatedIngredients);
         await JS.InvokeVoidAsync("window.open", "/aggregated-ingredients", "_blank");
         AggregatedIngredients = new();
     }

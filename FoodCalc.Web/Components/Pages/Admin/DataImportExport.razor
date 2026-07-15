@@ -48,7 +48,7 @@
     {
         try
         {
-            await messageService.ShowMessageAsync("Preparing export...", false, 0);
+            await messageService.ShowMessageAsync(WebConstants.Messages.PreparingExport, false, 0);
             await importExportService.ExportAsync(ExportFormat);
         }
         catch (Exception ex)
@@ -63,13 +63,13 @@
         {
             if (_selectedFile == null)
             {
-                await messageService.ShowMessageAsync("Please select a file first.", true);
+                await messageService.ShowMessageAsync(WebConstants.Messages.SelectFileFirst, true);
                 return;
             }
 
             if (!_selectedFile.Name.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
             {
-                await messageService.ShowMessageAsync("Only .json files are accepted.", true);
+                await messageService.ShowMessageAsync(WebConstants.Messages.OnlyJsonAccepted, true);
                 return;
             }
 
@@ -80,7 +80,7 @@
 
             if (bytes.Length == 0)
             {
-                await messageService.ShowMessageAsync("Could not read the selected file.", true);
+                await messageService.ShowMessageAsync(WebConstants.Messages.CouldNotReadFile, true);
                 return;
             }
 
