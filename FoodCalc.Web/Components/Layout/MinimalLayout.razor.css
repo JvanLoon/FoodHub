@@ -1,0 +1,6 @@
+.minimal-layout {
+    min-height: 100vh;
+    padding: var(--fh-space-6) var(--fh-space-5);
+    background: var(--fh-bg);
+    color: var(--fh-text);
+}

@@ -1,15 +1,10 @@
-﻿@inherits LayoutComponentBase
+@inherits LayoutComponentBase
 
 <div class="login-layout">
+    <div class="login-layout__theme">
+        <ThemeToggle />
+    </div>
     @Body
 </div>
 
-<style>
-    .login-layout {
-        min-height: 100vh;
-        background: #f8fafc;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-</style>
+<ToastHost />

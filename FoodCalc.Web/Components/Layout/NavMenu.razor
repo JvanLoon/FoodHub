@@ -1,57 +1,32 @@
-﻿@using FoodCalc.Web.Components.Services.Auth
+@using FoodCalc.Web.Components.Services.Auth
 @implements IDisposable
 @inject AuthStateService AuthStateService
 @inject MessageService MessageService
 
-<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">FoodHub</a>
-    </div>
+<div class="brand-row">
+    <a class="brand" href="">
+        <i class="bi bi-basket2-fill" aria-hidden="true"></i>
+        <span>FoodHub</span>
+    </a>
 </div>
 
 <input type="checkbox" title="Navigation menu" class="navbar-toggler" />
 
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="nav flex-column">
+    <nav class="nav-list">
         @if (isLoggedIn)
         {
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                    <span class="bi bi-house-door-fill" aria-hidden="true"></span> Home
-                </NavLink>
-            </div>
+            <NavItem Href="" Icon="house-door-fill" Label="Home" Match="NavLinkMatch.All" />
 
             @if (isAdmin)
             {
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/recipes/create">
-                        <span class="bi bi-list-nested" aria-hidden="true"></span> Add recipe
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/ingredients">
-                        <span class="bi bi-list-nested" aria-hidden="true"></span> Edit Ingredients
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/admin">
-                        <span class="bi bi-gear" aria-hidden="true"></span> Admin
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/admin/dataimportexport" Match="NavLinkMatch.All">
-                        <span class="bi bi-arrow-down-up" aria-hidden="true"></span> Import/Export
-                    </NavLink>
-                </div>
+                <NavItem Href="/recipes/create" Icon="plus-circle" Label="Add recipe" />
+                <NavItem Href="/ingredients" Icon="egg" Label="Edit Ingredients" />
+                <NavItem Href="/admin" Icon="gear" Label="Admin" />
+                <NavItem Href="/admin/dataimportexport" Icon="arrow-down-up" Label="Import/Export" Match="NavLinkMatch.All" />
             }
-            
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="/usersettings">
-                    <span class="bi bi-person" aria-hidden="true"></span> User Settings
-                </NavLink>
-            </div>
+
+            <NavItem Href="/usersettings" Icon="person" Label="User Settings" />
         }
     </nav>
 </div>
