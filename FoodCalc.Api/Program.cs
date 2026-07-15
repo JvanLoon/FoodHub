@@ -1,3 +1,6 @@
+using FastEndpoints;
+using FastEndpoints.Swagger;
+
 using FoodCalc.Api.Extensions;
 using FoodCalc.Features.Mapping;
 
@@ -23,6 +26,9 @@ public class Program
 
 		builder.Services.AddEndpointsApiExplorer();
 		builder.Services.AddSwaggerGen();
+
+		builder.Services.AddFastEndpoints();
+		builder.Services.SwaggerDocument();
 
 		// Add AutoMapper
 		builder.Services.AddAutoMapper(typeof(MappingProfile));
@@ -137,6 +143,23 @@ public class Program
 		app.UseCors("AllowWebApp");
 		app.UseAuthentication();
 		app.UseAuthorization();
+
+		app.UseFastEndpoints();
+		if (app.Environment.IsDevelopment())
+		{
+			// Mount the FastEndpoints/NSwag Swagger on a distinct path so it does not
+			// collide with the existing Swashbuckle UI, which stays on /swagger for the
+			// controllers that have not been migrated yet (both default to /swagger and
+			// /swagger/v1/swagger.json). Browse the migrated endpoints at /swagger-fe.
+			app.UseSwaggerGen(
+				c => c.Path = "/swagger-fe/{documentName}/swagger.json",
+				c =>
+				{
+					c.Path = "/swagger-fe";
+					c.DocumentPath = "/swagger-fe/{documentName}/swagger.json";
+				});
+		}
+
 		app.MapControllers();
 		app.MapDefaultEndpoints();
 
