@@ -144,7 +144,18 @@ public class Program
 		app.UseAuthentication();
 		app.UseAuthorization();
 
-		app.UseFastEndpoints();
+		app.UseFastEndpoints(c =>
+		{
+			// FastEndpoints honors the global Microsoft.AspNetCore.Http.Json
+			// options, which enable ReferenceHandler.Preserve. That serializes
+			// collections as { "$id":.., "$values":[..] }, which the Blazor
+			// client (RecipeService) cannot deserialize into
+			// PagedResultDto<RecipeDto>. The old MVC RecipeController serialized
+			// via Mvc.JsonOptions (plain web defaults, no Preserve), so match
+			// that wire format to keep the client working.
+			c.Serializer.Options.ReferenceHandler = null;
+			c.Serializer.Options.WriteIndented = false;
+		});
 		if (app.Environment.IsDevelopment())
 		{
 			// Mount the FastEndpoints/NSwag Swagger on a distinct path so it does not
