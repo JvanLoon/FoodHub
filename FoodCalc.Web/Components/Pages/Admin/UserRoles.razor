@@ -108,7 +108,7 @@
         if (!string.IsNullOrEmpty(selectedRole) && !roles.Contains(selectedRole))
         {
             (await AdminService.UpdateUserRolesAsync(email, selectedRole))
-                .OnSuccess(() =>
+                .Then(() =>
                 {
                     roles.Add(selectedRole);
                     selectedRole = string.Empty;
@@ -120,7 +120,7 @@
     private async Task RemoveRole(string role)
     {
         (await AdminService.RemoveUserRoleAsync(email, role))
-            .OnSuccess(() => roles.Remove(role))
+            .Then(() => roles.Remove(role))
             .Notify(MessageService, success: WebConstants.Messages.Roles.Removed);
     }
 
@@ -132,7 +132,7 @@
         resetPasswordDto.Password = resetModel.password;
 
         (await LoginService.ResetPassword(resetPasswordDto))
-            .OnSuccess(() => resetModel.password = string.Empty)
+            .Then(() => resetModel.password = string.Empty)
             .Notify(MessageService, success: WebConstants.Messages.Roles.PasswordReset);
     }
 

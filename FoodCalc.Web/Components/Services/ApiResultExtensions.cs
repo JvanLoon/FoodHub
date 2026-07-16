@@ -8,19 +8,33 @@ namespace FoodCalc.Web.Components.Services;
 /// </summary>
 public static class ApiResultExtensions
 {
-    // ----- Side effects on the outcome -----
+	// ----- Side effects on the outcome -----
 
-    /// <summary>Runs <paramref name="action"/> when the call succeeded.</summary>
-    public static ApiResult OnSuccess(this ApiResult result, Action action)
+	/// <summary>Runs <paramref name="action"/> when the call succeeded.</summary>
+	public static ApiResult OnSuccess(this ApiResult result, Action action)
+	{
+		if (result.Success) action();
+		return result;
+	}
+
+	/// <inheritdoc cref="OnSuccess(ApiResult, Action)"/>
+	public static ApiResult<T> OnSuccess<T>(this ApiResult<T> result, Action<T> action)
+	{
+		if (result.Success) action(result.Data!);
+		return result;
+	}
+
+	/// <summary>Runs <paramref name="action"/> when the call succeeded, without the payload.</summary>
+	public static ApiResult Then(this ApiResult result, Action action)
     {
         if (result.Success) action();
         return result;
     }
 
-    /// <inheritdoc cref="OnSuccess(ApiResult, Action)"/>
-    public static ApiResult<T> OnSuccess<T>(this ApiResult<T> result, Action<T> action)
+    /// <inheritdoc cref="Then(ApiResult, Action)"/>
+    public static ApiResult<T> Then<T>(this ApiResult<T> result, Action action)
     {
-        if (result.Success) action(result.Data!);
+        if (result.Success) action();
         return result;
     }
 
@@ -40,12 +54,12 @@ public static class ApiResultExtensions
 
     // ----- Toast the outcome via MessageService -----
 
-    /// <summary>
-    /// On failure, shows the server's error message as an error toast. On success, shows
-    /// <paramref name="success"/> as a success toast when one is supplied (otherwise stays silent).
-    /// Returns the same result so it can be chained or guarded on.
-    /// </summary>
-    public static ApiResult Notify(this ApiResult result, MessageService messages,
+	/// <summary>
+	/// On failure, shows the server's error message as an error toast. On success, shows
+	/// <paramref name="success"/> as a success toast when one is supplied (otherwise stays silent).
+	/// Returns the same result so it can be chained or guarded on.
+	/// </summary>
+	public static ApiResult Notify(this ApiResult result, MessageService messages,
         string? success = null,
         int successTimeInMs = MessageService.DefaultDisplayTimeInMs,
         int errorTimeInMs = MessageService.DefaultDisplayTimeInMs)

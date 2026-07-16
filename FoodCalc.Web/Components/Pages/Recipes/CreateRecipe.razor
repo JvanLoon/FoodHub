@@ -29,16 +29,8 @@
 
     private async Task CreateRecipeAsync()
     {
-        var result = await RecipeService.AddRecipe(recipe);
-
-        if (result.Success && result.Data?.Id is Guid id && id != Guid.Empty)
-        {
-            // Navigate to EditRecipe page with the new recipe's ID
-            NavigationManager.NavigateTo($"/recipes/edit/{id}");
-        }
-        else
-        {
-            MessageService.ShowMessage(result.Error ?? WebConstants.Messages.Recipe.CreateFailed, true);
-        }
+        (await RecipeService.AddRecipe(recipe))
+            .OnSuccess(data => NavigationManager.NavigateTo($"/recipes/edit/{data.Id}"))
+            .Notify(MessageService);
     }
 }
