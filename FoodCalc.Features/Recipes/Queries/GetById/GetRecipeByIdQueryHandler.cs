@@ -19,7 +19,7 @@ public class GetRecipeByIdQueryHandler(RecipeRepository recipeRepository, ILogge
 
 			if (recipe is null)
 			{
-				return Error.Failure("Recipe not found");
+				return Error.Failure(ErrorMessages.Recipe.NotFound);
 			}
 			return recipe.ToDto();
 		}

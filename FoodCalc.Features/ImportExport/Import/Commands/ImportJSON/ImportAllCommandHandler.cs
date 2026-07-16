@@ -21,7 +21,7 @@ public class ImportAllCommandHandler(UnitOfWork unitOfWork, ILogger<ImportAllCom
             var data = request.Data;
             if (data == null)
             {
-                return Error.Failure(ErrorMessages.NoImportData);
+                return Error.Failure(ErrorMessages.ImportExport.NoImportData);
             }
 
 			await unitOfWork.BeginTransactionAsync(cancellationToken);
@@ -210,8 +210,8 @@ public class ImportAllCommandHandler(UnitOfWork unitOfWork, ILogger<ImportAllCom
         catch (Exception ex)
         {
             await unitOfWork.RollbackTransactionAsync();
-            logger.LogError(ex, ErrorMessages.ImportAllFailed);
-            return Error.Failure(ErrorMessages.ImportAllFailed);
+            logger.LogError(ex, ErrorMessages.ImportExport.ImportFailed);
+            return Error.Failure(ErrorMessages.ImportExport.ImportFailed);
         }
 	}
 }

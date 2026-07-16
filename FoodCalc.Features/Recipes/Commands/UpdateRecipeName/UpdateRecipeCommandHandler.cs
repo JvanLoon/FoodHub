@@ -27,8 +27,8 @@ public class UpdateRecipeNameCommandHandler(UnitOfWork unitOfWork, ILogger<Updat
 		}
 		catch (Exception ex)
 		{
-			logger.LogError(ex, "Failed to update recipe");
-			return Error.Failure("Failed to update recipe", ex.Message);
+			logger.LogError(ex, ErrorMessages.Recipe.UpdateFailed);
+			return Error.Failure(ErrorMessages.Recipe.UpdateFailed, ex.Message);
 		}
 	}
 }

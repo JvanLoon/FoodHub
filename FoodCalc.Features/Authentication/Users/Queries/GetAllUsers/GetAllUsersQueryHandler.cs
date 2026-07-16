@@ -42,8 +42,8 @@ public class GetAllUsersQueryHandler(UnitOfWork unitOfWork, ILogger<GetAllUsersQ
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, ErrorMessages.GetAllUsersFailed);
-            return Error.Failure(ErrorMessages.GetAllUsersFailed);
+            logger.LogError(ex, ErrorMessages.User.GetAllFailed);
+            return Error.Failure(ErrorMessages.User.GetAllFailed);
         }
     }
 }

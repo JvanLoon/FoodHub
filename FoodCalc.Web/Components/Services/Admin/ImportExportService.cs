@@ -14,7 +14,7 @@ public class ImportExportService(AuthenticatedHttpClientService httpClient, IJSR
 	public async Task<ApiResult> ImportAsync(byte[] fileContent, string fileName)
 	{
 		if (fileContent == null || fileContent.Length == 0)
-			return ApiResult.Fail(WebConstants.Messages.NoFileContent);
+			return ApiResult.Fail(WebConstants.Messages.ImportExport.NoFileContent);
 
 		using var content = new MultipartFormDataContent();
 		var streamContent = new StreamContent(new MemoryStream(fileContent));
@@ -46,11 +46,11 @@ public class ImportExportService(AuthenticatedHttpClientService httpClient, IJSR
 		}
 		catch (Exception)
 		{
-			return ApiResult.Fail(WebConstants.Messages.ExportUnexpectedResponse);
+			return ApiResult.Fail(WebConstants.Messages.ImportExport.ExportUnexpectedResponse);
 		}
 
 		if (string.IsNullOrWhiteSpace(base64))
-			return ApiResult.Fail(WebConstants.Messages.ExportEmpty);
+			return ApiResult.Fail(WebConstants.Messages.ImportExport.ExportEmpty);
 
 		await js.InvokeVoidAsync("blazorDownloadFile", fileName, mimeType, base64);
 		return ApiResult.Ok(result.StatusCode);

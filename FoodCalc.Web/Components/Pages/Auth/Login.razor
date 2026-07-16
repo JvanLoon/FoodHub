@@ -36,13 +36,13 @@
 
         if (!response.Success)
         {
-            await MessageService.ShowMessageAsync(WebConstants.Messages.LoginFailed, true);
+            await MessageService.ShowMessageAsync(WebConstants.Messages.Auth.LoginFailed, true);
             return;
         }
 
         if (response.Data?.Token == null)
         {
-            await MessageService.ShowMessageAsync(WebConstants.Messages.LoginInvalidResponse, true);
+            await MessageService.ShowMessageAsync(WebConstants.Messages.Auth.LoginInvalidResponse, true);
             return;
         }
 

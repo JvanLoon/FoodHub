@@ -21,13 +21,13 @@ public class GetUserByEmailQueryHandler(UnitOfWork unitOfWork, ILogger<GetAllRec
 			var user = await unitOfWork.UserRepository.GetByEmailAsync(request.Email, cancellationToken);
 
 			if (user is null)
-				return Error.Failure(ErrorMessages.UserNotFound);
+				return Error.Failure(ErrorMessages.User.NotFound);
 
 			return user.ToUserDto();
 		}
 		catch (Exception ex)
 		{
-			logger.LogError(ex, ErrorMessages.GetUserByEmailFailed);
+			logger.LogError(ex, ErrorMessages.User.GetByEmailFailed);
 			//return message because GetByEmailAsync returns a error with message
 			return Error.Failure(ex.Message);
 		}

@@ -82,8 +82,8 @@ public class ExportAllCommandHandler(UnitOfWork unitOfWork, ILogger<ExportAllCom
 		}
 		catch (Exception ex)
 		{
-			logger.LogError(ex, ErrorMessages.ExportAllFailed);
-			return Error.Failure(ErrorMessages.ExportAllFailed);
+			logger.LogError(ex, ErrorMessages.ImportExport.ExportFailed);
+			return Error.Failure(ErrorMessages.ImportExport.ExportFailed);
 		}
 	}
 }

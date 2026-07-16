@@ -76,7 +76,7 @@ public class AuthenticatedHttpClientService(
         catch (Exception ex)
         {
             logger.LogError(ex, "Request {Method} {Uri} failed", method, requestUri);
-            return ApiResult.Fail(WebConstants.Messages.GenericFailure);
+            return ApiResult.Fail(WebConstants.Messages.Client.GenericFailure);
         }
     }
 
@@ -97,7 +97,7 @@ public class AuthenticatedHttpClientService(
         catch (Exception ex)
         {
             logger.LogError(ex, "Request {Method} {Uri} failed", method, requestUri);
-            return ApiResult<T>.Fail(WebConstants.Messages.GenericFailure);
+            return ApiResult<T>.Fail(WebConstants.Messages.Client.GenericFailure);
         }
     }
 
@@ -211,12 +211,12 @@ public class AuthenticatedHttpClientService(
 
     private static string StatusFallback(HttpStatusCode status) => status switch
     {
-        HttpStatusCode.Unauthorized => WebConstants.Messages.Unauthorized,
-        HttpStatusCode.Forbidden => WebConstants.Messages.Forbidden,
-        HttpStatusCode.NotFound => WebConstants.Messages.NotFound,
-        HttpStatusCode.BadRequest => WebConstants.Messages.BadRequest,
-        HttpStatusCode.Conflict => WebConstants.Messages.Conflict,
-        >= (HttpStatusCode)500 => WebConstants.Messages.ServerError,
-        _ => WebConstants.Messages.RequestFailed((int)status)
+        HttpStatusCode.Unauthorized => WebConstants.Messages.Client.Unauthorized,
+        HttpStatusCode.Forbidden => WebConstants.Messages.Client.Forbidden,
+        HttpStatusCode.NotFound => WebConstants.Messages.Client.NotFound,
+        HttpStatusCode.BadRequest => WebConstants.Messages.Client.BadRequest,
+        HttpStatusCode.Conflict => WebConstants.Messages.Client.Conflict,
+        >= (HttpStatusCode)500 => WebConstants.Messages.Client.ServerError,
+        _ => WebConstants.Messages.Client.RequestFailed((int)status)
     };
 }

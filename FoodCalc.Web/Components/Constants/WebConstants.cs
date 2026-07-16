@@ -7,52 +7,68 @@ namespace FoodCalc.Web.Components.Constants;
 /// </summary>
 public static class WebConstants
 {
-    /// <summary>Toast / notification text shown to the user.</summary>
+    /// <summary>Toast / notification text shown to the user, grouped by feature.</summary>
     public static class Messages
     {
-        // Generic HTTP client failures (AuthenticatedHttpClientService)
-        public const string GenericFailure = "Something went wrong. Please try again.";
-        public const string Unauthorized = "You are not signed in, or your session has expired.";
-        public const string Forbidden = "You don't have permission to do that.";
-        public const string NotFound = "The requested item was not found.";
-        public const string BadRequest = "The request was invalid.";
-        public const string Conflict = "That action conflicts with the current state.";
-        public const string ServerError = "The server encountered an error. Please try again later.";
-        public static string RequestFailed(int statusCode) => $"Request failed ({statusCode}).";
+        /// <summary>Generic HTTP client failures (AuthenticatedHttpClientService).</summary>
+        public static class Client
+        {
+            public const string GenericFailure = "Something went wrong. Please try again.";
+            public const string Unauthorized = "You are not signed in, or your session has expired.";
+            public const string Forbidden = "You don't have permission to do that.";
+            public const string NotFound = "The requested item was not found.";
+            public const string BadRequest = "The request was invalid.";
+            public const string Conflict = "That action conflicts with the current state.";
+            public const string ServerError = "The server encountered an error. Please try again later.";
+            public static string RequestFailed(int statusCode) => $"Request failed ({statusCode}).";
+        }
 
-        // Import / export
-        public const string NoFileContent = "No file content.";
-        public const string ExportUnexpectedResponse = "Export failed: the server returned an unexpected response.";
-        public const string ExportEmpty = "Export failed: file content is empty.";
-        public const string PreparingExport = "Preparing export...";
-        public const string SelectFileFirst = "Please select a file first.";
-        public const string OnlyJsonAccepted = "Only .json files are accepted.";
-        public const string CouldNotReadFile = "Could not read the selected file.";
+        /// <summary>Import / export.</summary>
+        public static class ImportExport
+        {
+            public const string NoFileContent = "No file content.";
+            public const string ExportUnexpectedResponse = "Export failed: the server returned an unexpected response.";
+            public const string ExportEmpty = "Export failed: file content is empty.";
+            public const string PreparingExport = "Preparing export...";
+            public const string SelectFileFirst = "Please select a file first.";
+            public const string OnlyJsonAccepted = "Only .json files are accepted.";
+            public const string CouldNotReadFile = "Could not read the selected file.";
+        }
 
-        // Authentication
-        public const string LoginFailed = "Failed to login. Invalid email or password.";
-        public const string LoginInvalidResponse = "Login failed: invalid server response.";
-        public const string RegisterSuccess = "Registration successful! You can now login.";
-        public const string RegisterFailed = "Error registering";
+        /// <summary>Authentication.</summary>
+        public static class Auth
+        {
+            public const string LoginFailed = "Failed to login. Invalid email or password.";
+            public const string LoginInvalidResponse = "Login failed: invalid server response.";
+            public const string RegisterSuccess = "Registration successful! You can now login.";
+            public const string RegisterFailed = "Error registering";
+        }
 
-        // Roles / password
-        public const string RoleAdded = "Role added successfully!";
-        public const string RoleRemoved = "Role removed successfully!";
-        public const string PasswordReset = "Password reset successfully!";
+        /// <summary>Role &amp; password management.</summary>
+        public static class Roles
+        {
+            public const string Added = "Role added successfully!";
+            public const string Removed = "Role removed successfully!";
+            public const string PasswordReset = "Password reset successfully!";
+        }
 
-        // Recipes
-        public const string RecipeNameUpdated = "Recipe name updated";
-        public const string CreateRecipeFailed = "Failed to create recipe.";
+        /// <summary>Recipes.</summary>
+        public static class Recipe
+        {
+            public const string NameUpdated = "Recipe name updated";
+            public const string CreateFailed = "Failed to create recipe.";
+        }
 
-        // Ingredients (EditRecipe)
-        public const string IngredientAddedOrUpdated = "Ingredient added/updated successfully";
-        public const string IngredientDeleted = "Ingredient deleted successfully";
-        public const string IngredientAdded = "Ingredient added";
-
-        // Ingredients (IngredientList)
-        public const string IngredientUpdated = "Ingredient updated successfully!";
-        public const string IngredientNameUpdated = "Ingredient name updated successfully!";
-        public const string IngredientDeletedWithReload = "Ingredient deleted successfully!";
+        /// <summary>Ingredients.</summary>
+        public static class Ingredient
+        {
+            public const string AddedOrUpdated = "Ingredient added/updated successfully";
+            public const string Deleted = "Ingredient deleted successfully";
+            public const string Added = "Ingredient added";
+            public const string Updated = "Ingredient updated successfully!";
+            public const string NameUpdated = "Ingredient name updated successfully!";
+            public const string DeletedWithReload = "Ingredient deleted successfully!";
+        }
     }
 
     /// <summary>Browser storage keys.</summary>

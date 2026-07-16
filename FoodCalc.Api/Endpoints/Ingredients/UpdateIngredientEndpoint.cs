@@ -16,11 +16,11 @@ public class UpdateIngredientValidator : Validator<UpdateIngredientDto>
 	{
 		RuleFor(x => x.Id)
 			.NotEmpty()
-			.WithMessage(ValidationMessages.IngredientIdRequired);
+			.WithMessage(ValidationMessages.Ingredient.IdRequired);
 
 		RuleFor(x => x.Name)
 			.NotEmpty()
-			.WithMessage(ValidationMessages.NameRequired);
+			.WithMessage(ValidationMessages.Common.NameRequired);
 	}
 }
 

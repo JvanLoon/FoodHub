@@ -30,7 +30,7 @@ public class CreateRecipeValidator : Validator<CreateRecipeDto>
 	{
 		RuleFor(x => x.Name)
 			.NotEmpty()
-			.WithMessage(ValidationMessages.NameRequired);
+			.WithMessage(ValidationMessages.Common.NameRequired);
 	}
 }
 
@@ -40,11 +40,11 @@ public class UpdateRecipeValidator : Validator<UpdateRecipeDto>
 	{
 		RuleFor(x => x.Id)
 			.NotEmpty()
-			.WithMessage(ValidationMessages.RecipeIdRequired);
+			.WithMessage(ValidationMessages.Recipe.IdRequired);
 
 		RuleFor(x => x.Name)
 			.NotEmpty()
-			.WithMessage(ValidationMessages.NameRequired);
+			.WithMessage(ValidationMessages.Common.NameRequired);
 	}
 }
 
@@ -54,10 +54,10 @@ public class RecipeNameUpdateValidator : Validator<RecipeNameUpdateDto>
 	{
 		RuleFor(x => x.Id)
 			.NotEmpty()
-			.WithMessage(ValidationMessages.RecipeIdRequired);
+			.WithMessage(ValidationMessages.Recipe.IdRequired);
 
 		RuleFor(x => x.Name)
 			.NotEmpty()
-			.WithMessage(ValidationMessages.NameRequired);
+			.WithMessage(ValidationMessages.Common.NameRequired);
 	}
 }

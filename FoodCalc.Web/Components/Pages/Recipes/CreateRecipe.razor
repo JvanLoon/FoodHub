@@ -38,7 +38,7 @@
         }
         else
         {
-            await MessageService.ShowMessageAsync(result.Error ?? WebConstants.Messages.CreateRecipeFailed, true);
+            await MessageService.ShowMessageAsync(result.Error ?? WebConstants.Messages.Recipe.CreateFailed, true);
         }
     }
 }

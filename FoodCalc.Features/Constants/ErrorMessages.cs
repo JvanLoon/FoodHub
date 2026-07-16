@@ -1,34 +1,47 @@
 namespace FoodCalc.Features.Constants;
 
 /// <summary>
-/// Domain error and log messages produced by the command/query handlers in this project.
-/// Kept here so the backend's wording lives in one place. Not shared with other projects.
+/// Domain error and log messages produced by the command/query handlers in this project,
+/// grouped by feature. Kept here so the backend's wording lives in one place.
+/// Not shared with other projects.
 /// </summary>
 public static class ErrorMessages
 {
-    // Recipes
-    public const string GetAllRecipesFailed = "Failed to get all Recipes";
-    public const string AddRecipeFailed = "Failed to add recipe";
-    public const string UpdateRecipeFailed = "Failed to update recipe";
-    public const string DeleteRecipeFailed = "Failed to delete recipe";
-    public const string RecipeNotFound = "Recipe not found";
-    public const string AddIngredientToRecipeFailed = "Failed to add ingredient to Recipe";
-    public const string UpdateRecipeIngredientFailed = "Failed to update Recipe";
+    /// <summary>Recipes.</summary>
+    public static class Recipe
+    {
+        public const string GetAllFailed = "Failed to get all Recipes";
+        public const string AddFailed = "Failed to add recipe";
+        public const string UpdateFailed = "Failed to update recipe";
+        public const string DeleteFailed = "Failed to delete recipe";
+        public const string NotFound = "Recipe not found";
+        public const string AddIngredientFailed = "Failed to add ingredient to Recipe";
+        public const string UpdateForIngredientFailed = "Failed to update Recipe";
+    }
 
-    // Ingredients
-    public const string GetAllIngredientsFailed = "Failed to get all ingredients";
-    public const string AddIngredientFailed = "Failed to add ingredient";
-    public const string UpdateIngredientFailed = "Failed to update ingredient";
-    public const string DeleteIngredientFailed = "Failed to delete ingredient";
-    public const string DeleteIngredientFromRecipeFailed = "Failed to delete ingredient from recipe";
+    /// <summary>Ingredients.</summary>
+    public static class Ingredient
+    {
+        public const string GetAllFailed = "Failed to get all ingredients";
+        public const string AddFailed = "Failed to add ingredient";
+        public const string UpdateFailed = "Failed to update ingredient";
+        public const string DeleteFailed = "Failed to delete ingredient";
+        public const string DeleteFromRecipeFailed = "Failed to delete ingredient from recipe";
+    }
 
-    // Users / roles
-    public const string GetAllUsersFailed = "Failed to get all Users";
-    public const string UserNotFound = "User not found";
-    public const string GetUserByEmailFailed = "Failed to get User by email";
+    /// <summary>Users &amp; roles.</summary>
+    public static class User
+    {
+        public const string GetAllFailed = "Failed to get all Users";
+        public const string NotFound = "User not found";
+        public const string GetByEmailFailed = "Failed to get User by email";
+    }
 
-    // Import / export
-    public const string ExportAllFailed = "Failed to export all data";
-    public const string ImportAllFailed = "Failed to import all data";
-    public const string NoImportData = "No data provided for import.";
+    /// <summary>Import / export.</summary>
+    public static class ImportExport
+    {
+        public const string ExportFailed = "Failed to export all data";
+        public const string ImportFailed = "Failed to import all data";
+        public const string NoImportData = "No data provided for import.";
+    }
 }

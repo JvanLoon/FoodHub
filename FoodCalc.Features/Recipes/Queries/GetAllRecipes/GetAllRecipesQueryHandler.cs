@@ -38,8 +38,8 @@ public class GetAllRecipesQueryHandler(UnitOfWork unitOfWork, ILogger<GetAllReci
 		}
 		catch (Exception ex)
 		{
-			logger.LogError(ex, "Failed to get all Recipes");
-			return Task.FromResult<ErrorOr<PagedResultDto<RecipeDto>>>(Error.Failure("Failed to get all Recipes"));
+			logger.LogError(ex, ErrorMessages.Recipe.GetAllFailed);
+			return Task.FromResult<ErrorOr<PagedResultDto<RecipeDto>>>(Error.Failure(ErrorMessages.Recipe.GetAllFailed));
 		}
 	}
 }

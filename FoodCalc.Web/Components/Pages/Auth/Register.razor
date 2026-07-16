@@ -34,12 +34,12 @@
 
         if (response.Success)
         {
-            await MessageService.ShowMessageAsync(WebConstants.Messages.RegisterSuccess, false);
+            await MessageService.ShowMessageAsync(WebConstants.Messages.Auth.RegisterSuccess, false);
             Navigation.NavigateTo("/login");
         }
         else
         {
-            await MessageService.ShowMessageAsync(response.Error ?? WebConstants.Messages.RegisterFailed, true, 0);
+            await MessageService.ShowMessageAsync(response.Error ?? WebConstants.Messages.Auth.RegisterFailed, true, 0);
         }
     }
 }

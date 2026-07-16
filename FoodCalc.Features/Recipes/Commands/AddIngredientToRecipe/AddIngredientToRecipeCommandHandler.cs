@@ -34,8 +34,8 @@ public class AddIngredientToRecipeCommandHandler(UnitOfWork unitOfWork, ILogger<
 		}
 	    catch (Exception ex)
 	    {
-		    logger.LogError(ex, "Failed to add ingredient to Recipe");
-		    return Error.Failure("Failed to update Recipe");
+		    logger.LogError(ex, ErrorMessages.Recipe.AddIngredientFailed);
+		    return Error.Failure(ErrorMessages.Recipe.UpdateForIngredientFailed);
 	    }
 	}
 }
