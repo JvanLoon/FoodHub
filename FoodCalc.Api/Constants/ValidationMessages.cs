@@ -14,7 +14,13 @@ public static class ValidationMessages
         public const string NameRequired = "No name provided";
 
         private const string EntityIdRequiredTemplate = "No {0} id provided";
-        public static string EntityIdRequired(string entityName) =>
-            string.Format(EntityIdRequiredTemplate, entityName);
+        public static string EntityIdRequired(Entity entityName) =>
+            string.Format(EntityIdRequiredTemplate, entityName.ToString());
     }
+}
+
+public enum Entity
+{
+	Recipe,
+	Ingredient
 }

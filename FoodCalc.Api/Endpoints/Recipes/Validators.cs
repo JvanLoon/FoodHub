@@ -40,7 +40,7 @@ public class UpdateRecipeValidator : Validator<UpdateRecipeDto>
 	{
 		RuleFor(x => x.Id)
 			.NotEmpty()
-			.WithMessage(ValidationMessages.Common.EntityIdRequired("recipe"));
+			.WithMessage(ValidationMessages.Common.EntityIdRequired(Entity.Recipe));
 
 		RuleFor(x => x.Name)
 			.NotEmpty()
@@ -54,7 +54,7 @@ public class RecipeNameUpdateValidator : Validator<RecipeNameUpdateDto>
 	{
 		RuleFor(x => x.Id)
 			.NotEmpty()
-			.WithMessage(ValidationMessages.Common.EntityIdRequired("recipe"));
+			.WithMessage(ValidationMessages.Common.EntityIdRequired(Entity.Recipe));
 
 		RuleFor(x => x.Name)
 			.NotEmpty()

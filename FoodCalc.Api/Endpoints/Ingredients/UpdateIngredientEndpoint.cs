@@ -16,7 +16,7 @@ public class UpdateIngredientValidator : Validator<UpdateIngredientDto>
 	{
 		RuleFor(x => x.Id)
 			.NotEmpty()
-			.WithMessage(ValidationMessages.Common.EntityIdRequired("ingredient"));
+			.WithMessage(ValidationMessages.Common.EntityIdRequired(Entity.Ingredient));
 
 		RuleFor(x => x.Name)
 			.NotEmpty()
