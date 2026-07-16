@@ -94,49 +94,34 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var rolesResult = await AdminService.GetUserRolesAsync(email);
-        if (rolesResult.Success)
-            roles = rolesResult.Data!;
-        else
-            await MessageService.ShowMessageAsync(rolesResult.Error!, true);
+        (await AdminService.GetUserRolesAsync(email))
+            .OnSuccess(r => roles = r)
+            .Notify(MessageService);
 
-        var allRolesResult = await AdminService.GetAllRolesAsync();
-        if (allRolesResult.Success)
-            allRoles = allRolesResult.Data!;
-        else
-            await MessageService.ShowMessageAsync(allRolesResult.Error!, true);
+        (await AdminService.GetAllRolesAsync())
+            .OnSuccess(r => allRoles = r)
+            .Notify(MessageService);
     }
 
     private async Task AddRole()
     {
         if (!string.IsNullOrEmpty(selectedRole) && !roles.Contains(selectedRole))
         {
-            var result = await AdminService.UpdateUserRolesAsync(email, selectedRole);
-            if (result.Success)
-            {
-                roles.Add(selectedRole);
-                selectedRole = string.Empty;
-                await MessageService.ShowMessageAsync(WebConstants.Messages.Roles.Added, false);
-            }
-            else
-            {
-                await MessageService.ShowMessageAsync(result.Error!, true);
-            }
+            (await AdminService.UpdateUserRolesAsync(email, selectedRole))
+                .OnSuccess(() =>
+                {
+                    roles.Add(selectedRole);
+                    selectedRole = string.Empty;
+                })
+                .Notify(MessageService, success: WebConstants.Messages.Roles.Added);
         }
     }
 
     private async Task RemoveRole(string role)
     {
-        var result = await AdminService.RemoveUserRoleAsync(email, role);
-        if (result.Success)
-        {
-            roles.Remove(role);
-            await MessageService.ShowMessageAsync(WebConstants.Messages.Roles.Removed, false);
-        }
-        else
-        {
-            await MessageService.ShowMessageAsync(result.Error!, true);
-        }
+        (await AdminService.RemoveUserRoleAsync(email, role))
+            .OnSuccess(() => roles.Remove(role))
+            .Notify(MessageService, success: WebConstants.Messages.Roles.Removed);
     }
 
     private ResetPasswordDto resetPasswordDto = new();
@@ -146,17 +131,9 @@
         resetPasswordDto.Email = email;
         resetPasswordDto.Password = resetModel.password;
 
-        var resetResponse = await LoginService.ResetPassword(resetPasswordDto);
-
-        if (resetResponse.Success)
-        {
-            await MessageService.ShowMessageAsync(WebConstants.Messages.Roles.PasswordReset, false);
-            resetModel.password = string.Empty;
-        }
-        else
-        {
-            await MessageService.ShowMessageAsync(resetResponse.Error!, true);
-        }
+        (await LoginService.ResetPassword(resetPasswordDto))
+            .OnSuccess(() => resetModel.password = string.Empty)
+            .Notify(MessageService, success: WebConstants.Messages.Roles.PasswordReset);
     }
 
     public class PasswordResetModel

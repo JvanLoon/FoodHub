@@ -135,19 +135,13 @@
     protected override async Task OnInitializedAsync()
     {
         var recipeResult = await RecipeService.GetRecipeByIdAsync(RecipeId);
-        if (!recipeResult.Success)
-        {
-            await MessageService.ShowMessageAsync(recipeResult.Error!, true, 20000);
+        if (!recipeResult.Notify(MessageService, errorTimeInMs: 20000).Success)
             return;
-        }
         recipe = recipeResult.Data ?? new RecipeDto();
 
         var ingredientsResult = await IngredientService.GetAllIngredientsAsync();
-        if (!ingredientsResult.Success)
-        {
-            await MessageService.ShowMessageAsync(ingredientsResult.Error!, true, 20000);
+        if (!ingredientsResult.Notify(MessageService, errorTimeInMs: 20000).Success)
             return;
-        }
         ingredients = ingredientsResult.Data!;
 
         noIngredient = Guid.NewGuid();
@@ -165,14 +159,10 @@
     {
         recipeIngredient.RecipeId = RecipeId;
         recipeIngredient.Amount = amountInput ?? 0;
-        var result = await RecipeService.AddIngredient(recipeIngredient);
-        if (!result.Success)
-        {
-            await MessageService.ShowMessageAsync(result.Error!, true);
+        if (!(await RecipeService.AddIngredient(recipeIngredient)).Notify(MessageService).Success)
             return;
-        }
 
-        await MessageService.ShowMessageAsync(WebConstants.Messages.Ingredient.AddedOrUpdated, false);
+        MessageService.ShowMessage(WebConstants.Messages.Ingredient.AddedOrUpdated, false);
         ClearForm();
         await RefreshRecipeAsync(); // Refresh the list
     }
@@ -192,14 +182,10 @@
 
     private async Task DeleteIngredient(Guid recipeIngredientId)
     {
-        var result = await RecipeService.DeleteIngredient(recipeIngredientId);
-        if (!result.Success)
-        {
-            await MessageService.ShowMessageAsync(result.Error!, true);
+        if (!(await RecipeService.DeleteIngredient(recipeIngredientId)).Notify(MessageService).Success)
             return;
-        }
 
-        await MessageService.ShowMessageAsync(WebConstants.Messages.Ingredient.Deleted, false);
+        MessageService.ShowMessage(WebConstants.Messages.Ingredient.Deleted, false);
         ClearForm();
         await RefreshRecipeAsync(); // Refresh the list
     }
@@ -213,35 +199,24 @@
 
     private async Task SaveRecipeName()
     {
-        var result = await RecipeService.UpdateRecipeName(RecipeId, recipe.Name!);
-        if (!result.Success)
-        {
-            await MessageService.ShowMessageAsync(result.Error!, true);
+        if (!(await RecipeService.UpdateRecipeName(RecipeId, recipe.Name!)).Notify(MessageService).Success)
             return;
-        }
 
         isEditingName = false;
         await RefreshRecipeAsync(); // Refresh
-        await MessageService.ShowMessageAsync(WebConstants.Messages.Recipe.NameUpdated, false);
+        MessageService.ShowMessage(WebConstants.Messages.Recipe.NameUpdated, false);
     }
 
     private async Task AddIngredient()
     {
         var ingredient = new CreateIngredientDto { Name = ingredientSearch };
 
-        var addResult = await IngredientService.AddIngredientAsync(ingredient);
-        if (!addResult.Success)
-        {
-            await MessageService.ShowMessageAsync(addResult.Error!, true);
+        if (!(await IngredientService.AddIngredientAsync(ingredient)).Notify(MessageService).Success)
             return;
-        }
 
         var ingredientsResult = await IngredientService.GetAllIngredientsAsync();
-        if (!ingredientsResult.Success)
-        {
-            await MessageService.ShowMessageAsync(ingredientsResult.Error!, true);
+        if (!ingredientsResult.Notify(MessageService).Success)
             return;
-        }
         ingredients = ingredientsResult.Data!;
 
         recipeIngredient.IngredientId = ingredients.FirstOrDefault(i => i.Name == ingredientSearch)?.Id ?? Guid.Empty;
@@ -251,7 +226,7 @@
             ingredientSearch = string.Empty;
         }
 
-        await MessageService.ShowMessageAsync(WebConstants.Messages.Ingredient.Added, false);
+        MessageService.ShowMessage(WebConstants.Messages.Ingredient.Added, false);
     }
 
     private void SelectIngredient(IngredientDto ingredient)

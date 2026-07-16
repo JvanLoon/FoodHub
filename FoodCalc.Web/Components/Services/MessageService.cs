@@ -1,28 +1,21 @@
-﻿namespace FoodCalc.Web.Components.Services;
+namespace FoodCalc.Web.Components.Services;
 
+/// <summary>
+/// Minimal pub/sub for toast notifications. A single <c>ToastHost</c> subscribes per circuit
+/// and owns all display and dismissal timing; this service just relays the request to it.
+/// Showing a toast is fire-and-forget from the caller's point of view, so the API is synchronous.
+/// </summary>
 public class MessageService
 {
     public const int DefaultDisplayTimeInMs = 12000;
-    public event Func<string, bool, int, CancellationToken, Task>? OnShowMessage;
 
-    public Task ShowMessageAsync(string message, bool isError, int timeInMs = DefaultDisplayTimeInMs, CancellationToken cancellationToken = default)
-    {
-        if (OnShowMessage == null) return Task.CompletedTask;
+    /// <summary>Raised when a toast should be shown. Subscribed to by <c>ToastHost</c>.</summary>
+    public event Action<ToastMessage>? OnShowMessage;
 
-        foreach (var handler in OnShowMessage.GetInvocationList().Cast<Func<string, bool, int, CancellationToken, Task>>())
-        {
-            _ = InvokeHandlerAsync(handler, message, isError, timeInMs, cancellationToken);
-        }
-
-        return Task.CompletedTask;
-    }
-
-    private static async Task InvokeHandlerAsync(Func<string, bool, int, CancellationToken, Task> handler, string message, bool isError, int timeInMs, CancellationToken cancellationToken)
-    {
-        try {
-			await handler(message, isError, timeInMs, cancellationToken);
-		}
-        catch (OperationCanceledException) { }
-        catch { }
-    }
+    /// <param name="timeInMs">How long to show the toast; <c>0</c> keeps it until dismissed.</param>
+    public void ShowMessage(string message, bool isError, int timeInMs = DefaultDisplayTimeInMs, CancellationToken cancellationToken = default) =>
+        OnShowMessage?.Invoke(new ToastMessage(message, isError, timeInMs, cancellationToken));
 }
+
+/// <summary>A single toast request.</summary>
+public readonly record struct ToastMessage(string Message, bool IsError, int TimeInMs, CancellationToken CancellationToken);

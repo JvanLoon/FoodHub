@@ -64,7 +64,7 @@
         }
         catch (Exception ex)
         {
-            await MessageService.ShowMessageAsync(ex.Message, true, 20000);
+            MessageService.ShowMessage(ex.Message, true, 20000);
         }
     }
 

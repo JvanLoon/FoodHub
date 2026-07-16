@@ -86,16 +86,9 @@
 
     private async Task LoadIngredientsAsync()
     {
-        var result = await IngredientService.GetPagedIngredientsAsync(currentPage, pageSize, searchTerm);
-        if (result.Success)
-        {
-            pagedResult = result.Data;
-        }
-        else
-        {
-            pagedResult = new();
-            await MessageService.ShowMessageAsync(result.Error!, true, 20000);
-        }
+        pagedResult = (await IngredientService.GetPagedIngredientsAsync(currentPage, pageSize, searchTerm))
+            .Notify(MessageService, errorTimeInMs: 20000)
+            .OrDefault(new());
     }
 
     private async Task OnPageChanged(int page)
@@ -128,11 +121,8 @@
             Name = ingredient.Name,
             ShouldBeAddedToShoppingCart = ingredient.ShouldBeAddedToShoppingCart
         };
-        var result = await IngredientService.UpdateIngredient(updateDto);
-        if (result.Success)
-            await MessageService.ShowMessageAsync(WebConstants.Messages.Ingredient.Updated, false);
-        else
-            await MessageService.ShowMessageAsync(result.Error!, true);
+        (await IngredientService.UpdateIngredient(updateDto))
+            .Notify(MessageService, success: WebConstants.Messages.Ingredient.Updated);
     }
 
     private void StartEdit(IngredientDto ingredient)
@@ -152,11 +142,8 @@
                 Name = ingredient.Name,
                 ShouldBeAddedToShoppingCart = ingredient.ShouldBeAddedToShoppingCart
             };
-            var result = await IngredientService.UpdateIngredient(updateDto);
-            if (result.Success)
-                await MessageService.ShowMessageAsync(WebConstants.Messages.Ingredient.NameUpdated, false);
-            else
-                await MessageService.ShowMessageAsync(result.Error!, true);
+            (await IngredientService.UpdateIngredient(updateDto))
+                .Notify(MessageService, success: WebConstants.Messages.Ingredient.NameUpdated);
         }
         editingIngredientId = null;
         editingName = string.Empty;
@@ -172,15 +159,10 @@
 
     private async Task DeleteIngredient(Guid id)
     {
-        var result = await IngredientService.DeleteIngredient(id);
-        if (result.Success)
-        {
-            await LoadIngredientsAsync();
-            await MessageService.ShowMessageAsync(WebConstants.Messages.Ingredient.DeletedWithReload, false);
-        }
-        else
-        {
-            await MessageService.ShowMessageAsync(result.Error!, true);
-        }
+        if (!(await IngredientService.DeleteIngredient(id)).Notify(MessageService).Success)
+            return;
+
+        await LoadIngredientsAsync();
+        MessageService.ShowMessage(WebConstants.Messages.Ingredient.DeletedWithReload, false);
     }
 }
