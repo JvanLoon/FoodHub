@@ -35,8 +35,8 @@ public class GetAllRolesQueryHandler(UnitOfWork unitOfWork, ILogger<GetAllUsersQ
 		}
 		catch (Exception ex)
 		{
-			logger.LogError(ex, ErrorMessages.User.GetAllFailed);
-			return Task.FromResult<ErrorOr<List<string>>>(Error.Failure(ErrorMessages.User.GetAllFailed));
+			logger.LogError(ex, ErrorMessages.Common.GetAllFailed("Users"));
+			return Task.FromResult<ErrorOr<List<string>>>(Error.Failure(ErrorMessages.Common.GetAllFailed("Users")));
 		}
 	}
 }

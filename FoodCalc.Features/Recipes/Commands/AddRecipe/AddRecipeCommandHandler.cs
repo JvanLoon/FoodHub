@@ -18,15 +18,15 @@ public class GetUserByEmailHandler(UnitOfWork unitOfWork, ILogger<GetUserByEmail
             Recipe? addedRecipe = await unitOfWork.RecipeRepository.AddAsync(recipe, cancellationToken);
 
             if (addedRecipe == null) {
-                return Error.Failure(ErrorMessages.Recipe.AddFailed);
+                return Error.Failure(ErrorMessages.Common.AddFailed("recipe"));
             }
 
             return addedRecipe.ToDto();
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, ErrorMessages.Recipe.AddFailed);
-            return Error.Failure(ErrorMessages.Recipe.AddFailed);
+            logger.LogError(ex, ErrorMessages.Common.AddFailed("recipe"));
+            return Error.Failure(ErrorMessages.Common.AddFailed("recipe"));
         }
     }
 }

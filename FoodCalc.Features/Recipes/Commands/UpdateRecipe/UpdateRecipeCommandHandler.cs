@@ -39,8 +39,8 @@ public class UpdateRecipeCommandHandler(UnitOfWork unitOfWork, ILogger<UpdateRec
 		}
 		catch (Exception ex)
 		{
-			logger.LogError(ex, ErrorMessages.Recipe.UpdateFailed);
-			return Error.Failure(ErrorMessages.Recipe.UpdateFailed, ex.Message);
+			logger.LogError(ex, ErrorMessages.Common.UpdateFailed("recipe"));
+			return Error.Failure(ErrorMessages.Common.UpdateFailed("recipe"), ex.Message);
 		}
 	}
 }

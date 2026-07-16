@@ -21,8 +21,8 @@ public class DeleteIngredientCommandHandler(UnitOfWork unitOfWork, ILogger<Delet
 		}
 		catch (Exception ex)
 		{
-			logger.LogError(ex, ErrorMessages.Ingredient.DeleteFailed);
-			return Error.Failure(ErrorMessages.Ingredient.DeleteFailed);
+			logger.LogError(ex, ErrorMessages.Common.DeleteFailed("ingredient"));
+			return Error.Failure(ErrorMessages.Common.DeleteFailed("ingredient"));
 		}
 	}
 }

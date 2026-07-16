@@ -17,8 +17,8 @@ public class DeleteRecipeCommandHandler(UnitOfWork unitOfWork, ILogger<DeleteRec
 		}
 		catch (Exception ex)
 		{
-			logger.LogError(ex, ErrorMessages.Recipe.DeleteFailed);
-			return Error.Failure(ErrorMessages.Recipe.DeleteFailed);
+			logger.LogError(ex, ErrorMessages.Common.DeleteFailed("recipe"));
+			return Error.Failure(ErrorMessages.Common.DeleteFailed("recipe"));
 		}
 	}
 }

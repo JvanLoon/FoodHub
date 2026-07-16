@@ -25,8 +25,8 @@ public class UpdateIngredientCommandHandler(UnitOfWork unitOfWork, ILogger<Updat
 		}
 		catch (Exception ex)
 		{
-			logger.LogError(ex, ErrorMessages.Ingredient.UpdateFailed);
-			return Error.Failure(ErrorMessages.Ingredient.UpdateFailed, ex.Message);
+			logger.LogError(ex, ErrorMessages.Common.UpdateFailed("ingredient"));
+			return Error.Failure(ErrorMessages.Common.UpdateFailed("ingredient"), ex.Message);
 		}
 	}
 }

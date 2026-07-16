@@ -33,8 +33,8 @@ public class GetAllIngredientsQueryHandler(UnitOfWork unitOfWork, ILogger<GetAll
 		}
 		catch (Exception ex)
 		{
-			logger.LogError(ex, ErrorMessages.Ingredient.GetAllFailed);
-			return Error.Failure(ErrorMessages.Ingredient.GetAllFailed);
+			logger.LogError(ex, ErrorMessages.Common.GetAllFailed("ingredients"));
+			return Error.Failure(ErrorMessages.Common.GetAllFailed("ingredients"));
 		}
 	}
 }
