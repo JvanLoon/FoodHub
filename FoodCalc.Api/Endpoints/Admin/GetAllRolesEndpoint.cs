@@ -1,6 +1,6 @@
 using FastEndpoints;
 
-using FoodCalc.Api.Endpoints.Common;
+using FoodCalc.Api.Common;
 using FoodCalc.Features.Authentication.Roles.Queries.GetAllRoles;
 
 using FoodHub.DTOs;

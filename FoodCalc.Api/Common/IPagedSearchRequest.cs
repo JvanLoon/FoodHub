@@ -1,4 +1,4 @@
-namespace FoodCalc.Api.Endpoints.Common;
+namespace FoodCalc.Api.Common;
 
 /// <summary>
 /// Query parameters shared by every paged + searchable "get all" endpoint.

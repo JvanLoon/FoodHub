@@ -1,7 +1,5 @@
 using FastEndpoints;
 
-using FluentValidation;
-
 using FoodCalc.Features.Ingredients.Commands.UpdateIngredient;
 
 using FoodHub.DTOs;
@@ -9,20 +7,6 @@ using FoodHub.DTOs;
 using MediatR;
 
 namespace FoodCalc.Api.Endpoints.Ingredients;
-
-public class UpdateIngredientValidator : Validator<UpdateIngredientDto>
-{
-	public UpdateIngredientValidator()
-	{
-		RuleFor(x => x.Id)
-			.NotEmpty()
-			.WithMessage(ValidationMessages.Common.EntityIdRequired(Entity.Ingredient));
-
-		RuleFor(x => x.Name)
-			.NotEmpty()
-			.WithMessage(ValidationMessages.Common.NameRequired);
-	}
-}
 
 /// <summary>PUT api/ingredient — Admin only.</summary>
 public class UpdateIngredientEndpoint(IMediator mediator)

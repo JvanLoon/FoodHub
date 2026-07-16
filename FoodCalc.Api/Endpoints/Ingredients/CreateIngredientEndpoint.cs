@@ -1,7 +1,5 @@
 using FastEndpoints;
 
-using FluentValidation;
-
 using FoodCalc.Features.Ingredients.Commands.AddIngredient;
 
 using FoodHub.DTOs;
@@ -9,19 +7,6 @@ using FoodHub.DTOs;
 using MediatR;
 
 namespace FoodCalc.Api.Endpoints.Ingredients;
-
-/// <summary>
-/// Replaces the old inline ModelState check in the AddIngredient action.
-/// </summary>
-public class CreateIngredientValidator : Validator<CreateIngredientDto>
-{
-	public CreateIngredientValidator()
-	{
-		RuleFor(x => x.Name)
-			.NotEmpty()
-			.WithMessage(ValidationMessages.Common.NameRequired);
-	}
-}
 
 /// <summary>POST api/ingredient — Admin only.</summary>
 public class CreateIngredientEndpoint(IMediator mediator)

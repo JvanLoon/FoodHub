@@ -2,7 +2,7 @@ using FastEndpoints;
 
 using FluentValidation;
 
-namespace FoodCalc.Api.Endpoints.Common;
+namespace FoodCalc.Api.Common;
 
 /// <summary>
 /// The single paging guard for all paged-search requests. PageSize is only

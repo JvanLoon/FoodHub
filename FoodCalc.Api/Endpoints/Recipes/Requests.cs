@@ -1,6 +1,6 @@
 using FastEndpoints;
 
-using FoodCalc.Api.Endpoints.Common;
+using FoodCalc.Api.Common;
 
 namespace FoodCalc.Api.Endpoints.Recipes;
 

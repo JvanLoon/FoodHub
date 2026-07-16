@@ -1,6 +1,6 @@
 using FastEndpoints;
 
-namespace FoodCalc.Api.Endpoints.Common;
+namespace FoodCalc.Api.Common;
 
 /// <summary>
 /// Query parameters for the "get all roles" endpoints. Roles are paged/searchable
@@ -18,6 +18,3 @@ public class GetRolesRequest : IPagedSearchRequest
 	[BindFrom("search")]
 	public string? Search { get; set; }
 }
-
-/// <summary>Paging guard for the roles endpoints (see <see cref="PagedSearchRequestValidator{T}"/>).</summary>
-public class GetRolesRequestValidator : PagedSearchRequestValidator<GetRolesRequest>;

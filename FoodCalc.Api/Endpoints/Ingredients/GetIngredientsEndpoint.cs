@@ -1,6 +1,6 @@
 using FastEndpoints;
 
-using FoodCalc.Api.Endpoints.Common;
+using FoodCalc.Api.Common;
 using FoodCalc.Feature.Ingredients.Queries.GetAllIngredients;
 
 using FoodHub.DTOs;
@@ -21,9 +21,6 @@ public class GetIngredientsRequest : IPagedSearchRequest
 	[BindFrom("search")]
 	public string? Search { get; set; }
 }
-
-/// <summary>Paging guard for GET api/ingredient (see <see cref="PagedSearchRequestValidator{T}"/>).</summary>
-public class GetIngredientsRequestValidator : PagedSearchRequestValidator<GetIngredientsRequest>;
 
 /// <summary>GET api/ingredient — any authenticated user.</summary>
 public class GetIngredientsEndpoint(IMediator mediator)

@@ -1,6 +1,6 @@
 using FastEndpoints;
 
-using FoodCalc.Api.Endpoints.Common;
+using FoodCalc.Api.Common;
 using FoodCalc.Features.Authentication.Roles.Queries.GetAllRoles;
 using FoodCalc.Features.Authentication.Users.Queries.GetAllUsers;
 
@@ -21,9 +21,6 @@ public class GetUsersRequest : IPagedSearchRequest
 	[BindFrom("search")]
 	public string? Search { get; set; }
 }
-
-/// <summary>Paging guard for GET api/user/users (see <see cref="PagedSearchRequestValidator{T}"/>).</summary>
-public class GetUsersRequestValidator : PagedSearchRequestValidator<GetUsersRequest>;
 
 /// <summary>GET api/user/users — Admin, Moderator or User.</summary>
 public class GetUsersEndpoint(IMediator mediator)
