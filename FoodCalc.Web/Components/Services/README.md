@@ -15,7 +15,9 @@ repetitive success/error plumbing at call sites.
 
 The important part: **the error message is already parsed for you** by the HTTP
 client. By the time a component sees an `ApiResult`, `Error` holds a clean,
-user-ready string. Components never parse response bodies.
+user-ready string. Components never parse response bodies. See
+[error-handling.md](error-handling.md) for how that message is recovered from the
+server response.
 
 ## `ApiResult` in brief
 
@@ -221,3 +223,8 @@ else
   there's nothing to `await`. Await the API call, then chain.
 - `OrDefault` returns `Data` on success (guaranteed non-null) or your fallback;
   it never toasts. Combine with `Notify` when you also want the error surfaced.
+
+## Related
+
+- [error-handling.md](error-handling.md) — how `AuthenticatedHttpClientService`
+  turns a failed response into the clean `Error` string these helpers consume.
