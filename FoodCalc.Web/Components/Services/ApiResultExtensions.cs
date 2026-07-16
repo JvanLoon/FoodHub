@@ -1,3 +1,7 @@
+using Microsoft.AspNetCore.Mvc;
+
+using static FoodCalc.Web.Components.Constants.WebConstants;
+
 namespace FoodCalc.Web.Components.Services;
 
 /// <summary>
@@ -11,86 +15,103 @@ public static class ApiResultExtensions
 	// ----- Side effects on the outcome -----
 
 	/// <summary>Runs <paramref name="action"/> when the call succeeded.</summary>
-	public static ApiResult OnSuccess(this ApiResult result, Action action)
+	public static ApiResult OnSuccess(this ApiResult result, Action action, string? message = null)
 	{
-		if (result.Success) action();
+		Notify(result, result.MessageService, message, action);
 		return result;
 	}
 
 	/// <inheritdoc cref="OnSuccess(ApiResult, Action)"/>
-	public static ApiResult<T> OnSuccess<T>(this ApiResult<T> result, Action<T> action)
+	public static ApiResult<T> OnSuccess<T>(this ApiResult<T> result, Action<T> action, string? message = null) where T : class
 	{
-		if (result.Success) action(result.Data!);
+		Notify(result, result.MessageService, message, () => action(result.Data!));
 		return result;
 	}
 
-	/// <summary>Runs <paramref name="action"/> when the call succeeded, without the payload.</summary>
-	public static ApiResult Then(this ApiResult result, Action action)
-    {
-        if (result.Success) action();
-        return result;
-    }
-
-    /// <inheritdoc cref="Then(ApiResult, Action)"/>
-    public static ApiResult<T> Then<T>(this ApiResult<T> result, Action action)
-    {
-        if (result.Success) action();
-        return result;
-    }
-
     /// <summary>Runs <paramref name="action"/> with the error message when the call failed.</summary>
-    public static ApiResult OnFailure(this ApiResult result, Action<string> action)
+    public static ApiResult OnFailure(this ApiResult result, Action action, string? message = null)
     {
-        if (!result.Success) action(result.Error!);
+		NotifyFail(result, result.MessageService, message, action);
         return result;
     }
 
-    /// <inheritdoc cref="OnFailure(ApiResult, Action{string})"/>
-    public static ApiResult<T> OnFailure<T>(this ApiResult<T> result, Action<string> action)
-    {
-        if (!result.Success) action(result.Error!);
-        return result;
-    }
+	// ----- Value extraction -----
 
-    // ----- Toast the outcome via MessageService -----
+	/// <summary>The payload on success, or <paramref name="fallback"/> on failure.</summary>
+	public static T OrDefault<T>(this ApiResult<T> result, T fallback, bool showMessage = false)
+	{
+		if(result.Success)
+			return result.Data!;
+
+		if (showMessage)
+			Notify(result, result.MessageService, result.Error);
+
+		return fallback;
+	}
+
+	// ----- Toast the outcome via MessageService -----
 
 	/// <summary>
 	/// On failure, shows the server's error message as an error toast. On success, shows
-	/// <paramref name="success"/> as a success toast when one is supplied (otherwise stays silent).
+	/// <paramref name="message"/> as a success toast when one is supplied (otherwise stays silent).
 	/// Returns the same result so it can be chained or guarded on.
 	/// </summary>
-	public static ApiResult Notify(this ApiResult result, MessageService messages,
-        string? success = null,
-        int successTimeInMs = MessageService.DefaultDisplayTimeInMs,
-        int errorTimeInMs = MessageService.DefaultDisplayTimeInMs)
-    {
-        if (result.Success)
-        {
-            if (success is not null)
-                messages.ShowMessage(success, isError: false, successTimeInMs);
-        }
-        else
-        {
-            messages.ShowMessage(result.Error!, isError: true, errorTimeInMs);
-        }
+	private static ApiResult Notify(this ApiResult result,
+		MessageService? messageService = null,
+		string? message = null,
+		Action? action = null,
+		int timeInMs = MessageService.DefaultDisplayTimeInMs)
+	{
+		if (result.Success)
+		{
+			if(!string.IsNullOrEmpty(message))
+				messageService?.ShowMessage(message, isError: false, timeInMs);
+			action?.Invoke();
+		}
+		else
+		{
+			if(!string.IsNullOrEmpty(result.Error))
+				messageService?.ShowMessage(result.Error, isError: true, timeInMs);
+		}
 
-        return result;
-    }
+		return result;
+	}
 
-    /// <inheritdoc cref="Notify(ApiResult, MessageService, string?, int, int)"/>
-    public static ApiResult<T> Notify<T>(this ApiResult<T> result, MessageService messages,
-        string? success = null,
-        int successTimeInMs = MessageService.DefaultDisplayTimeInMs,
-        int errorTimeInMs = MessageService.DefaultDisplayTimeInMs)
+	/// <inheritdoc cref="Notify(ApiResult, MessageService, string?, int, int)"/>
+	private static ApiResult<T> Notify<T>(this ApiResult<T> result,
+		MessageService? messageService = null,
+        string? message = null,
+		Action? action = null,
+		int timeInMs = MessageService.DefaultDisplayTimeInMs) where T : class 
     {
         // Cast to the base type so the non-generic overload runs (avoids recursion).
-        ((ApiResult)result).Notify(messages, success, successTimeInMs, errorTimeInMs);
+        ((ApiResult)result).Notify(messageService, message, action, timeInMs);
         return result;
     }
 
-    // ----- Value extraction -----
+	/// <summary>
+	/// On failure, shows the server's error message as an error toast. On success, shows
+	/// <paramref name="message"/> as a success toast when one is supplied (otherwise stays silent).
+	/// Returns the same result so it can be chained or guarded on.
+	/// </summary>
+	private static ApiResult NotifyFail(this ApiResult result,
+		MessageService? messageService = null,
+		string? message = null,
+		Action? action = null,
+		int timeInMs = MessageService.DefaultDisplayTimeInMs)
+	{
+		if (result.Success)
+		{
+			if(!string.IsNullOrEmpty(message))
+				messageService?.ShowMessage(message, isError: false, timeInMs);
+		}
+		else
+		{
+			if(!string.IsNullOrEmpty(result.Error))
+				messageService?.ShowMessage(result.Error, isError: true, timeInMs);
+			action?.Invoke();
+		}
 
-    /// <summary>The payload on success, or <paramref name="fallback"/> on failure.</summary>
-    public static T OrDefault<T>(this ApiResult<T> result, T fallback) =>
-        result.Success ? result.Data! : fallback;
+		return result;
+	}
 }

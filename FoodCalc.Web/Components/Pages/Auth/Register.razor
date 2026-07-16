@@ -31,7 +31,6 @@
     private async Task HandleRegister()
     {
         (await LoginService.RegisterAsync(registerModel))
-            .Notify(MessageService, success: WebConstants.Messages.Auth.RegisterSuccess)
-            .Then(() => Navigation.NavigateTo("/login"));
+        .OnSuccess(() => Navigation.NavigateTo("/login"), WebConstants.Messages.Auth.RegisterSuccess);
     }
 }

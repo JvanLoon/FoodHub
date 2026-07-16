@@ -134,18 +134,14 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var recipeResult = await RecipeService.GetRecipeByIdAsync(RecipeId);
-        if (!recipeResult.Notify(MessageService, errorTimeInMs: 20000).Success)
-            return;
-        recipe = recipeResult.Data ?? new RecipeDto();
+        recipe = (await RecipeService.GetRecipeByIdAsync(RecipeId)).OrDefault(new());
 
-        var ingredientsResult = await IngredientService.GetAllIngredientsAsync();
-        if (!ingredientsResult.Notify(MessageService, errorTimeInMs: 20000).Success)
-            return;
-        ingredients = ingredientsResult.Data!;
-
-        noIngredient = Guid.NewGuid();
-        ClearForm();
+        (await IngredientService.GetAllIngredientsAsync())
+        .OnSuccess((data) => { 
+            ingredients = data;
+            noIngredient = Guid.NewGuid();
+            ClearForm();
+        });
     }
 
     private async Task RefreshRecipeAsync()
@@ -157,12 +153,12 @@
     {
         recipeIngredient.RecipeId = RecipeId;
         recipeIngredient.Amount = amountInput ?? 0;
-        if (!(await RecipeService.AddIngredient(recipeIngredient)).Notify(MessageService).Success)
-            return;
 
-        MessageService.ShowMessage(WebConstants.Messages.Ingredient.AddedOrUpdated, false);
-        ClearForm();
-        await RefreshRecipeAsync(); // Refresh the list
+        (await RecipeService.AddIngredient(recipeIngredient)).Notify(MessageService, WebConstants.Messages.Ingredient.AddedOrUpdated).Then(async () =>
+        {
+            ClearForm();
+            await RefreshRecipeAsync(); // Refresh the list
+        });
     }
 
     private void EditIngredient(RecipeIngredientDto ingredient)
@@ -180,12 +176,11 @@
 
     private async Task DeleteIngredient(Guid recipeIngredientId)
     {
-        if (!(await RecipeService.DeleteIngredient(recipeIngredientId)).Notify(MessageService).Success)
-            return;
-
-        MessageService.ShowMessage(WebConstants.Messages.Ingredient.Deleted, false);
-        ClearForm();
-        await RefreshRecipeAsync(); // Refresh the list
+        (await RecipeService.DeleteIngredient(recipeIngredientId)).Notify(MessageService, success:WebConstants.Messages.Ingredient.Deleted).Then(async () =>
+        {
+            ClearForm();
+            await RefreshRecipeAsync(); // Refresh the list
+        });
     }
 
     private void ClearForm()
@@ -197,34 +192,24 @@
 
     private async Task SaveRecipeName()
     {
-        if (!(await RecipeService.UpdateRecipeName(RecipeId, recipe.Name!)).Notify(MessageService).Success)
-            return;
-
-        isEditingName = false;
-        await RefreshRecipeAsync(); // Refresh
-        MessageService.ShowMessage(WebConstants.Messages.Recipe.NameUpdated, false);
+        (await RecipeService.UpdateRecipeName(RecipeId, recipe.Name!)).Notify(MessageService, WebConstants.Messages.Recipe.NameUpdated).Then(async ()=>
+        {
+            isEditingName = false;
+            await RefreshRecipeAsync(); // Refresh
+        });
     }
 
     private async Task AddIngredient()
     {
-        var ingredient = new CreateIngredientDto { Name = ingredientSearch };
-
-        if (!(await IngredientService.AddIngredientAsync(ingredient)).Notify(MessageService).Success)
-            return;
-
-        var ingredientsResult = await IngredientService.GetAllIngredientsAsync();
-        if (!ingredientsResult.Notify(MessageService).Success)
-            return;
-        ingredients = ingredientsResult.Data!;
-
-        recipeIngredient.IngredientId = ingredients.FirstOrDefault(i => i.Name == ingredientSearch)?.Id ?? Guid.Empty;
-        if (recipeIngredient.IngredientId == Guid.Empty)
+        (await IngredientService.AddIngredientAsync(new CreateIngredientDto { Name = ingredientSearch })).Notify(MessageService, WebConstants.Messages.Ingredient.Added).Then(async () =>
         {
-            //only clear when failed
-            ingredientSearch = string.Empty;
-        }
+            (await IngredientService.GetAllIngredientsAsync()).OnSuccess((data) => ingredients = data);
 
-        MessageService.ShowMessage(WebConstants.Messages.Ingredient.Added, false);
+            recipeIngredient.IngredientId = ingredients.FirstOrDefault(i => i.Name == ingredientSearch)?.Id ?? Guid.Empty;
+
+            //only clear when failed
+            ingredientSearch = recipeIngredient.IngredientId == Guid.Empty ? string.Empty : ingredientSearch;
+        });
     }
 
     private void SelectIngredient(IngredientDto ingredient)

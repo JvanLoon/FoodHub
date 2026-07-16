@@ -18,7 +18,8 @@ namespace FoodCalc.Web.Components.Services.Auth;
 public class AuthenticatedHttpClientService(
     HttpClient httpClient,
     AuthTokenService authTokenService,
-    ILogger<AuthenticatedHttpClientService> logger)
+    ILogger<AuthenticatedHttpClientService> logger,
+	MessageService? messageService)
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
 

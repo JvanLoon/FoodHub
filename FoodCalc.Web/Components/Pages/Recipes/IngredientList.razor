@@ -87,8 +87,9 @@
     private async Task LoadIngredientsAsync()
     {
         pagedResult = (await IngredientService.GetPagedIngredientsAsync(currentPage, pageSize, searchTerm))
-            .Notify(MessageService, errorTimeInMs: 20000)
-            .OrDefault(new());
+        .OrDefault(new())
+            //.Notify(MessageService)
+            ;
     }
 
     private async Task OnPageChanged(int page)

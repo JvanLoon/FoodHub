@@ -9,7 +9,9 @@ namespace FoodCalc.Web.Components.Services;
 /// </summary>
 public class ApiResult
 {
-    public bool Success { get; init; }
+	internal MessageService? MessageService { get; set; }
+
+	public bool Success { get; init; }
 
     /// <summary>Clean, user-ready message. Null on success.</summary>
     public string? Error { get; init; }

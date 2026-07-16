@@ -30,7 +30,8 @@
     private async Task CreateRecipeAsync()
     {
         (await RecipeService.AddRecipe(recipe))
-            .OnSuccess(data => NavigationManager.NavigateTo($"/recipes/edit/{data.Id}"))
-            .Notify(MessageService);
+        .OnSuccess(MessageService, null, (data) => NavigationManager.NavigateTo($"/recipes/edit/{data.Id}"));
+        //.Notify(MessageService);
+        //.Then((data) => NavigationManager.NavigateTo($"/recipes/edit/{data.Id}"));
     }
 }

@@ -32,21 +32,16 @@
 
     private async Task HandleLogin()
     {
-        var response = await LoginService.LoginAsync(loginModel);
-
-        if (!response.Success)
+        (await LoginService.LoginAsync(loginModel)).OnSuccess(async (data) =>
         {
-            MessageService.ShowMessage(WebConstants.Messages.Auth.LoginFailed, true);
-            return;
-        }
+            if (data?.Token == null)
+            {
+                MessageService.ShowMessage(WebConstants.Messages.Auth.LoginInvalidResponse, true);
+                return;
+            }
 
-        if (response.Data?.Token == null)
-        {
-            MessageService.ShowMessage(WebConstants.Messages.Auth.LoginInvalidResponse, true);
-            return;
-        }
-
-        await AuthStateService.SignInAsync(response.Data.Token);
-        Navigation.NavigateTo("/");
+            await AuthStateService.SignInAsync(data.Token);
+            Navigation.NavigateTo("/");
+        });
     }
 }
