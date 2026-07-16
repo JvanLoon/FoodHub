@@ -1,7 +1,6 @@
 using FastEndpoints;
 
-using FluentValidation;
-
+using FoodCalc.Api.Endpoints.Common;
 using FoodCalc.Features.Authentication.Roles.Queries.GetAllRoles;
 using FoodCalc.Features.Authentication.Users.Queries.GetAllUsers;
 
@@ -11,7 +10,7 @@ using MediatR;
 
 namespace FoodCalc.Api.Endpoints.Users;
 
-public class GetUsersRequest
+public class GetUsersRequest : IPagedSearchRequest
 {
 	[BindFrom("page")]
 	public int Page { get; set; } = 1;
@@ -23,15 +22,8 @@ public class GetUsersRequest
 	public string? Search { get; set; }
 }
 
-/// <summary>Paging guard (PageSize lower-bounded only; see GetRecipesRequestValidator).</summary>
-public class GetUsersRequestValidator : Validator<GetUsersRequest>
-{
-	public GetUsersRequestValidator()
-	{
-		RuleFor(x => x.Page).GreaterThanOrEqualTo(1);
-		RuleFor(x => x.PageSize).GreaterThanOrEqualTo(1);
-	}
-}
+/// <summary>Paging guard for GET api/user/users (see <see cref="PagedSearchRequestValidator{T}"/>).</summary>
+public class GetUsersRequestValidator : PagedSearchRequestValidator<GetUsersRequest>;
 
 /// <summary>GET api/user/users — Admin, Moderator or User.</summary>
 public class GetUsersEndpoint(IMediator mediator)
@@ -56,9 +48,10 @@ public class GetUsersEndpoint(IMediator mediator)
 
 /// <summary>
 /// GET api/user/allroles — Admin, Moderator or User.
-/// Returns a raw comma-separated text/plain string (see the Admin variant).
+/// Returns a paged list of role names (see the Admin variant).
 /// </summary>
-public class GetAllRolesEndpoint(IMediator mediator) : EndpointWithoutRequest
+public class GetAllRolesEndpoint(IMediator mediator)
+	: Endpoint<GetRolesRequest, PagedResultDto<string>>
 {
 	public override void Configure()
 	{
@@ -66,12 +59,12 @@ public class GetAllRolesEndpoint(IMediator mediator) : EndpointWithoutRequest
 		Policies("Admin,Moderator,User");
 	}
 
-	public override async Task HandleAsync(CancellationToken ct)
+	public override async Task HandleAsync(GetRolesRequest req, CancellationToken ct)
 	{
-		var result = await mediator.Send(new GetAllRolesQuery(), ct);
+		var result = await mediator.Send(new GetAllRolesQuery(req.Page, req.PageSize, req.Search), ct);
 
 		await result.Match(
-			roles => Send.StringAsync(string.Join(",", roles), cancellation: ct),
+			value => Send.OkAsync(value, ct),
 			errors => Send.ResultAsync(TypedResults.Problem(
 				string.Join(", ", errors.Select(e => e.ToString())))));
 	}

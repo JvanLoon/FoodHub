@@ -1,6 +1,9 @@
 using FastEndpoints;
 
+using FoodCalc.Api.Endpoints.Common;
 using FoodCalc.Features.Authentication.Roles.Queries.GetAllRoles;
+
+using FoodHub.DTOs;
 
 using MediatR;
 
@@ -8,11 +11,11 @@ namespace FoodCalc.Api.Endpoints.Admin;
 
 /// <summary>
 /// GET api/admin/allroles — Admin or Moderator.
-/// Returns the roles as a raw comma-separated text/plain string, matching the
-/// old controller (the Blazor AdminService reads the body as a string and
-/// splits on ',', so this must NOT be a JSON-encoded string).
+/// Returns a paged list of role names. The Blazor AdminService fetches them all
+/// via pageSize = int.MaxValue and reads Items.
 /// </summary>
-public class GetAllRolesEndpoint(IMediator mediator) : EndpointWithoutRequest
+public class GetAllRolesEndpoint(IMediator mediator)
+	: Endpoint<GetRolesRequest, PagedResultDto<string>>
 {
 	public override void Configure()
 	{
@@ -20,12 +23,12 @@ public class GetAllRolesEndpoint(IMediator mediator) : EndpointWithoutRequest
 		Policies("Admin,Moderator");
 	}
 
-	public override async Task HandleAsync(CancellationToken ct)
+	public override async Task HandleAsync(GetRolesRequest req, CancellationToken ct)
 	{
-		var result = await mediator.Send(new GetAllRolesQuery(), ct);
+		var result = await mediator.Send(new GetAllRolesQuery(req.Page, req.PageSize, req.Search), ct);
 
 		await result.Match(
-			roles => Send.StringAsync(string.Join(",", roles), cancellation: ct),
+			value => Send.OkAsync(value, ct),
 			errors => Send.ResultAsync(TypedResults.Problem(
 				string.Join(", ", errors.Select(e => e.ToString())))));
 	}

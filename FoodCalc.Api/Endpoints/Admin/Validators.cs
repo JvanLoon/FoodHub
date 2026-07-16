@@ -2,17 +2,12 @@ using FastEndpoints;
 
 using FluentValidation;
 
+using FoodCalc.Api.Endpoints.Common;
+
 namespace FoodCalc.Api.Endpoints.Admin;
 
-/// <summary>Paging guard (PageSize lower-bounded only; see GetRecipesRequestValidator).</summary>
-public class GetUsersRequestValidator : Validator<GetUsersRequest>
-{
-	public GetUsersRequestValidator()
-	{
-		RuleFor(x => x.Page).GreaterThanOrEqualTo(1);
-		RuleFor(x => x.PageSize).GreaterThanOrEqualTo(1);
-	}
-}
+/// <summary>Paging guard for GET api/admin/users (see <see cref="PagedSearchRequestValidator{T}"/>).</summary>
+public class GetUsersRequestValidator : PagedSearchRequestValidator<GetUsersRequest>;
 
 public class GetUserRolesRequestValidator : Validator<GetUserRolesRequest>
 {

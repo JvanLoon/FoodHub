@@ -2,23 +2,14 @@ using FastEndpoints;
 
 using FluentValidation;
 
+using FoodCalc.Api.Endpoints.Common;
+
 using FoodHub.DTOs;
 
 namespace FoodCalc.Api.Endpoints.Recipes;
 
-/// <summary>
-/// Paging guard. PageSize is only lower-bounded: the Blazor "get all" helpers
-/// call this with pageSize = int.MaxValue to fetch every row, so an upper cap
-/// would break them.
-/// </summary>
-public class GetRecipesRequestValidator : Validator<GetRecipesRequest>
-{
-	public GetRecipesRequestValidator()
-	{
-		RuleFor(x => x.Page).GreaterThanOrEqualTo(1);
-		RuleFor(x => x.PageSize).GreaterThanOrEqualTo(1);
-	}
-}
+/// <summary>Paging guard for GET api/recipe/getallrecipes (see <see cref="PagedSearchRequestValidator{T}"/>).</summary>
+public class GetRecipesRequestValidator : PagedSearchRequestValidator<GetRecipesRequest>;
 
 /// <summary>
 /// Replaces the old inline ModelState check (`if (string.IsNullOrEmpty(recipe.Name))`)

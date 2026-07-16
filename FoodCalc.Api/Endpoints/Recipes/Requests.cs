@@ -1,12 +1,14 @@
 using FastEndpoints;
 
+using FoodCalc.Api.Endpoints.Common;
+
 namespace FoodCalc.Api.Endpoints.Recipes;
 
 /// <summary>
 /// Query parameters for GET api/recipe/getallrecipes.
 /// Defaults mirror the previous controller action.
 /// </summary>
-public class GetRecipesRequest
+public class GetRecipesRequest : IPagedSearchRequest
 {
 	[BindFrom("withingredient")]
 	public bool WithIngredient { get; set; } = true;

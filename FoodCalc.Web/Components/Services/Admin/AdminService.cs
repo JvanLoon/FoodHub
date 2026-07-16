@@ -28,14 +28,13 @@ public class AdminService(AuthenticatedHttpClientService httpClient)
 
 	public async Task<ApiResult<List<string>>> GetAllRolesAsync()
 	{
-		var result = await httpClient.GetAsync<string>(ApiRoutes.Admin.AllRoles);
-		if (!result.Success)
-			return ApiResult<List<string>>.Fail(result.Error!, result.StatusCode);
+		// Roles feed the role-picker, which needs every role, so fetch all in one page.
+		var paged = await httpClient.GetAsync<PagedResultDto<string>>(
+			$"{ApiRoutes.Admin.AllRoles}?page=1&pageSize={int.MaxValue}");
+		if (!paged.Success)
+			return ApiResult<List<string>>.Fail(paged.Error!, paged.StatusCode);
 
-		var roles = (result.Data ?? string.Empty)
-			.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-			.ToList();
-		return ApiResult<List<string>>.Ok(roles, result.StatusCode);
+		return ApiResult<List<string>>.Ok([.. paged.Data!.Items], paged.StatusCode);
 	}
 
 	public Task<ApiResult<List<string>>> GetUserRolesAsync(string email) =>

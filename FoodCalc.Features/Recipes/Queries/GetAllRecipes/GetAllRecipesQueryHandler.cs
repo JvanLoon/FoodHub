@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 namespace FoodCalc.Features.Recipes.Queries.GetAllRecipes;
 public class GetAllRecipesQueryHandler(UnitOfWork unitOfWork, ILogger<GetAllRecipesQueryHandler> logger) : IRequestHandler<GetAllRecipesQuery, ErrorOr<PagedResultDto<RecipeDto>>>
 {
-	public Task<ErrorOr<PagedResultDto<RecipeDto>>> Handle(GetAllRecipesQuery request, CancellationToken cancellationToken)
+	public async Task<ErrorOr<PagedResultDto<RecipeDto>>> Handle(GetAllRecipesQuery request, CancellationToken cancellationToken)
 	{
 		try
 		{
@@ -18,7 +18,7 @@ public class GetAllRecipesQueryHandler(UnitOfWork unitOfWork, ILogger<GetAllReci
 			if (!string.IsNullOrWhiteSpace(request.Search))
 				query = query.Where(r => r.Name.Contains(request.Search));
 
-			var paged = query.ToPagedResult(request.Page, request.PageSize);
+			var paged = await query.ToPagedResultAsync(request, cancellationToken);
 
 			if (!request.WithIngredient)
 			{
@@ -28,18 +28,18 @@ public class GetAllRecipesQueryHandler(UnitOfWork unitOfWork, ILogger<GetAllReci
 				}
 			}
 
-			return Task.FromResult<ErrorOr<PagedResultDto<RecipeDto>>>(new PagedResultDto<RecipeDto>
+			return new PagedResultDto<RecipeDto>
 			{
 				Items = paged.Items.ToDtoList(),
 				TotalCount = paged.TotalCount,
 				Page = paged.Page,
 				PageSize = paged.PageSize
-			});
+			};
 		}
 		catch (Exception ex)
 		{
 			logger.LogError(ex, ErrorMessages.Common.GetAllFailed("Recipes"));
-			return Task.FromResult<ErrorOr<PagedResultDto<RecipeDto>>>(Error.Failure(ErrorMessages.Common.GetAllFailed("Recipes")));
+			return Error.Failure(ErrorMessages.Common.GetAllFailed("Recipes"));
 		}
 	}
 }

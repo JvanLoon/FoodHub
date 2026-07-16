@@ -1,7 +1,6 @@
 using FastEndpoints;
 
-using FluentValidation;
-
+using FoodCalc.Api.Endpoints.Common;
 using FoodCalc.Feature.Ingredients.Queries.GetAllIngredients;
 
 using FoodHub.DTOs;
@@ -11,7 +10,7 @@ using MediatR;
 namespace FoodCalc.Api.Endpoints.Ingredients;
 
 /// <summary>Query parameters for GET api/ingredient.</summary>
-public class GetIngredientsRequest
+public class GetIngredientsRequest : IPagedSearchRequest
 {
 	[BindFrom("page")]
 	public int Page { get; set; } = 1;
@@ -23,15 +22,8 @@ public class GetIngredientsRequest
 	public string? Search { get; set; }
 }
 
-/// <summary>Paging guard (PageSize lower-bounded only; see GetRecipesRequestValidator).</summary>
-public class GetIngredientsRequestValidator : Validator<GetIngredientsRequest>
-{
-	public GetIngredientsRequestValidator()
-	{
-		RuleFor(x => x.Page).GreaterThanOrEqualTo(1);
-		RuleFor(x => x.PageSize).GreaterThanOrEqualTo(1);
-	}
-}
+/// <summary>Paging guard for GET api/ingredient (see <see cref="PagedSearchRequestValidator{T}"/>).</summary>
+public class GetIngredientsRequestValidator : PagedSearchRequestValidator<GetIngredientsRequest>;
 
 /// <summary>GET api/ingredient — any authenticated user.</summary>
 public class GetIngredientsEndpoint(IMediator mediator)

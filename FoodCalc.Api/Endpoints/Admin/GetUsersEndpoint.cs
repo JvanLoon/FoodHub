@@ -1,5 +1,6 @@
 using FastEndpoints;
 
+using FoodCalc.Api.Endpoints.Common;
 using FoodCalc.Features.Authentication.Users.Queries.GetAllUsers;
 
 using FoodHub.DTOs;
@@ -9,7 +10,7 @@ using MediatR;
 namespace FoodCalc.Api.Endpoints.Admin;
 
 /// <summary>Query parameters for the paged user list endpoints.</summary>
-public class GetUsersRequest
+public class GetUsersRequest : IPagedSearchRequest
 {
 	[BindFrom("page")]
 	public int Page { get; set; } = 1;

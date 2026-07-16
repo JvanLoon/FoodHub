@@ -18,9 +18,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FoodCalc.Features.Authentication.Roles.Queries.GetAllRoles;
-public class GetAllRolesQueryHandler(UnitOfWork unitOfWork, ILogger<GetAllUsersQueryHandler> logger) : IRequestHandler<GetAllRolesQuery, ErrorOr<List<string>>>
+public class GetAllRolesQueryHandler(UnitOfWork unitOfWork, ILogger<GetAllUsersQueryHandler> logger) : IRequestHandler<GetAllRolesQuery, ErrorOr<PagedResultDto<string>>>
 {
-	public Task<ErrorOr<List<string>>> Handle(GetAllRolesQuery request, CancellationToken cancellationToken)
+	public async Task<ErrorOr<PagedResultDto<string>>> Handle(GetAllRolesQuery request, CancellationToken cancellationToken)
 	{
 		try
 		{
@@ -29,14 +29,12 @@ public class GetAllRolesQueryHandler(UnitOfWork unitOfWork, ILogger<GetAllUsersQ
 			if (!string.IsNullOrWhiteSpace(request.Search))
 				query = query.Where(r => r.Contains(request.Search));
 
-			var roles = query.ToPagedResult(request.Page, request.PageSize);
-
-			return Task.FromResult<ErrorOr<List<string>>>(roles.Items.ToList());
+			return await query.ToPagedResultAsync(request, cancellationToken);
 		}
 		catch (Exception ex)
 		{
-			logger.LogError(ex, ErrorMessages.Common.GetAllFailed("Users"));
-			return Task.FromResult<ErrorOr<List<string>>>(Error.Failure(ErrorMessages.Common.GetAllFailed("Users")));
+			logger.LogError(ex, ErrorMessages.Common.GetAllFailed("Roles"));
+			return Error.Failure(ErrorMessages.Common.GetAllFailed("Roles"));
 		}
 	}
 }

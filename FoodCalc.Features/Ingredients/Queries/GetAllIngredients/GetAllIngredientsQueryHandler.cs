@@ -21,15 +21,7 @@ public class GetAllIngredientsQueryHandler(UnitOfWork unitOfWork, ILogger<GetAll
 			if (!string.IsNullOrWhiteSpace(request.Search))
 				query = query.Where(i => i.Name.Contains(request.Search));
 
-			var paged = await query.ToPagedResultAsync(request.Page, request.PageSize, cancellationToken);
-
-			return new PagedResultDto<IngredientDto>
-			{
-				Items = paged.Items.ToDtoList(),
-				TotalCount = paged.TotalCount,
-				Page = paged.Page,
-				PageSize = paged.PageSize
-			};
+			return await query.ToPagedResultAsync(request, items => items.ToDtoList(), cancellationToken);
 		}
 		catch (Exception ex)
 		{

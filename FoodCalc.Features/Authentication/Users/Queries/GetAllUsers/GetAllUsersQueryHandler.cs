@@ -20,7 +20,7 @@ public class GetAllUsersQueryHandler(UnitOfWork unitOfWork, ILogger<GetAllUsersQ
             if (!string.IsNullOrWhiteSpace(request.Search))
                 query = query.Where(u => u.Email!.Contains(request.Search));
 
-            var paged = query.ToPagedResult(request.Page, request.PageSize);
+            var paged = await query.ToPagedResultAsync(request, cancellationToken);
 
             var userDtos = new List<UserDto>();
             foreach (var user in paged.Items)
