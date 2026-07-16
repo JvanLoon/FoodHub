@@ -150,9 +150,7 @@
 
     private async Task RefreshRecipeAsync()
     {
-        var result = await RecipeService.GetRecipeByIdAsync(RecipeId);
-        if (result.Success && result.Data is not null)
-            recipe = result.Data;
+        (await RecipeService.GetRecipeByIdAsync(RecipeId)).OnSuccess((data) => recipe = data);
     }
 
     private async Task AddOrUpdateIngredient()
