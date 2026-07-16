@@ -21,7 +21,7 @@ public class GetUserByEmailQueryHandler(UnitOfWork unitOfWork, ILogger<GetAllRec
 			var user = await unitOfWork.UserRepository.GetByEmailAsync(request.Email, cancellationToken);
 
 			if (user is null)
-				return Error.Failure(ErrorMessages.User.NotFound);
+				return Error.Failure(ErrorMessages.Common.NotFound("User"));
 
 			return user.ToUserDto();
 		}

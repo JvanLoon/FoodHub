@@ -7,6 +7,14 @@ namespace FoodCalc.Features.Constants;
 /// </summary>
 public static class ErrorMessages
 {
+    /// <summary>Entity-agnostic messages, parameterized where one template serves several entities.</summary>
+    public static class Common
+    {
+        private const string NotFoundTemplate = "{0} not found";
+        public static string NotFound(string entityName) =>
+            string.Format(NotFoundTemplate, entityName);
+    }
+
     /// <summary>Recipes.</summary>
     public static class Recipe
     {
@@ -14,7 +22,6 @@ public static class ErrorMessages
         public const string AddFailed = "Failed to add recipe";
         public const string UpdateFailed = "Failed to update recipe";
         public const string DeleteFailed = "Failed to delete recipe";
-        public const string NotFound = "Recipe not found";
         public const string AddIngredientFailed = "Failed to add ingredient to Recipe";
         public const string UpdateForIngredientFailed = "Failed to update Recipe";
     }
@@ -33,7 +40,6 @@ public static class ErrorMessages
     public static class User
     {
         public const string GetAllFailed = "Failed to get all Users";
-        public const string NotFound = "User not found";
         public const string GetByEmailFailed = "Failed to get User by email";
     }
 
