@@ -28,7 +28,11 @@
                         <label class="form-label" for="importFile">Import file (.json)</label>
                         <InputFile id="importFile" class="form-control" OnChange="HandleFileSelected" accept=".json" />
                     </div>
-                    <AppButton Icon="upload" OnClick="ImportData">Import</AppButton>
+                    <div class="fh-cluster">
+                        <AppButton Icon="upload" OnClick="ImportData">Import</AppButton>
+                        <AppButton Variant="ButtonVariant.OutlineSecondary" Icon="clock-history" OnClick="ImportOldData">Import (old format)</AppButton>
+                    </div>
+                    <p class="fh-muted">Use "old format" for exports created before the ingredient rework.</p>
                 </Body>
             </AppCard>
         </div>
@@ -57,7 +61,13 @@
         }
     }
 
-    private async Task ImportData()
+    private Task ImportData() =>
+        RunImportAsync((bytes, name) => importExportService.ImportAsync(bytes, name));
+
+    private Task ImportOldData() =>
+        RunImportAsync((bytes, name) => importExportService.ImportOldAsync(bytes, name));
+
+    private async Task RunImportAsync(Func<byte[], string, Task<ApiResult>> import)
     {
         try
         {
@@ -84,7 +94,11 @@
                 return;
             }
 
-            await importExportService.ImportAsync(bytes, _selectedFile.Name);
+            var result = await import(bytes, _selectedFile.Name);
+            if (result.Success)
+                messageService.ShowMessage(WebConstants.Messages.ImportExport.ImportSucceeded, false);
+            else
+                messageService.ShowMessage(result.Error ?? WebConstants.Messages.ImportExport.ImportFailed, true);
         }
         catch (Exception ex)
         {

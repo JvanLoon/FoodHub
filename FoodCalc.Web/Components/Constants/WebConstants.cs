@@ -33,6 +33,8 @@ public static class WebConstants
             public const string SelectFileFirst = "Please select a file first.";
             public const string OnlyJsonAccepted = "Only .json files are accepted.";
             public const string CouldNotReadFile = "Could not read the selected file.";
+            public const string ImportSucceeded = "Import successful.";
+            public const string ImportFailed = "Import failed.";
         }
 
         /// <summary>Authentication.</summary>

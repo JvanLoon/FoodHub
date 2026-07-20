@@ -11,7 +11,14 @@ public class ImportExportService(AuthenticatedHttpClientService httpClient, IJSR
 {
 	private readonly string _exportFileName = WebConstants.Files.ExportBaseName;
 
-	public async Task<ApiResult> ImportAsync(byte[] fileContent, string fileName)
+	public Task<ApiResult> ImportAsync(byte[] fileContent, string fileName)
+		=> UploadAsync(ApiRoutes.ImportExport.Import, fileContent, fileName);
+
+	/// <summary>Imports a JSON export produced before the RecipeItem rework (legacy format).</summary>
+	public Task<ApiResult> ImportOldAsync(byte[] fileContent, string fileName)
+		=> UploadAsync(ApiRoutes.ImportExport.ImportOld, fileContent, fileName);
+
+	private async Task<ApiResult> UploadAsync(string route, byte[] fileContent, string fileName)
 	{
 		if (fileContent == null || fileContent.Length == 0)
 			return ApiResult.Fail(WebConstants.Messages.ImportExport.NoFileContent);
@@ -21,7 +28,7 @@ public class ImportExportService(AuthenticatedHttpClientService httpClient, IJSR
 		streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 		content.Add(streamContent, "file", fileName);
 
-		return await httpClient.PostAsync(ApiRoutes.ImportExport.Import, content);
+		return await httpClient.PostAsync(route, content);
 	}
 
 	public async Task<ApiResult> ExportAsync(string exportFormat)
