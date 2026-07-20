@@ -119,7 +119,7 @@
             Name = ingredient.Name,
             ShouldBeAddedToShoppingCart = ingredient.ShouldBeAddedToShoppingCart
         };
-        await IngredientService.UpdateIngredient(updateDto).OnSuccess(() => { }, WebConstants.Messages.Ingredient.Updated);
+        await IngredientService.UpdateIngredient(updateDto).OnSuccess(message: WebConstants.Messages.Ingredient.Updated).OnFailure();
     }
 
     private void StartEdit(IngredientDto ingredient)
@@ -139,7 +139,7 @@
                 Name = ingredient.Name,
                 ShouldBeAddedToShoppingCart = ingredient.ShouldBeAddedToShoppingCart
             };
-            await IngredientService.UpdateIngredient(updateDto).OnSuccess(() => { }, WebConstants.Messages.Ingredient.NameUpdated);
+            await IngredientService.UpdateIngredient(updateDto).OnSuccess(message: WebConstants.Messages.Ingredient.NameUpdated).OnFailure();
         }
         editingIngredientId = null;
         editingName = string.Empty;
@@ -156,6 +156,6 @@
     private async Task DeleteIngredient(Guid id)
     {
         //todo: checken of ook echt stopt als het foutgaat
-        await IngredientService.DeleteIngredient(id).OnSuccess(async () => await LoadIngredientsAsync(), WebConstants.Messages.Ingredient.DeletedWithReload);
+        await IngredientService.DeleteIngredient(id).OnSuccess(async () => await LoadIngredientsAsync(), WebConstants.Messages.Ingredient.DeletedWithReload).OnFailure();
     }
 }

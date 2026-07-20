@@ -154,7 +154,7 @@
         recipeIngredient.RecipeId = RecipeId;
         recipeIngredient.Amount = amountInput ?? 0;
 
-        await RecipeService.AddIngredient(recipeIngredient).OnSuccess(() => { }, WebConstants.Messages.Ingredient.AddedOrUpdated);
+        await RecipeService.AddIngredient(recipeIngredient).OnSuccess(message: WebConstants.Messages.Ingredient.AddedOrUpdated).OnFailure();
 
         ClearForm();
         await RefreshRecipeAsync(); // Refresh the list
@@ -175,7 +175,7 @@
 
     private async Task DeleteIngredient(Guid recipeIngredientId)
     {
-        await RecipeService.DeleteIngredient(recipeIngredientId).OnSuccess(() => { }, WebConstants.Messages.Ingredient.Deleted);
+        await RecipeService.DeleteIngredient(recipeIngredientId).OnSuccess(message: WebConstants.Messages.Ingredient.Deleted).OnFailure();
 
         ClearForm();
         await RefreshRecipeAsync(); // Refresh the list
@@ -190,7 +190,7 @@
 
     private async Task SaveRecipeName()
     {
-        await RecipeService.UpdateRecipeName(RecipeId, recipe.Name!).OnSuccess(() => { }, WebConstants.Messages.Recipe.NameUpdated);
+        await RecipeService.UpdateRecipeName(RecipeId, recipe.Name!).OnSuccess(message: WebConstants.Messages.Recipe.NameUpdated).OnFailure();
 
         isEditingName = false;
         await RefreshRecipeAsync(); // Refresh
@@ -200,15 +200,14 @@
     {
         await IngredientService.AddIngredientAsync(new CreateIngredientDto { Name = ingredientSearch }).OnSuccess(async () =>
         {
-            await IngredientService.GetAllIngredientsAsync().OnSuccess((data2) => ingredients = data2);
+            await IngredientService.GetAllIngredientsAsync().OnSuccess((data) => ingredients = data);
 
             recipeIngredient.IngredientId = ingredients.FirstOrDefault(i => i.Name == ingredientSearch)?.Id ?? Guid.Empty;
 
             //only clear when failed
             ingredientSearch = recipeIngredient.IngredientId == Guid.Empty ? string.Empty : ingredientSearch;
-        }, WebConstants.Messages.Ingredient.Added);
-
-
+        }, WebConstants.Messages.Ingredient.Added)
+        .OnFailure();
     }
 
     private void SelectIngredient(IngredientDto ingredient)

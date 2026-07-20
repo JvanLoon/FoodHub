@@ -13,26 +13,26 @@ public static class ApiResultExtensions
 	// ==========================================
 
 	// ----- OnSuccess -----
-	public static async Task<ApiResult> OnSuccess(this Task<ApiResult> resultTask, Action? action, string? message = null)
+	public static async Task<ApiResult> OnSuccess(this Task<ApiResult> resultTask, Action? action = null, string? message = null)
 	{
 		var result = await resultTask;
 		return result.OnSuccess(action, message);
 	}
 
-	public static async Task<ApiResult<T>> OnSuccess<T>(this Task<ApiResult<T>> resultTask, Action<T>? action, string? message = null) where T : class
+	public static async Task<ApiResult<T>> OnSuccess<T>(this Task<ApiResult<T>> resultTask, Action<T>? action = null, string? message = null) where T : class
 	{
 		var result = await resultTask;
 		return result.OnSuccess(action, message);
 	}
 
 	// ----- OnFailure -----
-	public static async Task<ApiResult> OnFailure(this Task<ApiResult> resultTask, Action? action, string? message = null)
+	public static async Task<ApiResult> OnFailure(this Task<ApiResult> resultTask, Action? action = null, string? message = null)
 	{
 		var result = await resultTask;
 		return result.OnFailure(action, message);
 	}
 
-	public static async Task<ApiResult<T>> OnFailure<T>(this Task<ApiResult<T>> resultTask, Action<string>? action, string? message = null) where T : class
+	public static async Task<ApiResult<T>> OnFailure<T>(this Task<ApiResult<T>> resultTask, Action<string>? action = null, string? message = null) where T : class
 	{
 		var result = await resultTask;
 		return result.OnFailure(action, message);

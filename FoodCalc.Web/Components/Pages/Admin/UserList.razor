@@ -98,6 +98,7 @@
             var user = pagedResult?.Items.FirstOrDefault(u => u.Email == email);
             if (user != null)
                 user.Enabled = enabled;
-        });
+        })
+        .OnFailure();
     }
 }
