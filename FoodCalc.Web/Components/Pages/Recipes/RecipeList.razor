@@ -91,7 +91,7 @@
     private async Task LoadRecipesAsync()
     {
         pagedResult = await recipeService.GetPagedRecipesAsync(currentPage, pageSize, searchTerm)
-        .OrDefault<PagedResultDto<RecipeDto>>(new(), WebConstants.Messages.Recipe.GetAllRecipesFailed);
+        .OrDefault(new PagedResultDto<RecipeDto>(), WebConstants.Messages.Recipe.GetAllRecipesFailed);
     }
 
     private async Task OnPageChanged(int page)
@@ -178,7 +178,11 @@
             return;
 
         await recipeService.DeleteRecipe(recipeId)
-        .OnSuccess(async () => await LoadRecipesAsync(), WebConstants.Messages.Recipe.Deleted)
+        .OnSuccess(async () =>
+        {
+            await LoadRecipesAsync();
+            StateHasChanged();
+        }, WebConstants.Messages.Recipe.Deleted)
         .OnFailure(message: WebConstants.Messages.Recipe.DeleteFailed);
     }
 }

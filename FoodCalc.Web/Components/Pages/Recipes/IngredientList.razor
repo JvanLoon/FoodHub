@@ -121,7 +121,7 @@
             ShouldBeAddedToShoppingCart = ingredient.ShouldBeAddedToShoppingCart
         };
         await IngredientService.UpdateIngredient(updateDto)
-        .OnSuccess(message: WebConstants.Messages.Ingredient.Updated)
+        .OnSuccess()
         .OnFailure(message: WebConstants.Messages.Ingredient.UpdatedSetShoppingCartFailed);
     }
 
