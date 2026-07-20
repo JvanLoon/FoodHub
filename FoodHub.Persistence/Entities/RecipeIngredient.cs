@@ -1,14 +1,18 @@
-﻿using System.Text.Json.Serialization;
-
 namespace FoodHub.Persistence.Entities;
+
+/// <summary>
+/// An ingredient line that belongs to a single <see cref="Recipe"/>. This is no
+/// longer a link table to <see cref="Ingredient"/>: the name (and the
+/// shopping-cart flag) are snapshotted onto the line, so a recipe exposes its
+/// ingredients directly as recipe.Ingredients[i].Name. The <see cref="Ingredient"/>
+/// entity remains as a separate catalog used for autocomplete/management.
+/// </summary>
 public class RecipeIngredient : BaseEntity
 {
-	public Guid Id { get; set; } = Guid.NewGuid(); // New surrogate key
+	public Guid Id { get; set; } = Guid.NewGuid();
 	public Guid RecipeId { get; set; }
-	[JsonIgnore]
-	public virtual Recipe Recipe { get; set; } = null!;
-	public Guid IngredientId { get; set; }
-	public virtual Ingredient Ingredient { get; set; } = null!;
+	public required string Name { get; set; }
 	public decimal Amount { get; set; }
 	public IngredientAmountType IngredientAmount { get; set; }
+	public bool ShouldBeAddedToShoppingCart { get; set; } = true;
 }

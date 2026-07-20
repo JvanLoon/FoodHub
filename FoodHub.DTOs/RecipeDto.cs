@@ -4,5 +4,5 @@ public class RecipeDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
-    public List<RecipeIngredientDto> RecipeIngredient { get; set; } = new();
+    public List<RecipeIngredientDto> Ingredients { get; set; } = new();
 }

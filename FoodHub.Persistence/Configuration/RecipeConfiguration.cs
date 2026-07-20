@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
 using FoodHub.Persistence.Entities;
 
@@ -16,12 +16,11 @@ public class RecipeConfiguration : IEntityTypeConfiguration<Recipe>
 			.HasMaxLength(450)
 			.IsRequired();
 
-		builder.HasMany(r => r.RecipeIngredient)
+		builder.HasMany(r => r.Ingredients)
 			.WithOne()
 			.HasForeignKey(k => k.RecipeId)
 			.OnDelete(DeleteBehavior.Cascade);
 
-		//also include Recipe.RecipeIngredient.Ingredient
-		builder.Navigation(r => r.RecipeIngredient).AutoInclude();
+		builder.Navigation(r => r.Ingredients).AutoInclude();
 	}
 }

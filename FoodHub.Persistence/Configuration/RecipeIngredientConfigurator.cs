@@ -1,4 +1,4 @@
-﻿using FoodHub.Persistence.Entities;
+using FoodHub.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -9,6 +9,10 @@ public class RecipeIngredientConfigurator : IEntityTypeConfiguration<RecipeIngre
     public void Configure(EntityTypeBuilder<RecipeIngredient> builder)
     {
         builder.HasKey(ri => ri.Id);
+
+        builder.Property(ri => ri.Name)
+            .HasMaxLength(450)
+            .IsRequired();
 
         builder.Property(ri => ri.Amount)
 			.IsRequired()
@@ -21,21 +25,11 @@ public class RecipeIngredientConfigurator : IEntityTypeConfiguration<RecipeIngre
         builder.ToTable(t =>
             t.HasCheckConstraint("CK_RecipeIngredient_IngredientAmount", "IngredientAmount > 0"));
 
-        // Unique constraint: A recipe can only contain an ingredient once
-        builder.HasIndex(ri => new { ri.RecipeId, ri.IngredientId })
+        builder.Property(ri => ri.ShouldBeAddedToShoppingCart).HasDefaultValue(true);
+
+        // Unique constraint: A recipe can only contain an ingredient (by name) once
+        builder.HasIndex(ri => new { ri.RecipeId, ri.Name })
             .IsUnique()
-            .HasDatabaseName("UX_RecipeIngredient_RecipeId_IngredientId");
-
-        builder.Navigation(n => n.Ingredient).AutoInclude();
-        builder.Navigation(n => n.Recipe).AutoInclude();
-
-        builder.HasOne(ri => ri.Recipe)
-            .WithMany(r => r.RecipeIngredient)
-            .HasForeignKey(ri => ri.RecipeId);
-
-        builder.HasOne(ri => ri.Ingredient)
-            .WithMany()
-            .HasForeignKey(ri => ri.IngredientId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .HasDatabaseName("UX_RecipeIngredient_RecipeId_Name");
 	}
 }

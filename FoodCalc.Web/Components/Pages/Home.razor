@@ -148,29 +148,27 @@
 
     private void ComputeRecipeStats(List<RecipeDto> recipes)
     {
-        totalRecipeIngredientLinks = recipes.Sum(r => r.RecipeIngredient?.Count ?? 0);
+        totalRecipeIngredientLinks = recipes.Sum(r => r.Ingredients?.Count ?? 0);
         avgIngredientsPerRecipe = recipes.Count == 0 ? 0 : (double)totalRecipeIngredientLinks / recipes.Count;
 
-        var seenShoppingIngredients = new HashSet<Guid>();
-        var usage = new Dictionary<Guid, IngredientUsage>();
+        var seenShoppingIngredients = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var usage = new Dictionary<string, IngredientUsage>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var recipe in recipes)
         {
-            if (recipe.RecipeIngredient == null) continue;
-            var recipeIngredientIds = new HashSet<Guid>();
-            foreach (var ri in recipe.RecipeIngredient)
+            if (recipe.Ingredients == null) continue;
+            var recipeIngredientNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var ri in recipe.Ingredients)
             {
-                if (ri.Ingredient == null) continue;
+                if (ri.ShouldBeAddedToShoppingCart)
+                    seenShoppingIngredients.Add(ri.Name);
 
-                if (ri.Ingredient.ShouldBeAddedToShoppingCart)
-                    seenShoppingIngredients.Add(ri.IngredientId);
-
-                if (recipeIngredientIds.Add(ri.IngredientId))
+                if (recipeIngredientNames.Add(ri.Name))
                 {
-                    if (!usage.TryGetValue(ri.IngredientId, out var u))
+                    if (!usage.TryGetValue(ri.Name, out var u))
                     {
-                        u = new IngredientUsage { Id = ri.IngredientId, Name = ri.Ingredient.Name };
-                        usage[ri.IngredientId] = u;
+                        u = new IngredientUsage { Name = ri.Name };
+                        usage[ri.Name] = u;
                     }
                     u.UsageCount++;
                 }
@@ -194,7 +192,6 @@
 
     private class IngredientUsage
     {
-        public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public int UsageCount { get; set; }
     }

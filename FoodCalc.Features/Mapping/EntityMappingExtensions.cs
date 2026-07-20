@@ -44,10 +44,10 @@ public static class EntityMappingExtensions
 	{
 		Id = e.Id,
 		RecipeId = e.RecipeId,
-		IngredientId = e.IngredientId,
-		Ingredient = e.Ingredient?.ToDto(),
+		Name = e.Name,
 		Amount = e.Amount,
-		IngredientAmount = (IngredientAmountTypeDto)e.IngredientAmount
+		IngredientAmount = (IngredientAmountTypeDto)e.IngredientAmount,
+		ShouldBeAddedToShoppingCart = e.ShouldBeAddedToShoppingCart
 	};
 
 	public static List<RecipeIngredientDto> ToDtoList(this IEnumerable<RecipeIngredient> items)
@@ -57,10 +57,10 @@ public static class EntityMappingExtensions
 	{
 		Id = d.Id,
 		RecipeId = d.RecipeId,
-		IngredientId = d.IngredientId,
-		Ingredient = d.Ingredient is null ? null! : d.Ingredient.ToEntity(),
+		Name = d.Name,
 		Amount = d.Amount,
-		IngredientAmount = (IngredientAmountType)d.IngredientAmount
+		IngredientAmount = (IngredientAmountType)d.IngredientAmount,
+		ShouldBeAddedToShoppingCart = d.ShouldBeAddedToShoppingCart
 	};
 
 	// ---------- Recipe ----------
@@ -70,7 +70,7 @@ public static class EntityMappingExtensions
 		Name = e.Name ?? string.Empty,
 		// Null collection -> empty list (GetAllRecipes nulls this out when
 		// WithIngredient is false), matching the old AutoMapper behaviour.
-		RecipeIngredient = e.RecipeIngredient?.Select(ri => ri.ToDto()).ToList() ?? new()
+		Ingredients = e.Ingredients?.Select(ri => ri.ToDto()).ToList() ?? new()
 	};
 
 	public static List<RecipeDto> ToDtoList(this IEnumerable<Recipe> items)

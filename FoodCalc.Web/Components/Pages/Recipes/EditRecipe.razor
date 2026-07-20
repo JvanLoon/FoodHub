@@ -55,7 +55,7 @@
                             @foreach (var ingredient in FilteredIngredients)
                             {
                                 <button type="button"
-                                        class="dropdown-item @(recipeIngredient.IngredientId == ingredient.Id ? "active" : "")"
+                                        class="dropdown-item @(recipeIngredient.Name == ingredient.Name ? "active" : "")"
                                         @onclick="() => SelectIngredient(ingredient)">
                                     @ingredient.Name
                                 </button>
@@ -86,14 +86,14 @@
 
         <!-- Right: current ingredients -->
         <div class="col-md-6">
-            @if (recipe?.RecipeIngredient is { Count: > 0 } ingredientsList)
+            @if (recipe?.Ingredients is { Count: > 0 } ingredientsList)
             {
                 <ul class="ingredient-list">
                     @foreach (var ingredient in ingredientsList)
                     {
                         <li>
                             <span>
-                                @ingredient.Ingredient!.Name
+                                @ingredient.Name
                                 <span class="fh-muted">@ingredient.Amount.ToFormattedString() @ingredient.IngredientAmount</span>
                             </span>
                             <span class="ingredient-list__actions">
@@ -121,7 +121,6 @@
     private RecipeDto recipe = new();
     private List<IngredientDto> ingredients = new();
     private RecipeIngredientDto recipeIngredient = new();
-    private Guid noIngredient;
     private bool isEditingName = false;
     private string ingredientSearch = string.Empty;
     private IEnumerable<IngredientDto> FilteredIngredients =>
@@ -137,9 +136,8 @@
         recipe = await RecipeService.GetRecipeByIdAsync(RecipeId).OrDefault<RecipeDto>(new());
 
         await IngredientService.GetAllIngredientsAsync()
-        .OnSuccess((data) => { 
+        .OnSuccess((data) => {
             ingredients = data;
-            noIngredient = Guid.NewGuid();
             ClearForm();
         }).OnFailure();
     }
@@ -165,12 +163,14 @@
         recipeIngredient = new RecipeIngredientDto
         {
             Id = ingredient.Id,
-            IngredientId = ingredient.IngredientId,
+            RecipeId = RecipeId,
+            Name = ingredient.Name,
             Amount = ingredient.Amount,
-            IngredientAmount = ingredient.IngredientAmount
+            IngredientAmount = ingredient.IngredientAmount,
+            ShouldBeAddedToShoppingCart = ingredient.ShouldBeAddedToShoppingCart
         };
         amountInput = ingredient.Amount == 0 ? null : ingredient.Amount;
-        ingredientSearch = ingredient.Ingredient!.Name;
+        ingredientSearch = ingredient.Name;
     }
 
     private async Task DeleteIngredient(Guid recipeIngredientId)
@@ -185,7 +185,7 @@
     {
         ingredientSearch = string.Empty;
         amountInput = null;
-        recipeIngredient = new RecipeIngredientDto { Id = Guid.NewGuid(), RecipeId = RecipeId, IngredientId = noIngredient };
+        recipeIngredient = new RecipeIngredientDto { Id = Guid.NewGuid(), RecipeId = RecipeId };
     }
 
     private async Task SaveRecipeName()
@@ -202,17 +202,26 @@
         {
             await IngredientService.GetAllIngredientsAsync().OnSuccess((data) => ingredients = data).OnFailure();
 
-            recipeIngredient.IngredientId = ingredients.FirstOrDefault(i => i.Name == ingredientSearch)?.Id ?? Guid.Empty;
+            var created = ingredients.FirstOrDefault(i => i.Name == ingredientSearch);
 
             //only clear when failed
-            ingredientSearch = recipeIngredient.IngredientId == Guid.Empty ? string.Empty : ingredientSearch;
+            if (created is not null)
+            {
+                recipeIngredient.Name = created.Name;
+                recipeIngredient.ShouldBeAddedToShoppingCart = created.ShouldBeAddedToShoppingCart;
+            }
+            else
+            {
+                ingredientSearch = string.Empty;
+            }
         }, WebConstants.Messages.Ingredient.Added)
         .OnFailure();
     }
 
     private void SelectIngredient(IngredientDto ingredient)
     {
-        recipeIngredient.IngredientId = ingredient.Id;
+        recipeIngredient.Name = ingredient.Name;
+        recipeIngredient.ShouldBeAddedToShoppingCart = ingredient.ShouldBeAddedToShoppingCart;
         ingredientSearch = ingredient.Name;
         dropdownOpen = false;
     }
