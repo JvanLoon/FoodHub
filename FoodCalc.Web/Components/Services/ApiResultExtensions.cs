@@ -85,7 +85,9 @@ public static class ApiResultExtensions
 	/// <summary>The payload on success, or <paramref name="fallback"/> on failure.</summary>
 	private static T OrDefault<T>(this ApiResult<T> result, T fallback, bool showMessage = false)
 	{
-		NotifyFail(result, result.MessageService, result.Error);
+		// result.Error is surfaced by NotifyFail (admins only); don't pass it as an ungated
+		// `message` here or the raw error would leak to every user.
+		NotifyFail(result, result.MessageService);
 
 		if (result.Success)
 			return result.Data!;
@@ -145,7 +147,8 @@ public static class ApiResultExtensions
 
 		if (!result.Success)
 		{
-			if (!string.IsNullOrEmpty(result.Error))
+			// Raw server error is only surfaced to admins; regular users get `message` (if any).
+			if (result.IsAdmin && !string.IsNullOrEmpty(result.Error))
 				messageService?.ShowMessage(result.Error, isError: true, timeInMs);
 
 			action?.Invoke();

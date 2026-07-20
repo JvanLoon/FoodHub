@@ -68,16 +68,15 @@ public class AuthenticatedHttpClientService(
         try
         {
             using var response = await SendRawAsync(method, requestUri, content);
-            if (response.IsSuccessStatusCode)
-                return ApiResult.Ok((int)response.StatusCode);
-
-            var error = await ExtractErrorAsync(response, method, requestUri);
-            return ApiResult.Fail(error, (int)response.StatusCode);
+            var result = response.IsSuccessStatusCode
+                ? ApiResult.Ok((int)response.StatusCode)
+                : ApiResult.Fail(await ExtractErrorAsync(response, method, requestUri), (int)response.StatusCode);
+            return await DecorateAsync(result);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Request {Method} {Uri} failed", method, requestUri);
-            return ApiResult.Fail(WebConstants.Messages.Client.GenericFailure);
+            return await DecorateAsync(ApiResult.Fail(WebConstants.Messages.Client.GenericFailure));
         }
     }
 
@@ -89,17 +88,35 @@ public class AuthenticatedHttpClientService(
             if (!response.IsSuccessStatusCode)
             {
                 var error = await ExtractErrorAsync(response, method, requestUri);
-                return ApiResult<T>.Fail(error, (int)response.StatusCode);
+                return await DecorateAsync(ApiResult<T>.Fail(error, (int)response.StatusCode));
             }
 
             var data = await ReadDataAsync<T>(response);
-            return ApiResult<T>.Ok(data!, (int)response.StatusCode);
+            return await DecorateAsync(ApiResult<T>.Ok(data!, (int)response.StatusCode));
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Request {Method} {Uri} failed", method, requestUri);
-            return ApiResult<T>.Fail(WebConstants.Messages.Client.GenericFailure);
+            return await DecorateAsync(ApiResult<T>.Fail(WebConstants.Messages.Client.GenericFailure));
         }
+    }
+
+    /// <summary>
+    /// Stamps UI context onto a result before it reaches the fluent notify helpers: the
+    /// <see cref="MessageService"/> that shows toasts, and whether the current user is an admin
+    /// (so raw server error messages are only surfaced to admins).
+    /// </summary>
+    private async Task<TResult> DecorateAsync<TResult>(TResult result) where TResult : ApiResult
+    {
+        result.MessageService = messageService;
+        result.IsAdmin = await IsAdminAsync();
+        return result;
+    }
+
+    private async Task<bool> IsAdminAsync()
+    {
+        var roles = await authTokenService.GetRolesAsync();
+        return roles.Contains("Admin");
     }
 
     private async Task<HttpResponseMessage> SendRawAsync(HttpMethod method, string requestUri, HttpContent? content)
