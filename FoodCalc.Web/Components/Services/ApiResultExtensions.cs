@@ -140,11 +140,11 @@ public static class ApiResultExtensions
 		Action? action = null,
 		int timeInMs = MessageService.DefaultDisplayTimeInMs)
 	{
+		if (!string.IsNullOrEmpty(message))
+			messageService?.ShowMessage(message, isError: true, timeInMs);
+
 		if (!result.Success)
 		{
-			if(!string.IsNullOrEmpty(message))
-				messageService?.ShowMessage(message, isError: false, timeInMs);
-
 			if (!string.IsNullOrEmpty(result.Error))
 				messageService?.ShowMessage(result.Error, isError: true, timeInMs);
 

@@ -109,13 +109,15 @@
                     selectedRole = string.Empty;
                 },
                 WebConstants.Messages.Roles.Added)
-                .OnFailure();
+                .OnFailure(message: WebConstants.Messages.Roles.AddedFailed);
         }
     }
 
     private async Task RemoveRole(string role)
     {
-        await AdminService.RemoveUserRoleAsync(email, role).OnSuccess(() => roles.Remove(role), WebConstants.Messages.Roles.Removed).OnFailure();
+        await AdminService.RemoveUserRoleAsync(email, role)
+        .OnSuccess(() => roles.Remove(role), WebConstants.Messages.Roles.Removed)
+        .OnFailure(message: WebConstants.Messages.Roles.RemovedFailed);
     }
 
     private ResetPasswordDto resetPasswordDto = new();
@@ -125,7 +127,9 @@
         resetPasswordDto.Email = email;
         resetPasswordDto.Password = resetModel.password;
 
-        await LoginService.ResetPassword(resetPasswordDto).OnSuccess(() => resetModel.password = string.Empty, WebConstants.Messages.Roles.PasswordReset).OnFailure();
+        await LoginService.ResetPassword(resetPasswordDto)
+        .OnSuccess(() => resetModel.password = string.Empty, WebConstants.Messages.Roles.PasswordReset)
+        .OnFailure(message: WebConstants.Messages.Roles.PasswordResetFailed);
     }
 
     public class PasswordResetModel

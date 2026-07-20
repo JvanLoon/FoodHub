@@ -35,7 +35,7 @@ public static class WebConstants
             public const string CouldNotReadFile = "Could not read the selected file.";
             public const string ImportSucceeded = "Import successful.";
             public const string ImportFailed = "Import failed.";
-        }
+		}
 
         /// <summary>Authentication.</summary>
         public static class Auth
@@ -44,7 +44,8 @@ public static class WebConstants
             public const string LoginInvalidResponse = "Login failed: invalid server response.";
             public const string RegisterSuccess = "Registration successful! You can now login.";
             public const string RegisterFailed = "Error registering";
-        }
+			public const string UserActiveSwitchFailed = "Failed to switch users active status to: {0}. still {1}.";
+		}
 
         /// <summary>Role &amp; password management.</summary>
         public static class Roles
@@ -52,16 +53,24 @@ public static class WebConstants
             public const string Added = "Role added successfully!";
             public const string Removed = "Role removed successfully!";
             public const string PasswordReset = "Password reset successfully!";
-        }
+
+			public const string AddedFailed = "Failed to add role.";
+			public const string RemovedFailed = "Failed to remove role.";
+			public const string PasswordResetFailed = "Failed to reset password.";
+
+		}
 
         /// <summary>Recipes.</summary>
         public static class Recipe
         {
 			public const string Created = "Recipe created successfully!";
-			public const string NameUpdated = "Recipe name updated";
+			public const string NameUpdated = "Recipe name updated successfully!";
             public const string CreateFailed = "Failed to create recipe.";
 			public const string Deleted = "Recipe deleted successfully!";
 			public const string Updated = "Recipe updated successfully!";
+
+			public const string NameUpdateFailed = "Failed to update recipe name.";
+			public const string DeleteFailed = "Failed to delete recipe.";
 		}
 
         /// <summary>Ingredients.</summary>
@@ -73,7 +82,14 @@ public static class WebConstants
             public const string Updated = "Ingredient updated successfully!";
             public const string NameUpdated = "Ingredient name updated successfully!";
             public const string DeletedWithReload = "Ingredient deleted successfully!";
-        }
+
+			public const string AddedOrUpdatedFailed = "Failed to add/update ingredient.";
+			public const string NameUpdateFailed = "Failed to update ingredient name.";
+			public const string UpdatedFailed = "Failed to update ingredient.";
+			public const string UpdatedSetShoppingCartFailed = "Failed to update the shopping cart status.";
+			public const string DeletedFailed = "Failed to delete ingredient.";
+			public const string GetAllIngredientsFailed = "Failed to get all ingredients.";
+		}
     }
 
     /// <summary>Browser storage keys.</summary>

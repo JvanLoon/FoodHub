@@ -99,6 +99,6 @@
             if (user != null)
                 user.Enabled = enabled;
         })
-        .OnFailure();
+        .OnFailure(message: string.Format(WebConstants.Messages.Auth.UserActiveSwitchFailed, enabled ? "enabled" : "disabled", enabled ? "disabled" : "enabled"));
     }
 }

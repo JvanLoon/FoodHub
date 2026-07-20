@@ -176,6 +176,8 @@
         if (!confirmed)
             return;
 
-        await recipeService.DeleteRecipe(recipeId).OnSuccess(async () => await LoadRecipesAsync(), WebConstants.Messages.Recipe.Deleted).OnFailure();
+        await recipeService.DeleteRecipe(recipeId)
+        .OnSuccess(async () => await LoadRecipesAsync(), WebConstants.Messages.Recipe.Deleted)
+        .OnFailure(message: WebConstants.Messages.Recipe.DeleteFailed);
     }
 }

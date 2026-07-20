@@ -94,11 +94,10 @@
                 return;
             }
 
-            var result = await import(bytes, _selectedFile.Name);
-            if (result.Success)
-                messageService.ShowMessage(WebConstants.Messages.ImportExport.ImportSucceeded, false);
-            else
-                messageService.ShowMessage(result.Error ?? WebConstants.Messages.ImportExport.ImportFailed, true);
+            var result = await import(bytes, _selectedFile.Name)
+            .OnSuccess(message: WebConstants.Messages.ImportExport.ImportSucceeded)
+            .OnFailure(message: WebConstants.Messages.ImportExport.ImportFailed);
+
         }
         catch (Exception ex)
         {
