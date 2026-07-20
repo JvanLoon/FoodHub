@@ -55,9 +55,12 @@ public static class WebConstants
         /// <summary>Recipes.</summary>
         public static class Recipe
         {
-            public const string NameUpdated = "Recipe name updated";
+			public const string Created = "Recipe created successfully!";
+			public const string NameUpdated = "Recipe name updated";
             public const string CreateFailed = "Failed to create recipe.";
-        }
+			public const string Deleted = "Recipe deleted successfully!";
+			public const string Updated = "Recipe updated successfully!";
+		}
 
         /// <summary>Ingredients.</summary>
         public static class Ingredient

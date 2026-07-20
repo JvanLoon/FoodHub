@@ -86,10 +86,7 @@
 
     private async Task LoadIngredientsAsync()
     {
-        pagedResult = (await IngredientService.GetPagedIngredientsAsync(currentPage, pageSize, searchTerm))
-        .OrDefault(new())
-            //.Notify(MessageService)
-            ;
+        pagedResult = await IngredientService.GetPagedIngredientsAsync(currentPage, pageSize, searchTerm).OrDefault<PagedResultDto<IngredientDto>>(new());
     }
 
     private async Task OnPageChanged(int page)
@@ -122,8 +119,7 @@
             Name = ingredient.Name,
             ShouldBeAddedToShoppingCart = ingredient.ShouldBeAddedToShoppingCart
         };
-        (await IngredientService.UpdateIngredient(updateDto))
-            .Notify(MessageService, success: WebConstants.Messages.Ingredient.Updated);
+        await IngredientService.UpdateIngredient(updateDto).OnSuccess(() => { }, WebConstants.Messages.Ingredient.Updated);
     }
 
     private void StartEdit(IngredientDto ingredient)
@@ -143,8 +139,7 @@
                 Name = ingredient.Name,
                 ShouldBeAddedToShoppingCart = ingredient.ShouldBeAddedToShoppingCart
             };
-            (await IngredientService.UpdateIngredient(updateDto))
-                .Notify(MessageService, success: WebConstants.Messages.Ingredient.NameUpdated);
+            await IngredientService.UpdateIngredient(updateDto).OnSuccess(() => { }, WebConstants.Messages.Ingredient.NameUpdated);
         }
         editingIngredientId = null;
         editingName = string.Empty;
@@ -160,10 +155,7 @@
 
     private async Task DeleteIngredient(Guid id)
     {
-        if (!(await IngredientService.DeleteIngredient(id)).Notify(MessageService).Success)
-            return;
-
-        await LoadIngredientsAsync();
-        MessageService.ShowMessage(WebConstants.Messages.Ingredient.DeletedWithReload, false);
+        //todo: checken of ook echt stopt als het foutgaat
+        await IngredientService.DeleteIngredient(id).OnSuccess(async () => await LoadIngredientsAsync(), WebConstants.Messages.Ingredient.DeletedWithReload);
     }
 }

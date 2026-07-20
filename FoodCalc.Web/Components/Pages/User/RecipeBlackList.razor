@@ -46,7 +46,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        AllRecipes = (await RecipeService.GetAllRecipesAsync(false)).OrDefault(new());
+        AllRecipes = await RecipeService.GetAllRecipesAsync(false).OrDefault<List<RecipeDto>>(new());
     }
 
     private async Task AddSelectedRecipe()

@@ -32,7 +32,7 @@
 
     private async Task HandleLogin()
     {
-        (await LoginService.LoginAsync(loginModel)).OnSuccess(async (data) =>
+        await LoginService.LoginAsync(loginModel).OnSuccess(async (data) =>
         {
             if (data?.Token == null)
             {
@@ -42,6 +42,11 @@
 
             await AuthStateService.SignInAsync(data.Token);
             Navigation.NavigateTo("/");
-        });
+        })
+        // .OnFailure((error) =>
+        // {
+        //     MessageService.ShowMessage(WebConstants.Messages.Auth.LoginFailed, true);
+        // })
+        ;
     }
 }
