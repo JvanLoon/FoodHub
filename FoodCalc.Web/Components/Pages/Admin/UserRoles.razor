@@ -94,29 +94,28 @@
 
     protected override async Task OnInitializedAsync()
     {
-        (await AdminService.GetUserRolesAsync(email)).OnSuccess(r => roles = r);
+        await AdminService.GetUserRolesAsync(email).OnSuccess(r => roles = r).OnFailure();
 
-        (await AdminService.GetAllRolesAsync()).OnSuccess(r => allRoles = r);
+        await AdminService.GetAllRolesAsync().OnSuccess(r => allRoles = r).OnFailure();
     }
 
     private async Task AddRole()
     {
         if (!string.IsNullOrEmpty(selectedRole) && !roles.Contains(selectedRole))
         {
-            (await AdminService.UpdateUserRolesAsync(email, selectedRole))
-                .OnSuccess(() =>
+            await AdminService.UpdateUserRolesAsync(email, selectedRole).OnSuccess(() =>
                 {
                     roles.Add(selectedRole);
                     selectedRole = string.Empty;
-                }, 
-                WebConstants.Messages.Roles.Added);
+                },
+                WebConstants.Messages.Roles.Added)
+                .OnFailure();
         }
     }
 
     private async Task RemoveRole(string role)
     {
-        (await AdminService.RemoveUserRoleAsync(email, role))
-            .OnSuccess(() => roles.Remove(role), WebConstants.Messages.Roles.Removed);
+        await AdminService.RemoveUserRoleAsync(email, role).OnSuccess(() => roles.Remove(role), WebConstants.Messages.Roles.Removed).OnFailure();
     }
 
     private ResetPasswordDto resetPasswordDto = new();
@@ -126,8 +125,7 @@
         resetPasswordDto.Email = email;
         resetPasswordDto.Password = resetModel.password;
 
-        (await LoginService.ResetPassword(resetPasswordDto))
-            .OnSuccess(() => resetModel.password = string.Empty, WebConstants.Messages.Roles.PasswordReset);
+        await LoginService.ResetPassword(resetPasswordDto).OnSuccess(() => resetModel.password = string.Empty, WebConstants.Messages.Roles.PasswordReset).OnFailure();
     }
 
     public class PasswordResetModel

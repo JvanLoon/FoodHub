@@ -129,19 +129,16 @@
             isAdmin = false;
         }
 
-        var recipesTask = await RecipeService.GetAllRecipesAsync(withIngredients: true);
-        var ingredientsPageTask = await IngredientService.GetPagedIngredientsAsync(1, 1);
-
-        var recipes = recipesTask.OrDefault(new List<RecipeDto>());
-        var ingredientsPage = ingredientsPageTask.OrDefault(new PagedResultDto<IngredientDto>());
+        var recipes = await RecipeService.GetAllRecipesAsync(withIngredients: true).OrDefault(new List<RecipeDto>());
+        var ingredientsPage = await IngredientService.GetPagedIngredientsAsync(1, 1).OrDefault(new PagedResultDto<IngredientDto>());
 
         recipeCount = recipes.Count;
         ingredientCount = ingredientsPage.TotalCount;
 
         if (isAdmin)
         {
-            var usersResult = await AdminService.GetPagedUsersAsync(1, 1);
-            userCount = usersResult?.OrDefault(new PagedResultDto<UserDto>()).TotalCount ?? 0;
+            var usersResult = await AdminService.GetPagedUsersAsync(1, 1).OrDefault(new PagedResultDto<UserDto>());
+            userCount = usersResult.TotalCount;
         }
 
         ComputeRecipeStats(recipes);
