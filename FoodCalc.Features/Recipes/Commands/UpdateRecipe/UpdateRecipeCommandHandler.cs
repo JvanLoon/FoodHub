@@ -3,6 +3,7 @@ using MediatR;
 using FoodCalc.Features.Mapping;
 using FoodHub.DTOs;
 using FoodHub.Persistence.Entities;
+using FoodHub.Persistence.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -18,12 +19,14 @@ public class UpdateRecipeCommandHandler(FoodHubDbContext context, ILogger<Update
 
 			recipe.Name = request.Recipe.Name;
 
-			// Replace the recipe's items with the set provided in the request.
-			recipe.Ingredients.Clear();
-			foreach (RecipeItemDto itemDto in request.Recipe.Ingredients)
-			{
-				recipe.Ingredients.Add(itemDto.ToEntity());
-			}
+			// Reconcile the recipe's items with the set provided in the request:
+			// update the ones still present, remove the missing, add the new.
+			recipe.Ingredients.Sync(
+				request.Recipe.Ingredients,
+				keyOfExisting: item => item.Id,
+				keyOfIncoming: dto => dto.Id,
+				create: dto => dto.ToEntity(),
+				update: (dto, item) => dto.ApplyTo(item));
 
 			await context.SaveChangesAsync(cancellationToken);
 

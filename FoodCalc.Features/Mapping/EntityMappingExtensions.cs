@@ -63,6 +63,16 @@ public static class EntityMappingExtensions
 		ShouldBeAddedToShoppingCart = d.ShouldBeAddedToShoppingCart
 	};
 
+	// Copies the editable fields onto an existing tracked entity, leaving its
+	// identity (Id/RecipeId) untouched. Used when reconciling a recipe's items.
+	public static void ApplyTo(this RecipeItemDto d, RecipeItem e)
+	{
+		e.Name = d.Name;
+		e.Amount = d.Amount;
+		e.IngredientAmount = (IngredientAmountType)d.IngredientAmount;
+		e.ShouldBeAddedToShoppingCart = d.ShouldBeAddedToShoppingCart;
+	}
+
 	// ---------- Recipe ----------
 	public static RecipeDto ToDto(this Recipe e) => new()
 	{
