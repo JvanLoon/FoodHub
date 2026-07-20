@@ -8,9 +8,13 @@ public class RecipeConfiguration : IEntityTypeConfiguration<Recipe>
 	public void Configure(EntityTypeBuilder<Recipe> builder)
 	{
 		builder.HasKey(r => r.Id);
-		builder.HasIndex(r => r.Name).IsUnique();
-		builder.Property(r => r.Name).HasMaxLength(450).IsRequired();
-		builder.Navigation(r => r.RecipeIngredient).AutoInclude();
+
+		builder.HasIndex(r => r.Name)
+			.IsUnique();
+
+		builder.Property(r => r.Name)
+			.HasMaxLength(450)
+			.IsRequired();
 
 		builder.HasMany(r => r.RecipeIngredient)
 			.WithOne()
@@ -18,6 +22,6 @@ public class RecipeConfiguration : IEntityTypeConfiguration<Recipe>
 			.OnDelete(DeleteBehavior.Cascade);
 
 		//also include Recipe.RecipeIngredient.Ingredient
-
+		builder.Navigation(r => r.RecipeIngredient).AutoInclude();
 	}
 }
