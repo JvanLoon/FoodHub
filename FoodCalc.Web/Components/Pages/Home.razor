@@ -129,21 +129,18 @@
             isAdmin = false;
         }
 
-        var recipesTask = RecipeService.GetAllRecipesAsync(withIngredients: true);
-        var ingredientsPageTask = IngredientService.GetPagedIngredientsAsync(1, 1);
-        var usersPageTask = isAdmin ? AdminService.GetPagedUsersAsync(1, 1) : Task.FromResult<ApiResult<PagedResultDto<UserDto>>?>(null)!;
+        var recipesTask = await RecipeService.GetAllRecipesAsync(withIngredients: true);
+        var ingredientsPageTask = await IngredientService.GetPagedIngredientsAsync(1, 1);
 
-        await Task.WhenAll(recipesTask, ingredientsPageTask, usersPageTask!);
-
-        var recipes = recipesTask.Result.OrDefault(new List<RecipeDto>());
-        var ingredientsPage = ingredientsPageTask.Result.OrDefault(new PagedResultDto<IngredientDto>());
+        var recipes = recipesTask.OrDefault(new List<RecipeDto>());
+        var ingredientsPage = ingredientsPageTask.OrDefault(new PagedResultDto<IngredientDto>());
 
         recipeCount = recipes.Count;
         ingredientCount = ingredientsPage.TotalCount;
 
         if (isAdmin)
         {
-            var usersResult = await usersPageTask;
+            var usersResult = await AdminService.GetPagedUsersAsync(1, 1);
             userCount = usersResult?.OrDefault(new PagedResultDto<UserDto>()).TotalCount ?? 0;
         }
 
