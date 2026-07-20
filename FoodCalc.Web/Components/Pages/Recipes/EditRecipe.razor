@@ -49,13 +49,13 @@
                     </div>
                 </div>
 
-                <EditForm Model="recipeIngredient" OnValidSubmit="AddOrUpdateIngredient" FormName="add-or-update-ingredient-form">
+                <EditForm Model="recipeItem" OnValidSubmit="AddOrUpdateIngredient" FormName="add-or-update-ingredient-form">
                     <div class="ingredient-dropdown">
                         <div class="ingredient-dropdown__menu dropdown-menu @(dropdownOpen ? "show" : null)">
                             @foreach (var ingredient in FilteredIngredients)
                             {
                                 <button type="button"
-                                        class="dropdown-item @(recipeIngredient.Name == ingredient.Name ? "active" : "")"
+                                        class="dropdown-item @(recipeItem.Name == ingredient.Name ? "active" : "")"
                                         @onclick="() => SelectIngredient(ingredient)">
                                     @ingredient.Name
                                 </button>
@@ -69,7 +69,7 @@
 
                     <NumberField TValue="decimal?" Label="Amount" @bind-Value="amountInput" />
 
-                    <SelectField TValue="IngredientAmountTypeDto" Label="Amount Type" @bind-Value="recipeIngredient.IngredientAmount">
+                    <SelectField TValue="IngredientAmountTypeDto" Label="Amount Type" @bind-Value="recipeItem.IngredientAmount">
                         @foreach (IngredientAmountTypeDto amountType in Enum.GetValues<IngredientAmountTypeDto>())
                         {
                             <option value="@amountType">@amountType</option>
@@ -120,7 +120,7 @@
 
     private RecipeDto recipe = new();
     private List<IngredientDto> ingredients = new();
-    private RecipeIngredientDto recipeIngredient = new();
+    private RecipeItemDto recipeItem = new();
     private bool isEditingName = false;
     private string ingredientSearch = string.Empty;
     private IEnumerable<IngredientDto> FilteredIngredients =>
@@ -149,18 +149,18 @@
 
     private async Task AddOrUpdateIngredient()
     {
-        recipeIngredient.RecipeId = RecipeId;
-        recipeIngredient.Amount = amountInput ?? 0;
+        recipeItem.RecipeId = RecipeId;
+        recipeItem.Amount = amountInput ?? 0;
 
-        await RecipeService.AddIngredient(recipeIngredient).OnSuccess(message: WebConstants.Messages.Ingredient.AddedOrUpdated).OnFailure();
+        await RecipeService.AddIngredient(recipeItem).OnSuccess(message: WebConstants.Messages.Ingredient.AddedOrUpdated).OnFailure();
 
         ClearForm();
         await RefreshRecipeAsync(); // Refresh the list
     }
 
-    private void EditIngredient(RecipeIngredientDto ingredient)
+    private void EditIngredient(RecipeItemDto ingredient)
     {
-        recipeIngredient = new RecipeIngredientDto
+        recipeItem = new RecipeItemDto
         {
             Id = ingredient.Id,
             RecipeId = RecipeId,
@@ -173,9 +173,9 @@
         ingredientSearch = ingredient.Name;
     }
 
-    private async Task DeleteIngredient(Guid recipeIngredientId)
+    private async Task DeleteIngredient(Guid recipeItemId)
     {
-        await RecipeService.DeleteIngredient(recipeIngredientId).OnSuccess(message: WebConstants.Messages.Ingredient.Deleted).OnFailure();
+        await RecipeService.DeleteIngredient(recipeItemId).OnSuccess(message: WebConstants.Messages.Ingredient.Deleted).OnFailure();
 
         ClearForm();
         await RefreshRecipeAsync(); // Refresh the list
@@ -185,7 +185,7 @@
     {
         ingredientSearch = string.Empty;
         amountInput = null;
-        recipeIngredient = new RecipeIngredientDto { Id = Guid.NewGuid(), RecipeId = RecipeId };
+        recipeItem = new RecipeItemDto { Id = Guid.NewGuid(), RecipeId = RecipeId };
     }
 
     private async Task SaveRecipeName()
@@ -207,8 +207,8 @@
             //only clear when failed
             if (created is not null)
             {
-                recipeIngredient.Name = created.Name;
-                recipeIngredient.ShouldBeAddedToShoppingCart = created.ShouldBeAddedToShoppingCart;
+                recipeItem.Name = created.Name;
+                recipeItem.ShouldBeAddedToShoppingCart = created.ShouldBeAddedToShoppingCart;
             }
             else
             {
@@ -220,8 +220,8 @@
 
     private void SelectIngredient(IngredientDto ingredient)
     {
-        recipeIngredient.Name = ingredient.Name;
-        recipeIngredient.ShouldBeAddedToShoppingCart = ingredient.ShouldBeAddedToShoppingCart;
+        recipeItem.Name = ingredient.Name;
+        recipeItem.ShouldBeAddedToShoppingCart = ingredient.ShouldBeAddedToShoppingCart;
         ingredientSearch = ingredient.Name;
         dropdownOpen = false;
     }

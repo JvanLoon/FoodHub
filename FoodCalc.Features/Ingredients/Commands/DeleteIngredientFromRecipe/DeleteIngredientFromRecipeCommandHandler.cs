@@ -11,10 +11,10 @@ public class DeleteIngredientFromRecipeCommandHandler(FoodHubDbContext context, 
 	{
 		try
 		{
-			var recipeIngredient = await context.RecipeIngredients.SingleOrDefaultAsync(r => r.Id == request.Id, cancellationToken);
-			if (recipeIngredient != null)
+			var recipeItem = await context.RecipeItems.SingleOrDefaultAsync(r => r.Id == request.Id, cancellationToken);
+			if (recipeItem != null)
 			{
-				context.RecipeIngredients.Remove(recipeIngredient);
+				context.RecipeItems.Remove(recipeItem);
 				await context.SaveChangesAsync(cancellationToken);
 			}
 

@@ -8,7 +8,7 @@ public class FoodHubDbContext : IdentityDbContext<IdentityUser>
 
 	// Define your DbSets here
 	public DbSet<Recipe> Recipes { get; set; }
-	public DbSet<RecipeIngredient> RecipeIngredients { get; set; }
+	public DbSet<RecipeItem> RecipeItems { get; set; }
 	public DbSet<Ingredient> Ingredients { get; set; }
 
 	public DbSet<RecipeBlackList> RecipeBlackLists { get; set; }

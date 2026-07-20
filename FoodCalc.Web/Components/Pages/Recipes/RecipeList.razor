@@ -40,7 +40,7 @@
                         <ul class="ingredients-list">
                             @if (recipe.Ingredients != null)
                             {
-                                foreach (RecipeIngredientDto ingredient in recipe.Ingredients)
+                                foreach (RecipeItemDto ingredient in recipe.Ingredients)
                                 {
                                     <li>
                                         <span>@ingredient.Name</span>
@@ -80,7 +80,7 @@
     private int pageSize = 10;
     private string searchTerm = string.Empty;
     private HashSet<Guid> SelectedRecipeIds = new();
-    private List<RecipeIngredientDto> AggregatedIngredients = new();
+    private List<RecipeItemDto> AggregatedIngredients = new();
     private ConfirmDialog? confirmDialog;
 
     protected override async Task OnInitializedAsync()
@@ -131,7 +131,7 @@
 
     private void AggregateIngredients()
     {
-        var ingredientDict = new Dictionary<(string Name, IngredientAmountTypeDto AmountType), RecipeIngredientDto>();
+        var ingredientDict = new Dictionary<(string Name, IngredientAmountTypeDto AmountType), RecipeItemDto>();
 
         foreach (var recipe in (pagedResult?.Items ?? []).Where(r => SelectedRecipeIds.Contains(r.Id)))
         {
@@ -149,7 +149,7 @@
                     else
                     {
                         // Clone to avoid mutating original
-                        ingredientDict[key] = new RecipeIngredientDto
+                        ingredientDict[key] = new RecipeItemDto
                         {
                             Name = ri.Name,
                             IngredientAmount = ri.IngredientAmount,

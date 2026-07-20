@@ -39,8 +39,8 @@ public static class EntityMappingExtensions
 		ShouldBeAddedToShoppingCart = d.ShouldBeAddedToShoppingCart
 	};
 
-	// ---------- RecipeIngredient ----------
-	public static RecipeIngredientDto ToDto(this RecipeIngredient e) => new()
+	// ---------- RecipeItem ----------
+	public static RecipeItemDto ToDto(this RecipeItem e) => new()
 	{
 		Id = e.Id,
 		RecipeId = e.RecipeId,
@@ -50,10 +50,10 @@ public static class EntityMappingExtensions
 		ShouldBeAddedToShoppingCart = e.ShouldBeAddedToShoppingCart
 	};
 
-	public static List<RecipeIngredientDto> ToDtoList(this IEnumerable<RecipeIngredient> items)
+	public static List<RecipeItemDto> ToDtoList(this IEnumerable<RecipeItem> items)
 		=> items.Select(ri => ri.ToDto()).ToList();
 
-	public static RecipeIngredient ToEntity(this RecipeIngredientDto d) => new()
+	public static RecipeItem ToEntity(this RecipeItemDto d) => new()
 	{
 		Id = d.Id,
 		RecipeId = d.RecipeId,
@@ -76,7 +76,7 @@ public static class EntityMappingExtensions
 	public static List<RecipeDto> ToDtoList(this IEnumerable<Recipe> items)
 		=> items.Select(r => r.ToDto()).ToList();
 
-	// CreateRecipeDto leaves Id/CreatedDate/ModifiedDate/RecipeIngredient at defaults.
+	// CreateRecipeDto leaves Id/CreatedDate/ModifiedDate/RecipeItem at defaults.
 	public static Recipe ToEntity(this CreateRecipeDto d) => new()
 	{
 		Name = d.Name

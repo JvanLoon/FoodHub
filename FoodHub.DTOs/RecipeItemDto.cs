@@ -1,6 +1,6 @@
 namespace FoodHub.DTOs;
 
-public class RecipeIngredientDto
+public class RecipeItemDto
 {
 	public Guid Id { get; set; } = new Guid();
 	public Guid RecipeId { get; set; }

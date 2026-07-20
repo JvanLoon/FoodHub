@@ -37,7 +37,7 @@ else
 }
 
 @code {
-    [Parameter] public List<RecipeIngredientDto> Ingredients { get; set; } = new();
+    [Parameter] public List<RecipeItemDto> Ingredients { get; set; } = new();
     [Parameter] public List<string> InitialItems { get; set; } = new();
     [Parameter] public EventCallback<List<string>> OnItemsChanged { get; set; }
 

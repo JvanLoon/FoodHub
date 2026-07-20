@@ -77,10 +77,10 @@ public class ImportAllCommandHandler(FoodHubDbContext context, UserManager<Ident
                 }
             }
 
-            // Import RecipeIngredients (ingredient lines snapshotted onto the recipe)
-            foreach (RecipeIngredientDto riDto in data.RecipeIngredients)
+            // Import RecipeItems (ingredient lines snapshotted onto the recipe)
+            foreach (RecipeItemDto riDto in data.RecipeItems)
             {
-                var existingRi = await context.RecipeIngredients.SingleOrDefaultAsync(ri => ri.Id == riDto.Id, cancellationToken);
+                var existingRi = await context.RecipeItems.SingleOrDefaultAsync(ri => ri.Id == riDto.Id, cancellationToken);
                 if (existingRi != null)
                 {
                     existingRi.Name = riDto.Name;
@@ -90,7 +90,7 @@ public class ImportAllCommandHandler(FoodHubDbContext context, UserManager<Ident
                     continue;
                 }
 
-                context.RecipeIngredients.Add(new RecipeIngredient
+                context.RecipeItems.Add(new RecipeItem
                 {
                     Id = riDto.Id,
                     RecipeId = riDto.RecipeId,

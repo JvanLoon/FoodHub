@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 
 namespace FoodHub.Persistence.Configuration;
-public class RecipeIngredientConfigurator : IEntityTypeConfiguration<RecipeIngredient>
+public class RecipeItemConfigurator : IEntityTypeConfiguration<RecipeItem>
 {
-    public void Configure(EntityTypeBuilder<RecipeIngredient> builder)
+    public void Configure(EntityTypeBuilder<RecipeItem> builder)
     {
         builder.HasKey(ri => ri.Id);
 
@@ -18,18 +18,18 @@ public class RecipeIngredientConfigurator : IEntityTypeConfiguration<RecipeIngre
 			.IsRequired()
 			.HasColumnType("decimal(10,2)");
         builder.ToTable(t =>
-            t.HasCheckConstraint("CK_RecipeIngredient_Amount", "Amount > 0"));
+            t.HasCheckConstraint("CK_RecipeItem_Amount", "Amount > 0"));
 
         builder.Property(ri => ri.IngredientAmount).IsRequired();
         //IngredientAmount may not be IngredientAmount.None
         builder.ToTable(t =>
-            t.HasCheckConstraint("CK_RecipeIngredient_IngredientAmount", "IngredientAmount > 0"));
+            t.HasCheckConstraint("CK_RecipeItem_IngredientAmount", "IngredientAmount > 0"));
 
         builder.Property(ri => ri.ShouldBeAddedToShoppingCart).HasDefaultValue(true);
 
         // Unique constraint: A recipe can only contain an ingredient (by name) once
         builder.HasIndex(ri => new { ri.RecipeId, ri.Name })
             .IsUnique()
-            .HasDatabaseName("UX_RecipeIngredient_RecipeId_Name");
+            .HasDatabaseName("UX_RecipeItem_RecipeId_Name");
 	}
 }

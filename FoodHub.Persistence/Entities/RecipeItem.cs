@@ -7,7 +7,7 @@ namespace FoodHub.Persistence.Entities;
 /// ingredients directly as recipe.Ingredients[i].Name. The <see cref="Ingredient"/>
 /// entity remains as a separate catalog used for autocomplete/management.
 /// </summary>
-public class RecipeIngredient : BaseEntity
+public class RecipeItem : BaseEntity
 {
 	public Guid Id { get; set; } = Guid.NewGuid();
 	public Guid RecipeId { get; set; }

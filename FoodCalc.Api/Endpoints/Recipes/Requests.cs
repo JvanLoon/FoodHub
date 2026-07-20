@@ -30,7 +30,7 @@ public class RecipeByIdRequest
 }
 
 /// <summary>Route parameter for endpoints keyed by a recipe-ingredient id.</summary>
-public class RecipeIngredientByIdRequest
+public class RecipeItemByIdRequest
 {
 	public Guid Id { get; set; }
 }
