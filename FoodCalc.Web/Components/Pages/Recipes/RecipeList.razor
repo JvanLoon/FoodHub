@@ -38,17 +38,14 @@
                                 OnDelete="() => DeleteRecipe(recipe.Id)">
                         <p class="ingredients-label">Ingredients</p>
                         <ul class="ingredients-list">
-                            @if (recipe.RecipeIngredient != null)
+                            @if (recipe.Ingredients != null)
                             {
-                                foreach (RecipeIngredientDto ingredient in recipe.RecipeIngredient)
+                                foreach (RecipeItemDto ingredient in recipe.Ingredients)
                                 {
-                                    if (ingredient.Ingredient != null)
-                                    {
-                                        <li>
-                                            <span>@ingredient.Ingredient.Name</span>
-                                            <span class="fh-muted">@ingredient.Amount.ToFormattedString() @ingredient.IngredientAmount.ToString()</span>
-                                        </li>
-                                    }
+                                    <li>
+                                        <span>@ingredient.Name</span>
+                                        <span class="fh-muted">@ingredient.Amount.ToFormattedString() @ingredient.IngredientAmount.ToString()</span>
+                                    </li>
                                 }
                             }
                         </ul>
@@ -83,7 +80,7 @@
     private int pageSize = 10;
     private string searchTerm = string.Empty;
     private HashSet<Guid> SelectedRecipeIds = new();
-    private List<RecipeIngredientDto> AggregatedIngredients = new();
+    private List<RecipeItemDto> AggregatedIngredients = new();
     private ConfirmDialog? confirmDialog;
 
     protected override async Task OnInitializedAsync()
@@ -134,17 +131,17 @@
 
     private void AggregateIngredients()
     {
-        var ingredientDict = new Dictionary<(Guid IngredientId, IngredientAmountTypeDto AmountType), RecipeIngredientDto>();
+        var ingredientDict = new Dictionary<(string Name, IngredientAmountTypeDto AmountType), RecipeItemDto>();
 
         foreach (var recipe in (pagedResult?.Items ?? []).Where(r => SelectedRecipeIds.Contains(r.Id)))
         {
-            if (recipe.RecipeIngredient == null) continue;
+            if (recipe.Ingredients == null) continue;
 
-            foreach (var ri in recipe.RecipeIngredient)
+            foreach (var ri in recipe.Ingredients)
             {
-                if (ri.Ingredient!.ShouldBeAddedToShoppingCart)
+                if (ri.ShouldBeAddedToShoppingCart)
                 {
-                    var key = (ri.IngredientId, ri.IngredientAmount);
+                    var key = (ri.Name.ToLowerInvariant(), ri.IngredientAmount);
                     if (ingredientDict.TryGetValue(key, out var existing))
                     {
                         existing.Amount += ri.Amount;
@@ -152,19 +149,19 @@
                     else
                     {
                         // Clone to avoid mutating original
-                        ingredientDict[key] = new RecipeIngredientDto
+                        ingredientDict[key] = new RecipeItemDto
                         {
-                            Ingredient = ri.Ingredient,
-                            IngredientId = ri.IngredientId,
+                            Name = ri.Name,
                             IngredientAmount = ri.IngredientAmount,
-                            Amount = ri.Amount
+                            Amount = ri.Amount,
+                            ShouldBeAddedToShoppingCart = ri.ShouldBeAddedToShoppingCart
                         };
                     }
                 }
             }
         }
 
-        AggregatedIngredients = ingredientDict.Values.OrderBy(i => i.Ingredient!.Name).ToList();
+        AggregatedIngredients = ingredientDict.Values.OrderBy(i => i.Name).ToList();
     }
 
     private void EditRecipe(Guid recipeId)

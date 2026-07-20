@@ -8,14 +8,14 @@
 </div>
 
 @code {
-    private List<RecipeIngredientDto> _ingredients = new();
+    private List<RecipeItemDto> _ingredients = new();
     private List<string> _initialItems = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            var newList = await LocalStorage.GetItemAsync<List<RecipeIngredientDto>>(WebConstants.Storage.AggregatedIngredients);
+            var newList = await LocalStorage.GetItemAsync<List<RecipeItemDto>>(WebConstants.Storage.AggregatedIngredients);
             if (newList?.Count > 0)
             {
                 _ingredients = newList;

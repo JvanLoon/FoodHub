@@ -1,19 +1,17 @@
-﻿using ErrorOr;
+using ErrorOr;
 using MediatR;
 using FoodCalc.Features.Mapping;
 using FoodHub.DTOs;
-using FoodHub.Persistence.Entities;
-using FoodHub.Persistence.Persistence;
 using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Features.Recipes.Queries.GetAllRecipes;
-public class GetAllRecipesQueryHandler(UnitOfWork unitOfWork, ILogger<GetAllRecipesQueryHandler> logger) : IRequestHandler<GetAllRecipesQuery, ErrorOr<PagedResultDto<RecipeDto>>>
+public class GetAllRecipesQueryHandler(FoodHubDbContext context, ILogger<GetAllRecipesQueryHandler> logger) : IRequestHandler<GetAllRecipesQuery, ErrorOr<PagedResultDto<RecipeDto>>>
 {
 	public async Task<ErrorOr<PagedResultDto<RecipeDto>>> Handle(GetAllRecipesQuery request, CancellationToken cancellationToken)
 	{
 		try
 		{
-			var query = unitOfWork.RecipeRepository.GetAllAsync();
+			var query = context.Recipes.AsQueryable();
 
 			if (!string.IsNullOrWhiteSpace(request.Search))
 				query = query.Where(r => r.Name.Contains(request.Search));
@@ -24,7 +22,7 @@ public class GetAllRecipesQueryHandler(UnitOfWork unitOfWork, ILogger<GetAllReci
 			{
 				foreach (var item in paged.Items)
 				{
-					item.RecipeIngredient = null!;
+					item.Ingredients = null!;
 				}
 			}
 

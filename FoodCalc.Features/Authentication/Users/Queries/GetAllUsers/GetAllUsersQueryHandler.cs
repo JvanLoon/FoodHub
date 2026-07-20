@@ -1,21 +1,19 @@
-﻿using ErrorOr;
+using ErrorOr;
 using FoodCalc.Features.Mapping;
 using FoodHub.DTOs;
-using FoodHub.Persistence.Entities;
-using FoodHub.Persistence.Persistence;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
 
 namespace FoodCalc.Features.Authentication.Users.Queries.GetAllUsers;
-public class GetAllUsersQueryHandler(UnitOfWork unitOfWork, ILogger<GetAllUsersQueryHandler> logger, UserManager<IdentityUser> userManager) : IRequestHandler<GetAllUsersQuery, ErrorOr<PagedResultDto<UserDto>>>
+public class GetAllUsersQueryHandler(FoodHubDbContext context, ILogger<GetAllUsersQueryHandler> logger, UserManager<IdentityUser> userManager) : IRequestHandler<GetAllUsersQuery, ErrorOr<PagedResultDto<UserDto>>>
 {
     public async Task<ErrorOr<PagedResultDto<UserDto>>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            var query = unitOfWork.UserRepository.GetAllAsync();
+            var query = context.Users.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(request.Search))
                 query = query.Where(u => u.Email!.Contains(request.Search));

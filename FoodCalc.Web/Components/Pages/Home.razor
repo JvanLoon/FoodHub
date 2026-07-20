@@ -73,7 +73,7 @@
                     <div class="fh-stat-icon"><i class="bi bi-link-45deg"></i></div>
                     <div class="fh-stat-body">
                         <div class="fh-stat-label">Recipe-ingredient links</div>
-                        <div class="fh-stat-value">@totalRecipeIngredientLinks</div>
+                        <div class="fh-stat-value">@totalRecipeItemLinks</div>
                     </div>
                 </div>
             </section>
@@ -112,7 +112,7 @@
     private int ingredientCount;
     private int userCount;
     private int shoppingCartIngredientCount;
-    private int totalRecipeIngredientLinks;
+    private int totalRecipeItemLinks;
     private double avgIngredientsPerRecipe;
 
     private List<IngredientUsage> topIngredients = new();
@@ -148,29 +148,27 @@
 
     private void ComputeRecipeStats(List<RecipeDto> recipes)
     {
-        totalRecipeIngredientLinks = recipes.Sum(r => r.RecipeIngredient?.Count ?? 0);
-        avgIngredientsPerRecipe = recipes.Count == 0 ? 0 : (double)totalRecipeIngredientLinks / recipes.Count;
+        totalRecipeItemLinks = recipes.Sum(r => r.Ingredients?.Count ?? 0);
+        avgIngredientsPerRecipe = recipes.Count == 0 ? 0 : (double)totalRecipeItemLinks / recipes.Count;
 
-        var seenShoppingIngredients = new HashSet<Guid>();
-        var usage = new Dictionary<Guid, IngredientUsage>();
+        var seenShoppingIngredients = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var usage = new Dictionary<string, IngredientUsage>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var recipe in recipes)
         {
-            if (recipe.RecipeIngredient == null) continue;
-            var recipeIngredientIds = new HashSet<Guid>();
-            foreach (var ri in recipe.RecipeIngredient)
+            if (recipe.Ingredients == null) continue;
+            var recipeItemNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var ri in recipe.Ingredients)
             {
-                if (ri.Ingredient == null) continue;
+                if (ri.ShouldBeAddedToShoppingCart)
+                    seenShoppingIngredients.Add(ri.Name);
 
-                if (ri.Ingredient.ShouldBeAddedToShoppingCart)
-                    seenShoppingIngredients.Add(ri.IngredientId);
-
-                if (recipeIngredientIds.Add(ri.IngredientId))
+                if (recipeItemNames.Add(ri.Name))
                 {
-                    if (!usage.TryGetValue(ri.IngredientId, out var u))
+                    if (!usage.TryGetValue(ri.Name, out var u))
                     {
-                        u = new IngredientUsage { Id = ri.IngredientId, Name = ri.Ingredient.Name };
-                        usage[ri.IngredientId] = u;
+                        u = new IngredientUsage { Name = ri.Name };
+                        usage[ri.Name] = u;
                     }
                     u.UsageCount++;
                 }
@@ -194,7 +192,6 @@
 
     private class IngredientUsage
     {
-        public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public int UsageCount { get; set; }
     }

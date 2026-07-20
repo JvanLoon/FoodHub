@@ -37,7 +37,7 @@ else
 }
 
 @code {
-    [Parameter] public List<RecipeIngredientDto> Ingredients { get; set; } = new();
+    [Parameter] public List<RecipeItemDto> Ingredients { get; set; } = new();
     [Parameter] public List<string> InitialItems { get; set; } = new();
     [Parameter] public EventCallback<List<string>> OnItemsChanged { get; set; }
 
@@ -53,8 +53,8 @@ else
         {
             _initialized = true;
             _displayItems = Ingredients
-                .Where(i => i.Ingredient is not null)
-                .Select(i => $"{i.Ingredient!.Name}: {i.Amount.ToFormattedString()} {i.IngredientAmount}")
+                .Where(i => !string.IsNullOrWhiteSpace(i.Name))
+                .Select(i => $"{i.Name}: {i.Amount.ToFormattedString()} {i.IngredientAmount}")
                 .ToList();
             await OnItemsChanged.InvokeAsync(_displayItems);
         }

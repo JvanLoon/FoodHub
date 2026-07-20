@@ -39,29 +39,39 @@ public static class EntityMappingExtensions
 		ShouldBeAddedToShoppingCart = d.ShouldBeAddedToShoppingCart
 	};
 
-	// ---------- RecipeIngredient ----------
-	public static RecipeIngredientDto ToDto(this RecipeIngredient e) => new()
+	// ---------- RecipeItem ----------
+	public static RecipeItemDto ToDto(this RecipeItem e) => new()
 	{
 		Id = e.Id,
 		RecipeId = e.RecipeId,
-		IngredientId = e.IngredientId,
-		Ingredient = e.Ingredient?.ToDto(),
+		Name = e.Name,
 		Amount = e.Amount,
-		IngredientAmount = (IngredientAmountTypeDto)e.IngredientAmount
+		IngredientAmount = (IngredientAmountTypeDto)e.IngredientAmount,
+		ShouldBeAddedToShoppingCart = e.ShouldBeAddedToShoppingCart
 	};
 
-	public static List<RecipeIngredientDto> ToDtoList(this IEnumerable<RecipeIngredient> items)
+	public static List<RecipeItemDto> ToDtoList(this IEnumerable<RecipeItem> items)
 		=> items.Select(ri => ri.ToDto()).ToList();
 
-	public static RecipeIngredient ToEntity(this RecipeIngredientDto d) => new()
+	public static RecipeItem ToEntity(this RecipeItemDto d) => new()
 	{
 		Id = d.Id,
 		RecipeId = d.RecipeId,
-		IngredientId = d.IngredientId,
-		Ingredient = d.Ingredient is null ? null! : d.Ingredient.ToEntity(),
+		Name = d.Name,
 		Amount = d.Amount,
-		IngredientAmount = (IngredientAmountType)d.IngredientAmount
+		IngredientAmount = (IngredientAmountType)d.IngredientAmount,
+		ShouldBeAddedToShoppingCart = d.ShouldBeAddedToShoppingCart
 	};
+
+	// Copies the editable fields onto an existing tracked entity, leaving its
+	// identity (Id/RecipeId) untouched. Used when reconciling a recipe's items.
+	public static void ApplyTo(this RecipeItemDto d, RecipeItem e)
+	{
+		e.Name = d.Name;
+		e.Amount = d.Amount;
+		e.IngredientAmount = (IngredientAmountType)d.IngredientAmount;
+		e.ShouldBeAddedToShoppingCart = d.ShouldBeAddedToShoppingCart;
+	}
 
 	// ---------- Recipe ----------
 	public static RecipeDto ToDto(this Recipe e) => new()
@@ -70,13 +80,13 @@ public static class EntityMappingExtensions
 		Name = e.Name ?? string.Empty,
 		// Null collection -> empty list (GetAllRecipes nulls this out when
 		// WithIngredient is false), matching the old AutoMapper behaviour.
-		RecipeIngredient = e.RecipeIngredient?.Select(ri => ri.ToDto()).ToList() ?? new()
+		Ingredients = e.Ingredients?.Select(ri => ri.ToDto()).ToList() ?? new()
 	};
 
 	public static List<RecipeDto> ToDtoList(this IEnumerable<Recipe> items)
 		=> items.Select(r => r.ToDto()).ToList();
 
-	// CreateRecipeDto leaves Id/CreatedDate/ModifiedDate/RecipeIngredient at defaults.
+	// CreateRecipeDto leaves Id/CreatedDate/ModifiedDate/RecipeItem at defaults.
 	public static Recipe ToEntity(this CreateRecipeDto d) => new()
 	{
 		Name = d.Name

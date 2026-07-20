@@ -1,8 +1,6 @@
-﻿using ErrorOr;
+using ErrorOr;
 using FoodCalc.Features.Mapping;
 using FoodHub.DTOs;
-using FoodHub.Persistence.Entities;
-using FoodHub.Persistence.Persistence;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -10,13 +8,13 @@ using FoodCalc.Features;
 
 namespace FoodCalc.Feature.Ingredients.Queries.GetAllIngredients;
 
-public class GetAllIngredientsQueryHandler(UnitOfWork unitOfWork, ILogger<GetAllIngredientsQueryHandler> logger) : IRequestHandler<GetAllIngredientsQuery, ErrorOr<PagedResultDto<IngredientDto>>>
+public class GetAllIngredientsQueryHandler(FoodHubDbContext context, ILogger<GetAllIngredientsQueryHandler> logger) : IRequestHandler<GetAllIngredientsQuery, ErrorOr<PagedResultDto<IngredientDto>>>
 {
 	public async Task<ErrorOr<PagedResultDto<IngredientDto>>> Handle(GetAllIngredientsQuery request, CancellationToken cancellationToken)
 	{
 		try
 		{
-			var query = unitOfWork.IngredientRepository.GetAllAsync();
+			var query = context.Ingredients.AsQueryable();
 
 			if (!string.IsNullOrWhiteSpace(request.Search))
 				query = query.Where(i => i.Name.Contains(request.Search));

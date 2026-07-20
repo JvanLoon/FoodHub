@@ -1,21 +1,20 @@
-﻿
+
 using ErrorOr;
 
 using FoodHub.DTOs;
 using FoodHub.Persistence.Entities;
-using FoodHub.Persistence.Persistence;
 
 using MediatR;
 
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Features.ImportExport.Import.Commands.ImportJSON;
-public class ImportAllCommandHandler(UnitOfWork unitOfWork, ILogger<ImportAllCommandHandler> logger) : IRequestHandler<ImportAllCommand, ErrorOr<bool>>
+public class ImportAllCommandHandler(FoodHubDbContext context, UserManager<IdentityUser> userManager, ILogger<ImportAllCommandHandler> logger) : IRequestHandler<ImportAllCommand, ErrorOr<bool>>
 {
 	public async Task<ErrorOr<bool>> Handle(ImportAllCommand request, CancellationToken cancellationToken)
 	{
-        
         try
         {
             var data = request.Data;
@@ -24,117 +23,82 @@ public class ImportAllCommandHandler(UnitOfWork unitOfWork, ILogger<ImportAllCom
                 return Error.Failure(ErrorMessages.ImportExport.NoImportData);
             }
 
-			await unitOfWork.BeginTransactionAsync(cancellationToken);
+			await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
 
-			// Maps imported ingredient IDs to existing IDs when matched by name
-			var ingredientIdRemap = new Dictionary<Guid, Guid>();
-
-            // Import Ingredients
+            // Import Ingredients (catalog)
             foreach (var ingredientDto in data.Ingredients)
             {
-                var existingById = await unitOfWork.IngredientRepository.GetByIdAsync(ingredientDto.Id, cancellationToken);
+                var existingById = await context.Ingredients.SingleOrDefaultAsync(i => i.Id == ingredientDto.Id, cancellationToken);
                 if (existingById != null)
                 {
-                    bool changed = false;
                     if (existingById.Name != ingredientDto.Name)
                     {
                         existingById.Name = ingredientDto.Name;
-                        changed = true;
                     }
                     if (existingById.ShouldBeAddedToShoppingCart != ingredientDto.ShouldBeAddedToShoppingCart)
                     {
                         existingById.ShouldBeAddedToShoppingCart = ingredientDto.ShouldBeAddedToShoppingCart;
-                        changed = true;
-                    }
-                    if (changed)
-                    {
-                        await unitOfWork.IngredientRepository.UpdateAsync(existingById, cancellationToken);
                     }
                     continue;
                 }
 
-                var existingByName = await unitOfWork.IngredientRepository.GetByNameAsync(ingredientDto.Name, cancellationToken);
+                var existingByName = await context.Ingredients.SingleOrDefaultAsync(i => i.Name == ingredientDto.Name, cancellationToken);
                 if (existingByName != null)
                 {
-                    ingredientIdRemap[ingredientDto.Id] = existingByName.Id;
                     continue;
                 }
 
-                var ingredient = new Ingredient
+                context.Ingredients.Add(new Ingredient
                 {
                     Id = ingredientDto.Id,
                     Name = ingredientDto.Name,
                     ShouldBeAddedToShoppingCart = ingredientDto.ShouldBeAddedToShoppingCart
-                };
-                await unitOfWork.IngredientRepository.AddAsync(ingredient, cancellationToken);
+                });
             }
 
             // Import Recipes
             foreach (var recipeDto in data.Recipes)
             {
-                var existing = await unitOfWork.RecipeRepository.GetByIdAsync(recipeDto.Id, cancellationToken);
+                var existing = await context.Recipes.SingleOrDefaultAsync(r => r.Id == recipeDto.Id, cancellationToken);
                 if (existing != null)
                 {
                     if (existing.Name != recipeDto.Name)
                     {
                         existing.Name = recipeDto.Name;
-                        await unitOfWork.RecipeRepository.UpdateNameAsync(existing, cancellationToken);
                     }
                 }
                 else
                 {
-                    var recipe = new Recipe
+                    context.Recipes.Add(new Recipe
                     {
                         Id = recipeDto.Id,
                         Name = recipeDto.Name,
-                    };
-                    await unitOfWork.RecipeRepository.AddAsync(recipe, cancellationToken);
+                    });
                 }
             }
 
-            // Import RecipeIngredients
-            foreach (RecipeIngredientDto riDto in data.RecipeIngredients)
+            // Import RecipeItems (ingredient lines snapshotted onto the recipe)
+            foreach (RecipeItemDto riDto in data.RecipeItems)
             {
-                var resolvedIngredientId = ingredientIdRemap.TryGetValue(riDto.IngredientId, out var remappedId)
-                    ? remappedId
-                    : riDto.IngredientId;
-
-                var existingRi = await unitOfWork.RecipeRepository.GetRecipeIngredientByIdAsync(riDto.Id, cancellationToken);
+                var existingRi = await context.RecipeItems.SingleOrDefaultAsync(ri => ri.Id == riDto.Id, cancellationToken);
                 if (existingRi != null)
                 {
-                    bool changed = false;
-                    if (existingRi.IngredientId != resolvedIngredientId)
-                    {
-                        existingRi.IngredientId = resolvedIngredientId;
-                        changed = true;
-                    }
-                    if (existingRi.Amount != riDto.Amount)
-                    {
-                        existingRi.Amount = riDto.Amount;
-                        changed = true;
-                    }
-                    var mappedAmountType = (IngredientAmountType)riDto.IngredientAmount;
-                    if (!Equals(existingRi.IngredientAmount, mappedAmountType))
-                    {
-                        existingRi.IngredientAmount = mappedAmountType;
-                        changed = true;
-                    }
-                    if (changed)
-                    {
-                        await unitOfWork.RecipeRepository.UpdateRecipeIngredientAsync(existingRi, cancellationToken);
-                    }
+                    existingRi.Name = riDto.Name;
+                    existingRi.Amount = riDto.Amount;
+                    existingRi.IngredientAmount = (IngredientAmountType)riDto.IngredientAmount;
+                    existingRi.ShouldBeAddedToShoppingCart = riDto.ShouldBeAddedToShoppingCart;
                     continue;
                 }
 
-                var recipeIngredient = new RecipeIngredient
+                context.RecipeItems.Add(new RecipeItem
                 {
                     Id = riDto.Id,
                     RecipeId = riDto.RecipeId,
-                    IngredientId = resolvedIngredientId,
+                    Name = riDto.Name,
                     Amount = riDto.Amount,
-                    IngredientAmount = (IngredientAmountType)riDto.IngredientAmount
-                };
-                await unitOfWork.RecipeRepository.AddRecipeIngredientAsync(recipeIngredient, cancellationToken);
+                    IngredientAmount = (IngredientAmountType)riDto.IngredientAmount,
+                    ShouldBeAddedToShoppingCart = riDto.ShouldBeAddedToShoppingCart
+                });
             }
 
             // Import Users with Roles (optional)
@@ -142,7 +106,7 @@ public class ImportAllCommandHandler(UnitOfWork unitOfWork, ILogger<ImportAllCom
             {
                 foreach (UserWithRolesDto userDto in data.Users)
                 {
-                    var existing = await unitOfWork.UserRepository.GetByEmailAsync(userDto.Email, cancellationToken);
+                    var existing = await userManager.FindByEmailAsync(userDto.Email);
                     if (existing == null)
                     {
                         var user = new IdentityUser
@@ -153,12 +117,13 @@ public class ImportAllCommandHandler(UnitOfWork unitOfWork, ILogger<ImportAllCom
                             EmailConfirmed = userDto.EmailConfirmed,
                             LockoutEnabled = userDto.LockoutEnabled
                         };
-                        // You may need to set a default password or handle this elsewhere
-                        await unitOfWork.UserRepository.UpdateAsync(user, cancellationToken);
-                        // Add roles
-                        foreach (var role in userDto.Roles!)
+                        await userManager.CreateAsync(user);
+                        if (userDto.Roles != null)
                         {
-                            await unitOfWork.UserRepository.AddRoleToUser(user, role, cancellationToken);
+                            foreach (var role in userDto.Roles)
+                            {
+                                await userManager.AddToRoleAsync(user, role);
+                            }
                         }
                         continue;
                     }
@@ -176,40 +141,29 @@ public class ImportAllCommandHandler(UnitOfWork unitOfWork, ILogger<ImportAllCom
                     }
 
                     // Sync roles
-                    var existingRoles = await unitOfWork.UserRepository.GetRolesAsync(existing, cancellationToken);
+                    var existingRoles = await userManager.GetRolesAsync(existing);
                     var importedRoles = userDto.Roles?.ToHashSet() ?? new HashSet<string>();
-                    var existingRolesSet = existingRoles?.ToHashSet() ?? new HashSet<string>();
+                    var existingRolesSet = existingRoles.ToHashSet();
 
                     var rolesToAdd = importedRoles.Except(existingRolesSet).ToList();
                     var rolesToRemove = existingRolesSet.Except(importedRoles).ToList();
 
-                    if (rolesToAdd.Count > 0 || rolesToRemove.Count > 0)
-                    {
-                        changed = true;
-                        foreach (var role in rolesToAdd)
-                        {
-                            await unitOfWork.UserRepository.AddRoleToUser(existing, role, cancellationToken);
-                        }
-                        foreach (var role in rolesToRemove)
-                        {
-                            await unitOfWork.UserRepository.RemoveRoleFromUser(existing, role, cancellationToken);
-                        }
-                    }
+                    if (rolesToAdd.Count > 0)
+                        await userManager.AddToRolesAsync(existing, rolesToAdd);
+                    if (rolesToRemove.Count > 0)
+                        await userManager.RemoveFromRolesAsync(existing, rolesToRemove);
 
                     if (changed)
-                    {
-                        await unitOfWork.UserRepository.UpdateAsync(existing, cancellationToken);
-                    }
+                        await userManager.UpdateAsync(existing);
                 }
             }
 
-            await unitOfWork.SaveChangesAsync(cancellationToken);
-            await unitOfWork.CommitTransactionAsync();
+            await context.SaveChangesAsync(cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
             return true;
         }
         catch (Exception ex)
         {
-            await unitOfWork.RollbackTransactionAsync();
             logger.LogError(ex, ErrorMessages.ImportExport.ImportFailed);
             return Error.Failure(ErrorMessages.ImportExport.ImportFailed);
         }

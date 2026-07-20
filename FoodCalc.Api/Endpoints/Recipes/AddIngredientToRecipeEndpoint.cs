@@ -10,7 +10,7 @@ namespace FoodCalc.Api.Endpoints.Recipes;
 
 /// <summary>POST api/recipe/ingredient — Admin only.</summary>
 public class AddIngredientToRecipeEndpoint(IMediator mediator)
-	: Endpoint<RecipeIngredientDto, RecipeIngredientDto>
+	: Endpoint<RecipeItemDto, RecipeItemDto>
 {
 	public override void Configure()
 	{
@@ -18,7 +18,7 @@ public class AddIngredientToRecipeEndpoint(IMediator mediator)
 		Roles("Admin");
 	}
 
-	public override async Task HandleAsync(RecipeIngredientDto req, CancellationToken ct)
+	public override async Task HandleAsync(RecipeItemDto req, CancellationToken ct)
 	{
 		var result = await mediator.Send(new AddIngredientToRecipeCommand(req), ct);
 

@@ -34,7 +34,7 @@ public class Program
 		});
 
 		// Add services to the container.
-		builder.Services.AddDbContext<ApplicationDbContext>(options =>
+		builder.Services.AddDbContext<FoodHubDbContext>(options =>
 			options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 		// Add Identity
@@ -47,7 +47,7 @@ public class Program
 			options.Lockout.MaxFailedAccessAttempts = 5;
 			options.Lockout.AllowedForNewUsers = true;
 		})
-		.AddEntityFrameworkStores<ApplicationDbContext>()
+		.AddEntityFrameworkStores<FoodHubDbContext>()
 		.AddDefaultTokenProviders();
 
 		builder.Services.AddAuthorization(options =>
@@ -93,8 +93,6 @@ public class Program
 		});
 
 		// Use the custom service registration method
-		builder.Services.AddCustomServices();
-
 		builder.Services.AddApplicationMediatR();
 
 		// CORS config
@@ -113,7 +111,7 @@ public class Program
 		// Run migrations at startup
 		using (var scope = app.Services.CreateScope())
 		{
-			var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+			var db = scope.ServiceProvider.GetRequiredService<FoodHubDbContext>();
 			db.Database.Migrate();
 		}
 

@@ -11,15 +11,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FoodHub.Persistence.Migrations
 {
     [DbContext(typeof(FoodHubDbContext))]
-    [Migration("20250831153654_AspUsers")]
-    partial class AspUsers
+    [Migration("20260720202239_ReworkRecipeIngredientSnapshot")]
+    partial class ReworkRecipeIngredientSnapshot
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.14")
+                .HasAnnotation("ProductVersion", "10.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -76,6 +76,19 @@ namespace FoodHub.Persistence.Migrations
                     b.ToTable("Recipes");
                 });
 
+            modelBuilder.Entity("FoodHub.Persistence.Entities.RecipeBlackList", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("RecipeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("UserId", "RecipeId");
+
+                    b.ToTable("RecipeBlackLists", (string)null);
+                });
+
             modelBuilder.Entity("FoodHub.Persistence.Entities.RecipeIngredient", b =>
                 {
                     b.Property<Guid>("Id")
@@ -91,22 +104,27 @@ namespace FoodHub.Persistence.Migrations
                     b.Property<int>("IngredientAmount")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("IngredientId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("ModifiedDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<Guid>("RecipeId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<bool>("ShouldBeAddedToShoppingCart")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
                     b.HasKey("Id");
 
-                    b.HasIndex("IngredientId");
-
-                    b.HasIndex("RecipeId", "IngredientId")
+                    b.HasIndex("RecipeId", "Name")
                         .IsUnique()
-                        .HasDatabaseName("UX_RecipeIngredient_RecipeId_IngredientId");
+                        .HasDatabaseName("UX_RecipeIngredient_RecipeId_Name");
 
                     b.ToTable("RecipeIngredients", t =>
                         {
@@ -316,21 +334,11 @@ namespace FoodHub.Persistence.Migrations
 
             modelBuilder.Entity("FoodHub.Persistence.Entities.RecipeIngredient", b =>
                 {
-                    b.HasOne("FoodHub.Persistence.Entities.Ingredient", "Ingredient")
-                        .WithMany()
-                        .HasForeignKey("IngredientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("FoodHub.Persistence.Entities.Recipe", "Recipe")
-                        .WithMany("RecipeIngredient")
+                    b.HasOne("FoodHub.Persistence.Entities.Recipe", null)
+                        .WithMany("Ingredients")
                         .HasForeignKey("RecipeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Ingredient");
-
-                    b.Navigation("Recipe");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -386,7 +394,7 @@ namespace FoodHub.Persistence.Migrations
 
             modelBuilder.Entity("FoodHub.Persistence.Entities.Recipe", b =>
                 {
-                    b.Navigation("RecipeIngredient");
+                    b.Navigation("Ingredients");
                 });
 #pragma warning restore 612, 618
         }

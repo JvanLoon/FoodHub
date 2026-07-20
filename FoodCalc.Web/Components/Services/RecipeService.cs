@@ -44,9 +44,9 @@ public class RecipeService(AuthenticatedHttpClientService httpClient)
     public Task<ApiResult<List<IngredientDto>>> GetIngredientsAsync() =>
         httpClient.GetAsync<List<IngredientDto>>("api/recipe/ingredients");
 
-    public Task<ApiResult> AddIngredient(RecipeIngredientDto ingredient) =>
+    public Task<ApiResult> AddIngredient(RecipeItemDto ingredient) =>
         httpClient.PostAsync(ApiRoutes.Recipe.AddIngredient, ingredient);
 
-    public Task<ApiResult> DeleteIngredient(Guid recipeIngredientId) =>
-        httpClient.DeleteAsync(ApiRoutes.Recipe.DeleteIngredient(recipeIngredientId));
+    public Task<ApiResult> DeleteIngredient(Guid recipeItemId) =>
+        httpClient.DeleteAsync(ApiRoutes.Recipe.DeleteIngredient(recipeItemId));
 }

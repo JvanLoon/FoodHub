@@ -1,39 +1,34 @@
-﻿using ErrorOr;
+using ErrorOr;
 using MediatR;
 using FoodCalc.Features.Mapping;
 using FoodHub.DTOs;
 using FoodHub.Persistence.Entities;
-using FoodHub.Persistence.Persistence;
+using FoodHub.Persistence.Extensions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Features.Recipes.Commands.UpdateRecipe;
-public class UpdateRecipeCommandHandler(UnitOfWork unitOfWork, ILogger<UpdateRecipeCommandHandler> logger) : IRequestHandler<UpdateRecipeCommand, ErrorOr<RecipeDto>>
+public class UpdateRecipeCommandHandler(FoodHubDbContext context, ILogger<UpdateRecipeCommandHandler> logger) : IRequestHandler<UpdateRecipeCommand, ErrorOr<RecipeDto>>
 {
 	public async Task<ErrorOr<RecipeDto>> Handle(UpdateRecipeCommand request, CancellationToken cancellationToken)
 	{
 		try
 		{
-			Recipe recipe = await unitOfWork.RecipeRepository.GetByIdAsync(request.Recipe.Id, cancellationToken) ??
+			Recipe recipe = await context.Recipes.SingleOrDefaultAsync(r => r.Id == request.Recipe.Id, cancellationToken) ??
 							throw new Exception($"recipe by id:{request.Recipe.Id} not found.");
 
-			if (recipe.Name != request.Recipe.Name)
-			{
-				recipe.Name = request.Recipe.Name;
-			}
+			recipe.Name = request.Recipe.Name;
 
-			if (request.Recipe.RecipeIngredient.Count > 1)
-			{
-				throw new Exception($"{request.Recipe.RecipeIngredient.Count} ingredients provided. More the 1 is required");
-			}
-			recipe.RecipeIngredient.Clear();
+			// Reconcile the recipe's items with the set provided in the request:
+			// update the ones still present, remove the missing, add the new.
+			recipe.Ingredients.Sync(
+				request.Recipe.Ingredients,
+				keyOfExisting: item => item.Id,
+				keyOfIncoming: dto => dto.Id,
+				create: dto => dto.ToEntity(),
+				update: (dto, item) => dto.ApplyTo(item));
 
-			foreach (RecipeIngredientDto ingredientDto in request.Recipe.RecipeIngredient)
-			{
-				var ingredient = ingredientDto.ToEntity();
-				recipe.RecipeIngredient.Add(ingredient);
-			}
-
-			await unitOfWork.RecipeRepository.UpdateAsync(recipe, cancellationToken);
+			await context.SaveChangesAsync(cancellationToken);
 
 			return recipe.ToDto();
 		}
