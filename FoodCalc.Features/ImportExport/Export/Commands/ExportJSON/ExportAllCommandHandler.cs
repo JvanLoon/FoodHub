@@ -7,6 +7,7 @@ using FoodHub.Persistence.Entities;
 
 using MediatR;
 
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -15,7 +16,7 @@ using System.Text.Json;
 
 namespace FoodCalc.Features.ImportExport.Export.Commands.ExportJSON;
 
-public class ExportAllCommandHandler(FoodHubDbContext context, ILogger<ExportAllCommandHandler> logger) : IRequestHandler<ExportAllCommand, ErrorOr<string>>
+public class ExportAllCommandHandler(FoodHubDbContext context, UserManager<IdentityUser> userManager, ILogger<ExportAllCommandHandler> logger) : IRequestHandler<ExportAllCommand, ErrorOr<string>>
 {
 	public async Task<ErrorOr<string>> Handle(ExportAllCommand request, CancellationToken cancellationToken)
 	{
@@ -26,12 +27,12 @@ public class ExportAllCommandHandler(FoodHubDbContext context, ILogger<ExportAll
 			var ingredients = await context.Ingredients.ToListAsync(cancellationToken);
 
 			// Flatten the recipe ingredient lines across all recipes
-			var recipeIngredients = new List<RecipeIngredient>();
+			var recipeItems = new List<RecipeItem>();
 			foreach (var recipe in recipes)
 			{
 				if (recipe.Ingredients != null && recipe.Ingredients.Count > 0)
 				{
-					recipeIngredients.AddRange(recipe.Ingredients);
+					recipeItems.AddRange(recipe.Ingredients);
 				}
 			}
 
@@ -40,17 +41,17 @@ public class ExportAllCommandHandler(FoodHubDbContext context, ILogger<ExportAll
 			if (request.includeUsers)
 			{
 				var users = await context.Users.ToListAsync(cancellationToken);
-				var roles = await context.Roles.Select(r => r.Name!).ToListAsync(cancellationToken);
 				usersWithRoles = new List<UserWithRolesDto>();
 				foreach (var user in users)
 				{
+					var roles = await userManager.GetRolesAsync(user);
 					usersWithRoles.Add(new UserWithRolesDto
 					{
 						Id = user.Id,
 						Email = user.Email ?? "",
 						EmailConfirmed = user.EmailConfirmed,
 						LockoutEnabled = user.LockoutEnabled,
-						Roles = roles // Replace with actual user roles
+						Roles = roles.ToList()
 					});
 				}
 			}
@@ -59,7 +60,7 @@ public class ExportAllCommandHandler(FoodHubDbContext context, ILogger<ExportAll
 			{
 				Recipes = recipes.OrderBy(r => r.Name).ToDtoList(),
 				Ingredients = ingredients.OrderBy(i => i.Name).ToDtoList(),
-				RecipeIngredients = recipeIngredients.ToDtoList(),
+				RecipeItems = recipeItems.ToDtoList(),
 				Users = usersWithRoles
 			};
 

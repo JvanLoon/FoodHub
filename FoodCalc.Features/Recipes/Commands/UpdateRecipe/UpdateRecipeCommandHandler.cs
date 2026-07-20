@@ -16,21 +16,13 @@ public class UpdateRecipeCommandHandler(FoodHubDbContext context, ILogger<Update
 			Recipe recipe = await context.Recipes.SingleOrDefaultAsync(r => r.Id == request.Recipe.Id, cancellationToken) ??
 							throw new Exception($"recipe by id:{request.Recipe.Id} not found.");
 
-			if (recipe.Name != request.Recipe.Name)
-			{
-				recipe.Name = request.Recipe.Name;
-			}
+			recipe.Name = request.Recipe.Name;
 
-			if (request.Recipe.Ingredients.Count > 1)
-			{
-				throw new Exception($"{request.Recipe.Ingredients.Count} ingredients provided. More the 1 is required");
-			}
+			// Replace the recipe's items with the set provided in the request.
 			recipe.Ingredients.Clear();
-
-			foreach (RecipeIngredientDto ingredientDto in request.Recipe.Ingredients)
+			foreach (RecipeItemDto itemDto in request.Recipe.Ingredients)
 			{
-				var ingredient = ingredientDto.ToEntity();
-				recipe.Ingredients.Add(ingredient);
+				recipe.Ingredients.Add(itemDto.ToEntity());
 			}
 
 			await context.SaveChangesAsync(cancellationToken);
