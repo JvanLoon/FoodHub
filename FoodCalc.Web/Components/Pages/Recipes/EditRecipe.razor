@@ -133,7 +133,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        recipe = await RecipeService.GetRecipeByIdAsync(RecipeId).OrDefault<RecipeDto>(new());
+        recipe = await RecipeService.GetRecipeByIdAsync(RecipeId)
+        .OrDefault<RecipeDto>(new());
 
         await IngredientService.GetAllIngredientsAsync()
         .OnSuccess((data) => {

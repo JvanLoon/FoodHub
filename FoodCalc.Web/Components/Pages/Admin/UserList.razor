@@ -68,7 +68,8 @@
 
     private async Task LoadUsersAsync()
     {
-        pagedResult = await AdminService.GetPagedUsersAsync(currentPage, pageSize, searchTerm).OrDefault<PagedResultDto<UserDto>>(new());
+        pagedResult = await AdminService.GetPagedUsersAsync(currentPage, pageSize, searchTerm)
+        .OrDefault(new PagedResultDto<UserDto>(), WebConstants.Messages.Auth.UserLoadFailed);
     }
 
     private async Task OnPageChanged(int page)

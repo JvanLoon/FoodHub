@@ -90,7 +90,8 @@
 
     private async Task LoadRecipesAsync()
     {
-        pagedResult = await recipeService.GetPagedRecipesAsync(currentPage, pageSize, searchTerm).OrDefault<PagedResultDto<RecipeDto>>(new());
+        pagedResult = await recipeService.GetPagedRecipesAsync(currentPage, pageSize, searchTerm)
+        .OrDefault<PagedResultDto<RecipeDto>>(new(), WebConstants.Messages.Recipe.GetAllRecipesFailed);
     }
 
     private async Task OnPageChanged(int page)

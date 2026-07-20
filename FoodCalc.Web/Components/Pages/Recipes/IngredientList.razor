@@ -86,7 +86,8 @@
 
     private async Task LoadIngredientsAsync()
     {
-        pagedResult = await IngredientService.GetPagedIngredientsAsync(currentPage, pageSize, searchTerm).OrDefault<PagedResultDto<IngredientDto>>(new());
+        pagedResult = await IngredientService.GetPagedIngredientsAsync(currentPage, pageSize, searchTerm)
+            .OrDefault<PagedResultDto<IngredientDto>>(new(), WebConstants.Messages.Ingredient.GetAllIngredientsFailed);
     }
 
     private async Task OnPageChanged(int page)

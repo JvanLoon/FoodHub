@@ -45,6 +45,7 @@ public static class WebConstants
             public const string RegisterSuccess = "Registration successful! You can now login.";
             public const string RegisterFailed = "Error registering";
 			public const string UserActiveSwitchFailed = "Failed to switch users active status to: {0}. still {1}.";
+            public const string UserLoadFailed = "Failed to load users.";
 		}
 
         /// <summary>Role &amp; password management.</summary>
@@ -71,6 +72,7 @@ public static class WebConstants
 
 			public const string NameUpdateFailed = "Failed to update recipe name.";
 			public const string DeleteFailed = "Failed to delete recipe.";
+			public const string GetAllRecipesFailed = "Failed to get all recipes.";
 		}
 
         /// <summary>Ingredients.</summary>
@@ -89,6 +91,8 @@ public static class WebConstants
 			public const string UpdatedSetShoppingCartFailed = "Failed to update the shopping cart status.";
 			public const string DeletedFailed = "Failed to delete ingredient.";
 			public const string GetAllIngredientsFailed = "Failed to get all ingredients.";
+
+			public const string LoadFailed = "Failed to load ingredients.";
 		}
     }
 
