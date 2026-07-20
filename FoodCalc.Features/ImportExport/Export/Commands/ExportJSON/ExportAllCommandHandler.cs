@@ -1,12 +1,9 @@
-﻿using ErrorOr;
+using ErrorOr;
 
-using FoodCalc.Features.Authentication.Users.Commands.RemoveRecipeFromBlackList;
-using FoodCalc.Features.ImportExport.Import.Commands.ImportJSON;
 using FoodCalc.Features.Mapping;
 
 using FoodHub.DTOs;
 using FoodHub.Persistence.Entities;
-using FoodHub.Persistence.Persistence;
 
 using MediatR;
 
@@ -18,29 +15,23 @@ using System.Text.Json;
 
 namespace FoodCalc.Features.ImportExport.Export.Commands.ExportJSON;
 
-public class ExportAllCommandHandler(UnitOfWork unitOfWork, ILogger<ExportAllCommandHandler> logger) : IRequestHandler<ExportAllCommand, ErrorOr<string>>
+public class ExportAllCommandHandler(FoodHubDbContext context, ILogger<ExportAllCommandHandler> logger) : IRequestHandler<ExportAllCommand, ErrorOr<string>>
 {
 	public async Task<ErrorOr<string>> Handle(ExportAllCommand request, CancellationToken cancellationToken)
 	{
 		try
 		{
-			// Fetch all data
-			var recipes = unitOfWork.RecipeRepository.GetAllAsync();
-			var ingredients = unitOfWork.IngredientRepository.GetAllAsync();
+			// Fetch all data (Recipe.Ingredients is auto-included)
+			var recipes = await context.Recipes.ToListAsync(cancellationToken);
+			var ingredients = await context.Ingredients.ToListAsync(cancellationToken);
 
-			// Assuming RecipeIngredient is a separate entity, fetch all
+			// Flatten the recipe ingredient lines across all recipes
 			var recipeIngredients = new List<RecipeIngredient>();
 			foreach (var recipe in recipes)
 			{
-				if (recipe.RecipeIngredient != null && recipe.RecipeIngredient.Count > 0)
+				if (recipe.Ingredients != null && recipe.Ingredients.Count > 0)
 				{
-					//remove all ingredients from recipe.RecipeIngredient
-					foreach (var recipeIngredient in recipe.RecipeIngredient)
-					{
-						recipeIngredient.Ingredient = null!;
-					}
-
-					recipeIngredients.AddRange(recipe.RecipeIngredient);
+					recipeIngredients.AddRange(recipe.Ingredients);
 				}
 			}
 
@@ -48,12 +39,11 @@ public class ExportAllCommandHandler(UnitOfWork unitOfWork, ILogger<ExportAllCom
 			List<UserWithRolesDto>? usersWithRoles = null;
 			if (request.includeUsers)
 			{
-				var users = unitOfWork.UserRepository.GetAllAsync();
+				var users = await context.Users.ToListAsync(cancellationToken);
+				var roles = await context.Roles.Select(r => r.Name!).ToListAsync(cancellationToken);
 				usersWithRoles = new List<UserWithRolesDto>();
 				foreach (var user in users)
 				{
-					// You may need to implement a method to get roles for a user
-					List<string> roles = await unitOfWork.RoleRepository.GetAllAsync().ToListAsync();
 					usersWithRoles.Add(new UserWithRolesDto
 					{
 						Id = user.Id,

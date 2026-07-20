@@ -2,9 +2,9 @@ using FoodHub.Persistence.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-public class ApplicationDbContext : IdentityDbContext<IdentityUser>
+public class FoodHubDbContext : IdentityDbContext<IdentityUser>
 {
-	public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options){}
+	public FoodHubDbContext(DbContextOptions<FoodHubDbContext> options) : base(options){}
 
 	// Define your DbSets here
 	public DbSet<Recipe> Recipes { get; set; }
@@ -41,7 +41,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
-		modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+		modelBuilder.ApplyConfigurationsFromAssembly(typeof(FoodHubDbContext).Assembly);
 		base.OnModelCreating(modelBuilder);
 	}
 }

@@ -1,17 +1,22 @@
-﻿using ErrorOr;
+using ErrorOr;
 using MediatR;
 
-using FoodHub.Persistence.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Features.Ingredients.Commands.DeleteIngredientFromRecipe;
-public class DeleteIngredientFromRecipeCommandHandler(UnitOfWork unitOfWork, ILogger<DeleteIngredientFromRecipeCommandHandler> logger) : IRequestHandler<DeleteIngredientFromRecipeCommand, ErrorOr<bool>>
+public class DeleteIngredientFromRecipeCommandHandler(FoodHubDbContext context, ILogger<DeleteIngredientFromRecipeCommandHandler> logger) : IRequestHandler<DeleteIngredientFromRecipeCommand, ErrorOr<bool>>
 {
 	public async Task<ErrorOr<bool>> Handle(DeleteIngredientFromRecipeCommand request, CancellationToken cancellationToken)
 	{
 		try
 		{
-			await unitOfWork.RecipeRepository.DeleteRecipeIngredientAsync(request.Id, cancellationToken);
+			var recipeIngredient = await context.RecipeIngredients.SingleOrDefaultAsync(r => r.Id == request.Id, cancellationToken);
+			if (recipeIngredient != null)
+			{
+				context.RecipeIngredients.Remove(recipeIngredient);
+				await context.SaveChangesAsync(cancellationToken);
+			}
 
 			return true;
 		}

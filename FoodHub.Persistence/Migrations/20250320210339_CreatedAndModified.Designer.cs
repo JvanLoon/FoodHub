@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FoodHub.Persistence.Migrations
 {
-    [DbContext(typeof(ApplicationDbContext))]
+    [DbContext(typeof(FoodHubDbContext))]
     [Migration("20250320210339_CreatedAndModified")]
     partial class CreatedAndModified
     {

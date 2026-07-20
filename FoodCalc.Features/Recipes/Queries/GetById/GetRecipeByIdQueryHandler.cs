@@ -1,21 +1,21 @@
-﻿using ErrorOr;
+using ErrorOr;
 using FoodCalc.Features.Mapping;
 
 using FoodHub.DTOs;
 
 using MediatR;
 
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using FoodHub.Persistence.Repositories;
 
 namespace FoodCalc.Features.Recipes.Queries.GetById;
-public class GetRecipeByIdQueryHandler(RecipeRepository recipeRepository, ILogger<GetRecipeByIdQueryHandler> logger) : IRequestHandler<GetRecipeByIdQuery, ErrorOr<RecipeDto?>>
+public class GetRecipeByIdQueryHandler(FoodHubDbContext context, ILogger<GetRecipeByIdQueryHandler> logger) : IRequestHandler<GetRecipeByIdQuery, ErrorOr<RecipeDto?>>
 {
 	public async Task<ErrorOr<RecipeDto?>> Handle(GetRecipeByIdQuery request, CancellationToken cancellationToken)
 	{
 		try
 		{
-			var recipe = await recipeRepository.GetByIdAsync(request.Id, cancellationToken);
+			var recipe = await context.Recipes.SingleOrDefaultAsync(r => r.Id == request.Id, cancellationToken);
 
 			if (recipe is null)
 			{

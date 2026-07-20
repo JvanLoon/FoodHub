@@ -1,36 +1,40 @@
-﻿using ErrorOr;
+using ErrorOr;
 using MediatR;
 using FoodCalc.Features.Mapping;
 
 using FoodHub.DTOs;
 using FoodHub.Persistence.Entities;
-using FoodHub.Persistence.Persistence;
 
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Features.Recipes.Commands.AddIngredientToRecipe;
-public class AddIngredientToRecipeCommandHandler(UnitOfWork unitOfWork, ILogger<AddIngredientToRecipeCommandHandler> logger) : IRequestHandler<AddIngredientToRecipeCommand, ErrorOr<RecipeIngredientDto>>
+public class AddIngredientToRecipeCommandHandler(FoodHubDbContext context, ILogger<AddIngredientToRecipeCommandHandler> logger) : IRequestHandler<AddIngredientToRecipeCommand, ErrorOr<RecipeIngredientDto>>
 {
     public async Task<ErrorOr<RecipeIngredientDto>> Handle(AddIngredientToRecipeCommand request, CancellationToken cancellationToken)
     {
 		try
 		{
-			var recipeIngredient = await unitOfWork.RecipeRepository.GetIngredientRecipeByRecipeId(request.RecipeIngredient.RecipeId, request.RecipeIngredient.Id, cancellationToken);
+			var dto = request.RecipeIngredient;
 
-			if (recipeIngredient != null)
-			{
-				recipeIngredient.Amount = request.RecipeIngredient.Amount;
-				recipeIngredient.IngredientAmount = (IngredientAmountType)request.RecipeIngredient.IngredientAmount;
+			var existing = await context.RecipeIngredients
+				.FirstOrDefaultAsync(ri => ri.Id == dto.Id && ri.RecipeId == dto.RecipeId, cancellationToken);
 
-				await unitOfWork.IngredientRepository.UpdateAsync(recipeIngredient.Ingredient, cancellationToken);
-				return recipeIngredient.ToDto();
-			}
-			else
+			if (existing != null)
 			{
-				RecipeIngredient mappedRecipeIngredient = request.RecipeIngredient.ToEntity();
-				await unitOfWork.RecipeRepository.AddRecipeIngredientAsync(mappedRecipeIngredient, cancellationToken);
-				return mappedRecipeIngredient.ToDto();
+				existing.Name = dto.Name;
+				existing.Amount = dto.Amount;
+				existing.IngredientAmount = (IngredientAmountType)dto.IngredientAmount;
+				existing.ShouldBeAddedToShoppingCart = dto.ShouldBeAddedToShoppingCart;
+
+				await context.SaveChangesAsync(cancellationToken);
+				return existing.ToDto();
 			}
+
+			RecipeIngredient mappedRecipeIngredient = dto.ToEntity();
+			context.RecipeIngredients.Add(mappedRecipeIngredient);
+			await context.SaveChangesAsync(cancellationToken);
+			return mappedRecipeIngredient.ToDto();
 		}
 	    catch (Exception ex)
 	    {

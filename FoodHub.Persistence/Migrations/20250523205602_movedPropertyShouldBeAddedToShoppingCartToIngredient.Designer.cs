@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FoodHub.Persistence.Migrations
 {
-    [DbContext(typeof(ApplicationDbContext))]
+    [DbContext(typeof(FoodHubDbContext))]
     [Migration("20250523205602_movedPropertyShouldBeAddedToShoppingCartToIngredient")]
     partial class movedPropertyShouldBeAddedToShoppingCartToIngredient
     {

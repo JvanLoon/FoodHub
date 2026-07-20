@@ -1,22 +1,22 @@
-﻿using ErrorOr;
+using ErrorOr;
 using MediatR;
 using FoodCalc.Features.Mapping;
 using FoodHub.DTOs;
 using FoodHub.Persistence.Entities;
-using FoodHub.Persistence.Persistence;
 using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Features.Ingredients.Commands.AddIngredient
 {
-	public class AddIngredientCommandHandler(UnitOfWork unitOfWork, ILogger<AddIngredientCommandHandler> logger)
+	public class AddIngredientCommandHandler(FoodHubDbContext context, ILogger<AddIngredientCommandHandler> logger)
 		: IRequestHandler<AddIngredientCommand, ErrorOr<IngredientDto>>
 	{
 		public async Task<ErrorOr<IngredientDto>> Handle(AddIngredientCommand request, CancellationToken cancellationToken)
 		{
 			try
 			{
-				var ingredient = request.Ingredient.ToEntity();
-				await unitOfWork.IngredientRepository.AddAsync(ingredient, cancellationToken);
+				Ingredient ingredient = request.Ingredient.ToEntity();
+				context.Ingredients.Add(ingredient);
+				await context.SaveChangesAsync(cancellationToken);
 
 				return ingredient.ToDto();
 			}

@@ -98,13 +98,13 @@ OR
 Add-Migration -Project FoodHub.Persistence -StartupProject FoodCalc.Api -Name <MigrationName>
 
 # Apply migrations
-Update-Database -Context ApplicationDbContext -Project FoodHub.Persistence -StartupProject FoodCalc.Api
+Update-Database -Context FoodHubDbContext -Project FoodHub.Persistence -StartupProject FoodCalc.Api
 
 # Remove last migration
 Remove-Migration -Project FoodHub.Persistence -StartupProject FoodCalc.Api
 
 # Revert to specific migration
-Update-Database -Context ApplicationDbContext -Project FoodHub.Persistence -StartupProject FoodCalc.Api -Migration <MigrationName>
+Update-Database -Context FoodHubDbContext -Project FoodHub.Persistence -StartupProject FoodCalc.Api -Migration <MigrationName>
 ```
 
 ### API Documentation
