@@ -17,8 +17,12 @@
         Accent
     }
 
-    [Parameter] public BadgeVariant Variant { get; set; } = BadgeVariant.Neutral;
-    [Parameter] public string? Icon { get; set; }
-    [Parameter] public string? CssClass { get; set; }
-    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter]
+    public BadgeVariant Variant { get; set; } = BadgeVariant.Neutral;
+    [Parameter]
+    public string? Icon { get; set; }
+    [Parameter]
+    public string? CssClass { get; set; }
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
 }

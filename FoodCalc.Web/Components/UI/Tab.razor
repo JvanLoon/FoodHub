@@ -6,9 +6,12 @@
 @code {
     [CascadingParameter] private TabSet? TabSet { get; set; }
 
-    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
-    [Parameter] public string? Icon { get; set; }
-    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter, EditorRequired] 
+    public string Title { get; set; } = string.Empty;
+    [Parameter] 
+    public string? Icon { get; set; }
+    [Parameter] 
+    public RenderFragment? ChildContent { get; set; }
 
     protected override void OnInitialized()
     {

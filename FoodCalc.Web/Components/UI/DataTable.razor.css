@@ -1,36 +1,36 @@
 .fh-table-wrap {
-    background: var(--fh-surface);
-    border: 1px solid var(--fh-border);
-    border-radius: var(--fh-radius-lg);
-    overflow-x: auto;
-    box-shadow: var(--fh-shadow-sm);
+	background: var(--fh-surface);
+	border: 1px solid var(--fh-border);
+	border-radius: var(--fh-radius-lg);
+	overflow-x: auto;
+	box-shadow: var(--fh-shadow-sm);
 }
 
 .fh-table {
-    margin-bottom: 0;
-}
+	margin-bottom: 0;
 
-.fh-table ::deep thead th {
-    font-size: var(--fh-text-xs);
-    font-weight: var(--fh-weight-semibold);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--fh-text-muted);
-    background: var(--fh-surface-sunken);
-    border-bottom: 1px solid var(--fh-border);
-    padding: var(--fh-space-3) var(--fh-space-4);
-    white-space: nowrap;
-}
+	&::deep thead th {
+		font-size: var(--fh-text-xs);
+		font-weight: var(--fh-weight-semibold);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: var(--fh-text-muted);
+		background: var(--fh-surface-sunken);
+		border-bottom: 1px solid var(--fh-border);
+		padding: var(--fh-space-3) var(--fh-space-4);
+		white-space: nowrap;
+	}
 
-.fh-table ::deep tbody td {
-    padding: var(--fh-space-3) var(--fh-space-4);
-    border-bottom: 1px solid var(--fh-border);
-}
+	&::deep tbody td {
+		padding: var(--fh-space-3) var(--fh-space-4);
+		border-bottom: 1px solid var(--fh-border);
+	}
 
-.fh-table ::deep tbody tr:last-child td {
-    border-bottom: none;
-}
+	&::deep tbody tr:last-child td {
+		border-bottom: none;
+	}
 
-.fh-table ::deep tbody tr:nth-child(even) td {
-    background: var(--fh-surface-sunken);
+	&::deep tbody tr:nth-child(even) td {
+		background: var(--fh-surface-sunken);
+	}
 }

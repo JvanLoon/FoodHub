@@ -4,7 +4,6 @@ using MediatR;
 
 using Microsoft.Extensions.Logging;
 
-
 namespace FoodCalc.Features.Authentication.Users.Commands.RemoveRecipeFromBlackList;
 
 public class RemoveRecipeFromBlackListCommandHandler(FoodHubDbContext context, ILogger<RemoveRecipeFromBlackListCommandHandler> logger) : IRequestHandler<RemoveRecipeFromBlackListCommand, ErrorOr<bool>>

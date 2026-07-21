@@ -32,7 +32,7 @@ public class Program
 
 		var apiBaseAddress = builder.Configuration["API:BaseAddress"];
 
-		if(string.IsNullOrEmpty(apiBaseAddress))
+		if (string.IsNullOrEmpty(apiBaseAddress))
 			throw new InvalidOperationException("API base address is not configured.");
 
 		builder.Services.AddHttpClient("ApiClient", client =>
@@ -91,7 +91,7 @@ public class Program
 			IConfigurationSection jwtSettings = builder.Configuration.GetSection("Jwt");
 			var key = jwtSettings["Key"];
 
-			if(string.IsNullOrWhiteSpace(key))
+			if (string.IsNullOrWhiteSpace(key))
 				throw new InvalidOperationException("JWT key is not configured.");
 
 			options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
@@ -113,7 +113,7 @@ public class Program
 			options.Events = new JwtBearerEvents
 			{
 				//Allows you to hook into JWT authentication events (e.g., for logging, custom validation).
-				OnAuthenticationFailed = context => {  return Task.CompletedTask; }
+				OnAuthenticationFailed = context => { return Task.CompletedTask; }
 			};
 		});
 		builder.Services.AddAuthorization();

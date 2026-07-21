@@ -1,17 +1,17 @@
 .fh-loading {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: var(--fh-space-3);
-    padding: var(--fh-space-6);
-    color: var(--fh-text-muted);
-}
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: var(--fh-space-3);
+	padding: var(--fh-space-6);
+	color: var(--fh-text-muted);
 
-.fh-loading .spinner-border {
-    color: var(--fh-green-500);
+	&.spinner-border {
+		color: var(--fh-green-500);
+	}
 }
 
 .fh-loading__label {
-    font-size: var(--fh-text-sm);
+	font-size: var(--fh-text-sm);
 }

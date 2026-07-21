@@ -1,63 +1,63 @@
 .recipe-name {
-    display: flex;
-    align-items: center;
-    gap: var(--fh-space-3);
-}
+	display: flex;
+	align-items: center;
+	gap: var(--fh-space-3);
 
-.recipe-name ::deep .recipe-name__form {
-    display: flex;
-    align-items: center;
-    gap: var(--fh-space-2);
-    flex: 1;
-    max-width: 32rem;
+	&::deep .recipe-name__form {
+		display: flex;
+		align-items: center;
+		gap: var(--fh-space-2);
+		flex: 1;
+		max-width: 32rem;
+	}
 }
 
 .ingredient-dropdown {
-    position: relative;
-    width: 100%;
+	position: relative;
+	width: 100%;
 }
 
 .ingredient-dropdown__menu {
-    width: 100%;
-    max-height: 200px;
-    overflow-y: auto;
-    position: absolute;
-    z-index: 1000;
-    background: var(--fh-surface-raised);
-    border: 1px solid var(--fh-border);
-    border-radius: var(--fh-radius-md);
-    box-shadow: var(--fh-shadow-md);
+	width: 100%;
+	max-height: 200px;
+	overflow-y: auto;
+	position: absolute;
+	z-index: 1000;
+	background: var(--fh-surface-raised);
+	border: 1px solid var(--fh-border);
+	border-radius: var(--fh-radius-md);
+	box-shadow: var(--fh-shadow-md);
 }
 
 .ingredient-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    background: var(--fh-surface);
-    border: 1px solid var(--fh-border);
-    border-radius: var(--fh-radius-lg);
-    box-shadow: var(--fh-shadow-sm);
-    overflow: hidden;
-}
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	background: var(--fh-surface);
+	border: 1px solid var(--fh-border);
+	border-radius: var(--fh-radius-lg);
+	box-shadow: var(--fh-shadow-sm);
+	overflow: hidden;
 
-.ingredient-list li {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--fh-space-3);
-    padding: var(--fh-space-3) var(--fh-space-4);
-    border-bottom: 1px solid var(--fh-border);
-}
+	li {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--fh-space-3);
+		padding: var(--fh-space-3) var(--fh-space-4);
+		border-bottom: 1px solid var(--fh-border);
 
-.ingredient-list li:last-child {
-    border-bottom: none;
-}
+		&:last-child {
+			border-bottom: none;
+		}
 
-.ingredient-list li:nth-child(even) {
-    background: var(--fh-surface-sunken);
+		&:nth-child(even) {
+			background: var(--fh-surface-sunken);
+		}
+	}
 }
 
 .ingredient-list__actions {
-    display: inline-flex;
-    gap: var(--fh-space-1);
+	display: inline-flex;
+	gap: var(--fh-space-1);
 }

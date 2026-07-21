@@ -3,6 +3,7 @@ using FoodCalc.Web.Components.Services.Auth;
 using FoodHub.DTOs;
 
 namespace FoodCalc.Web.Components.Services.Admin;
+
 public class AdminService(AuthenticatedHttpClientService httpClient)
 {
 	public Task<ApiResult<PagedResultDto<UserDto>>> GetPagedUsersAsync(int page, int pageSize, string? search = null)

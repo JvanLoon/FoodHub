@@ -1,11 +1,11 @@
 .fh-icon {
-    display: inline-flex;
-    align-items: center;
-    line-height: 1;
-}
+	display: inline-flex;
+	align-items: center;
+	line-height: 1;
 
-.fh-icon ::deep svg {
-    width: 1em;
-    height: 1em;
-    fill: currentColor;
+	&::deep svg {
+		width: 1em;
+		height: 1em;
+		fill: currentColor;
+	}
 }

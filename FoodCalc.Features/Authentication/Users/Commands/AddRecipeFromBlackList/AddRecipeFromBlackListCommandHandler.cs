@@ -4,7 +4,6 @@ using MediatR;
 
 using Microsoft.Extensions.Logging;
 
-
 namespace FoodCalc.Features.Authentication.Users.Commands.AddRecipeFromBlackList;
 public class AddRecipeFromBlackListCommandHandler(FoodHubDbContext context, ILogger<AddRecipeFromBlackListCommandHandler> logger) : IRequestHandler<AddRecipeFromBlackListCommand, ErrorOr<bool>>
 {

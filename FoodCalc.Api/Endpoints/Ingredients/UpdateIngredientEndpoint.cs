@@ -2,8 +2,6 @@ using FastEndpoints;
 
 using FoodCalc.Features.Ingredients.Commands.UpdateIngredient;
 
-using FoodHub.DTOs;
-
 using MediatR;
 
 namespace FoodCalc.Api.Endpoints.Ingredients;

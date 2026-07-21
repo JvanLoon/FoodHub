@@ -4,8 +4,6 @@ using System.Text;
 
 using FastEndpoints;
 
-using FoodHub.DTOs;
-
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 

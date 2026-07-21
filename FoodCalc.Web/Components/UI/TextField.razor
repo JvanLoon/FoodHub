@@ -22,13 +22,22 @@
 </div>
 
 @code {
-    [Parameter] public string? Label { get; set; }
-    [Parameter] public string Id { get; set; } = $"fh-field-{Guid.NewGuid():N}";
-    [Parameter] public string Type { get; set; } = "text";
-    [Parameter] public string? Placeholder { get; set; }
-    [Parameter] public string? Autocomplete { get; set; }
-    [Parameter] public string? CssClass { get; set; }
-    [Parameter] public string? Value { get; set; }
-    [Parameter] public EventCallback<string?> ValueChanged { get; set; }
-    [Parameter] public Expression<Func<string?>>? ValueExpression { get; set; }
+    [Parameter]
+    public string? Label { get; set; }
+    [Parameter]
+    public string Id { get; set; } = $"fh-field-{Guid.NewGuid():N}";
+    [Parameter]
+    public string Type { get; set; } = "text";
+    [Parameter]
+    public string? Placeholder { get; set; }
+    [Parameter]
+    public string? Autocomplete { get; set; }
+    [Parameter]
+    public string? CssClass { get; set; }
+    [Parameter]
+    public string? Value { get; set; }
+    [Parameter]
+    public EventCallback<string?> ValueChanged { get; set; }
+    [Parameter]
+    public Expression<Func<string?>>? ValueExpression { get; set; }
 }

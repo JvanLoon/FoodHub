@@ -1,71 +1,72 @@
 .add-item-bar {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background-color: var(--fh-bg);
-    padding: var(--fh-space-2) 0 var(--fh-space-4);
+	position: sticky;
+	top: 0;
+	z-index: 10;
+	background-color: var(--fh-bg);
+	padding: var(--fh-space-2) 0 var(--fh-space-4);
 }
 
 .ingredient-print-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    background: var(--fh-surface);
-    border: 1px solid var(--fh-border);
-    border-radius: var(--fh-radius-lg);
-    overflow: hidden;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	background: var(--fh-surface);
+	border: 1px solid var(--fh-border);
+	border-radius: var(--fh-radius-lg);
+	overflow: hidden;
+
+	li {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: var(--fh-space-3);
+		padding: var(--fh-space-1) var(--fh-space-3);
+
+		&:nth-child(even) {
+			background-color: var(--fh-surface-sunken);
+		}
+	}
 }
 
-.ingredient-print-list li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: var(--fh-space-3);
-    padding: var(--fh-space-1) var(--fh-space-3);
-}
-
-.ingredient-print-list li:nth-child(even) {
-    background-color: var(--fh-surface-sunken);
-}
 
 .ingredient-text {
-    font-size: 0.95rem;
+	font-size: 0.95rem;
 }
 
 /* ── Print styles ── */
 @media print {
-    .no-print {
-        display: none !important;
-    }
+	.no-print {
+		display: none !important;
+	}
 
-    .ingredient-print-list {
-        display: block !important;
-        column-count: 3;
-        column-gap: 2rem;
-        width: 100%;
-        padding: 0;
-        margin: 0;
-        background: transparent;
-        border: none !important;
-        border-radius: 0;
-    }
+	.ingredient-print-list {
+		display: block !important;
+		column-count: 3;
+		column-gap: 2rem;
+		width: 100%;
+		padding: 0;
+		margin: 0;
+		background: transparent;
+		border: none !important;
+		border-radius: 0;
 
-    .ingredient-print-list li {
-        display: block !important;
-        break-inside: avoid;
-        border: none !important;
-        padding: 0.1rem 0;
-        font-size: 0.8rem;
-        background: transparent !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-    }
+		li {
+			display: block !important;
+			break-inside: avoid;
+			border: none !important;
+			padding: 0.1rem 0;
+			font-size: 0.8rem;
+			background: transparent !important;
+			-webkit-print-color-adjust: exact;
+			print-color-adjust: exact;
 
-    .ingredient-print-list li:nth-child(even) {
-        background-color: #f0f0f0 !important;
-    }
+			&:nth-child(even) {
+				background-color: #f0f0f0 !important;
+			}
+		}
+	}
 
-    .ingredient-text {
-        font-size: 0.8rem;
-    }
+	.ingredient-text {
+		font-size: 0.8rem;
+	}
 }

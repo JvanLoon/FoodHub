@@ -8,15 +8,15 @@ namespace FoodCalc.Api.Constants;
 /// </summary>
 public static class ValidationMessages
 {
-    /// <summary>Messages reused across features.</summary>
-    public static class Common
-    {
-        public const string NameRequired = "No name provided";
+	/// <summary>Messages reused across features.</summary>
+	public static class Common
+	{
+		public const string NameRequired = "No name provided";
 
-        private const string EntityIdRequiredTemplate = "No {0} id provided";
-        public static string EntityIdRequired(Entity entityName) =>
-            string.Format(EntityIdRequiredTemplate, entityName.ToString());
-    }
+		private const string EntityIdRequiredTemplate = "No {0} id provided";
+		public static string EntityIdRequired(Entity entityName) =>
+			string.Format(EntityIdRequiredTemplate, entityName.ToString());
+	}
 }
 
 public enum Entity

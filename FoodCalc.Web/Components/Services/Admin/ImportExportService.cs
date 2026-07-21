@@ -7,6 +7,7 @@ using Microsoft.JSInterop;
 using System.Net.Http.Headers;
 
 namespace FoodCalc.Web.Components.Services.Admin;
+
 public class ImportExportService(AuthenticatedHttpClientService httpClient, IJSRuntime js)
 {
 	private readonly string _exportFileName = WebConstants.Files.ExportBaseName;

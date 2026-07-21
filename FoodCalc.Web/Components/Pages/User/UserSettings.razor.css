@@ -1,18 +1,18 @@
 .settings-card {
-    max-width: 28rem;
+	max-width: 28rem;
 }
 
 .settings-row {
-    display: flex;
-    align-items: center;
-    gap: var(--fh-space-3);
-}
+	display: flex;
+	align-items: center;
+	gap: var(--fh-space-3);
 
-.settings-row .bi {
-    color: var(--fh-text-faint);
+	.bi {
+		color: var(--fh-text-faint);
+	}
 }
 
 .settings-row__value {
-    margin-left: auto;
-    font-weight: var(--fh-weight-medium);
+	margin-left: auto;
+	font-weight: var(--fh-weight-medium);
 }

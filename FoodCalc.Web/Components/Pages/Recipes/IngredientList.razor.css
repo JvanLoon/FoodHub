@@ -1,17 +1,17 @@
 .ingredient-layout {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    min-height: 0;
-    gap: var(--fh-space-5);
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-height: 0;
+	gap: var(--fh-space-5);
 }
 
 .ingredient-body {
-    flex: 1;
-    overflow-y: auto;
-    min-height: 0;
+	flex: 1;
+	overflow-y: auto;
+	min-height: 0;
 }
 
 .ingredient-footer {
-    padding-top: var(--fh-space-3);
+	padding-top: var(--fh-space-3);
 }

@@ -105,7 +105,7 @@ public static class ApiResultExtensions
 	{
 		if (result.Success)
 		{
-			if(!string.IsNullOrEmpty(message))
+			if (!string.IsNullOrEmpty(message))
 				result.MessageService?.ShowMessage(message, isError: false, _timeInMs);
 
 			action?.Invoke();
@@ -115,10 +115,10 @@ public static class ApiResultExtensions
 	}
 
 	/// <inheritdoc cref="NotifySuccess(ApiResult, MessageService, string?, int, int)"/>
-	private static ApiResult<T> NotifySuccess<T>(this ApiResult<T> result, string? message = null, Action? action = null) where T : class 
+	private static ApiResult<T> NotifySuccess<T>(this ApiResult<T> result, string? message = null, Action? action = null) where T : class
 	{
 		// Cast to the base type so the non-generic overload runs (avoids recursion).
-		((ApiResult)result).NotifySuccess(message, action);
+		((ApiResult) result).NotifySuccess(message, action);
 		return result;
 	}
 
@@ -133,7 +133,7 @@ public static class ApiResultExtensions
 		{
 			if (!string.IsNullOrEmpty(result.Error))
 				result.MessageService?.ShowMessage(result.Error, isError: true, _timeInMs);
-			
+
 
 			action?.Invoke();
 		}
@@ -149,7 +149,7 @@ public static class ApiResultExtensions
 	private static ApiResult<T> NotifyFail<T>(this ApiResult<T> result, Action? action = null) where T : class
 	{
 		// Cast to the base type so the non-generic overload runs (avoids recursion).
-		((ApiResult)result).NotifyFail(action);
+		((ApiResult) result).NotifyFail(action);
 		return result;
 	}
 }

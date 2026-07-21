@@ -1,7 +1,9 @@
 using FoodCalc.Web.Components.Services.Auth;
+
 using FoodHub.DTOs;
 
 namespace FoodCalc.Web.Components.Services;
+
 public class IngredientService(AuthenticatedHttpClientService httpClient)
 {
 	public Task<ApiResult<PagedResultDto<IngredientDto>>> GetPagedIngredientsAsync(int page, int pageSize, string? search = null)

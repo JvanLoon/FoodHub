@@ -7,9 +7,6 @@ using FoodCalc.Api.Endpoints.Authentication;
 using FoodCalc.Api.Endpoints.ImportExport;
 using FoodCalc.Api.Endpoints.Ingredients;
 using FoodCalc.Api.Endpoints.Recipes;
-using FoodCalc.Api.Endpoints.Users;
-
-using FoodHub.DTOs;
 
 namespace FoodCalc.Api.Common;
 

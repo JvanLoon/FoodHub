@@ -3,8 +3,6 @@ using FastEndpoints;
 using FoodCalc.Api.Common;
 using FoodCalc.Feature.Ingredients.Queries.GetAllIngredients;
 
-using FoodHub.DTOs;
-
 using MediatR;
 
 namespace FoodCalc.Api.Endpoints.Ingredients;

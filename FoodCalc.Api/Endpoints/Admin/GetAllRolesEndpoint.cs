@@ -3,8 +3,6 @@ using FastEndpoints;
 using FoodCalc.Api.Common;
 using FoodCalc.Features.Authentication.Roles.Queries.GetAllRoles;
 
-using FoodHub.DTOs;
-
 using MediatR;
 
 namespace FoodCalc.Api.Endpoints.Admin;

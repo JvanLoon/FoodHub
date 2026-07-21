@@ -1,7 +1,5 @@
 using FastEndpoints;
 
-using FoodHub.DTOs;
-
 using Microsoft.AspNetCore.Identity;
 
 namespace FoodCalc.Api.Endpoints.Authentication;

@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
+namespace FoodCalc.Api;
+
 public class Program
 {
 	public static void Main(string[] args)
@@ -74,7 +76,7 @@ public class Program
 		var jwtSettings = builder.Configuration.GetSection("Jwt");
 		var key = jwtSettings["Key"];
 
-		if(string.IsNullOrEmpty(key))
+		if (string.IsNullOrEmpty(key))
 			throw new InvalidOperationException("JWT key is not configured.");
 
 		builder.Services.AddAuthentication(options =>
@@ -161,6 +163,3 @@ public class Program
 		app.Run();
 	}
 }
-
-
-

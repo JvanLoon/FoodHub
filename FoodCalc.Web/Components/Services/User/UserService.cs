@@ -1,7 +1,9 @@
 using FoodCalc.Web.Components.Services.Auth;
+
 using FoodHub.DTOs;
 
 namespace FoodCalc.Web.Components.Services;
+
 public class UserService(AuthenticatedHttpClientService httpClient)
 {
 	// TODO(blacklist): these are stubs — they ignore recipeId and just refetch users.

@@ -1,5 +1,7 @@
 using ErrorOr;
+
 using MediatR;
+
 using FoodCalc.Features.Mapping;
 
 using FoodHub.DTOs;
@@ -9,10 +11,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Features.Recipes.Commands.AddIngredientToRecipe;
+
 public class AddIngredientToRecipeCommandHandler(FoodHubDbContext context, ILogger<AddIngredientToRecipeCommandHandler> logger) : IRequestHandler<AddIngredientToRecipeCommand, ErrorOr<RecipeItemDto>>
 {
-    public async Task<ErrorOr<RecipeItemDto>> Handle(AddIngredientToRecipeCommand request, CancellationToken cancellationToken)
-    {
+	public async Task<ErrorOr<RecipeItemDto>> Handle(AddIngredientToRecipeCommand request, CancellationToken cancellationToken)
+	{
 		try
 		{
 			var dto = request.RecipeItem;
@@ -24,7 +27,7 @@ public class AddIngredientToRecipeCommandHandler(FoodHubDbContext context, ILogg
 			{
 				existing.Name = dto.Name;
 				existing.Amount = dto.Amount;
-				existing.IngredientAmount = (IngredientAmountType)dto.IngredientAmount;
+				existing.IngredientAmount = (IngredientAmountType) dto.IngredientAmount;
 				existing.ShouldBeAddedToShoppingCart = dto.ShouldBeAddedToShoppingCart;
 
 				await context.SaveChangesAsync(cancellationToken);
@@ -36,10 +39,10 @@ public class AddIngredientToRecipeCommandHandler(FoodHubDbContext context, ILogg
 			await context.SaveChangesAsync(cancellationToken);
 			return mappedRecipeItem.ToDto();
 		}
-	    catch (Exception ex)
-	    {
-		    logger.LogError(ex, ErrorMessages.Recipe.AddIngredientFailed);
-		    return Error.Failure(ErrorMessages.Recipe.UpdateForIngredientFailed);
-	    }
+		catch (Exception ex)
+		{
+			logger.LogError(ex, ErrorMessages.Recipe.AddIngredientFailed);
+			return Error.Failure(ErrorMessages.Recipe.UpdateForIngredientFailed);
+		}
 	}
 }

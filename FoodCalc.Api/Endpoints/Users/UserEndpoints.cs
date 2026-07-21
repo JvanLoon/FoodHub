@@ -4,8 +4,6 @@ using FoodCalc.Api.Common;
 using FoodCalc.Features.Authentication.Roles.Queries.GetAllRoles;
 using FoodCalc.Features.Authentication.Users.Queries.GetAllUsers;
 
-using FoodHub.DTOs;
-
 using MediatR;
 
 namespace FoodCalc.Api.Endpoints.Users;

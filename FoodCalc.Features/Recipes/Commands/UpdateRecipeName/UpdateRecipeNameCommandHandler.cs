@@ -1,12 +1,17 @@
 using ErrorOr;
+
 using MediatR;
+
 using FoodCalc.Features.Mapping;
+
 using FoodHub.DTOs;
 using FoodHub.Persistence.Entities;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Features.Recipes.Commands.UpdateRecipeName;
+
 public class UpdateRecipeNameCommandHandler(FoodHubDbContext context, ILogger<UpdateRecipeNameCommandHandler> logger) : IRequestHandler<UpdateRecipeNameCommand, ErrorOr<RecipeDto>>
 {
 	public async Task<ErrorOr<RecipeDto>> Handle(UpdateRecipeNameCommand request, CancellationToken cancellationToken)

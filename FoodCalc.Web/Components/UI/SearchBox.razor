@@ -19,11 +19,16 @@
 </div>
 
 @code {
-    [Parameter] public string Value { get; set; } = string.Empty;
-    [Parameter] public EventCallback<string> ValueChanged { get; set; }
-    [Parameter] public string Placeholder { get; set; } = "Search...";
-    [Parameter] public int DebounceMs { get; set; } = 300;
-    [Parameter] public string? CssClass { get; set; }
+    [Parameter]
+    public string Value { get; set; } = string.Empty;
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; }
+    [Parameter]
+    public string Placeholder { get; set; } = "Search...";
+    [Parameter]
+    public int DebounceMs { get; set; } = 300;
+    [Parameter]
+    public string? CssClass { get; set; }
 
     private CancellationTokenSource _cts = new();
 

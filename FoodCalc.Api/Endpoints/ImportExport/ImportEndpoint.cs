@@ -4,8 +4,6 @@ using FastEndpoints;
 
 using FoodCalc.Features.ImportExport.Import.Commands.ImportJSON;
 
-using FoodHub.DTOs;
-
 using MediatR;
 
 namespace FoodCalc.Api.Endpoints.ImportExport;
