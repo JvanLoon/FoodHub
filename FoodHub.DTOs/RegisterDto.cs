@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace FoodHub.DTOs;
+
 public class RegisterDto
 {
 	[Required]
