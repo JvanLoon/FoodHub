@@ -33,7 +33,6 @@
     public TValue? Value { get; set; }
     [Parameter]
     public EventCallback<TValue?> ValueChanged { get; set; }
-    [Parameter
-        public Expression
-<Func<TValue?>>? ValueExpression { get; set; }
-        }
+    [Parameter]
+    public Expression<Func<TValue?>>? ValueExpression { get; set; }
+}
