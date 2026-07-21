@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
+
 using FoodHub.Persistence.Entities;
 
 namespace FoodHub.Persistence.Configuration;
+
 public class RecipeConfiguration : IEntityTypeConfiguration<Recipe>
 {
 	public void Configure(EntityTypeBuilder<Recipe> builder)

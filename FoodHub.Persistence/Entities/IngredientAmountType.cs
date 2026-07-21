@@ -1,4 +1,5 @@
 ﻿namespace FoodHub.Persistence.Entities;
+
 public enum IngredientAmountType
 {
 	None = 0,

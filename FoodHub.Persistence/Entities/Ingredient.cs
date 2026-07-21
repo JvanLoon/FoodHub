@@ -1,4 +1,5 @@
 ﻿namespace FoodHub.Persistence.Entities;
+
 public class Ingredient : BaseEntity
 {
 	public Guid Id { get; set; }

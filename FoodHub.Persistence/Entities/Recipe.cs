@@ -1,4 +1,5 @@
 namespace FoodHub.Persistence.Entities;
+
 public class Recipe : BaseEntity
 {
 	public Guid Id { get; set; } = Guid.NewGuid();
