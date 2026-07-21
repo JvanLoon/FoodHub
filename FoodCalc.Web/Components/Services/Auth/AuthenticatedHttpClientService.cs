@@ -32,6 +32,10 @@ public class AuthenticatedHttpClientService(
 	public Task<ApiResult<T>> GetAsync<T>(string requestUri) =>
 		SendForDataAsync<T>(HttpMethod.Get, requestUri, content: null);
 
+	/// <summary>GET where only success/failure matters and the response body is ignored.</summary>
+	public Task<ApiResult> GetAsync(string requestUri) =>
+		SendAsync(HttpMethod.Get, requestUri, content: null);
+
 	public Task<ApiResult> PostAsync<TRequest>(string requestUri, TRequest value) =>
 		SendAsync(HttpMethod.Post, requestUri, JsonContent.Create(value, options: _jsonOptions));
 
@@ -258,7 +262,7 @@ public class AuthenticatedHttpClientService(
 		HttpStatusCode.NotFound => WebConstants.Messages.Client.NotFound,
 		HttpStatusCode.BadRequest => WebConstants.Messages.Client.BadRequest,
 		HttpStatusCode.Conflict => WebConstants.Messages.Client.Conflict,
-		HttpStatusCode.InternalServerError => WebConstants.Messages.Client.ServerError,
+		>= (HttpStatusCode)500 => WebConstants.Messages.Client.ServerError,
 		_ => WebConstants.Messages.Client.RequestFailed((int) status)
 	};
 }

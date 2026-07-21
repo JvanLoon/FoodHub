@@ -71,6 +71,13 @@ public static class ApiRoutes
 		public const string AllRoles = Base + "/allroles";
 	}
 
+	/// <summary>Development-only diagnostics. These return 404 outside the Development environment.</summary>
+	public static class Dev
+	{
+		private const string Base = "api/dev";
+		public const string ErrorTest = Base + "/errortest"; // GET, count/statusCode via query string
+	}
+
 	public static class ImportExport
 	{
 		private const string Base = "api/importexport";

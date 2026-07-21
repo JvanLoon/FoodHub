@@ -27,6 +27,13 @@ public class AdminService(AuthenticatedHttpClientService httpClient)
 	public Task<ApiResult> ToggleUserAsync(string email, bool enable = true) =>
 		httpClient.PostAsync($"{ApiRoutes.Authentication.ToggleUser}?email={email}&enable={enable}");
 
+	/// <summary>
+	/// Development diagnostics: asks the API to fail with <paramref name="count"/> errors so the
+	/// multi-error path can be exercised end to end. <paramref name="count"/> 0 returns success.
+	/// </summary>
+	public Task<ApiResult> TriggerErrorTestAsync(int count, int statusCode) =>
+		httpClient.GetAsync($"{ApiRoutes.Dev.ErrorTest}?count={count}&statusCode={statusCode}");
+
 	public async Task<ApiResult<List<string>>> GetAllRolesAsync()
 	{
 		// Roles feed the role-picker, which needs every role, so fetch all in one page.
