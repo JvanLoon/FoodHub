@@ -19,16 +19,21 @@ public class ApiResult
 	/// </summary>
 	public IReadOnlyList<string> Errors { get; init; } = [];
 
-	/// <summary>HTTP status code, when one is available (0 for transport/exception failures).</summary>
+	/// <summary>
+	/// HTTP status code for the outcome. Required on every factory call: the messages are
+	/// prefixed with it, so a defaulted code would surface to the user as a bogus number.
+	/// Failures with no real response (transport errors, client-side guards) pass the status
+	/// that best describes them rather than falling back to a placeholder.
+	/// </summary>
 	public int StatusCode { get; init; }
 
-	public static ApiResult Ok(int statusCode = 200) =>
+	public static ApiResult Ok(int statusCode) =>
 		new() { Success = true, StatusCode = statusCode };
 
-	public static ApiResult Fail(string error, int statusCode = 0) =>
+	public static ApiResult Fail(string error, int statusCode) =>
 		Fail([$"{statusCode} {error}"], statusCode);
 
-	public static ApiResult Fail(IReadOnlyList<string> errors, int statusCode = 0) =>
+	public static ApiResult Fail(IReadOnlyList<string> errors, int statusCode) =>
 		new() { Success = false, Errors = errors, StatusCode = statusCode };
 }
 
@@ -37,12 +42,12 @@ public class ApiResult<T> : ApiResult
 {
 	public T? Data { get; init; }
 
-	public static ApiResult<T> Ok(T data, int statusCode = 200) =>
+	public static ApiResult<T> Ok(T data, int statusCode) =>
 		new() { Success = true, Data = data, StatusCode = statusCode };
 
-	public static new ApiResult<T> Fail(string error, int statusCode = 0) =>
+	public static new ApiResult<T> Fail(string error, int statusCode) =>
 		Fail([$"{statusCode} {error}"], statusCode);
 
-	public static new ApiResult<T> Fail(IReadOnlyList<string> errors, int statusCode = 0) =>
+	public static new ApiResult<T> Fail(IReadOnlyList<string> errors, int statusCode) =>
 		new() { Success = false, Errors = errors, StatusCode = statusCode };
 }

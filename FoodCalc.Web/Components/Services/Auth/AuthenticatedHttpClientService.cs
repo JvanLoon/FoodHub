@@ -97,7 +97,7 @@ public class AuthenticatedHttpClientService(
 		catch (Exception ex)
 		{
 			logger.LogError(ex, "Request {Method} {Uri} failed", method, requestUri);
-			return await DecorateAsync(ApiResult<T>.Fail(WebConstants.Messages.Client.GenericFailure));
+			return await DecorateAsync(ApiResult<T>.Fail(WebConstants.Messages.Client.GenericFailure, (int) HttpStatusCode.InternalServerError));
 		}
 	}
 

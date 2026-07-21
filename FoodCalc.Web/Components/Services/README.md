@@ -29,7 +29,7 @@ public class ApiResult
 {
     public bool Success { get; init; }
     public IReadOnlyList<string> Errors { get; init; } = [];  // user-ready messages; empty on success
-    public int StatusCode { get; init; }                      // 0 for transport/exception failures
+    public int StatusCode { get; init; }                      // always set; never defaulted
 }
 
 public class ApiResult<T> : ApiResult
@@ -42,6 +42,12 @@ Guarantees the helpers rely on:
 
 - On **failure**, `Errors` holds at least one message.
 - On **success** of an `ApiResult<T>`, `Data` is present.
+- `StatusCode` is always a real code. The `Ok`/`Fail` factories take it as a
+  required argument — there is no default — because failure messages are prefixed
+  with it, and a defaulted `0` would show up in the toast. Failures with no HTTP
+  response of their own (transport errors, client-side guards) pass the status
+  that best describes them: `500` for a request that never completed, `400` for a
+  malformed server payload, and so on.
 
 `Errors` is a list because the API reports *every* problem it found, not just the
 first. Most responses still carry exactly one.
