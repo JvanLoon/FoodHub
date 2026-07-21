@@ -22,6 +22,14 @@ public class ErrorTestRequest
 /// you ask for, through the same <c>SendErrorsAsync</c> path every real endpoint uses, so the
 /// response shape is the real one rather than a hand-rolled imitation.
 /// </para>
+/// <para>
+/// The two knobs cover both halves of the client's error handling:
+/// <list type="bullet">
+/// <item><c>count &gt; 0</c> — the server supplies the messages, so the client parses them.</item>
+/// <item><c>count = 0</c> — an empty body, so the client falls back to its own status-based
+/// message from <c>WebConstants.Messages.Client</c>.</item>
+/// </list>
+/// </para>
 /// </summary>
 public class ErrorTestEndpoint(IWebHostEnvironment env) : Endpoint<ErrorTestRequest>
 {
@@ -44,9 +52,14 @@ public class ErrorTestEndpoint(IWebHostEnvironment env) : Endpoint<ErrorTestRequ
 			return;
 		}
 
-		if (req.Count <= 0)
+		// Two cases send a bare status with no body:
+		//   * a 2xx, which the client treats as success and never reads a body for, so errors
+		//     attached to one would silently vanish;
+		//   * count <= 0, which is how you reach the client's StatusFallback — it only fires when
+		//     the body yields no message, so an empty body is the point.
+		if (req.StatusCode is >= 200 and < 300 || req.Count <= 0)
 		{
-			await Send.OkAsync(ct);
+			await Send.ResultAsync(Results.StatusCode(req.StatusCode));
 			return;
 		}
 

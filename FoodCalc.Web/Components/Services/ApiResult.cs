@@ -26,7 +26,7 @@ public class ApiResult
 		new() { Success = true, StatusCode = statusCode };
 
 	public static ApiResult Fail(string error, int statusCode = 0) =>
-		Fail([error], statusCode);
+		Fail([$"{statusCode} {error}"], statusCode);
 
 	public static ApiResult Fail(IReadOnlyList<string> errors, int statusCode = 0) =>
 		new() { Success = false, Errors = errors, StatusCode = statusCode };
@@ -41,7 +41,7 @@ public class ApiResult<T> : ApiResult
 		new() { Success = true, Data = data, StatusCode = statusCode };
 
 	public static new ApiResult<T> Fail(string error, int statusCode = 0) =>
-		Fail([error], statusCode);
+		Fail([$"{statusCode} {error}"], statusCode);
 
 	public static new ApiResult<T> Fail(IReadOnlyList<string> errors, int statusCode = 0) =>
 		new() { Success = false, Errors = errors, StatusCode = statusCode };

@@ -76,7 +76,7 @@ public class AuthenticatedHttpClientService(
 		catch (Exception ex)
 		{
 			logger.LogError(ex, "Request {Method} {Uri} failed", method, requestUri);
-			return await DecorateAsync(ApiResult.Fail(WebConstants.Messages.Client.GenericFailure));
+			return await DecorateAsync(ApiResult.Fail(WebConstants.Messages.Client.GenericFailure, (int) HttpStatusCode.InternalServerError));
 		}
 	}
 
@@ -257,12 +257,34 @@ public class AuthenticatedHttpClientService(
 
 	private static string StatusFallback(HttpStatusCode status) => status switch
 	{
+		// --- 2xx Success ---
+		HttpStatusCode.OK => WebConstants.Messages.Client.OK,
+		HttpStatusCode.Created => WebConstants.Messages.Client.Created,
+		HttpStatusCode.Accepted => WebConstants.Messages.Client.Accepted,
+		HttpStatusCode.NoContent => WebConstants.Messages.Client.NoContent,
+
+		// --- 4xx Client Errors ---
+		HttpStatusCode.BadRequest => WebConstants.Messages.Client.BadRequest,
 		HttpStatusCode.Unauthorized => WebConstants.Messages.Client.Unauthorized,
 		HttpStatusCode.Forbidden => WebConstants.Messages.Client.Forbidden,
 		HttpStatusCode.NotFound => WebConstants.Messages.Client.NotFound,
-		HttpStatusCode.BadRequest => WebConstants.Messages.Client.BadRequest,
+		HttpStatusCode.RequestTimeout => WebConstants.Messages.Client.RequestTimeout,
 		HttpStatusCode.Conflict => WebConstants.Messages.Client.Conflict,
-		>= (HttpStatusCode)500 => WebConstants.Messages.Client.ServerError,
+		HttpStatusCode.UnsupportedMediaType => WebConstants.Messages.Client.UnsupportedMediaType,
+		HttpStatusCode.TooManyRequests => WebConstants.Messages.Client.TooManyRequests,
+		HttpStatusCode.RequestEntityTooLarge => WebConstants.Messages.Client.PayloadTooLarge,
+		HttpStatusCode.MethodNotAllowed => WebConstants.Messages.Client.MethodNotAllowed,
+		HttpStatusCode.UnprocessableEntity => WebConstants.Messages.Client.UnprocessableEntity,
+
+		// --- 5xx Server Errors ---
+		HttpStatusCode.InternalServerError => WebConstants.Messages.Client.InternalServerError,
+		HttpStatusCode.NotImplemented => WebConstants.Messages.Client.NotImplemented,
+		HttpStatusCode.BadGateway => WebConstants.Messages.Client.BadGateway,
+		HttpStatusCode.ServiceUnavailable => WebConstants.Messages.Client.ServiceUnavailable,
+		HttpStatusCode.GatewayTimeout => WebConstants.Messages.Client.GatewayTimeout,
+		HttpStatusCode.NetworkAuthenticationRequired => WebConstants.Messages.Client.NetworkAuthenticationRequired,
+
+		// --- Fallback voor onbekende of custom statuscodes ---
 		_ => WebConstants.Messages.Client.RequestFailed((int) status)
 	};
 }

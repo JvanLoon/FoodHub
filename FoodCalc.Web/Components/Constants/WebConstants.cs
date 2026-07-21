@@ -10,16 +10,50 @@ public static class WebConstants
 	/// <summary>Toast / notification text shown to the user, grouped by feature.</summary>
 	public static class Messages
 	{
-		/// <summary>Generic HTTP client failures (AuthenticatedHttpClientService).</summary>
+		/// <summary>
+		/// Status-based fallbacks used by <c>AuthenticatedHttpClientService.StatusFallback</c> when a
+		/// response body carries no usable message of its own. Wording is deliberately
+		/// user-facing: it says what happened and what (if anything) the user can do, never what
+		/// the server was doing internally.
+		/// </summary>
 		public static class Client
 		{
 			public const string GenericFailure = "Something went wrong. Please try again.";
+
+			// --- 2xx Success ---
+			public const string OK = "Done.";
+			public const string Created = "Created successfully.";
+			public const string Accepted = "Accepted — this is still being processed.";
+			public const string NoContent = "Done. There was nothing to show.";
+
+			// --- 4xx Client Errors ---
+			public const string BadRequest = "The request was invalid.";
 			public const string Unauthorized = "You are not signed in, or your session has expired.";
 			public const string Forbidden = "You don't have permission to do that.";
 			public const string NotFound = "The requested item was not found.";
-			public const string BadRequest = "The request was invalid.";
+			public const string RequestTimeout = "The request took too long. Please try again.";
 			public const string Conflict = "That action conflicts with the current state.";
-			public const string ServerError = "The server encountered an error. Please try again later.";
+			public const string UnsupportedMediaType = "That file type isn't supported.";
+			public const string TooManyRequests = "Too many requests. Please wait a moment and try again.";
+
+			// Suggested additions — see the matching arms in StatusFallback.
+			/// <summary>413 — import uploads can exceed the server's request body limit.</summary>
+			public const string PayloadTooLarge = "That file is too large to upload.";
+			/// <summary>405 — a route/verb mismatch; surfaces during endpoint refactors.</summary>
+			public const string MethodNotAllowed = "That action isn't allowed here.";
+			/// <summary>422 — if FastEndpoints' validation status is ever moved off 400.</summary>
+			public const string UnprocessableEntity = "The request was understood but could not be processed.";
+
+			// --- 5xx Server Errors ---
+			public const string InternalServerError = "The server encountered an error. Please try again later.";
+			public const string NotImplemented = "That feature isn't available yet.";
+			public const string BadGateway = "The server got an invalid response upstream. Please try again later.";
+			public const string ServiceUnavailable = "The service is temporarily unavailable. Please try again later.";
+			public const string NetworkAuthenticationRequired = "Your network requires you to sign in before continuing.";
+
+			/// <summary>504 — suggested addition; the upstream counterpart to <see cref="BadGateway"/>.</summary>
+			public const string GatewayTimeout = "The server took too long to respond. Please try again later.";
+
 			public static string RequestFailed(int statusCode) => $"Request failed ({statusCode}).";
 		}
 

@@ -4,6 +4,7 @@ using FoodHub.DTOs;
 
 using Microsoft.JSInterop;
 
+using System.Net;
 using System.Net.Http.Headers;
 
 namespace FoodCalc.Web.Components.Services.Admin;
@@ -22,7 +23,7 @@ public class ImportExportService(AuthenticatedHttpClientService httpClient, IJSR
 	private async Task<ApiResult> UploadAsync(string route, byte[] fileContent, string fileName)
 	{
 		if (fileContent == null || fileContent.Length == 0)
-			return ApiResult.Fail(WebConstants.Messages.ImportExport.NoFileContent);
+			return ApiResult.Fail(WebConstants.Messages.ImportExport.NoFileContent, (int) HttpStatusCode.NoContent);
 
 		using var content = new MultipartFormDataContent();
 		var streamContent = new StreamContent(new MemoryStream(fileContent));
@@ -54,11 +55,11 @@ public class ImportExportService(AuthenticatedHttpClientService httpClient, IJSR
 		}
 		catch (Exception)
 		{
-			return ApiResult.Fail(WebConstants.Messages.ImportExport.ExportUnexpectedResponse);
+			return ApiResult.Fail(WebConstants.Messages.ImportExport.ExportUnexpectedResponse, (int) HttpStatusCode.BadRequest);
 		}
 
 		if (string.IsNullOrWhiteSpace(base64))
-			return ApiResult.Fail(WebConstants.Messages.ImportExport.ExportEmpty);
+			return ApiResult.Fail(WebConstants.Messages.ImportExport.ExportEmpty, (int)HttpStatusCode.BadRequest);
 
 		await js.InvokeVoidAsync("blazorDownloadFile", fileName, mimeType, base64);
 		return ApiResult.Ok(result.StatusCode);
