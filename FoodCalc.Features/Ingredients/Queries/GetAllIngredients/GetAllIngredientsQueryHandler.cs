@@ -24,7 +24,7 @@ public class GetAllIngredientsQueryHandler(FoodHubDbContext context, ILogger<Get
 		catch (Exception ex)
 		{
 			logger.LogError(ex, ErrorMessages.Common.GetAllFailed("ingredients"));
-			return Error.Failure(ErrorMessages.Common.GetAllFailed("ingredients"));
+			return Error.Failure(description: ErrorMessages.Common.GetAllFailed("ingredients"));
 		}
 	}
 }

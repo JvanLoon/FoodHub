@@ -24,7 +24,7 @@ public class AddRecipeCommandHandler(FoodHubDbContext context, ILogger<AddRecipe
 		catch (Exception ex)
 		{
 			logger.LogError(ex, ErrorMessages.Common.AddFailed("recipe"));
-			return Error.Failure(ErrorMessages.Common.AddFailed("recipe"));
+			return Error.Failure(description: ErrorMessages.Common.AddFailed("recipe"));
 		}
 	}
 }

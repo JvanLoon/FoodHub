@@ -23,7 +23,7 @@ namespace FoodCalc.Features.Ingredients.Commands.AddIngredient
 			catch (Exception ex)
 			{
 				logger.LogError(ex, ErrorMessages.Common.AddFailed("ingredient"));
-				return Error.Failure(ErrorMessages.Common.AddFailed("ingredient"));
+				return Error.Failure(description: ErrorMessages.Common.AddFailed("ingredient"));
 			}
 		}
 	}

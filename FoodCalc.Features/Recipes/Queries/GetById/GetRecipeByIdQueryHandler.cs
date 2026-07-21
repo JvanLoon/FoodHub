@@ -21,14 +21,14 @@ public class GetRecipeByIdQueryHandler(FoodHubDbContext context, ILogger<GetReci
 
 			if (recipe is null)
 			{
-				return Error.Failure(ErrorMessages.Common.NotFound("Recipe"));
+				return Error.Failure(description: ErrorMessages.Common.NotFound("Recipe"));
 			}
 			return recipe.ToDto();
 		}
 		catch (Exception ex)
 		{
 			logger.LogError(ex, $"Failed to get recipe by id: {request.Id}");
-			return Error.Failure($"Failed to get recipe by id: {request.Id}");
+			return Error.Failure(description: $"Failed to get recipe by id: {request.Id}");
 		}
 	}
 }

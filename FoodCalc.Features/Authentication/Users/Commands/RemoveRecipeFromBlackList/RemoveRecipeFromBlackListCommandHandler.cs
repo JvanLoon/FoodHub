@@ -19,7 +19,7 @@ public class RemoveRecipeFromBlackListCommandHandler(FoodHubDbContext context, I
 		catch (Exception ex)
 		{
 			logger.LogError(ex, "Failed to ");
-			return Error.Failure("Failed to ");
+			return Error.Failure(description: "Failed to ");
 		}
 	}
 }

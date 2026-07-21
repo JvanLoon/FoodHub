@@ -26,7 +26,7 @@ public class UpdateIngredientCommandHandler(FoodHubDbContext context, ILogger<Up
 		catch (Exception ex)
 		{
 			logger.LogError(ex, ErrorMessages.Common.UpdateFailed("ingredient"));
-			return Error.Failure(ErrorMessages.Common.UpdateFailed("ingredient"), ex.Message);
+			return Error.Failure(description: ErrorMessages.Common.UpdateFailed("ingredient"));
 		}
 	}
 }

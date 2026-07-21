@@ -74,7 +74,7 @@ public class ExportAllCommandHandler(FoodHubDbContext context, UserManager<Ident
 		catch (Exception ex)
 		{
 			logger.LogError(ex, ErrorMessages.ImportExport.ExportFailed);
-			return Error.Failure(ErrorMessages.ImportExport.ExportFailed);
+			return Error.Failure(description: ErrorMessages.ImportExport.ExportFailed);
 		}
 	}
 }

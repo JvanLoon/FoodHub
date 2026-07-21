@@ -25,7 +25,7 @@ public class DeleteRecipeCommandHandler(FoodHubDbContext context, ILogger<Delete
 		catch (Exception ex)
 		{
 			logger.LogError(ex, ErrorMessages.Common.DeleteFailed("recipe"));
-			return Error.Failure(ErrorMessages.Common.DeleteFailed("recipe"));
+			return Error.Failure(description: ErrorMessages.Common.DeleteFailed("recipe"));
 		}
 	}
 }

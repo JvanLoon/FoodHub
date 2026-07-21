@@ -57,11 +57,8 @@ constant from `WebConstants.Messages.Client`:
 | 404 | `NotFound` |
 | 400 | `BadRequest` |
 | 409 | `Conflict` |
-| 500 | `ServerError` |
+| ≥ 500 | `ServerError` |
 | other | `RequestFailed(status)` |
-
-Note that only 500 exactly maps to `ServerError` — 502/503 and friends fall
-through to `RequestFailed(status)`.
 
 ### Exceptions
 

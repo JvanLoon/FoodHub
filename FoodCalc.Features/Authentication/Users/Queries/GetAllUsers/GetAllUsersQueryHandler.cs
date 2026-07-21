@@ -41,7 +41,7 @@ public class GetAllUsersQueryHandler(FoodHubDbContext context, ILogger<GetAllUse
         catch (Exception ex)
         {
             logger.LogError(ex, ErrorMessages.Common.GetAllFailed("Users"));
-            return Error.Failure(ErrorMessages.Common.GetAllFailed("Users"));
+            return Error.Failure(description: ErrorMessages.Common.GetAllFailed("Users"));
         }
     }
 }

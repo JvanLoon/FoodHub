@@ -42,7 +42,7 @@ public class AddIngredientToRecipeCommandHandler(FoodHubDbContext context, ILogg
 		catch (Exception ex)
 		{
 			logger.LogError(ex, ErrorMessages.Recipe.AddIngredientFailed);
-			return Error.Failure(ErrorMessages.Recipe.UpdateForIngredientFailed);
+			return Error.Failure(description: ErrorMessages.Recipe.UpdateForIngredientFailed);
 		}
 	}
 }

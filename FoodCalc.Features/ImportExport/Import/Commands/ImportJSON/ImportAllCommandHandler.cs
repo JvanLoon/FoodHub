@@ -20,7 +20,7 @@ public class ImportAllCommandHandler(FoodHubDbContext context, UserManager<Ident
 			var data = request.Data;
 			if (data == null)
 			{
-				return Error.Failure(ErrorMessages.ImportExport.NoImportData);
+				return Error.Failure(description: ErrorMessages.ImportExport.NoImportData);
 			}
 
 			await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
@@ -165,7 +165,7 @@ public class ImportAllCommandHandler(FoodHubDbContext context, UserManager<Ident
 		catch (Exception ex)
 		{
 			logger.LogError(ex, ErrorMessages.ImportExport.ImportFailed);
-			return Error.Failure(ErrorMessages.ImportExport.ImportFailed);
+			return Error.Failure(description: ErrorMessages.ImportExport.ImportFailed);
 		}
 	}
 }

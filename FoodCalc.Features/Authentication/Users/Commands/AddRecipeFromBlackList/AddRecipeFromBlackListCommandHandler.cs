@@ -18,7 +18,7 @@ public class AddRecipeFromBlackListCommandHandler(FoodHubDbContext context, ILog
 		catch (Exception ex)
 		{
 			logger.LogError(ex, "Failed to ");
-			return Error.Failure("Failed to ");
+			return Error.Failure(description: "Failed to ");
 		}
 	}
 }

@@ -23,7 +23,7 @@ public class DeleteIngredientFromRecipeCommandHandler(FoodHubDbContext context, 
 		catch (Exception ex)
 		{
 			logger.LogError(ex, ErrorMessages.Ingredient.DeleteFromRecipeFailed);
-			return Error.Failure(ErrorMessages.Ingredient.DeleteFromRecipeFailed);
+			return Error.Failure(description: ErrorMessages.Ingredient.DeleteFromRecipeFailed);
 		}
 	}
 }

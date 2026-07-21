@@ -33,7 +33,7 @@ public class UpdateRecipeNameCommandHandler(FoodHubDbContext context, ILogger<Up
 		catch (Exception ex)
 		{
 			logger.LogError(ex, ErrorMessages.Common.UpdateFailed("recipe"));
-			return Error.Failure(ErrorMessages.Common.UpdateFailed("recipe"), ex.Message);
+			return Error.Failure(description: ErrorMessages.Common.UpdateFailed("recipe"));
 		}
 	}
 }

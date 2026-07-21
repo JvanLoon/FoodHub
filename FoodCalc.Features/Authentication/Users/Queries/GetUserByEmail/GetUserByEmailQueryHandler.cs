@@ -21,14 +21,14 @@ public class GetUserByEmailQueryHandler(FoodHubDbContext context, ILogger<GetAll
 			var user = await context.Users.SingleOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
 
 			if (user is null)
-				return Error.Failure(ErrorMessages.Common.NotFound("User"));
+				return Error.Failure(description: ErrorMessages.Common.NotFound("User"));
 
 			return user.ToUserDto();
 		}
 		catch (Exception ex)
 		{
 			logger.LogError(ex, ErrorMessages.User.GetByEmailFailed);
-			return Error.Failure(ex.Message);
+			return Error.Failure(description: ErrorMessages.User.GetByEmailFailed);
 		}
 	}
 }
