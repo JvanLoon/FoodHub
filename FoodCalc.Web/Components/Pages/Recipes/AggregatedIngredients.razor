@@ -37,9 +37,12 @@ else
 }
 
 @code {
-    [Parameter] public List<RecipeItemDto> Ingredients { get; set; } = new();
-    [Parameter] public List<string> InitialItems { get; set; } = new();
-    [Parameter] public EventCallback<List<string>> OnItemsChanged { get; set; }
+    [Parameter]
+    public List<RecipeItemDto> Ingredients { get; set; } = new();
+    [Parameter]
+    public List<string> InitialItems { get; set; } = new();
+    [Parameter]
+    public EventCallback<List<string>> OnItemsChanged { get; set; }
 
     private List<string> _displayItems = new();
     private string _newItem = string.Empty;

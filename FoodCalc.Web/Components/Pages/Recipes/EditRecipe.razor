@@ -116,7 +116,8 @@
 </div>
 
 @code {
-    [Parameter] public Guid RecipeId { get; set; }
+    [Parameter] 
+    public Guid RecipeId { get; set; }
 
     private RecipeDto recipe = new();
     private List<IngredientDto> ingredients = new();
@@ -155,7 +156,7 @@
 
         await RecipeService.AddIngredient(recipeItem)
         .OnSuccess(message: WebConstants.Messages.Ingredient.AddedOrUpdated)
-        .OnFailure(message: WebConstants.Messages.Ingredient.AddedOrUpdatedFailed);
+        .OnFailure();
 
         ClearForm();
         await RefreshRecipeAsync(); // Refresh the list
@@ -180,7 +181,7 @@
     {
         await RecipeService.DeleteIngredient(recipeItemId)
         .OnSuccess(message: WebConstants.Messages.Ingredient.Deleted)
-        .OnFailure(message: WebConstants.Messages.Ingredient.DeletedFailed);
+        .OnFailure();
 
         ClearForm();
         await RefreshRecipeAsync(); // Refresh the list
@@ -197,7 +198,7 @@
     {
         await RecipeService.UpdateRecipeName(RecipeId, recipe.Name!)
         .OnSuccess(message: WebConstants.Messages.Recipe.NameUpdated)
-        .OnFailure(message: WebConstants.Messages.Recipe.NameUpdateFailed);
+        .OnFailure();
 
         isEditingName = false;
         await RefreshRecipeAsync(); // Refresh
@@ -209,7 +210,7 @@
         {
             await IngredientService.GetAllIngredientsAsync()
             .OnSuccess((data) => ingredients = data)
-            .OnFailure(message: WebConstants.Messages.Ingredient.GetAllIngredientsFailed);
+            .OnFailure();
 
             var created = ingredients.FirstOrDefault(i => i.Name == ingredientSearch);
 

@@ -87,7 +87,7 @@
     private async Task LoadIngredientsAsync()
     {
         pagedResult = await IngredientService.GetPagedIngredientsAsync(currentPage, pageSize, searchTerm)
-            .OrDefault<PagedResultDto<IngredientDto>>(new(), WebConstants.Messages.Ingredient.GetAllIngredientsFailed);
+            .OrDefault<PagedResultDto<IngredientDto>>(new());
     }
 
     private async Task OnPageChanged(int page)
@@ -122,7 +122,7 @@
         };
         await IngredientService.UpdateIngredient(updateDto)
         .OnSuccess()
-        .OnFailure(message: WebConstants.Messages.Ingredient.UpdatedSetShoppingCartFailed);
+        .OnFailure();
     }
 
     private void StartEdit(IngredientDto ingredient)
@@ -144,7 +144,7 @@
             };
             await IngredientService.UpdateIngredient(updateDto)
             .OnSuccess(message: WebConstants.Messages.Ingredient.NameUpdated)
-            .OnFailure(message: WebConstants.Messages.Ingredient.NameUpdateFailed);
+            .OnFailure();
         }
         editingIngredientId = null;
         editingName = string.Empty;
@@ -163,6 +163,6 @@
         //todo: checken of ook echt stopt als het foutgaat
         await IngredientService.DeleteIngredient(id)
         .OnSuccess(async () => await LoadIngredientsAsync(), WebConstants.Messages.Ingredient.DeletedWithReload)
-        .OnFailure(message: WebConstants.Messages.Ingredient.DeletedFailed);
+        .OnFailure();
     }
 }

@@ -131,7 +131,7 @@
 
         var recipes = await RecipeService.GetAllRecipesAsync(withIngredients: true).OrDefault(new List<RecipeDto>());
         var ingredientsPage = await IngredientService.GetPagedIngredientsAsync(1, 1)
-        .OrDefault(new PagedResultDto<IngredientDto>(), WebConstants.Messages.Ingredient.LoadFailed);
+        .OrDefault(new PagedResultDto<IngredientDto>());
 
         recipeCount = recipes.Count;
         ingredientCount = ingredientsPage.TotalCount;
@@ -139,7 +139,7 @@
         if (isAdmin)
         {
             var usersResult = await AdminService.GetPagedUsersAsync(1, 1)
-            .OrDefault(new PagedResultDto<UserDto>(), WebConstants.Messages.Auth.UserLoadFailed);
+            .OrDefault(new PagedResultDto<UserDto>());
             userCount = usersResult.TotalCount;
         }
 

@@ -14,25 +14,25 @@ public static class ErrorMessages
     /// </summary>
     public static class Common
     {
-        private const string NotFoundTemplate = "{0} not found";
+        private const string _notFoundTemplate = "{0} not found";
         public static string NotFound(string entityName) =>
-            string.Format(NotFoundTemplate, entityName);
+            string.Format(_notFoundTemplate, entityName);
 
-        private const string GetAllFailedTemplate = "Failed to get all {0}";
+        private const string _getAllFailedTemplate = "Failed to get all {0}";
         public static string GetAllFailed(string entityName) =>
-            string.Format(GetAllFailedTemplate, entityName);
+            string.Format(_getAllFailedTemplate, entityName);
 
-        private const string AddFailedTemplate = "Failed to add {0}";
+        private const string _addFailedTemplate = "Failed to add {0}";
         public static string AddFailed(string entityName) =>
-            string.Format(AddFailedTemplate, entityName);
+            string.Format(_addFailedTemplate, entityName);
 
-        private const string UpdateFailedTemplate = "Failed to update {0}";
+        private const string _updateFailedTemplate = "Failed to update {0}";
         public static string UpdateFailed(string entityName) =>
-            string.Format(UpdateFailedTemplate, entityName);
+            string.Format(_updateFailedTemplate, entityName);
 
-        private const string DeleteFailedTemplate = "Failed to delete {0}";
+        private const string _deleteFailedTemplate = "Failed to delete {0}";
         public static string DeleteFailed(string entityName) =>
-            string.Format(DeleteFailedTemplate, entityName);
+            string.Format(_deleteFailedTemplate, entityName);
     }
 
     /// <summary>Recipe-specific wording.</summary>

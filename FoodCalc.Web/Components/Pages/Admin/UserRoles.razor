@@ -87,6 +87,7 @@
 @code {
     [Parameter]
     public string email { get; set; } = null!;
+
     private List<string> roles = [];
     private List<string> allRoles = [];
     private string selectedRole = null!;
@@ -109,7 +110,7 @@
                     selectedRole = string.Empty;
                 },
                 WebConstants.Messages.Roles.Added)
-                .OnFailure(message: WebConstants.Messages.Roles.AddedFailed);
+                .OnFailure();
         }
     }
 
@@ -117,7 +118,7 @@
     {
         await AdminService.RemoveUserRoleAsync(email, role)
         .OnSuccess(() => roles.Remove(role), WebConstants.Messages.Roles.Removed)
-        .OnFailure(message: WebConstants.Messages.Roles.RemovedFailed);
+        .OnFailure();
     }
 
     private ResetPasswordDto resetPasswordDto = new();
@@ -129,7 +130,7 @@
 
         await LoginService.ResetPassword(resetPasswordDto)
         .OnSuccess(() => resetModel.password = string.Empty, WebConstants.Messages.Roles.PasswordReset)
-        .OnFailure(message: WebConstants.Messages.Roles.PasswordResetFailed);
+        .OnFailure();
     }
 
     public class PasswordResetModel

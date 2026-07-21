@@ -29,6 +29,8 @@
 
     private async Task CreateRecipeAsync()
     {
-        await RecipeService.AddRecipe(recipe).OnSuccess((data) => NavigationManager.NavigateTo($"/recipes/edit/{data.Id}"), WebConstants.Messages.Recipe.Created).OnFailure();
+        await RecipeService.AddRecipe(recipe)
+        .OnSuccess((data) => NavigationManager.NavigateTo($"/recipes/edit/{data.Id}"), WebConstants.Messages.Recipe.Created)
+        .OnFailure();
     }
 }

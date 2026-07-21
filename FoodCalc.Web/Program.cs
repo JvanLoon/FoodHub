@@ -31,6 +31,10 @@ public class Program
 		builder.Services.AddBlazoredLocalStorage();
 
 		var apiBaseAddress = builder.Configuration["API:BaseAddress"];
+
+		if(string.IsNullOrEmpty(apiBaseAddress))
+			throw new InvalidOperationException("API base address is not configured.");
+
 		builder.Services.AddHttpClient("ApiClient", client =>
 		{
 			client.BaseAddress = new Uri(apiBaseAddress);
@@ -84,7 +88,12 @@ public class Program
 		builder.Services.AddAuthentication("JwtBearer")
 		.AddJwtBearer("JwtBearer", options =>
 		{
-			var jwtSettings = builder.Configuration.GetSection("Jwt");
+			IConfigurationSection jwtSettings = builder.Configuration.GetSection("Jwt");
+			var key = jwtSettings["Key"];
+
+			if(string.IsNullOrWhiteSpace(key))
+				throw new InvalidOperationException("JWT key is not configured.");
+
 			options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
 			{
 				ValidateIssuer = true,
@@ -94,7 +103,7 @@ public class Program
 				ValidateIssuerSigningKey = true,
 				ValidIssuer = jwtSettings["Issuer"],
 				IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
-					System.Text.Encoding.UTF8.GetBytes(jwtSettings["Key"])
+					System.Text.Encoding.UTF8.GetBytes(key)
 				),
 				ClockSkew = TimeSpan.Zero
 			};

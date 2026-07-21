@@ -11,10 +11,6 @@ public class ApiResult
 {
 	internal MessageService? MessageService { get; set; }
 
-	/// <summary>Whether the current user is an admin, stamped by the HTTP client. Gates whether
-	/// the raw server <see cref="Error"/> may be surfaced to the user.</summary>
-	internal bool IsAdmin { get; set; }
-
 	public bool Success { get; init; }
 
     /// <summary>Clean, user-ready message. Null on success.</summary>

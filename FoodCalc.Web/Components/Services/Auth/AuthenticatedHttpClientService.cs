@@ -21,7 +21,7 @@ public class AuthenticatedHttpClientService(
     ILogger<AuthenticatedHttpClientService> logger,
 	MessageService? messageService)
 {
-    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
+    private static readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
 
     private async Task AttachTokenAsync()
     {
@@ -37,10 +37,10 @@ public class AuthenticatedHttpClientService(
         SendForDataAsync<T>(HttpMethod.Get, requestUri, content: null);
 
     public Task<ApiResult> PostAsync<TRequest>(string requestUri, TRequest value) =>
-        SendAsync(HttpMethod.Post, requestUri, JsonContent.Create(value, options: JsonOptions));
+        SendAsync(HttpMethod.Post, requestUri, JsonContent.Create(value, options: _jsonOptions));
 
     public Task<ApiResult<TResponse>> PostAsync<TRequest, TResponse>(string requestUri, TRequest value) =>
-        SendForDataAsync<TResponse>(HttpMethod.Post, requestUri, JsonContent.Create(value, options: JsonOptions));
+        SendForDataAsync<TResponse>(HttpMethod.Post, requestUri, JsonContent.Create(value, options: _jsonOptions));
 
     /// <summary>POST with no JSON body (query-string driven endpoints, or custom content such as multipart).</summary>
     public Task<ApiResult> PostAsync(string requestUri, HttpContent? content = null) =>
@@ -50,10 +50,10 @@ public class AuthenticatedHttpClientService(
         SendForDataAsync<TResponse>(HttpMethod.Post, requestUri, content);
 
     public Task<ApiResult> PutAsync<TRequest>(string requestUri, TRequest value) =>
-        SendAsync(HttpMethod.Put, requestUri, JsonContent.Create(value, options: JsonOptions));
+        SendAsync(HttpMethod.Put, requestUri, JsonContent.Create(value, options: _jsonOptions));
 
     public Task<ApiResult<TResponse>> PutAsync<TRequest, TResponse>(string requestUri, TRequest value) =>
-        SendForDataAsync<TResponse>(HttpMethod.Put, requestUri, JsonContent.Create(value, options: JsonOptions));
+        SendForDataAsync<TResponse>(HttpMethod.Put, requestUri, JsonContent.Create(value, options: _jsonOptions));
 
     public Task<ApiResult> DeleteAsync(string requestUri) =>
         SendAsync(HttpMethod.Delete, requestUri, content: null);
@@ -109,14 +109,7 @@ public class AuthenticatedHttpClientService(
     private async Task<TResult> DecorateAsync<TResult>(TResult result) where TResult : ApiResult
     {
         result.MessageService = messageService;
-        result.IsAdmin = await IsAdminAsync();
         return result;
-    }
-
-    private async Task<bool> IsAdminAsync()
-    {
-        var roles = await authTokenService.GetRolesAsync();
-        return roles.Contains("Admin");
     }
 
     private async Task<HttpResponseMessage> SendRawAsync(HttpMethod method, string requestUri, HttpContent? content)
@@ -138,7 +131,7 @@ public class AuthenticatedHttpClientService(
         if (response.Content.Headers.ContentLength == 0)
             return default;
 
-        return await response.Content.ReadFromJsonAsync<T>(JsonOptions);
+        return await response.Content.ReadFromJsonAsync<T>(_jsonOptions);
     }
 
     /// <summary>
@@ -234,7 +227,7 @@ public class AuthenticatedHttpClientService(
         HttpStatusCode.NotFound => WebConstants.Messages.Client.NotFound,
         HttpStatusCode.BadRequest => WebConstants.Messages.Client.BadRequest,
         HttpStatusCode.Conflict => WebConstants.Messages.Client.Conflict,
-        >= (HttpStatusCode)500 => WebConstants.Messages.Client.ServerError,
+        HttpStatusCode.InternalServerError => WebConstants.Messages.Client.ServerError,
         _ => WebConstants.Messages.Client.RequestFailed((int)status)
     };
 }

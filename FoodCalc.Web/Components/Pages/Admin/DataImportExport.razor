@@ -96,7 +96,7 @@
 
             var result = await import(bytes, _selectedFile.Name)
             .OnSuccess(message: WebConstants.Messages.ImportExport.ImportSucceeded)
-            .OnFailure(message: WebConstants.Messages.ImportExport.ImportFailed);
+            .OnFailure();
 
         }
         catch (Exception ex)

@@ -14,6 +14,8 @@ public class Program
 		var builder = WebApplication.CreateBuilder(args);
 
 		var webBaseAddress = builder.Configuration["WebServer:BaseAddress"];
+		if (string.IsNullOrEmpty(webBaseAddress))
+			throw new InvalidOperationException("Web server base address is not configured.");
 
 		// Add service defaults & Aspire client integrations.
 		builder.AddServiceDefaults();
@@ -70,6 +72,11 @@ public class Program
 
 		// Configure JWT authentication
 		var jwtSettings = builder.Configuration.GetSection("Jwt");
+		var key = jwtSettings["Key"];
+
+		if(string.IsNullOrEmpty(key))
+			throw new InvalidOperationException("JWT key is not configured.");
+
 		builder.Services.AddAuthentication(options =>
 		{
 			options.DefaultAuthenticateScheme = "JwtBearer";
@@ -85,7 +92,7 @@ public class Program
 				ValidateLifetime = true,
 				ValidateIssuerSigningKey = true,
 				ValidIssuer = jwtSettings["Issuer"],
-				IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(jwtSettings["Key"])),
+				IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(key)),
 				ClockSkew = TimeSpan.Zero
 			};
 

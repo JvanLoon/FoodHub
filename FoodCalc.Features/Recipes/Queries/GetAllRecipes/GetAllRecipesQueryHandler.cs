@@ -14,7 +14,7 @@ public class GetAllRecipesQueryHandler(FoodHubDbContext context, ILogger<GetAllR
 			var query = context.Recipes.AsQueryable();
 
 			if (!string.IsNullOrWhiteSpace(request.Search))
-				query = query.Where(r => r.Name.Contains(request.Search));
+				query = query.Where(r => r.Name != null && r.Name.Contains(request.Search));
 
 			var paged = await query.ToPagedResultAsync(request, cancellationToken);
 

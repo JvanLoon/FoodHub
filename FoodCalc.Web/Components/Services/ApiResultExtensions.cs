@@ -8,6 +8,7 @@ namespace FoodCalc.Web.Components.Services;
 /// </summary>
 public static class ApiResultExtensions
 {
+	private const int _timeInMs = MessageService.DefaultDisplayTimeInMs;
 	// ==========================================
 	// Asynchrone Overloads (voor Task-chaining)
 	// ==========================================
@@ -26,23 +27,23 @@ public static class ApiResultExtensions
 	}
 
 	// ----- OnFailure -----
-	public static async Task<ApiResult> OnFailure(this Task<ApiResult> resultTask, Action? action = null, string? message = null)
+	public static async Task<ApiResult> OnFailure(this Task<ApiResult> resultTask, Action? action = null)
 	{
 		var result = await resultTask;
-		return result.OnFailure(action, message);
+		return result.OnFailure(action);
 	}
 
-	public static async Task<ApiResult<T>> OnFailure<T>(this Task<ApiResult<T>> resultTask, Action<string>? action = null, string? message = null) where T : class
+	public static async Task<ApiResult<T>> OnFailure<T>(this Task<ApiResult<T>> resultTask, Action<string?>? action = null) where T : class
 	{
 		var result = await resultTask;
-		return result.OnFailure(action, message);
+		return result.OnFailure(action);
 	}
 
 	// ----- Value extraction -----
-	public static async Task<T> OrDefault<T>(this Task<ApiResult<T>> resultTask, T fallback, string? message = null)
+	public static async Task<T> OrDefault<T>(this Task<ApiResult<T>> resultTask, T fallback)
 	{
 		var result = await resultTask;
-		return result.OrDefault(fallback, message);
+		return result.OrDefault(fallback);
 	}
 
 	// ==========================================
@@ -52,7 +53,7 @@ public static class ApiResultExtensions
 	/// <summary>Runs <paramref name="action"/> when the call succeeded.</summary>
 	private static ApiResult OnSuccess(this ApiResult result, Action? action, string? message = null)
 	{
-		NotifySuccess(result, result.MessageService, message, action);
+		NotifySuccess(result, message, action);
 
 		return result;
 	}
@@ -60,22 +61,22 @@ public static class ApiResultExtensions
 	/// <inheritdoc cref="OnSuccess(ApiResult, Action)"/>
 	private static ApiResult<T> OnSuccess<T>(this ApiResult<T> result, Action<T>? action, string? message = null) where T : class
 	{
-		NotifySuccess(result, result.MessageService, message, () => action?.Invoke(result.Data!));
+		NotifySuccess(result, message, () => action?.Invoke(result.Data!));
 
 		return result;
 	}
 
 	/// <summary>Runs <paramref name="action"/> with the error message when the call failed.</summary>
-	private static ApiResult OnFailure(this ApiResult result, Action? action, string? message = null)
+	private static ApiResult OnFailure(this ApiResult result, Action? action)
 	{
-		NotifyFail(result, result.MessageService, message, action);
+		NotifyFail(result, action);
 
 		return result;
 	}
 
-	private static ApiResult<T> OnFailure<T>(this ApiResult<T> result, Action<string>? action, string? message = null) where T : class
+	private static ApiResult<T> OnFailure<T>(this ApiResult<T> result, Action<string?>? action, string? message = null) where T : class
 	{
-		NotifyFail(result, result.MessageService, message, () => action?.Invoke(result.Error! ?? "Onbekende fout"));
+		NotifyFail(result, () => action?.Invoke(result.Error));
 
 		return result;
 	}
@@ -83,11 +84,9 @@ public static class ApiResultExtensions
 	// ----- Value extraction -----
 
 	/// <summary>The payload on success, or <paramref name="fallback"/> on failure.</summary>
-	private static T OrDefault<T>(this ApiResult<T> result, T fallback, string? message)
+	private static T OrDefault<T>(this ApiResult<T> result, T fallback)
 	{
-		// result.Error is surfaced by NotifyFail (admins only); don't pass it as an ungated
-		// `message` here or the raw error would leak to every user.
-		NotifyFail(result, result.MessageService, message);
+		NotifyFail(result);
 
 		if (result.Success)
 			return result.Data!;
@@ -102,16 +101,12 @@ public static class ApiResultExtensions
 	/// <paramref name="message"/> as a success toast when one is supplied (otherwise stays silent).
 	/// Returns the same result so it can be chained or guarded on.
 	/// </summary>
-	private static ApiResult NotifySuccess(this ApiResult result,
-		MessageService? messageService = null,
-		string? message = null,
-		Action? action = null,
-		int timeInMs = MessageService.DefaultDisplayTimeInMs)
+	private static ApiResult NotifySuccess(this ApiResult result, string? message = null, Action? action = null)
 	{
 		if (result.Success)
 		{
 			if(!string.IsNullOrEmpty(message))
-				messageService?.ShowMessage(message, isError: false, timeInMs);
+				result.MessageService?.ShowMessage(message, isError: false, _timeInMs);
 
 			action?.Invoke();
 		}
@@ -120,14 +115,10 @@ public static class ApiResultExtensions
 	}
 
 	/// <inheritdoc cref="NotifySuccess(ApiResult, MessageService, string?, int, int)"/>
-	private static ApiResult<T> NotifySuccess<T>(this ApiResult<T> result,
-		MessageService? messageService = null,
-		string? message = null,
-		Action? action = null,
-		int timeInMs = MessageService.DefaultDisplayTimeInMs) where T : class 
+	private static ApiResult<T> NotifySuccess<T>(this ApiResult<T> result, string? message = null, Action? action = null) where T : class 
 	{
 		// Cast to the base type so the non-generic overload runs (avoids recursion).
-		((ApiResult)result).NotifySuccess(messageService, message, action, timeInMs);
+		((ApiResult)result).NotifySuccess(message, action);
 		return result;
 	}
 
@@ -136,26 +127,13 @@ public static class ApiResultExtensions
 	/// <paramref name="message"/> as a success toast when one is supplied (otherwise stays silent).
 	/// Returns the same result so it can be chained or guarded on.
 	/// </summary>
-	private static ApiResult NotifyFail(this ApiResult result,
-		MessageService? messageService = null,
-		string? message = null,
-		Action? action = null,
-		int timeInMs = MessageService.DefaultDisplayTimeInMs)
+	private static ApiResult NotifyFail(this ApiResult result, Action? action = null)
 	{
 		if (!result.Success)
 		{
-			if (!string.IsNullOrEmpty(message))
-				messageService?.ShowMessage(message, isError: true, timeInMs);
-
-			// Raw server error is only surfaced to admins; regular users get `message` (if any).
-			if (result.IsAdmin)
-			{
-				if (!string.IsNullOrEmpty(result.Error))
-					messageService?.ShowMessage(result.Error, isError: true, timeInMs);
-			}
-			else
-				if (!string.IsNullOrEmpty(message))
-					messageService?.ShowMessage(message, isError: true, timeInMs);
+			if (!string.IsNullOrEmpty(result.Error))
+				result.MessageService?.ShowMessage(result.Error, isError: true, _timeInMs);
+			
 
 			action?.Invoke();
 		}
@@ -168,14 +146,10 @@ public static class ApiResultExtensions
 	/// <paramref name="message"/> as a success toast when one is supplied (otherwise stays silent).
 	/// Returns the same result so it can be chained or guarded on.
 	/// </summary>
-	private static ApiResult<T> NotifyFail<T>(this ApiResult<T> result,
-		MessageService? messageService = null,
-		string? message = null,
-		Action? action = null,
-		int timeInMs = MessageService.DefaultDisplayTimeInMs) where T : class
+	private static ApiResult<T> NotifyFail<T>(this ApiResult<T> result, Action? action = null) where T : class
 	{
 		// Cast to the base type so the non-generic overload runs (avoids recursion).
-		((ApiResult)result).NotifyFail(messageService, message, action, timeInMs);
+		((ApiResult)result).NotifyFail(action);
 		return result;
 	}
 }
