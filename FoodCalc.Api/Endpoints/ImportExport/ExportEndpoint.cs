@@ -50,6 +50,6 @@ public class ExportEndpoint(IMediator mediator)
 				ContentType = "application/json",
 				FileDownloadName = "users.json"
 			}, ct),
-			errors => Send.ResultAsync(TypedResults.Problem(errors.First().Description)));
+			errors => this.SendErrorsAsync(errors, ct: ct));
 	}
 }

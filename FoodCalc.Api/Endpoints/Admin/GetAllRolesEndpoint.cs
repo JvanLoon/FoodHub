@@ -27,7 +27,6 @@ public class GetAllRolesEndpoint(IMediator mediator)
 
 		await result.Match(
 			value => Send.OkAsync(value, ct),
-			errors => Send.ResultAsync(TypedResults.Problem(
-				string.Join(", ", errors.Select(e => e.ToString())))));
+			errors => this.SendErrorsAsync(errors, ct: ct));
 	}
 }

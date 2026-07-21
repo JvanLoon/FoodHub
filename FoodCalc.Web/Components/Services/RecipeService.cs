@@ -19,7 +19,7 @@ public class RecipeService(AuthenticatedHttpClientService httpClient)
 	{
 		var paged = await GetPagedRecipesAsync(1, int.MaxValue, withIngredients: withIngredients);
 		if (!paged.Success)
-			return ApiResult<List<RecipeDto>>.Fail(paged.Error!, paged.StatusCode);
+			return ApiResult<List<RecipeDto>>.Fail(paged.Errors, paged.StatusCode);
 
 		return ApiResult<List<RecipeDto>>.Ok([.. paged.Data!.Items], paged.StatusCode);
 	}

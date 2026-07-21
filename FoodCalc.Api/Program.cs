@@ -150,6 +150,16 @@ public class Program
 			// Preserve), so match that wire format to keep the clients working.
 			c.Serializer.Options.ReferenceHandler = null;
 			c.Serializer.Options.WriteIndented = false;
+
+			// One error shape for everything: validator failures and domain failures
+			// (see ErrorResultExtensions) both serialize as RFC9457 ProblemDetails with a
+			// flat "errors": [{ name, reason }] array, so the client parses one thing.
+			c.Errors.UseProblemDetails(p =>
+			{
+				// Domain errors all share the same field name; without this only the
+				// first of them would survive into the response.
+				p.AllowDuplicateErrors = true;
+			});
 		});
 		if (app.Environment.IsDevelopment())
 		{

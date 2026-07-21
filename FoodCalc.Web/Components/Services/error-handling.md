@@ -1,9 +1,13 @@
 # Error handling pipeline
 
-Where the clean `ApiResult.Error` string comes from. The `Notify`/`OrDefault`
-helpers documented in [README.md](README.md) rely on the error already being a
-user-ready message by the time a component sees it — this is the code that makes
-that true.
+Where the clean `ApiResult.Errors` list comes from. The `Notify`/`OrDefault`
+helpers documented in [README.md](README.md) rely on the errors already being
+user-ready messages by the time a component sees them — this is the code that
+makes that true.
+
+`Errors` is a list, not a single string: the API reports *every* error it found,
+and the client shows all of them (one toast each). Most responses still carry
+exactly one.
 
 ## The choke-point
 
@@ -13,7 +17,7 @@ Every API call goes through `AuthenticatedHttpClientService`. It:
 2. Sends the request.
 3. **Never throws** — success or failure always comes back as an `ApiResult`.
 4. On a non-success response, reads the body and recovers the server's real
-   message (see below).
+   messages (see below).
 5. On an exception (network down, timeout, etc.), logs the full stack trace and
    returns a generic message.
 
@@ -26,16 +30,17 @@ Because the services are thin pass-throughs to the choke-point, none of them do
 their own error handling — there is exactly one place that turns an HTTP failure
 into a message.
 
-## Turning a failed response into a message
+## Turning a failed response into messages
 
-`ExtractErrorAsync` reads the response body and hands it to `ParseServerMessage`,
-which tries these in order and returns the first that yields text:
+`ExtractErrorsAsync` reads the response body and hands it to
+`ParseServerMessages`, which tries these in order and returns the first that
+yields text:
 
 | Source | Shape | Notes |
 | --- | --- | --- |
-| ProblemDetails | `{ "detail": "..." }` | What `TypedResults.Problem(...)` produces. |
-| Validation errors | `{ "errors": { "Field": ["msg", ...] } }` | FastEndpoints validation. All messages are joined with a space. Also accepts `{ "Field": "msg" }`. |
-| Generic fallbacks | `{ "title" \| "message" \| "error": "..." }` | First non-empty one wins. |
+| ProblemDetails errors | `{ "errors": [{ "name": .., "reason": ".." }] }` | **The API's normal shape.** Every `reason` is kept as its own message. |
+| Model-state errors | `{ "errors": { "Field": ["msg", ...] } }` | Legacy/third-party shape. All messages kept. Also accepts `{ "Field": "msg" }`. |
+| Single-message shapes | `{ "detail" \| "title" \| "message" \| "error": "..." }` | First non-empty one wins. |
 | Plain text | not JSON | Used directly (trimmed to 500 chars). |
 
 If none of those produce anything, it falls back to a status-based message.
@@ -60,16 +65,31 @@ constant from `WebConstants.Messages.Client`:
 If the request throws (rather than returning a non-success status), the exception
 is logged at **Error** level with the full stack trace, and the caller gets
 `WebConstants.Messages.Client.GenericFailure`. Non-success responses are logged at
-**Warning** level with the method, URI, status, and resolved message.
+**Warning** level with the method, URI, status, and resolved messages (joined
+with ` | `).
+
+## Where the API side produces this
+
+`FoodCalc.Api/Common/ErrorResultExtensions.cs` gives endpoints
+`this.SendErrorsAsync(errors, ct: ct)`, which pushes every `ErrorOr` error (or any
+set of message strings) through FastEndpoints' validation-failure collection.
+`Program.cs` configures `c.Errors.UseProblemDetails(p => p.AllowDuplicateErrors = true)`,
+so validator failures and domain failures leave the API in the same RFC9457 shape.
+
+`AllowDuplicateErrors` matters: domain errors all carry the same field name, and
+without it only the first would reach the client — the exact problem this
+replaced.
 
 ## What this means for callers
 
 - Components never parse response bodies or inspect `StatusCode` for messaging —
-  `Error` is already the string to show. That is exactly what `Notify` puts on a
-  toast.
+  `Errors` already holds the strings to show. That is exactly what `Notify` puts
+  on toasts, one per entry.
 - To change how a specific failure reads to the user, fix it **at the endpoint**
-  (return a ProblemDetails `detail` or a validation message). The frontend picks
-  it up automatically.
+  (the `Error.Failure(...)` description in the handler). The frontend picks it up
+  automatically.
+- To surface more than one problem at once, return multiple errors from the
+  handler — nothing downstream truncates the list.
 - The generic/exception path is deliberately vague (`GenericFailure`) so transport
   errors don't leak internals; the real detail is in the server logs.
 

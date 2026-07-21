@@ -19,7 +19,7 @@ public class AdminService(AuthenticatedHttpClientService httpClient)
 	{
 		var paged = await GetPagedUsersAsync(1, int.MaxValue);
 		if (!paged.Success)
-			return ApiResult<List<UserDto>>.Fail(paged.Error!, paged.StatusCode);
+			return ApiResult<List<UserDto>>.Fail(paged.Errors, paged.StatusCode);
 
 		return ApiResult<List<UserDto>>.Ok([.. paged.Data!.Items], paged.StatusCode);
 	}
@@ -33,7 +33,7 @@ public class AdminService(AuthenticatedHttpClientService httpClient)
 		var paged = await httpClient.GetAsync<PagedResultDto<string>>(
 			$"{ApiRoutes.Admin.AllRoles}?page=1&pageSize={int.MaxValue}");
 		if (!paged.Success)
-			return ApiResult<List<string>>.Fail(paged.Error!, paged.StatusCode);
+			return ApiResult<List<string>>.Fail(paged.Errors, paged.StatusCode);
 
 		return ApiResult<List<string>>.Ok([.. paged.Data!.Items], paged.StatusCode);
 	}

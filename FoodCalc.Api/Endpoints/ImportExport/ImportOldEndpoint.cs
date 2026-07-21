@@ -67,6 +67,6 @@ public class ImportOldEndpoint(IMediator mediator)
 
 		await result.Match(
 			_ => Send.StringAsync("Import successful.", cancellation: ct),
-			errors => Send.ResultAsync(TypedResults.Problem(errors.First().Description)));
+			errors => this.SendErrorsAsync(errors, ct: ct));
 	}
 }

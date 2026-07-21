@@ -29,6 +29,8 @@
     <Using Include="FoodHub.DTOs" />
     <!-- Request-validation message constants. -->
     <Using Include="FoodCalc.Api.Constants" />
+    <!-- SendErrorsAsync + shared request contracts/validators. -->
+    <Using Include="FoodCalc.Api.Common" />
   </ItemGroup>
 
 </Project>

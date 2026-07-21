@@ -2,7 +2,7 @@ namespace FoodCalc.Web.Components.Services;
 
 /// <summary>
 /// Fluent helpers that collapse the repetitive "check <see cref="ApiResult.Success"/>, pull
-/// <see cref="ApiResult{T}.Data"/>, toast <see cref="ApiResult.Error"/>" dance at call sites
+/// <see cref="ApiResult{T}.Data"/>, toast <see cref="ApiResult.Errors"/>" dance at call sites
 /// into a single expressive line. Every helper returns the same result so calls can be chained
 /// or guarded on (<c>if (!result.Notify(messages).Success) return;</c>).
 /// </summary>
@@ -33,7 +33,7 @@ public static class ApiResultExtensions
 		return result.OnFailure(action);
 	}
 
-	public static async Task<ApiResult<T>> OnFailure<T>(this Task<ApiResult<T>> resultTask, Action<string?>? action = null) where T : class
+	public static async Task<ApiResult<T>> OnFailure<T>(this Task<ApiResult<T>> resultTask, Action<IReadOnlyList<string>>? action = null) where T : class
 	{
 		var result = await resultTask;
 		return result.OnFailure(action);
@@ -74,9 +74,9 @@ public static class ApiResultExtensions
 		return result;
 	}
 
-	private static ApiResult<T> OnFailure<T>(this ApiResult<T> result, Action<string?>? action, string? message = null) where T : class
+	private static ApiResult<T> OnFailure<T>(this ApiResult<T> result, Action<IReadOnlyList<string>>? action, string? message = null) where T : class
 	{
-		NotifyFail(result, () => action?.Invoke(result.Error));
+		NotifyFail(result, () => action?.Invoke(result.Errors));
 
 		return result;
 	}
@@ -123,17 +123,19 @@ public static class ApiResultExtensions
 	}
 
 	/// <summary>
-	/// On failure, shows the server's error message as an error toast. On success, shows
-	/// <paramref name="message"/> as a success toast when one is supplied (otherwise stays silent).
+	/// On failure, shows one error toast per message the server reported — usually a single one,
+	/// but endpoints may return several and none of them should be swallowed.
 	/// Returns the same result so it can be chained or guarded on.
 	/// </summary>
 	private static ApiResult NotifyFail(this ApiResult result, Action? action = null)
 	{
 		if (!result.Success)
 		{
-			if (!string.IsNullOrEmpty(result.Error))
-				result.MessageService?.ShowMessage(result.Error, isError: true, _timeInMs);
-
+			foreach (var error in result.Errors)
+			{
+				if (!string.IsNullOrEmpty(error))
+					result.MessageService?.ShowMessage(error, isError: true, _timeInMs);
+			}
 
 			action?.Invoke();
 		}

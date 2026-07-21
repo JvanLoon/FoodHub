@@ -7,8 +7,9 @@ namespace FoodCalc.Web.Components.Services.Auth;
 /// <summary>
 /// The single choke-point for talking to the API. Attaches the bearer token, sends the
 /// request, and always returns an <see cref="ApiResult"/> — it never throws. On failure it
-/// reads the response body to recover the server's real message (ProblemDetails / validation
-/// errors) and, for exceptions, logs the full stack trace to the console via <see cref="ILogger"/>.
+/// reads the response body to recover every message the server reported (RFC9457 ProblemDetails /
+/// validation errors) and, for exceptions, logs the full stack trace to the console via
+/// <see cref="ILogger"/>.
 /// </summary>
 public class AuthenticatedHttpClientService(
 	HttpClient httpClient,
@@ -65,7 +66,7 @@ public class AuthenticatedHttpClientService(
 			using var response = await SendRawAsync(method, requestUri, content);
 			var result = response.IsSuccessStatusCode
 				? ApiResult.Ok((int) response.StatusCode)
-				: ApiResult.Fail(await ExtractErrorAsync(response, method, requestUri), (int) response.StatusCode);
+				: ApiResult.Fail(await ExtractErrorsAsync(response, method, requestUri), (int) response.StatusCode);
 			return await DecorateAsync(result);
 		}
 		catch (Exception ex)
@@ -82,8 +83,8 @@ public class AuthenticatedHttpClientService(
 			using var response = await SendRawAsync(method, requestUri, content);
 			if (!response.IsSuccessStatusCode)
 			{
-				var error = await ExtractErrorAsync(response, method, requestUri);
-				return await DecorateAsync(ApiResult<T>.Fail(error, (int) response.StatusCode));
+				var errors = await ExtractErrorsAsync(response, method, requestUri);
+				return await DecorateAsync(ApiResult<T>.Fail(errors, (int) response.StatusCode));
 			}
 
 			var data = await ReadDataAsync<T>(response);
@@ -130,11 +131,12 @@ public class AuthenticatedHttpClientService(
 	}
 
 	/// <summary>
-	/// Turn a non-success response into a clean, user-ready message. Prefers the server's own
-	/// wording (ProblemDetails <c>detail</c>, FastEndpoints validation <c>errors</c>, <c>title</c>/
-	/// <c>message</c>), falling back to a status-based message. Logged at Warning level.
+	/// Turn a non-success response into clean, user-ready messages — <em>all</em> of them, since
+	/// the API reports every error it found. Prefers the server's own wording (RFC9457
+	/// ProblemDetails <c>errors</c>, <c>detail</c>, <c>title</c>/<c>message</c>), falling back to a
+	/// status-based message. Logged at Warning level.
 	/// </summary>
-	private async Task<string> ExtractErrorAsync(HttpResponseMessage response, HttpMethod method, string requestUri)
+	private async Task<IReadOnlyList<string>> ExtractErrorsAsync(HttpResponseMessage response, HttpMethod method, string requestUri)
 	{
 		string? body = null;
 		try
@@ -146,69 +148,103 @@ public class AuthenticatedHttpClientService(
 			// ignore — fall back to status-based message below
 		}
 
-		var message = ParseServerMessage(body) ?? StatusFallback(response.StatusCode);
+		var messages = ParseServerMessages(body);
+		if (messages.Count == 0)
+			messages = [StatusFallback(response.StatusCode)];
 
 		logger.LogWarning("Request {Method} {Uri} returned {Status}: {Message}",
-			method, requestUri, (int) response.StatusCode, message);
+			method, requestUri, (int) response.StatusCode, string.Join(" | ", messages));
 
-		return message;
+		return messages;
 	}
 
-	private static string? ParseServerMessage(string? body)
+	/// <summary>
+	/// Pull every message out of an error body. Returns an empty list when the body yields nothing
+	/// usable, so the caller can fall back to a status-based message.
+	/// </summary>
+	private static List<string> ParseServerMessages(string? body)
 	{
 		if (string.IsNullOrWhiteSpace(body))
-			return null;
+			return [];
 
 		try
 		{
 			using var doc = JsonDocument.Parse(body);
 			var root = doc.RootElement;
 			if (root.ValueKind != JsonValueKind.Object)
-				return Trim(body);
+				return [Trim(body)];
 
-			// ProblemDetails (TypedResults.Problem) -> "detail"
-			if (root.TryGetProperty("detail", out var detail) && detail.ValueKind == JsonValueKind.String)
+			if (root.TryGetProperty("errors", out var errors))
 			{
-				var value = detail.GetString();
-				if (!string.IsNullOrWhiteSpace(value))
-					return value;
-			}
-
-			// Validation failures -> "errors": { field: [msg, ...] } or { field: "msg" }
-			if (root.TryGetProperty("errors", out var errors) && errors.ValueKind == JsonValueKind.Object)
-			{
-				var messages = new List<string>();
-				foreach (var field in errors.EnumerateObject())
-				{
-					if (field.Value.ValueKind == JsonValueKind.Array)
-						messages.AddRange(field.Value.EnumerateArray()
-							.Where(e => e.ValueKind == JsonValueKind.String)
-							.Select(e => e.GetString()!));
-					else if (field.Value.ValueKind == JsonValueKind.String)
-						messages.Add(field.Value.GetString()!);
-				}
-
+				var messages = ReadErrors(errors);
 				if (messages.Count > 0)
-					return string.Join(" ", messages);
+					return messages;
 			}
 
-			// Fallbacks used by various handlers
-			foreach (var name in new[] { "title", "message", "error" })
+			// Single-message shapes used by ProblemDetails and various handlers.
+			foreach (var name in new[] { "detail", "title", "message", "error" })
 			{
 				if (root.TryGetProperty(name, out var prop) && prop.ValueKind == JsonValueKind.String)
 				{
 					var value = prop.GetString();
 					if (!string.IsNullOrWhiteSpace(value))
-						return value;
+						return [value];
 				}
 			}
 
-			return null;
+			return [];
 		}
 		catch (JsonException)
 		{
 			// Not JSON — a plain text/plain body. Use it directly if it's reasonable.
-			return Trim(body);
+			return [Trim(body)];
+		}
+	}
+
+	/// <summary>
+	/// Read the <c>errors</c> member, which comes in two shapes:
+	/// <list type="bullet">
+	/// <item>RFC9457 ProblemDetails (what the API sends now): <c>[{ "name": .., "reason": .. }]</c>.</item>
+	/// <item>Classic model-state style: <c>{ "Field": ["msg", ..] }</c> or <c>{ "Field": "msg" }</c>.</item>
+	/// </list>
+	/// </summary>
+	private static List<string> ReadErrors(JsonElement errors)
+	{
+		var messages = new List<string>();
+
+		if (errors.ValueKind == JsonValueKind.Array)
+		{
+			foreach (var error in errors.EnumerateArray())
+			{
+				if (error.ValueKind == JsonValueKind.String)
+					AddIfPresent(error.GetString());
+				else if (error.ValueKind == JsonValueKind.Object && error.TryGetProperty("reason", out var reason))
+					AddIfPresent(reason.GetString());
+			}
+		}
+		else if (errors.ValueKind == JsonValueKind.Object)
+		{
+			foreach (var field in errors.EnumerateObject())
+			{
+				if (field.Value.ValueKind == JsonValueKind.Array)
+				{
+					foreach (var entry in field.Value.EnumerateArray())
+						if (entry.ValueKind == JsonValueKind.String)
+							AddIfPresent(entry.GetString());
+				}
+				else if (field.Value.ValueKind == JsonValueKind.String)
+				{
+					AddIfPresent(field.Value.GetString());
+				}
+			}
+		}
+
+		return messages;
+
+		void AddIfPresent(string? message)
+		{
+			if (!string.IsNullOrWhiteSpace(message))
+				messages.Add(message);
 		}
 	}
 

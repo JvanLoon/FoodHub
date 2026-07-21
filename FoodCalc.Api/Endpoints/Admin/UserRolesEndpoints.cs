@@ -64,8 +64,7 @@ public class AddUserRoleEndpoint(UserManager<IdentityUser> userManager)
 		var result = await userManager.AddToRoleAsync(user, req.Role);
 		if (!result.Succeeded)
 		{
-			await Send.ResultAsync(TypedResults.Problem(
-				string.Join(", ", result.Errors.Select(e => e.Description))));
+			await this.SendErrorsAsync(result.Errors.Select(e => e.Description), ct: ct);
 			return;
 		}
 
@@ -95,8 +94,7 @@ public class RemoveUserRoleEndpoint(UserManager<IdentityUser> userManager)
 		var result = await userManager.RemoveFromRoleAsync(user, req.Role);
 		if (!result.Succeeded)
 		{
-			await Send.ResultAsync(TypedResults.Problem(
-				string.Join(", ", result.Errors.Select(e => e.Description))));
+			await this.SendErrorsAsync(result.Errors.Select(e => e.Description), ct: ct);
 			return;
 		}
 

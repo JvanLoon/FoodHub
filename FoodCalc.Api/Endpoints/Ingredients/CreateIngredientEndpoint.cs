@@ -22,6 +22,6 @@ public class CreateIngredientEndpoint(IMediator mediator)
 
 		await result.Match(
 			value => Send.OkAsync(value, ct),
-			errors => Send.ResultAsync(TypedResults.Problem(errors.First().Description)));
+			errors => this.SendErrorsAsync(errors, ct: ct));
 	}
 }
