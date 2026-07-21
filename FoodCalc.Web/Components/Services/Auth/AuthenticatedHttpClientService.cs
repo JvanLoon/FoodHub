@@ -152,8 +152,8 @@ public class AuthenticatedHttpClientService(
 		if (messages.Count == 0)
 			messages = [StatusFallback(response.StatusCode)];
 
-		logger.LogWarning("Request {Method} {Uri} returned {Status}: {Message}",
-			method, requestUri, (int) response.StatusCode, string.Join(" | ", messages));
+		messages.ForEach(message => 
+			logger.LogWarning("Request {Method} {Uri} returned {Status}: {Message}",method, requestUri, (int) response.StatusCode, message));
 
 		return messages;
 	}

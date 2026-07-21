@@ -1,6 +1,6 @@
 # Error handling pipeline
 
-Where the clean `ApiResult.Errors` list comes from. The `Notify`/`OrDefault`
+Where the clean `ApiResult.Errors` list comes from. The `OnFailure`/`OrDefault`
 helpers documented in [README.md](README.md) rely on the errors already being
 user-ready messages by the time a component sees them — this is the code that
 makes that true.
@@ -57,16 +57,19 @@ constant from `WebConstants.Messages.Client`:
 | 404 | `NotFound` |
 | 400 | `BadRequest` |
 | 409 | `Conflict` |
-| ≥ 500 | `ServerError` |
+| 500 | `ServerError` |
 | other | `RequestFailed(status)` |
+
+Note that only 500 exactly maps to `ServerError` — 502/503 and friends fall
+through to `RequestFailed(status)`.
 
 ### Exceptions
 
 If the request throws (rather than returning a non-success status), the exception
 is logged at **Error** level with the full stack trace, and the caller gets
 `WebConstants.Messages.Client.GenericFailure`. Non-success responses are logged at
-**Warning** level with the method, URI, status, and resolved messages (joined
-with ` | `).
+**Warning** level — one entry per resolved message, each with the method, URI and
+status.
 
 ## Where the API side produces this
 
@@ -83,8 +86,8 @@ replaced.
 ## What this means for callers
 
 - Components never parse response bodies or inspect `StatusCode` for messaging —
-  `Errors` already holds the strings to show. That is exactly what `Notify` puts
-  on toasts, one per entry.
+  `Errors` already holds the strings to show. That is exactly what `OnFailure`
+  puts on toasts, one per entry.
 - To change how a specific failure reads to the user, fix it **at the endpoint**
   (the `Error.Failure(...)` description in the handler). The frontend picks it up
   automatically.
@@ -95,5 +98,5 @@ replaced.
 
 ## Related
 
-- [README.md](README.md) — the `ApiResult` helpers (`Notify`, `OrDefault`,
-  `OnSuccess`, `OnFailure`) that consume these results.
+- [README.md](README.md) — the `ApiResult` helpers (`OnSuccess`, `OnFailure`,
+  `OrDefault`) that consume these results.
