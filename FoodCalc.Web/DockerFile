@@ -12,9 +12,13 @@ COPY ["FoodHub.ServiceDefaults/FoodHub.ServiceDefaults.csproj", "FoodHub.Service
 
 RUN dotnet restore "FoodCalc.Web/FoodCalc.Web.csproj"
 
-# Copy the rest of the source and publish.
+# Copy the rest of the source and publish. NB: no --no-restore here — on .NET 10
+# the framework static web assets (_framework/blazor.web.js) come from the
+# restorable microsoft.aspnetcore.app.internal.assets package, and a csproj-only
+# restore + --no-restore leaves them out of the publish. The earlier restore
+# still warms the NuGet cache, so this re-restore is fast.
 COPY . .
-RUN dotnet publish "FoodCalc.Web/FoodCalc.Web.csproj" -c Release -o /app/publish --no-restore
+RUN dotnet publish "FoodCalc.Web/FoodCalc.Web.csproj" -c Release -o /app/publish
 
 # ---- Runtime stage ----
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
