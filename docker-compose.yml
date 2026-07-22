@@ -1,67 +1,64 @@
+# FoodHub self-hosted stack: db + api + web (no Aspire AppHost).
+#
+#   docker compose up -d --build      start / rebuild
+#   docker compose down               stop  (KEEPS the data volume)
+#   docker compose down -v            stop AND delete the database  <-- avoid
+#
+# The SQL Server data lives in the named volume `mssql-data`, so tearing the
+# containers down and recomposing keeps every recipe/user intact. Only `-v`
+# wipes it.
+
 services:
   db:
-   image: mcr.microsoft.com/mssql/server:2022-latest
-   environment:
-    SA_PASSWORD: "LY#DF3*8cjadGPK41q^gNg^byj@kjb"
-    ACCEPT_EULA: "Y"
-   ports:
-    - "1433:1433"
-   volumes:
-    - mssql-data:/var/opt/mssql
-   healthcheck:
-    test: ["CMD-SHELL", "sqlcmd -S localhost -U sa -P 'LY#DF3*8cjadGPK41q^gNg^byj@kjb' -Q 'select 1'"]
-    interval: 10s
-    timeout: 5s
-    retries: 10
-
-  db-init:
-    image: mcr.microsoft.com/mssql-tools
-    depends_on:
-      db:
-        condition: service_completed_successfully
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      MSSQL_SA_PASSWORD: "LY#DF3*8cjadGPK41q^gNg^byj@kjb"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
     volumes:
-      - ./init-db.sql:/init-db.sql
-    entrypoint:
-      - /bin/bash
-      - -c
-      - |
-        echo "Waiting for DB to be ready..."
-        until /opt/mssql-tools/bin/sqlcmd -S db -U sa -P 'LY#DF3*8cjadGPK41q^gNg^byj@kjb' -Q "SELECT 1" ; do
-          sleep 5
-        done
-        echo "Running init-db.sql..."
-        /opt/mssql-tools/bin/sqlcmd -S db -U sa -P 'LY#DF3*8cjadGPK41q^gNg^byj@kjb' -i /init-db.sql
+      - mssql-data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P \"LY#DF3*8cjadGPK41q^gNg^byj@kjb\" -Q 'SELECT 1'"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
   api:
     build:
       context: .
       dockerfile: FoodCalc.Api/DockerFile
-    volumes:
-      - ./keys:/root/.aspnet/DataProtection-Keys
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - WebServer__BaseAddress=http://web:5002
-      - ConnectionStrings__Default=Server=db;Database=FoodCalc;User Id=foodhubuser;Password=aj7a!unEe#Ms*BqTE7WJ2a4tX1$^y7;TrustServerCertificate=True;
+      # Internal docker-network address of the web app (used for CORS origin).
+      - WebServer__BaseAddress=http://web:8080
+      # Connect as sa: EF Core migrations (run at API startup) create the
+      # FoodCalc database and the whole schema, so no init script is needed.
+      - "ConnectionStrings__DefaultConnection=Server=db;Database=FoodCalc;User Id=sa;Password=LY#DF3*8cjadGPK41q^gNg^byj@kjb;TrustServerCertificate=True;"
     depends_on:
-      db-init:
-        condition: service_completed_successfully
+      db:
+        condition: service_healthy
     ports:
-      - "5001:443"
+      - "5001:8080"
 
   web:
     build:
       context: .
       dockerfile: FoodCalc.Web/DockerFile
-    volumes:
-      - ./keys:/root/.aspnet/DataProtection-Keys
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - API__BaseAddress=http://api:443
-      - ConnectionStrings__Default=Server=db;Database=FoodCalc;User Id=foodhubuser;Password=aj7a!unEe#Ms*BqTE7WJ2a4tX1$^y7;TrustServerCertificate=True;
-      - DataProtection__PersistKeysToFileSystem=/keys
+      # Internal docker-network address of the API.
+      - API__BaseAddress=http://api:8080
+    volumes:
+      # DataProtection keys: persisted so auth/antiforgery survive a recompose.
+      # Path matches Environment.SpecialFolder.LocalApplicationData for root.
+      - dataprotection-keys:/root/.local/share/FoodHub/dataprotection-keys
     depends_on:
       - api
     ports:
-      - "5002:443"
+      - "5002:8080"
 
 volumes:
   mssql-data:
+  dataprotection-keys:
