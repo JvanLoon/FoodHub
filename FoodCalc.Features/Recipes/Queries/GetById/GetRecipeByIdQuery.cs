@@ -1,8 +1,8 @@
-﻿using MediatR;
+﻿using ErrorOr;
 
 using FoodHub.DTOs;
 
-using ErrorOr;
+using MediatR;
 
 namespace FoodCalc.Features.Recipes.Queries.GetById;
 

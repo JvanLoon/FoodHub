@@ -59,7 +59,7 @@ public class AuthTokenService(ILocalStorageService localStorage)
 	{
 		var token = await GetTokenAsync();
 		if (string.IsNullOrEmpty(token))
-			return new List<string>();
+			return [];
 
 		var handler = new JwtSecurityTokenHandler();
 		var jwt = handler.ReadJwtToken(token);

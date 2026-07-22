@@ -9,6 +9,7 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Features.Authentication.Roles.Queries.GetAllRoles;
+
 public class GetAllRolesQueryHandler(FoodHubDbContext context, ILogger<GetAllUsersQueryHandler> logger) : IRequestHandler<GetAllRolesQuery, ErrorOr<PagedResultDto<string>>>
 {
 	public async Task<ErrorOr<PagedResultDto<string>>> Handle(GetAllRolesQuery request, CancellationToken cancellationToken)

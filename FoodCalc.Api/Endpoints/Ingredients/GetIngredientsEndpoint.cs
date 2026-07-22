@@ -1,6 +1,5 @@
 using FastEndpoints;
 
-using FoodCalc.Api.Common;
 using FoodCalc.Feature.Ingredients.Queries.GetAllIngredients;
 
 using MediatR;

@@ -41,7 +41,7 @@ public class ExportAllCommandHandler(FoodHubDbContext context, UserManager<Ident
 			if (request.includeUsers)
 			{
 				var users = await context.Users.ToListAsync(cancellationToken);
-				usersWithRoles = new List<UserWithRolesDto>();
+				usersWithRoles = [];
 				foreach (var user in users)
 				{
 					var roles = await userManager.GetRolesAsync(user);

@@ -1,12 +1,12 @@
 using ErrorOr;
 
-using MediatR;
-
 using FoodCalc.Features.Mapping;
 
 using FoodHub.DTOs;
 using FoodHub.Persistence.Entities;
 using FoodHub.Persistence.Extensions;
+
+using MediatR;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;

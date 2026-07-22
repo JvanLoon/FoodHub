@@ -1,10 +1,13 @@
 using ErrorOr;
-using FoodCalc.Features.Mapping;
-using FoodHub.DTOs;
-using MediatR;
-using Microsoft.Extensions.Logging;
 
 using FoodCalc.Features;
+using FoodCalc.Features.Mapping;
+
+using FoodHub.DTOs;
+
+using MediatR;
+
+using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Feature.Ingredients.Queries.GetAllIngredients;
 

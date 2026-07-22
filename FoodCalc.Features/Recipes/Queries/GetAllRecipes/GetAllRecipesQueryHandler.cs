@@ -1,10 +1,10 @@
 using ErrorOr;
 
-using MediatR;
-
 using FoodCalc.Features.Mapping;
 
 using FoodHub.DTOs;
+
+using MediatR;
 
 using Microsoft.Extensions.Logging;
 

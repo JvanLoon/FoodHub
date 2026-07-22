@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 
 
 namespace FoodCalc.Features.Authentication.Users.Queries.GetUserByEmail;
+
 public class GetUserByEmailQueryHandler(FoodHubDbContext context, ILogger<GetAllRecipesQueryHandler> logger) : IRequestHandler<GetUserByEmailQuery, ErrorOr<UserDto>>
 {
 	public async Task<ErrorOr<UserDto>> Handle(GetUserByEmailQuery request, CancellationToken cancellationToken)

@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Features.ImportExport.Import.Commands.ImportJSON;
+
 public class ImportAllCommandHandler(FoodHubDbContext context, UserManager<IdentityUser> userManager, ILogger<ImportAllCommandHandler> logger) : IRequestHandler<ImportAllCommand, ErrorOr<bool>>
 {
 	public async Task<ErrorOr<bool>> Handle(ImportAllCommand request, CancellationToken cancellationToken)
@@ -85,7 +86,7 @@ public class ImportAllCommandHandler(FoodHubDbContext context, UserManager<Ident
 				{
 					existingRi.Name = riDto.Name;
 					existingRi.Amount = riDto.Amount;
-					existingRi.IngredientAmount = (IngredientAmountType)riDto.IngredientAmount;
+					existingRi.IngredientAmount = (IngredientAmountType) riDto.IngredientAmount;
 					existingRi.ShouldBeAddedToShoppingCart = riDto.ShouldBeAddedToShoppingCart;
 					continue;
 				}
@@ -96,7 +97,7 @@ public class ImportAllCommandHandler(FoodHubDbContext context, UserManager<Ident
 					RecipeId = riDto.RecipeId,
 					Name = riDto.Name,
 					Amount = riDto.Amount,
-					IngredientAmount = (IngredientAmountType)riDto.IngredientAmount,
+					IngredientAmount = (IngredientAmountType) riDto.IngredientAmount,
 					ShouldBeAddedToShoppingCart = riDto.ShouldBeAddedToShoppingCart
 				});
 			}
@@ -142,7 +143,7 @@ public class ImportAllCommandHandler(FoodHubDbContext context, UserManager<Ident
 
 					// Sync roles
 					var existingRoles = await userManager.GetRolesAsync(existing);
-					var importedRoles = userDto.Roles?.ToHashSet() ?? new HashSet<string>();
+					var importedRoles = userDto.Roles?.ToHashSet() ?? [];
 					var existingRolesSet = existingRoles.ToHashSet();
 
 					var rolesToAdd = importedRoles.Except(existingRolesSet).ToList();

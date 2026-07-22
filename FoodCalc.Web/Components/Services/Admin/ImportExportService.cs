@@ -59,7 +59,7 @@ public class ImportExportService(AuthenticatedHttpClientService httpClient, IJSR
 		}
 
 		if (string.IsNullOrWhiteSpace(base64))
-			return ApiResult.Fail(WebConstants.Messages.ImportExport.ExportEmpty, (int)HttpStatusCode.BadRequest);
+			return ApiResult.Fail(WebConstants.Messages.ImportExport.ExportEmpty, (int) HttpStatusCode.BadRequest);
 
 		await js.InvokeVoidAsync("blazorDownloadFile", fileName, mimeType, base64);
 		return ApiResult.Ok(result.StatusCode);

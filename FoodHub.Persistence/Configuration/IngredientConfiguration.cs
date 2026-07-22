@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
+﻿using FoodHub.Persistence.Entities;
 
-using FoodHub.Persistence.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace FoodHub.Persistence.Configuration;
 

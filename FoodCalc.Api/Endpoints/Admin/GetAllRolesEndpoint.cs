@@ -1,6 +1,5 @@
 using FastEndpoints;
 
-using FoodCalc.Api.Common;
 using FoodCalc.Features.Authentication.Roles.Queries.GetAllRoles;
 
 using MediatR;
