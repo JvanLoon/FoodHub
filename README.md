@@ -88,9 +88,9 @@ docker compose up -d --build
 - **API**: http://localhost:5001 (optional; the Blazor server calls it internally)
 - **SQL Server**: `localhost:1433`
 
-Startup order is handled automatically: `db` → `db-init` (creates the `FoodCalc`
-database and `foodhubuser` login from [`init-db.sql`](init-db.sql)) → `api` (applies EF
-Core migrations on boot) → `web`.
+Startup order is handled automatically: `db` (waited on via healthcheck) → `api` →
+`web`. The API connects as `sa` and runs EF Core migrations on boot, which create the
+`FoodCalc` database and the entire schema — no separate init script is required.
 
 ### Data persistence
 

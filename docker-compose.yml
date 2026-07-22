@@ -25,20 +25,6 @@ services:
       retries: 12
       start_period: 30s
 
-  # Creates the FoodCalc database + the foodhubuser login before the API
-  # connects. EF Core migrations (run by the API at startup) build the schema.
-  db-init:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    depends_on:
-      db:
-        condition: service_healthy
-    volumes:
-      - ./init-db.sql:/init-db.sql:ro
-    entrypoint:
-      - /bin/bash
-      - -c
-      - /opt/mssql-tools18/bin/sqlcmd -C -S db -U sa -P "LY#DF3*8cjadGPK41q^gNg^byj@kjb" -i /init-db.sql
-
   api:
     build:
       context: .
@@ -47,10 +33,12 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       # Internal docker-network address of the web app (used for CORS origin).
       - WebServer__BaseAddress=http://web:8080
-      # Connection string comes from appsettings.json (already Server=db;...).
+      # Connect as sa: EF Core migrations (run at API startup) create the
+      # FoodCalc database and the whole schema, so no init script is needed.
+      - "ConnectionStrings__DefaultConnection=Server=db;Database=FoodCalc;User Id=sa;Password=LY#DF3*8cjadGPK41q^gNg^byj@kjb;TrustServerCertificate=True;"
     depends_on:
-      db-init:
-        condition: service_completed_successfully
+      db:
+        condition: service_healthy
     ports:
       - "5001:8080"
 
