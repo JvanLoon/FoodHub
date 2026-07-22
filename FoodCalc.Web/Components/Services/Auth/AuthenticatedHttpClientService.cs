@@ -42,11 +42,17 @@ public class AuthenticatedHttpClientService(
 	public Task<ApiResult<TResponse>> PostAsync<TRequest, TResponse>(string requestUri, TRequest value) =>
 		SendForDataAsync<TResponse>(HttpMethod.Post, requestUri, JsonContent.Create(value, options: _jsonOptions));
 
-	/// <summary>POST with no JSON body (query-string driven endpoints, or custom content such as multipart).</summary>
-	public Task<ApiResult> PostAsync(string requestUri, HttpContent? content = null) =>
+	/// <summary>
+	/// POST raw <see cref="HttpContent"/> (query-string driven endpoints with no body, or custom
+	/// content such as multipart file uploads). Named distinctly from the generic
+	/// <see cref="PostAsync{TRequest}(string, TRequest)"/> on purpose: an <see cref="HttpContent"/>
+	/// is an exact match for that generic's <c>TRequest</c>, so calling <c>PostAsync(uri, content)</c>
+	/// would silently pick the JSON overload and serialize the content object itself as JSON.
+	/// </summary>
+	public Task<ApiResult> PostContentAsync(string requestUri, HttpContent? content = null) =>
 		SendAsync(HttpMethod.Post, requestUri, content);
 
-	public Task<ApiResult<TResponse>> PostForDataAsync<TResponse>(string requestUri, HttpContent? content = null) =>
+	public Task<ApiResult<TResponse>> PostContentForDataAsync<TResponse>(string requestUri, HttpContent? content = null) =>
 		SendForDataAsync<TResponse>(HttpMethod.Post, requestUri, content);
 
 	public Task<ApiResult> PutAsync<TRequest>(string requestUri, TRequest value) =>

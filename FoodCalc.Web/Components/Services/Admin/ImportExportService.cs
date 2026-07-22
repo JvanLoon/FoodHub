@@ -30,7 +30,7 @@ public class ImportExportService(AuthenticatedHttpClientService httpClient, IJSR
 		streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 		content.Add(streamContent, "file", fileName);
 
-		return await httpClient.PostAsync(route, content);
+		return await httpClient.PostContentAsync(route, content);
 	}
 
 	public async Task<ApiResult> ExportAsync(string exportFormat)

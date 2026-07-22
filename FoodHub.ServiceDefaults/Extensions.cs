@@ -20,8 +20,9 @@ public static class Extensions
 
 		builder.Services.Configure<ServiceDiscoveryOptions>(options =>
 		{
-			options.AllowedSchemes = ["https"];
-			// You can set other options here, like discovery endpoints
+			// This stack talks to the API over plain HTTP on the internal Docker
+			// network (http://api:8080), so http must be an allowed scheme.
+			options.AllowedSchemes = ["https", "http"];
 		});
 
 		builder.Services.AddServiceDiscovery();

@@ -25,7 +25,7 @@ public class AdminService(AuthenticatedHttpClientService httpClient)
 	}
 
 	public Task<ApiResult> ToggleUserAsync(string email, bool enable = true) =>
-		httpClient.PostAsync($"{ApiRoutes.Authentication.ToggleUser}?email={email}&enable={enable}");
+		httpClient.PostContentAsync($"{ApiRoutes.Authentication.ToggleUser}?email={email}&enable={enable}");
 
 	/// <summary>
 	/// Development diagnostics: asks the API to fail with <paramref name="count"/> errors so the
@@ -50,7 +50,7 @@ public class AdminService(AuthenticatedHttpClientService httpClient)
 		httpClient.GetAsync<List<string>>($"{ApiRoutes.Admin.UserRoles}?email={email}");
 
 	public Task<ApiResult> UpdateUserRolesAsync(string email, string newRole) =>
-		httpClient.PostAsync($"{ApiRoutes.Admin.UserRoles}?email={email}&role={newRole}");
+		httpClient.PostContentAsync($"{ApiRoutes.Admin.UserRoles}?email={email}&role={newRole}");
 
 	public Task<ApiResult> RemoveUserRoleAsync(string email, string role) =>
 		httpClient.DeleteAsync($"{ApiRoutes.Admin.UserRoles}?email={email}&role={role}");
