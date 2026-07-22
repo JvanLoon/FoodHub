@@ -2,6 +2,8 @@ using ErrorOr;
 
 using FastEndpoints;
 
+using System.Net;
+
 namespace FoodCalc.Api.Endpoints.Dev;
 
 public class ErrorTestRequest
@@ -52,12 +54,27 @@ public class ErrorTestEndpoint(IWebHostEnvironment env) : Endpoint<ErrorTestRequ
 			return;
 		}
 
-		// Two cases send a bare status with no body:
-		//   * a 2xx, which the client treats as success and never reads a body for, so errors
-		//     attached to one would silently vanish;
-		//   * count <= 0, which is how you reach the client's StatusFallback — it only fires when
-		//     the body yields no message, so an empty body is the point.
-		if (req.StatusCode is >= 200 and < 300 || req.Count <= 0)
+		// A 2xx is always success, whatever the count — errors attached to one would silently
+		// vanish, so we never send them here. The body names the status (e.g. "200 => OK") so the
+		// client can toast a concrete confirmation instead of a generic one. 204 is the exception:
+		// the spec forbids a body on No Content, so it goes out bare and the client falls back to
+		// its own "No Content" wording.
+		if (req.StatusCode is >= 200 and < 300)
+		{
+			if (req.StatusCode == StatusCodes.Status204NoContent)
+			{
+				await Send.ResultAsync(Results.StatusCode(req.StatusCode));
+				return;
+			}
+
+			var reason = ((HttpStatusCode) req.StatusCode).ToString();
+			await Send.ResultAsync(Results.Text($"{req.StatusCode} => {reason}", contentType: "text/plain", statusCode: req.StatusCode));
+			return;
+		}
+
+		// count <= 0 on a non-2xx is how you reach the client's StatusFallback — it only fires when
+		// the body yields no message, so an empty body is the point.
+		if (req.Count <= 0)
 		{
 			await Send.ResultAsync(Results.StatusCode(req.StatusCode));
 			return;
@@ -68,7 +85,7 @@ public class ErrorTestEndpoint(IWebHostEnvironment env) : Endpoint<ErrorTestRequ
 		// Deliberately all Error.Failure with the default code, matching what the real handlers
 		// produce — that is the case AllowDuplicateErrors has to survive.
 		var errors = Enumerable.Range(1, count)
-			.Select(i => Error.Failure(description: $"Test error {i} of {count}."))
+			.Select(i => Error.Failure(description: $"{req.StatusCode} => Test error {i} of {count}."))
 			.ToList();
 
 		await this.SendErrorsAsync(errors, req.StatusCode, ct);

@@ -29,10 +29,11 @@ public class AdminService(AuthenticatedHttpClientService httpClient)
 
 	/// <summary>
 	/// Development diagnostics: asks the API to fail with <paramref name="count"/> errors so the
-	/// multi-error path can be exercised end to end. <paramref name="count"/> 0 returns success.
+	/// multi-error path can be exercised end to end. On a 2xx status the API returns a short text
+	/// body naming the status (e.g. "200 => OK"), surfaced as the success payload.
 	/// </summary>
-	public Task<ApiResult> TriggerErrorTestAsync(int count, int statusCode) =>
-		httpClient.GetAsync($"{ApiRoutes.Dev.ErrorTest}?count={count}&statusCode={statusCode}");
+	public Task<ApiResult<string>> TriggerErrorTestAsync(int count, int statusCode) =>
+		httpClient.GetAsync<string>($"{ApiRoutes.Dev.ErrorTest}?count={count}&statusCode={statusCode}");
 
 	public async Task<ApiResult<List<string>>> GetAllRolesAsync()
 	{

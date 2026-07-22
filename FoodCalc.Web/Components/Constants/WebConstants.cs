@@ -114,6 +114,7 @@ public static class WebConstants
 		public const string AuthToken = "Authorization";
 		public const string AggregatedIngredients = "aggregated-ingredients";
 		public const string ShoppingListItems = "shopping-list-items";
+		public const string PantryPreferences = "pantry-preferences";
 	}
 
 	/// <summary>Misc client-side constants.</summary>

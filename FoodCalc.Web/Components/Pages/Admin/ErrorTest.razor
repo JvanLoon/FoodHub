@@ -20,8 +20,8 @@
                 <code>WebConstants.Messages.Client</code> wording.
             </li>
             <li>
-                <strong>A 2xx status</strong> — always a success, whatever the count. Nothing should
-                be toasted.
+                <strong>A 2xx status</strong> — always a success, whatever the count. The server
+                returns its status text (e.g. <code>200 => OK</code>), which is toasted.
             </li>
         </ul>
 
@@ -115,9 +115,17 @@
         // OnFailure() raises the toasts; the returned result is what the panel below renders,
         // so the two views of the same failure can be compared.
         result = await AdminService.TriggerErrorTestAsync(form.Count, form.StatusCode)
-        .OnSuccess((data) => MessageService.ShowMessage(data, false))
+        .OnSuccess(ShowSuccess)
         .OnFailure();
 
         running = false;
+    }
+
+    // 204 No Content comes back with an empty body (a body is forbidden on 204), so there is
+    // nothing to toast — stay silent rather than showing a blank message.
+    private void ShowSuccess(string message)
+    {
+        if (!string.IsNullOrWhiteSpace(message))
+            MessageService.ShowMessage(message, false);
     }
 }
