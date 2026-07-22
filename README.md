@@ -92,6 +92,19 @@ Startup order is handled automatically: `db` (waited on via healthcheck) → `ap
 `web`. The API connects as `sa` and runs EF Core migrations on boot, which create the
 `FoodCalc` database and the entire schema — no separate init script is required.
 
+### Default accounts
+
+The `SeedDefaultUsers` migration seeds the `Admin`/`Moderator`/`User` roles and two
+sign-in-ready accounts so a fresh database has a working login:
+
+| Account | Email | Password | Roles |
+|---------|-------|----------|-------|
+| Admin | `admin@foodhub.local` | `Admin123!` | Admin, Moderator, User |
+| User  | `user@foodhub.local`  | `User123!`  | User |
+
+> 🔒 These are development defaults committed to the repo — **change the passwords
+> after the first login** (or delete/replace the accounts) before exposing the app.
+
 ### Data persistence
 
 The database is stored in the named volume `mssql-data`, and DataProtection keys

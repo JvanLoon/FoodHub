@@ -42,7 +42,10 @@ public class FoodHubDbContext : IdentityDbContext<IdentityUser>
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
-		modelBuilder.ApplyConfigurationsFromAssembly(typeof(FoodHubDbContext).Assembly);
+		// Configure Identity + relational conventions first, then apply our
+		// entity configurations and seed the default roles/users.
 		base.OnModelCreating(modelBuilder);
+		modelBuilder.ApplyConfigurationsFromAssembly(typeof(FoodHubDbContext).Assembly);
+		FoodHub.Persistence.Configuration.IdentitySeed.Seed(modelBuilder);
 	}
 }
