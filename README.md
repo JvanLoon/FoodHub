@@ -73,6 +73,38 @@ Dark mode uses Bootstrap 5.3's `data-bs-theme`; an inline script in `App.razor` 
    - Web Application: The URL will be displayed in the console (typically https://localhost:7xxx)
    - API Documentation: Available at the API's `/swagger` endpoint in development
 
+## 🐳 Run with Docker
+
+A self-contained stack (SQL Server **db** + **api** + **web**, no Aspire AppHost) is
+defined in [`docker-compose.yml`](docker-compose.yml). Everything runs over HTTP on the
+internal Docker network (port `8080`); only the web app needs to be reached from a browser.
+
+```bash
+# Build images and start the stack in the background
+docker compose up -d --build
+```
+
+- **Web app**: http://localhost:5002
+- **API**: http://localhost:5001 (optional; the Blazor server calls it internally)
+- **SQL Server**: `localhost:1433`
+
+Startup order is handled automatically: `db` → `db-init` (creates the `FoodCalc`
+database and `foodhubuser` login from [`init-db.sql`](init-db.sql)) → `api` (applies EF
+Core migrations on boot) → `web`.
+
+### Data persistence
+
+The database is stored in the named volume `mssql-data`, and DataProtection keys
+(auth/antiforgery) in `dataprotection-keys`. Both survive container recreation:
+
+```bash
+docker compose down           # stop & remove containers — DATA IS KEPT
+docker compose up -d          # recompose — recipes/users are still there
+```
+
+> ⚠️ `docker compose down -v` deletes the volumes and wipes the database. Don't use `-v`
+> unless you intend to start from scratch.
+
 ## 🔧 Development
 
 ### Database Migrations

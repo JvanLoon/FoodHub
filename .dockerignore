@@ -1,0 +1,23 @@
+# Build artifacts
+**/bin/
+**/obj/
+**/out/
+**/publish/
+
+# IDE / VCS
+.git/
+.gitignore
+.vs/
+.vscode/
+.idea/
+**/*.user
+
+# Runtime data that must never land in the image/context
+keys/
+data/
+
+# Docker / docs
+**/DockerFile
+docker-compose*.yml
+.dockerignore
+*.md
