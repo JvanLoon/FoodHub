@@ -1,6 +1,7 @@
 @using FoodCalc.Web.Components.Services
 @using FoodCalc.Web.Components.Services.Admin
 @inject AdminService AdminService
+@inject MessageService MessageService
 
 <div class="fh-stack">
     <AppCard>
@@ -113,7 +114,9 @@
 
         // OnFailure() raises the toasts; the returned result is what the panel below renders,
         // so the two views of the same failure can be compared.
-        result = await AdminService.TriggerErrorTestAsync(form.Count, form.StatusCode).OnFailure();
+        result = await AdminService.TriggerErrorTestAsync(form.Count, form.StatusCode)
+        .OnSuccess((data) => MessageService.ShowMessage(data, false))
+        .OnFailure();
 
         running = false;
     }

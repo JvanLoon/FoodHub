@@ -12,10 +12,17 @@ tab_width = 4
 
 [*]
 
+# Tabs everywhere by default (indent_size/tab_width control how wide a tab renders).
+indent_style = tab
+indent_size = 4
+tab_width = 4
+
 # Microsoft .NET properties
 csharp_new_line_before_members_in_object_initializers = true
 csharp_preferred_modifier_order = public, private, protected, internal, new, static, abstract, virtual, sealed, readonly, override, extern, unsafe, volatile, async:suggestion
-csharp_prefer_braces = true:none
+# Braces required ONLY when the controlled statement spans multiple lines.
+# Allows: if (Disabled) return;   Requires braces on any 2+ line body.
+csharp_prefer_braces = when_multiline:warning
 csharp_space_after_cast = true
 csharp_style_var_elsewhere = false:suggestion
 csharp_style_var_for_built_in_types = false:suggestion
@@ -76,10 +83,12 @@ dotnet_style_require_accessibility_modifiers = for_non_interface_members:suggest
 
 # ReSharper properties
 resharper_apply_auto_detected_rules = false
-resharper_braces_for_for = required
-resharper_braces_for_foreach = required
-resharper_braces_for_ifelse = required
-resharper_braces_for_while = required
+# Keep braces in sync with csharp_prefer_braces = when_multiline:
+# single-line bodies (if (Disabled) return;) may omit braces, multi-line must have them.
+resharper_braces_for_for = required_for_multiline
+resharper_braces_for_foreach = required_for_multiline
+resharper_braces_for_ifelse = required_for_multiline
+resharper_braces_for_while = required_for_multiline
 resharper_braces_redundant = true
 resharper_csharp_keep_blank_lines_in_declarations = 1
 resharper_csharp_naming_rule.private_constants = AaBb:do_not_check
@@ -89,6 +98,12 @@ resharper_for_other_types = use_explicit_type
 resharper_show_autodetect_configure_formatting_tip = false
 resharper_space_within_single_line_array_initializer_braces = false
 resharper_use_indent_from_vs = false
+
+# Blazor: attributes always go on their own line above the member, e.g.
+#   [Parameter]
+#   public EventCallback OnClick { get; set; }
+resharper_place_attribute_on_same_line = never
+resharper_place_field_attribute_on_same_line = never
 
 # ReSharper inspection severities
 resharper_arrange_redundant_parentheses_highlighting = hint
@@ -188,7 +203,13 @@ csharp_style_prefer_primary_constructors = true:suggestion
 csharp_prefer_system_threading_lock = true:suggestion
 
 
-[*.{csproj,props}]
+# Tabs here too. YAML is the one format that cannot use tabs (see below).
+[*.{csproj,props,targets}]
+indent_style = tab
+indent_size = 4
+tab_width = 4
 
+# YAML must use spaces — tabs are illegal in the format.
+[*.{yml,yaml}]
 indent_style = space
 indent_size = 2
