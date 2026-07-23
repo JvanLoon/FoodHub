@@ -14,6 +14,8 @@ public class FoodHubDbContext : IdentityDbContext<IdentityUser>
 
 	public DbSet<RecipeBlackList> RecipeBlackLists { get; set; }
 
+	public DbSet<MealPlanEntry> MealPlanEntries { get; set; }
+
 	public override int SaveChanges()
 	{
 		var entries = ChangeTracker.Entries<BaseEntity>();
