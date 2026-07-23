@@ -19,6 +19,13 @@ public class AuthStateService(AuthTokenService authTokenService)
 		return roles.Contains("Admin");
 	}
 
+	/// <summary>True if the logged-in user holds at least one of the given roles.</summary>
+	public async Task<bool> IsInAnyRoleAsync(params string[] roles)
+	{
+		var mine = await authTokenService.GetRolesAsync();
+		return mine.Any(r => roles.Contains(r, StringComparer.OrdinalIgnoreCase));
+	}
+
 	public async Task SignInAsync(string token)
 	{
 		await authTokenService.SetTokenAsync(token);

@@ -53,6 +53,7 @@ public class Program
 		builder.Services.AddScoped<AdminService>();
 		builder.Services.AddScoped<LoginService>();
 		builder.Services.AddScoped<RecipeService>();
+		builder.Services.AddScoped<MealPlanService>();
 		builder.Services.AddScoped<IngredientService>();
 		builder.Services.AddScoped<ImportExportService>();
 		builder.Services.AddScoped<UserService>();

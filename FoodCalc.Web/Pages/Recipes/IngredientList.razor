@@ -5,6 +5,8 @@
 @using FoodHub.DTOs
 @inject IngredientService IngredientService
 @inject MessageService MessageService
+@inject AuthStateService AuthStateService
+@inject NavigationManager Navigation
 
 <PageTitle>Ingredients</PageTitle>
 
@@ -82,6 +84,12 @@
 
     protected override async Task OnInitializedAsync()
     {
+        if (!await AuthStateService.IsInAnyRoleAsync("Admin"))
+        {
+            Navigation.NavigateTo("/");
+            return;
+        }
+
         await LoadIngredientsAsync();
     }
 

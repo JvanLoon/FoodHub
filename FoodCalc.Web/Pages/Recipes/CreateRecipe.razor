@@ -8,6 +8,7 @@
 
 <PageTitle>Create Recipe</PageTitle>
 
+<RoleGuard AllowedRoles="Admin">
 <div class="fh-stack">
     <PageHeader Title="Create a New Recipe" />
 
@@ -24,6 +25,7 @@
         </AppCard>
     </div>
 </div>
+</RoleGuard>
 
 @code {
     private CreateRecipeDto recipe = new();

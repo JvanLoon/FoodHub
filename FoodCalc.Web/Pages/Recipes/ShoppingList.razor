@@ -3,6 +3,8 @@
 @using Blazored.LocalStorage
 @using FoodCalc.Web.Constants
 @inject ILocalStorageService LocalStorage
+@inject AuthStateService AuthStateService
+@inject NavigationManager Navigation
 
 <div class="shopping-list-page">
     <AggregatedIngredients Ingredients="_ingredients" InitialItems="_initialItems" OnItemsChanged="SaveItemsAsync" />
@@ -16,6 +18,12 @@
     {
         if (firstRender)
         {
+            if (!await AuthStateService.IsInAnyRoleAsync("Admin", "Moderator"))
+            {
+                Navigation.NavigateTo("/");
+                return;
+            }
+
             var newList = await LocalStorage.GetItemAsync<List<RecipeItemDto>>(WebConstants.Storage.AggregatedIngredients);
             if (newList?.Count > 0)
             {

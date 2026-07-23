@@ -1,0 +1,37 @@
+@* Wrap a page's content to restrict it to specific roles. If the logged-in user
+   lacks every allowed role, they are redirected to Home (/). Content only renders
+   once authorization is confirmed, so a user who types a protected URL never sees
+   the page flash. Nav links to these pages are hidden separately in NavMenu. *@
+
+@inject AuthStateService AuthStateService
+@inject NavigationManager Navigation
+
+@if (_authorized)
+{
+    @ChildContent
+}
+
+@code {
+    /// <summary>Comma-separated roles allowed to view the wrapped content, e.g. "Admin,Moderator".</summary>
+    [Parameter, EditorRequired]
+    public string AllowedRoles { get; set; } = string.Empty;
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    private bool _authorized;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var allowed = AllowedRoles.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+        List<string> roles;
+        try { roles = await AuthStateService.GetRolesAsync(); }
+        catch { roles = new(); }
+
+        _authorized = roles.Any(r => allowed.Contains(r, StringComparer.OrdinalIgnoreCase));
+
+        if (!_authorized)
+            Navigation.NavigateTo("/");
+    }
+}

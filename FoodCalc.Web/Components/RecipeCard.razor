@@ -22,12 +22,15 @@
         <h5 class="card-title" title="@Title">@Title</h5>
         @ChildContent
     </div>
+    @if (ShowActions)
+    {
     <div class="card-footer" @onmousedown:stopPropagation>
         <AppButton Variant="ButtonVariant.OutlineSecondary" Size="ButtonSize.Small" Icon="pencil"
                    StopPropagation OnClick="OnEdit">Edit</AppButton>
         <AppButton Variant="ButtonVariant.OutlineDanger" Size="ButtonSize.Small" Icon="trash"
                    StopPropagation OnClick="OnDelete">Delete</AppButton>
     </div>
+    }
 </div>
 
 @code {
@@ -37,6 +40,8 @@
     public string? ImageUrl { get; set; }
     [Parameter]
     public bool Selected { get; set; }
+    [Parameter]
+    public bool ShowActions { get; set; } = true;
     [Parameter]
     public EventCallback OnToggle { get; set; }
     [Parameter]

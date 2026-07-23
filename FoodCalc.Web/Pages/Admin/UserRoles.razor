@@ -5,6 +5,7 @@
 @inject LoginService LoginService
 @inject MessageService MessageService
 @inject NavigationManager Navigation
+@inject AuthStateService AuthStateService
 
 <PageTitle>User Roles</PageTitle>
 
@@ -96,6 +97,12 @@
 
     protected override async Task OnInitializedAsync()
     {
+        if (!await AuthStateService.IsInAnyRoleAsync("Admin"))
+        {
+            Navigation.NavigateTo("/");
+            return;
+        }
+
         await AdminService.GetUserRolesAsync(email).OnSuccess(r => roles = r).OnFailure();
 
         await AdminService.GetAllRolesAsync().OnSuccess(r => allRoles = r).OnFailure();

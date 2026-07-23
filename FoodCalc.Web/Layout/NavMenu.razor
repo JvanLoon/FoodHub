@@ -18,8 +18,9 @@
         @if (isLoggedIn)
         {
             <NavItem Href="" Icon="house-door-fill" Label="Home" Match="NavLinkMatch.All" />
+            <NavItem Href="/calendar" Icon="calendar-week" Label="Calendar" />
             <NavItem Href="/recipes" Icon="journal-text" Label="Recipes" />
-                <NavItem Href="/recipes/find" Icon="search-heart" Label="Find recipes" />
+            <NavItem Href="/recipes/find" Icon="search-heart" Label="Find recipes" />
 
             @if (isAdmin)
             {

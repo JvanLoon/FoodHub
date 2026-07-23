@@ -1,0 +1,117 @@
+.cal-day {
+    display: flex;
+    flex-direction: column;
+    gap: var(--fh-space-1);
+    background: var(--fh-surface);
+    border: 1px solid var(--fh-border);
+    border-radius: var(--fh-radius-md);
+    padding: var(--fh-space-2);
+    cursor: pointer;
+    transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.cal-day:hover {
+    border-color: var(--fh-accent);
+}
+
+.cal-day--selected {
+    border-color: var(--fh-accent);
+    box-shadow: var(--fh-focus-ring);
+    background: var(--fh-accent-subtle);
+}
+
+.cal-day--today .cal-day__num {
+    color: var(--fh-accent);
+    font-weight: 700;
+}
+
+.cal-day--muted {
+    opacity: 0.5;
+}
+
+/* Week cells are tall; month cells are compact squares. */
+.cal-day {
+    min-height: 5.5rem;
+}
+
+.cal-day--compact {
+    min-height: 4.75rem;
+    gap: 2px;
+    padding: var(--fh-space-1);
+}
+
+.cal-day__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--fh-space-1);
+}
+
+.cal-day__num {
+    font-size: var(--fh-text-sm);
+    font-weight: 600;
+    color: var(--fh-text);
+}
+
+.cal-day__add {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.4rem;
+    height: 1.4rem;
+    border: 1px solid var(--fh-border);
+    border-radius: var(--fh-radius-sm);
+    background: var(--fh-surface);
+    color: var(--fh-accent);
+    cursor: pointer;
+    font-size: 0.75rem;
+    line-height: 1;
+}
+
+.cal-day__add:hover {
+    background: var(--fh-accent);
+    color: #fff;
+    border-color: var(--fh-accent);
+}
+
+.cal-day__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow-y: auto;
+}
+
+.cal-meal {
+    display: flex;
+    align-items: center;
+    gap: var(--fh-space-1);
+    background: var(--fh-surface-sunken);
+    border-radius: var(--fh-radius-sm);
+    padding: 1px 2px 1px 6px;
+    font-size: var(--fh-text-sm);
+}
+
+.cal-meal__name {
+    flex: 1 1 auto;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--fh-text);
+}
+
+.cal-meal__x {
+    border: none;
+    background: transparent;
+    color: var(--fh-text-muted);
+    cursor: pointer;
+    display: inline-flex;
+    padding: 0;
+    flex: 0 0 auto;
+}
+
+.cal-meal__x:hover {
+    color: var(--fh-danger);
+}

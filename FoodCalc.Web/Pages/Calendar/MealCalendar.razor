@@ -1,0 +1,380 @@
+@page "/calendar"
+
+@inject MealPlanService MealPlanService
+@inject RecipeService RecipeService
+@inject MessageService MessageService
+
+<PageTitle>Meal calendar</PageTitle>
+
+<div class="cal-layout">
+    <div class="cal-header">
+        <PageHeader Title="Meal calendar" Subtitle="Plan a recipe for each day. Select two or more days to randomize.">
+            <AppButton Variant="ButtonVariant.Primary" Icon="shuffle"
+                       Disabled="@(selectedDates.Count < 2)"
+                       OnClick="OpenRandomize">
+                Randomize @(selectedDates.Count >= 2 ? $"({selectedDates.Count})" : "")
+            </AppButton>
+            @if (selectedDates.Count > 0)
+            {
+                <AppButton Variant="ButtonVariant.OutlineSecondary" Icon="x-circle"
+                           OnClick="ClearSelection">
+                    Clear selection
+                </AppButton>
+            }
+        </PageHeader>
+    </div>
+
+    @if (loading)
+    {
+        <LoadingSpinner Label="Loading calendar..." />
+    }
+    else
+    {
+        <div class="cal-views">
+            @* ---------- Week view ---------- *@
+            <section class="cal-panel">
+                <div class="cal-panel__head">
+                    <h2 class="fh-subheading">Week</h2>
+                    <div class="cal-nav">
+                        <IconButton Icon="chevron-left" Title="Previous week" OnClick="PrevWeek" />
+                        <span class="cal-nav__label">@WeekLabel</span>
+                        <IconButton Icon="chevron-right" Title="Next week" OnClick="NextWeek" />
+                    </div>
+                </div>
+                <div class="cal-week">
+                    @foreach (var day in WeekDays)
+                    {
+                        <CalDay Day="day" Compact="false"
+                                Selected="selectedDates.Contains(day)"
+                                Entries="EntriesFor(day)"
+                                OnSelect="() => ToggleSelect(day)"
+                                OnAdd="() => OpenAdd(day)"
+                                OnRemove="RemoveEntryAsync" />
+                    }
+                </div>
+            </section>
+
+            @* ---------- Month view ---------- *@
+            <section class="cal-panel">
+                <div class="cal-panel__head">
+                    <h2 class="fh-subheading">Month</h2>
+                    <div class="cal-nav">
+                        <IconButton Icon="chevron-left" Title="Previous month" OnClick="PrevMonth" />
+                        <span class="cal-nav__label">@MonthLabel</span>
+                        <IconButton Icon="chevron-right" Title="Next month" OnClick="NextMonth" />
+                    </div>
+                </div>
+                <div class="cal-month">
+                    @foreach (var dow in DayOfWeekHeaders)
+                    {
+                        <div class="cal-month__dow">@dow</div>
+                    }
+                    @foreach (var day in MonthGridDays)
+                    {
+                        <CalDay Day="day" Compact="true"
+                                Selected="selectedDates.Contains(day)"
+                                IsOtherMonth="day.Month != monthAnchor.Month"
+                                Entries="EntriesFor(day)"
+                                OnSelect="() => ToggleSelect(day)"
+                                OnAdd="() => OpenAdd(day)"
+                                OnRemove="RemoveEntryAsync" />
+                    }
+                </div>
+            </section>
+        </div>
+    }
+</div>
+
+@* ---------- Add-recipe picker ---------- *@
+<Modal @bind-Visible="addModalVisible" Title="@AddModalTitle">
+    <SearchBox Placeholder="Search recipes..." Value="@recipeSearch" ValueChanged="OnRecipeSearchChanged" />
+    <div class="cal-picker">
+        @foreach (var recipe in FilteredRecipes)
+        {
+            <button type="button" class="cal-picker__item" @onclick="() => AddRecipeAsync(recipe)">
+                <i class="bi bi-egg-fried" aria-hidden="true"></i>
+                <span>@recipe.Name</span>
+                <i class="bi bi-plus-lg cal-picker__add"></i>
+            </button>
+        }
+        @if (!FilteredRecipes.Any())
+        {
+            <EmptyState Icon="journal-x" Title="No recipes" Message="Nothing matches that search." />
+        }
+    </div>
+</Modal>
+
+@* ---------- Randomize popup ---------- *@
+<Modal @bind-Visible="randomizeModalVisible" Title="Randomize selected days">
+    <ChildContent>
+    <p class="fh-muted">
+        Fills the @selectedDates.Count selected day@(selectedDates.Count == 1 ? "" : "s")
+        with random recipes from your library.
+    </p>
+
+    <div class="fh-field">
+        <label class="fh-label">Wanted ingredients <span class="fh-muted">(optional)</span></label>
+        @if (wantedIngredients.Any())
+        {
+            <div class="cal-chips">
+                @foreach (var ing in wantedIngredients)
+                {
+                    <span class="cal-chip">
+                        @ing
+                        <button type="button" class="cal-chip__x" @onclick="() => RemoveIngredient(ing)" aria-label="Remove">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </span>
+                }
+            </div>
+        }
+        <div class="cal-chip-input">
+            <input class="cal-input" placeholder="e.g. chicken, then Enter"
+                   @bind="ingredientDraft" @bind:event="oninput" @onkeydown="OnIngredientKeyDown" />
+            <AppButton Variant="ButtonVariant.OutlineSecondary" Icon="plus-lg" OnClick="AddIngredientDraft">Add</AppButton>
+        </div>
+    </div>
+
+    @* Recipes-per-day: wired up but intentionally hidden for now (defaults to 1). *@
+    <div class="fh-field" style="display:none;">
+        <label class="fh-label">Recipes per day</label>
+        <input class="cal-input" type="number" min="1" max="20" @bind="recipesPerDay" disabled />
+    </div>
+
+    <label class="cal-check">
+        <input type="checkbox" @bind="overwriteDays" />
+        <span>Override existing recipes on the selected days</span>
+    </label>
+    </ChildContent>
+
+    <Footer>
+        <AppButton Variant="ButtonVariant.OutlineSecondary" OnClick="CloseRandomize">Cancel</AppButton>
+        <AppButton Variant="ButtonVariant.Primary" Icon="shuffle" Disabled="@randomizing" OnClick="RunRandomizeAsync">
+            @(randomizing ? "Randomizing..." : "Randomize")
+        </AppButton>
+    </Footer>
+</Modal>
+
+@code {
+    private bool loading = true;
+
+    // Anchors for the two views.
+    private DateOnly weekAnchor = DateOnly.FromDateTime(DateTime.Today);
+    private DateOnly monthAnchor = new(DateTime.Today.Year, DateTime.Today.Month, 1);
+
+    // date -> entries planned for that day (covers the currently fetched range).
+    private Dictionary<DateOnly, List<MealPlanEntryDto>> entriesByDay = new();
+
+    private readonly HashSet<DateOnly> selectedDates = new();
+
+    private List<RecipeDto> allRecipes = new();
+
+    // Add picker state.
+    private bool addModalVisible;
+    private DateOnly addTargetDate;
+    private string recipeSearch = string.Empty;
+
+    // Randomize state.
+    private bool randomizeModalVisible;
+    private bool randomizing;
+    private List<string> wantedIngredients = new();
+    private string ingredientDraft = string.Empty;
+    private int recipesPerDay = 1;
+    private bool overwriteDays;
+
+    private static readonly string[] DayOfWeekHeaders = { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
+
+    protected override async Task OnInitializedAsync()
+    {
+        var recipes = await RecipeService.GetAllRecipesAsync(withIngredients: false)
+            .OrDefault(new List<RecipeDto>());
+        allRecipes = recipes.OrderBy(r => r.Name).ToList();
+
+        await ReloadAsync();
+        loading = false;
+    }
+
+    // ---------- Range helpers ----------
+
+    private DateOnly WeekStart => StartOfWeek(weekAnchor);
+    private IEnumerable<DateOnly> WeekDays => Enumerable.Range(0, 7).Select(i => WeekStart.AddDays(i));
+
+    private DateOnly MonthGridStart => StartOfWeek(monthAnchor);
+    private DateOnly MonthGridEnd
+    {
+        get
+        {
+            var lastOfMonth = monthAnchor.AddMonths(1).AddDays(-1);
+            return StartOfWeek(lastOfMonth).AddDays(6);
+        }
+    }
+    private IEnumerable<DateOnly> MonthGridDays
+    {
+        get
+        {
+            var days = new List<DateOnly>();
+            for (var d = MonthGridStart; d <= MonthGridEnd; d = d.AddDays(1))
+                days.Add(d);
+            return days;
+        }
+    }
+
+    private static DateOnly StartOfWeek(DateOnly d)
+    {
+        // Monday-based week.
+        int diff = ((int)d.DayOfWeek + 6) % 7;
+        return d.AddDays(-diff);
+    }
+
+    private string WeekLabel => $"{WeekStart:d MMM} – {WeekStart.AddDays(6):d MMM yyyy}";
+    private string MonthLabel => monthAnchor.ToString("MMMM yyyy");
+    private string AddModalTitle => $"Add recipe — {addTargetDate:dddd d MMM}";
+
+    private IEnumerable<RecipeDto> FilteredRecipes =>
+        string.IsNullOrWhiteSpace(recipeSearch)
+            ? allRecipes
+            : allRecipes.Where(r => r.Name.Contains(recipeSearch, StringComparison.OrdinalIgnoreCase));
+
+    private List<MealPlanEntryDto> EntriesFor(DateOnly day) =>
+        entriesByDay.TryGetValue(day, out var list) ? list : new();
+
+    private async Task ReloadAsync()
+    {
+        var from = WeekStart < MonthGridStart ? WeekStart : MonthGridStart;
+        var toWeek = WeekStart.AddDays(6);
+        var to = toWeek > MonthGridEnd ? toWeek : MonthGridEnd;
+
+        var result = await MealPlanService.GetRangeAsync(from, to).OrDefault(new List<MealPlanEntryDto>());
+        entriesByDay = result
+            .GroupBy(e => e.Date)
+            .ToDictionary(g => g.Key, g => g.ToList());
+    }
+
+    // ---------- Navigation ----------
+
+    private async Task PrevWeek() { weekAnchor = weekAnchor.AddDays(-7); await ReloadAsync(); }
+    private async Task NextWeek() { weekAnchor = weekAnchor.AddDays(7); await ReloadAsync(); }
+    private async Task PrevMonth() { monthAnchor = monthAnchor.AddMonths(-1); await ReloadAsync(); }
+    private async Task NextMonth() { monthAnchor = monthAnchor.AddMonths(1); await ReloadAsync(); }
+
+    // ---------- Selection ----------
+
+    private void ToggleSelect(DateOnly day)
+    {
+        if (!selectedDates.Add(day))
+            selectedDates.Remove(day);
+    }
+
+    private void ClearSelection() => selectedDates.Clear();
+
+    // ---------- Add / remove ----------
+
+    private void OpenAdd(DateOnly day)
+    {
+        addTargetDate = day;
+        recipeSearch = string.Empty;
+        addModalVisible = true;
+    }
+
+    private void OnRecipeSearchChanged(string value) => recipeSearch = value;
+
+    private async Task AddRecipeAsync(RecipeDto recipe)
+    {
+        var result = await MealPlanService.AddAsync(addTargetDate, recipe.Id);
+        if (result.Success && result.Data is not null)
+        {
+            if (!entriesByDay.TryGetValue(addTargetDate, out var list))
+            {
+                list = new();
+                entriesByDay[addTargetDate] = list;
+            }
+            list.Add(result.Data);
+            addModalVisible = false;
+        }
+        else
+        {
+            MessageService.ShowMessage(FirstError(result, "Could not add recipe."), true, 6000);
+        }
+    }
+
+    private async Task RemoveEntryAsync(MealPlanEntryDto entry)
+    {
+        var result = await MealPlanService.DeleteAsync(entry.Id);
+        if (result.Success)
+        {
+            if (entriesByDay.TryGetValue(entry.Date, out var list))
+                list.RemoveAll(e => e.Id == entry.Id);
+        }
+        else
+        {
+            MessageService.ShowMessage(FirstError(result, "Could not remove recipe."), true, 6000);
+        }
+    }
+
+    // ---------- Randomize ----------
+
+    private void OpenRandomize()
+    {
+        if (selectedDates.Count < 2) return;
+        wantedIngredients = new();
+        ingredientDraft = string.Empty;
+        recipesPerDay = 1;
+        overwriteDays = false;
+        randomizeModalVisible = true;
+    }
+
+    private void CloseRandomize() => randomizeModalVisible = false;
+
+    private void OnIngredientKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key is "Enter" or ",")
+            AddIngredientDraft();
+    }
+
+    private void AddIngredientDraft()
+    {
+        var value = ingredientDraft.Trim().TrimEnd(',').Trim();
+        if (!string.IsNullOrEmpty(value) &&
+            !wantedIngredients.Contains(value, StringComparer.OrdinalIgnoreCase))
+        {
+            wantedIngredients.Add(value);
+        }
+        ingredientDraft = string.Empty;
+    }
+
+    private void RemoveIngredient(string ing) => wantedIngredients.Remove(ing);
+
+    private async Task RunRandomizeAsync()
+    {
+        // Fold any half-typed ingredient in before sending.
+        AddIngredientDraft();
+
+        randomizing = true;
+        var dayCount = selectedDates.Count;
+        var request = new RandomizeMealPlanDto
+        {
+            Dates = selectedDates.ToList(),
+            Ingredients = wantedIngredients.ToList(),
+            RecipesPerDay = recipesPerDay,
+            Overwrite = overwriteDays
+        };
+
+        var result = await MealPlanService.RandomizeAsync(request);
+        randomizing = false;
+
+        if (result.Success)
+        {
+            await ReloadAsync();
+            randomizeModalVisible = false;
+            var count = result.Data?.Count ?? 0;
+            MessageService.ShowMessage($"Added {count} recipe{(count == 1 ? "" : "s")} across {dayCount} days.", false, 4000);
+        }
+        else
+        {
+            MessageService.ShowMessage(FirstError(result, "Could not randomize."), true, 6000);
+        }
+    }
+
+    private static string FirstError(ApiResult result, string fallback) =>
+        result.Errors.Count > 0 ? result.Errors[0] : fallback;
+}

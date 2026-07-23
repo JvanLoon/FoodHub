@@ -1,6 +1,8 @@
 @page "/recipes/edit/{RecipeId:guid}"
 @inject RecipeService RecipeService
 @inject IngredientService IngredientService
+@inject AuthStateService AuthStateService
+@inject NavigationManager Navigation
 
 <PageTitle>Edit Recipe</PageTitle>
 
@@ -141,6 +143,12 @@
 
 	protected override async Task OnInitializedAsync()
 	{
+		if (!await AuthStateService.IsInAnyRoleAsync("Admin"))
+		{
+			Navigation.NavigateTo("/");
+			return;
+		}
+
 		recipe = await RecipeService.GetRecipeByIdAsync(RecipeId)
 			.OrDefault<RecipeDto>(new());
 

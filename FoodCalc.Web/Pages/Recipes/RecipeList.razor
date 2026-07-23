@@ -7,6 +7,7 @@
 @inject ILocalStorageService LocalStorage
 @inject MessageService MessageService
 @inject NavigationManager NavigationManager
+@inject AuthStateService AuthStateService
 
 <PageTitle>Recipes</PageTitle>
 
@@ -14,11 +15,14 @@
     <div class="recipes-header">
         <PageHeader Title="Recipes" Subtitle="Select recipes to build a shopping list">
             <SearchBox Placeholder="Search recipes..." Value="@searchTerm" ValueChanged="OnSearchChanged" />
-            <AppButton Variant="ButtonVariant.Primary" Icon="cart3"
-                       Disabled="@(!SelectedRecipeIds.Any())"
-                       OnClick="OpenAggregatedIngredientsPage">
-                Generate shopping list
-            </AppButton>
+            @if (isAdmin)
+            {
+                <AppButton Variant="ButtonVariant.Primary" Icon="cart3"
+                           Disabled="@(!SelectedRecipeIds.Any())"
+                           OnClick="OpenAggregatedIngredientsPage">
+                    Generate shopping list
+                </AppButton>
+            }
         </PageHeader>
     </div>
 
@@ -33,6 +37,7 @@
                 @foreach (RecipeDto recipe in pagedResult.Items)
                 {
                     <RecipeCard Title="@(recipe.Name ?? string.Empty)"
+                                ShowActions="isAdmin"
                                 Selected="@SelectedRecipeIds.Contains(recipe.Id)"
                                 OnToggle="() => ToggleRecipeSelection(recipe.Id, !SelectedRecipeIds.Contains(recipe.Id))"
                                 OnEdit="() => EditRecipe(recipe.Id)"
@@ -83,9 +88,12 @@
     private HashSet<Guid> SelectedRecipeIds = new();
     private List<RecipeItemDto> AggregatedIngredients = new();
     private ConfirmDialog? confirmDialog;
+    private bool isAdmin;
 
     protected override async Task OnInitializedAsync()
     {
+        try { isAdmin = await AuthStateService.IsAdminAsync(); }
+        catch { isAdmin = false; }
         await LoadRecipesAsync();
     }
 

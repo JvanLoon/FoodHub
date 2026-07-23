@@ -9,6 +9,42 @@
 <PageTitle>Home</PageTitle>
 
 <div class="home-layout">
+    @if (!isAdmin)
+    {
+        <div class="home-header">
+            <PageHeader Title="Welcome to FoodHub" Subtitle="Plan your meals and find something to cook." />
+        </div>
+
+        <div class="home-body">
+            <section class="fh-stat-grid">
+                <div class="fh-stat-card fh-stat-card--primary" @onclick="GoToCalendar" role="button" tabindex="0">
+                    <div class="fh-stat-icon"><i class="bi bi-calendar-week"></i></div>
+                    <div class="fh-stat-body">
+                        <div class="fh-stat-label">Meal calendar</div>
+                        <div class="fh-stat-sub fh-muted">Plan what to eat each day</div>
+                    </div>
+                </div>
+
+                <div class="fh-stat-card fh-stat-card--accent" @onclick="GoToRecipes" role="button" tabindex="0">
+                    <div class="fh-stat-icon"><i class="bi bi-journal-text"></i></div>
+                    <div class="fh-stat-body">
+                        <div class="fh-stat-label">Recipes</div>
+                        <div class="fh-stat-sub fh-muted">Browse the recipe library</div>
+                    </div>
+                </div>
+
+                <div class="fh-stat-card fh-stat-card--info" @onclick="GoToFindRecipes" role="button" tabindex="0">
+                    <div class="fh-stat-icon"><i class="bi bi-search-heart"></i></div>
+                    <div class="fh-stat-body">
+                        <div class="fh-stat-label">Find recipes</div>
+                        <div class="fh-stat-sub fh-muted">Search by the ingredients you have</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    }
+    else
+    {
     <div class="home-header">
         <PageHeader Title="Dashboard" Subtitle="An overview of your FoodHub library." />
     </div>
@@ -98,6 +134,7 @@
             }
         }
     </div>
+    }
 </div>
 
 @code {
@@ -123,6 +160,13 @@
         catch
         {
             isAdmin = false;
+        }
+
+        // Regular users get a lightweight landing page — no dashboard stats to load.
+        if (!isAdmin)
+        {
+            loading = false;
+            return;
         }
 
         var recipes = await RecipeService.GetAllRecipesAsync(withIngredients: true).OrDefault(new List<RecipeDto>());
@@ -187,6 +231,8 @@
     private void GoToRecipes() => NavigationManager.NavigateTo("/recipes");
     private void GoToIngredients() => NavigationManager.NavigateTo("/ingredients");
     private void GoToAdmin() => NavigationManager.NavigateTo("/admin");
+    private void GoToCalendar() => NavigationManager.NavigateTo("/calendar");
+    private void GoToFindRecipes() => NavigationManager.NavigateTo("/recipes/find");
 
     private class IngredientUsage
     {
