@@ -1,0 +1,64 @@
+@page "/recipe/{RecipeId:guid}"
+
+@inject RecipeService RecipeService
+@inject IJSRuntime JS
+
+<PageTitle>@(recipe?.Name ?? "Recipe")</PageTitle>
+
+<div class="fh-stack">
+    <PageHeader Title="@(recipe?.Name ?? "Recipe")" Subtitle="Recipe details">
+        <AppButton Variant="ButtonVariant.OutlineSecondary" Icon="arrow-left" OnClick="GoBack">Back</AppButton>
+    </PageHeader>
+
+    @if (loading)
+    {
+        <LoadingSpinner Label="Loading recipe..." />
+    }
+    else if (recipe is null)
+    {
+        <EmptyState Icon="journal-x" Title="Recipe not found."
+                    Message="This recipe may have been removed." />
+    }
+    else
+    {
+        <AppCard>
+            <h2 class="fh-subheading">Ingredients</h2>
+            @if (recipe.Ingredients is { Count: > 0 })
+            {
+                <ul class="recipe-view__ingredients">
+                    @foreach (var ingredient in recipe.Ingredients)
+                    {
+                        <li>
+                            <span>@ingredient.Name</span>
+                            <span class="fh-muted">
+                                @ingredient.Amount.ToFormattedString() @ingredient.IngredientAmount.ToString()
+                            </span>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p class="fh-muted">This recipe has no ingredients yet.</p>
+            }
+        </AppCard>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public Guid RecipeId { get; set; }
+
+    private RecipeDto? recipe;
+    private bool loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await RecipeService.GetRecipeByIdAsync(RecipeId);
+        if (result.Success)
+            recipe = result.Data;
+        loading = false;
+    }
+
+    private async Task GoBack() => await JS.InvokeVoidAsync("history.back");
+}

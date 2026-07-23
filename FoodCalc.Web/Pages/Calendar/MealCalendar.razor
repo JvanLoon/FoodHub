@@ -2,13 +2,25 @@
 
 @inject MealPlanService MealPlanService
 @inject RecipeService RecipeService
+@inject IngredientService IngredientService
 @inject MessageService MessageService
+@inject NavigationManager Navigation
 
 <PageTitle>Meal calendar</PageTitle>
 
 <div class="cal-layout">
     <div class="cal-header">
         <PageHeader Title="Meal calendar" Subtitle="Plan a recipe for each day. Select two or more days to randomize.">
+            <div class="cal-toggle" role="tablist" aria-label="Calendar view">
+                <button type="button" class="cal-toggle__btn @(viewMode == View.Week ? "cal-toggle__btn--active" : "")"
+                        role="tab" aria-selected="@(viewMode == View.Week)" @onclick="() => viewMode = View.Week">
+                    <i class="bi bi-calendar-week" aria-hidden="true"></i> Week
+                </button>
+                <button type="button" class="cal-toggle__btn @(viewMode == View.Month ? "cal-toggle__btn--active" : "")"
+                        role="tab" aria-selected="@(viewMode == View.Month)" @onclick="() => viewMode = View.Month">
+                    <i class="bi bi-calendar-month" aria-hidden="true"></i> Month
+                </button>
+            </div>
             <AppButton Variant="ButtonVariant.Primary" Icon="shuffle"
                        Disabled="@(selectedDates.Count < 2)"
                        OnClick="OpenRandomize">
@@ -31,56 +43,63 @@
     else
     {
         <div class="cal-views">
-            @* ---------- Week view ---------- *@
-            <section class="cal-panel">
-                <div class="cal-panel__head">
-                    <h2 class="fh-subheading">Week</h2>
-                    <div class="cal-nav">
-                        <IconButton Icon="chevron-left" Title="Previous week" OnClick="PrevWeek" />
-                        <span class="cal-nav__label">@WeekLabel</span>
-                        <IconButton Icon="chevron-right" Title="Next week" OnClick="NextWeek" />
+            @if (viewMode == View.Week)
+            {
+                @* ---------- Week view ---------- *@
+                <section class="cal-panel">
+                    <div class="cal-panel__head">
+                        <h2 class="fh-subheading">Week</h2>
+                        <div class="cal-nav">
+                            <IconButton Icon="chevron-left" Title="Previous week" OnClick="PrevWeek" />
+                            <span class="cal-nav__label">@WeekLabel</span>
+                            <IconButton Icon="chevron-right" Title="Next week" OnClick="NextWeek" />
+                        </div>
                     </div>
-                </div>
-                <div class="cal-week">
-                    @foreach (var day in WeekDays)
-                    {
-                        <CalDay Day="day" Compact="false"
-                                Selected="selectedDates.Contains(day)"
-                                Entries="EntriesFor(day)"
-                                OnSelect="() => ToggleSelect(day)"
-                                OnAdd="() => OpenAdd(day)"
-                                OnRemove="RemoveEntryAsync" />
-                    }
-                </div>
-            </section>
-
-            @* ---------- Month view ---------- *@
-            <section class="cal-panel">
-                <div class="cal-panel__head">
-                    <h2 class="fh-subheading">Month</h2>
-                    <div class="cal-nav">
-                        <IconButton Icon="chevron-left" Title="Previous month" OnClick="PrevMonth" />
-                        <span class="cal-nav__label">@MonthLabel</span>
-                        <IconButton Icon="chevron-right" Title="Next month" OnClick="NextMonth" />
+                    <div class="cal-week">
+                        @foreach (var day in WeekDays)
+                        {
+                            <CalDay Day="day" Compact="false"
+                                    Selected="selectedDates.Contains(day)"
+                                    Entries="EntriesFor(day)"
+                                    OnSelect="() => ToggleSelect(day)"
+                                    OnAdd="() => OpenAdd(day)"
+                                    OnRemove="RemoveEntryAsync"
+                                    OnOpen="OpenRecipe" />
+                        }
                     </div>
-                </div>
-                <div class="cal-month">
-                    @foreach (var dow in DayOfWeekHeaders)
-                    {
-                        <div class="cal-month__dow">@dow</div>
-                    }
-                    @foreach (var day in MonthGridDays)
-                    {
-                        <CalDay Day="day" Compact="true"
-                                Selected="selectedDates.Contains(day)"
-                                IsOtherMonth="day.Month != monthAnchor.Month"
-                                Entries="EntriesFor(day)"
-                                OnSelect="() => ToggleSelect(day)"
-                                OnAdd="() => OpenAdd(day)"
-                                OnRemove="RemoveEntryAsync" />
-                    }
-                </div>
-            </section>
+                </section>
+            }
+            else
+            {
+                @* ---------- Month view ---------- *@
+                <section class="cal-panel">
+                    <div class="cal-panel__head">
+                        <h2 class="fh-subheading">Month</h2>
+                        <div class="cal-nav">
+                            <IconButton Icon="chevron-left" Title="Previous month" OnClick="PrevMonth" />
+                            <span class="cal-nav__label">@MonthLabel</span>
+                            <IconButton Icon="chevron-right" Title="Next month" OnClick="NextMonth" />
+                        </div>
+                    </div>
+                    <div class="cal-month">
+                        @foreach (var dow in DayOfWeekHeaders)
+                        {
+                            <div class="cal-month__dow">@dow</div>
+                        }
+                        @foreach (var day in MonthGridDays)
+                        {
+                            <CalDay Day="day" Compact="true"
+                                    Selected="selectedDates.Contains(day)"
+                                    IsOtherMonth="day.Month != monthAnchor.Month"
+                                    Entries="EntriesFor(day)"
+                                    OnSelect="() => ToggleSelect(day)"
+                                    OnAdd="() => OpenAdd(day)"
+                                    OnRemove="RemoveEntryAsync"
+                                    OnOpen="OpenRecipe" />
+                        }
+                    </div>
+                </section>
+            }
         </div>
     }
 </div>
@@ -128,10 +147,33 @@
                 }
             </div>
         }
-        <div class="cal-chip-input">
-            <input class="cal-input" placeholder="e.g. chicken, then Enter"
-                   @bind="ingredientDraft" @bind:event="oninput" @onkeydown="OnIngredientKeyDown" />
-            <AppButton Variant="ButtonVariant.OutlineSecondary" Icon="plus-lg" OnClick="AddIngredientDraft">Add</AppButton>
+        <div class="cal-combo">
+            <div class="cal-combo__control">
+                <input class="cal-input" placeholder="Select or type an ingredient..."
+                       @bind="ingredientDraft" @bind:event="oninput"
+                       @onfocus="() => ingredientMenuOpen = true"
+                       @onkeydown="OnIngredientKeyDown" />
+                <button type="button" class="cal-combo__toggle" @onclick="ToggleIngredientMenu" aria-label="Toggle ingredient list">
+                    <i class="bi bi-chevron-@(ingredientMenuOpen ? "up" : "down")"></i>
+                </button>
+            </div>
+            @if (ingredientMenuOpen)
+            {
+                <ul class="cal-combo__menu">
+                    @foreach (var name in IngredientOptions)
+                    {
+                        <li>
+                            <button type="button" class="cal-combo__item" @onclick="() => SelectIngredient(name)">@name</button>
+                        </li>
+                    }
+                    @if (!IngredientOptions.Any())
+                    {
+                        <li class="cal-combo__empty">
+                            @(allIngredientNames.Count == 0 ? "No ingredients available" : "No matches")
+                        </li>
+                    }
+                </ul>
+            }
         </div>
     </div>
 
@@ -158,6 +200,9 @@
 @code {
     private bool loading = true;
 
+    private enum View { Week, Month }
+    private View viewMode = View.Week;
+
     // Anchors for the two views.
     private DateOnly weekAnchor = DateOnly.FromDateTime(DateTime.Today);
     private DateOnly monthAnchor = new(DateTime.Today.Year, DateTime.Today.Month, 1);
@@ -182,6 +227,10 @@
     private int recipesPerDay = 1;
     private bool overwriteDays;
 
+    // All ingredient names from the DB, for the randomize dropdown.
+    private List<string> allIngredientNames = new();
+    private bool ingredientMenuOpen;
+
     private static readonly string[] DayOfWeekHeaders = { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
 
     protected override async Task OnInitializedAsync()
@@ -189,6 +238,15 @@
         var recipes = await RecipeService.GetAllRecipesAsync(withIngredients: false)
             .OrDefault(new List<RecipeDto>());
         allRecipes = recipes.OrderBy(r => r.Name).ToList();
+
+        var ingredients = await IngredientService.GetAllIngredientsAsync()
+            .OrDefault(new List<IngredientDto>());
+        allIngredientNames = ingredients
+            .Select(i => i.Name)
+            .Where(n => !string.IsNullOrWhiteSpace(n))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(n => n)
+            .ToList();
 
         await ReloadAsync();
         loading = false;
@@ -278,6 +336,9 @@
 
     private void OnRecipeSearchChanged(string value) => recipeSearch = value;
 
+    private void OpenRecipe(MealPlanEntryDto entry) =>
+        Navigation.NavigateTo($"/recipe/{entry.RecipeId}");
+
     private async Task AddRecipeAsync(RecipeDto recipe)
     {
         var result = await MealPlanService.AddAsync(addTargetDate, recipe.Id);
@@ -318,6 +379,7 @@
         if (selectedDates.Count < 2) return;
         wantedIngredients = new();
         ingredientDraft = string.Empty;
+        ingredientMenuOpen = false;
         recipesPerDay = 1;
         overwriteDays = false;
         randomizeModalVisible = true;
@@ -325,9 +387,33 @@
 
     private void CloseRandomize() => randomizeModalVisible = false;
 
+    // Ingredient names available to pick: everything not already chosen, filtered by what's typed.
+    private IEnumerable<string> IngredientOptions =>
+        allIngredientNames
+            .Where(n => !wantedIngredients.Contains(n, StringComparer.OrdinalIgnoreCase))
+            .Where(n => string.IsNullOrWhiteSpace(ingredientDraft)
+                        || n.Contains(ingredientDraft.Trim(), StringComparison.OrdinalIgnoreCase));
+
+    private void ToggleIngredientMenu() => ingredientMenuOpen = !ingredientMenuOpen;
+
+    private void SelectIngredient(string name)
+    {
+        if (!wantedIngredients.Contains(name, StringComparer.OrdinalIgnoreCase))
+            wantedIngredients.Add(name);
+        ingredientDraft = string.Empty;
+        ingredientMenuOpen = false;
+    }
+
     private void OnIngredientKeyDown(KeyboardEventArgs e)
     {
-        if (e.Key is "Enter" or ",")
+        if (e.Key is not ("Enter" or ","))
+            return;
+
+        // Enter/comma: pick the first matching DB ingredient, else accept free text.
+        var match = IngredientOptions.FirstOrDefault();
+        if (match is not null)
+            SelectIngredient(match);
+        else
             AddIngredientDraft();
     }
 
@@ -340,6 +426,7 @@
             wantedIngredients.Add(value);
         }
         ingredientDraft = string.Empty;
+        ingredientMenuOpen = false;
     }
 
     private void RemoveIngredient(string ing) => wantedIngredients.Remove(ing);

@@ -6,14 +6,14 @@ using MediatR;
 
 namespace FoodCalc.Api.Endpoints.Recipes;
 
-/// <summary>GET api/recipe/{id} — Admin only.</summary>
+/// <summary>GET api/recipe/{id} — any authenticated user (read-only recipe view).</summary>
 public class GetRecipeByIdEndpoint(IMediator mediator)
 	: Endpoint<RecipeByIdRequest, RecipeDto?>
 {
 	public override void Configure()
 	{
 		Get(ApiRoutes.Recipe.GetByIdTemplate);
-		Roles("Admin");
+		Policies("Admin,Moderator,User");
 	}
 
 	public override async Task HandleAsync(RecipeByIdRequest req, CancellationToken ct)

@@ -19,7 +19,15 @@
         </span>
     </div>
     <div class="card-body">
-        <h5 class="card-title" title="@Title">@Title</h5>
+        @if (OnOpen.HasDelegate)
+        {
+            <button type="button" class="card-title card-title--link" title="@Title"
+                    @onmousedown:stopPropagation @onclick="OnOpen">@Title</button>
+        }
+        else
+        {
+            <h5 class="card-title" title="@Title">@Title</h5>
+        }
         @ChildContent
     </div>
     @if (ShowActions)
@@ -44,6 +52,8 @@
     public bool ShowActions { get; set; } = true;
     [Parameter]
     public EventCallback OnToggle { get; set; }
+    [Parameter]
+    public EventCallback OnOpen { get; set; }
     [Parameter]
     public EventCallback OnEdit { get; set; }
     [Parameter]

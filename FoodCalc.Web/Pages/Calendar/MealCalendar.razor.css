@@ -5,16 +5,37 @@
 }
 
 .cal-views {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
-    gap: var(--fh-space-5);
-    align-items: start;
+    display: block;
 }
 
-@media (max-width: 1100px) {
-    .cal-views {
-        grid-template-columns: minmax(0, 1fr);
-    }
+/* View toggle (Week / Month) */
+.cal-toggle {
+    display: inline-flex;
+    border: 1px solid var(--fh-border);
+    border-radius: var(--fh-radius-md);
+    overflow: hidden;
+    background: var(--fh-surface);
+}
+
+.cal-toggle__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--fh-space-1);
+    padding: var(--fh-space-2) var(--fh-space-3);
+    border: none;
+    background: transparent;
+    color: var(--fh-text-muted);
+    cursor: pointer;
+    font: inherit;
+}
+
+.cal-toggle__btn + .cal-toggle__btn {
+    border-left: 1px solid var(--fh-border);
+}
+
+.cal-toggle__btn--active {
+    background: var(--fh-accent);
+    color: #fff;
 }
 
 .cal-panel {
@@ -118,10 +139,83 @@
     box-shadow: var(--fh-focus-ring);
 }
 
-.cal-chip-input {
+/* Ingredient combobox */
+.cal-combo {
+    position: relative;
+}
+
+.cal-combo__control {
     display: flex;
-    gap: var(--fh-space-2);
+    align-items: stretch;
+    border: 1px solid var(--fh-border);
+    border-radius: var(--fh-radius-md);
+    background: var(--fh-surface);
+    overflow: hidden;
+}
+
+.cal-combo__control:focus-within {
+    border-color: var(--fh-accent);
+    box-shadow: var(--fh-focus-ring);
+}
+
+.cal-combo__control .cal-input {
+    border: none;
+    border-radius: 0;
+    flex: 1 1 auto;
+}
+
+.cal-combo__control .cal-input:focus {
+    box-shadow: none;
+}
+
+.cal-combo__toggle {
+    border: none;
+    border-left: 1px solid var(--fh-border);
+    background: var(--fh-surface-sunken);
+    color: var(--fh-text-muted);
+    cursor: pointer;
+    padding: 0 var(--fh-space-3);
+    display: inline-flex;
     align-items: center;
+}
+
+.cal-combo__menu {
+    list-style: none;
+    margin: 4px 0 0;
+    padding: 4px;
+    position: absolute;
+    z-index: 20;
+    left: 0;
+    right: 0;
+    max-height: 14rem;
+    overflow-y: auto;
+    background: var(--fh-surface-raised);
+    border: 1px solid var(--fh-border);
+    border-radius: var(--fh-radius-md);
+    box-shadow: var(--fh-shadow-md);
+}
+
+.cal-combo__item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: var(--fh-space-2) var(--fh-space-3);
+    border: none;
+    background: transparent;
+    color: var(--fh-text);
+    border-radius: var(--fh-radius-sm);
+    cursor: pointer;
+    font: inherit;
+}
+
+.cal-combo__item:hover {
+    background: var(--fh-accent-subtle);
+}
+
+.cal-combo__empty {
+    padding: var(--fh-space-2) var(--fh-space-3);
+    color: var(--fh-text-muted);
+    font-size: var(--fh-text-sm);
 }
 
 .cal-chips {

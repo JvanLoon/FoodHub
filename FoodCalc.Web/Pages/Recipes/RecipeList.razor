@@ -38,6 +38,7 @@
                 {
                     <RecipeCard Title="@(recipe.Name ?? string.Empty)"
                                 ShowActions="isAdmin"
+                                OnOpen="() => OpenRecipe(recipe.Id)"
                                 Selected="@SelectedRecipeIds.Contains(recipe.Id)"
                                 OnToggle="() => ToggleRecipeSelection(recipe.Id, !SelectedRecipeIds.Contains(recipe.Id))"
                                 OnEdit="() => EditRecipe(recipe.Id)"
@@ -177,6 +178,11 @@
     private void EditRecipe(Guid recipeId)
     {
         NavigationManager.NavigateTo($"/recipes/edit/{recipeId}");
+    }
+
+    private void OpenRecipe(Guid recipeId)
+    {
+        NavigationManager.NavigateTo($"/recipe/{recipeId}");
     }
 
     private async Task DeleteRecipe(Guid recipeId)

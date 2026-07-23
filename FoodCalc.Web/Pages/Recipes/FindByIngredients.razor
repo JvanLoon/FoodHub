@@ -6,7 +6,6 @@
 @inject IngredientService ingredientService
 @inject ILocalStorageService LocalStorage
 @inject NavigationManager NavigationManager
-@inject AuthStateService AuthStateService
 
 <PageTitle>Find recipes</PageTitle>
 
@@ -215,15 +214,12 @@
 										@match.MissingCount more @(match.MissingCount == 1 ? "ingredient" : "ingredients") needed
 									</span>
 								}
-								@if (isAdmin)
-								{
-									<AppButton Variant="ButtonVariant.OutlineSecondary"
-											   Size="ButtonSize.Small"
-											   Icon="box-arrow-up-right"
-											   OnClick="() => OpenRecipe(match.Recipe.Id)">
-										Open
-									</AppButton>
-								}
+								<AppButton Variant="ButtonVariant.OutlineSecondary"
+										   Size="ButtonSize.Small"
+										   Icon="box-arrow-up-right"
+										   OnClick="() => OpenRecipe(match.Recipe.Id)">
+									Open
+								</AppButton>
 							</div>
 						</div>
 					}
@@ -243,13 +239,8 @@
 
 	private Preferences prefs = new();
 
-	private bool isAdmin;
-
 	protected override async Task OnInitializedAsync()
 	{
-		try { isAdmin = await AuthStateService.IsAdminAsync(); }
-		catch { isAdmin = false; }
-
 		prefs = await LocalStorage.GetItemAsync<Preferences>(WebConstants.Storage.PantryPreferences) ?? new Preferences();
 
 		allRecipes = await recipeService.GetAllRecipesAsync(withIngredients: true).OrDefault(new List<RecipeDto>());
@@ -370,7 +361,7 @@
 
 	private void OpenRecipe(Guid recipeId)
 	{
-		NavigationManager.NavigateTo($"/recipes/edit/{recipeId}");
+		NavigationManager.NavigateTo($"/recipe/{recipeId}");
 	}
 
 	private async Task PersistAndRecompute()

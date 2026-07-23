@@ -13,7 +13,10 @@
         @foreach (var entry in Entries)
         {
             <li class="cal-meal" title="@entry.RecipeName">
-                <span class="cal-meal__name">@entry.RecipeName</span>
+                <button type="button" class="cal-meal__name" title="Open recipe"
+                        @onclick="() => OnOpen.InvokeAsync(entry)" @onclick:stopPropagation="true">
+                    @entry.RecipeName
+                </button>
                 <button type="button" class="cal-meal__x" title="Remove"
                         @onclick="() => OnRemove.InvokeAsync(entry)" @onclick:stopPropagation="true">
                     <i class="bi bi-x"></i>
@@ -32,6 +35,7 @@
     [Parameter] public EventCallback OnSelect { get; set; }
     [Parameter] public EventCallback OnAdd { get; set; }
     [Parameter] public EventCallback<MealPlanEntryDto> OnRemove { get; set; }
+    [Parameter] public EventCallback<MealPlanEntryDto> OnOpen { get; set; }
 
     private string CssClass
     {

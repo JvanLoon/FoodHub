@@ -96,10 +96,22 @@
 
 .cal-meal__name {
     flex: 1 1 auto;
+    min-width: 0;
+    text-align: left;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     color: var(--fh-text);
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font: inherit;
+}
+
+.cal-meal__name:hover {
+    color: var(--fh-accent);
+    text-decoration: underline;
 }
 
 .cal-meal__x {
