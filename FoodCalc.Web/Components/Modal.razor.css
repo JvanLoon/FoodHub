@@ -51,6 +51,12 @@
     overflow-y: auto;
 }
 
+/* Opt-in: let an inner popover (e.g. a dropdown) spill outside the modal body
+   instead of being clipped/scrolled. Used by short modals only. */
+.fh-modal__body--allow-overflow {
+    overflow: visible;
+}
+
 .fh-modal__footer {
     display: flex;
     justify-content: flex-end;

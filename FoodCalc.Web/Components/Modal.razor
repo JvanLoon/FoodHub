@@ -9,7 +9,7 @@
 				<h5 class="fh-modal__title">@Title</h5>
 				<IconButton Icon="x-lg" Title="Close" Size="ButtonSize.Small" OnClick="CloseAsync"/>
 			</div>
-			<div class="fh-modal__body">
+			<div class="fh-modal__body @BodyClass">
 				@ChildContent
 			</div>
 			@if (Footer is not null)
@@ -30,6 +30,10 @@
 
 	[Parameter]
 	public string? Title { get; set; }
+
+	/// <summary>Extra CSS class for the modal body, e.g. to allow an inner dropdown to overflow.</summary>
+	[Parameter]
+	public string? BodyClass { get; set; }
 
 	[Parameter]
 	public RenderFragment? ChildContent { get; set; }

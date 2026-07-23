@@ -124,7 +124,8 @@
 </Modal>
 
 @* ---------- Randomize popup ---------- *@
-<Modal @bind-Visible="randomizeModalVisible" Title="Randomize selected days">
+<Modal @bind-Visible="randomizeModalVisible" Title="Randomize selected days"
+       BodyClass="fh-modal__body--allow-overflow">
 	<ChildContent>
 		<p class="fh-muted">
 			Fills the @selectedDates.Count selected day@(selectedDates.Count == 1 ? "" : "s")
