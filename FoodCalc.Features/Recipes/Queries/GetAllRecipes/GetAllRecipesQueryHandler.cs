@@ -1,18 +1,17 @@
-using ErrorOr;
-
+﻿using ErrorOr;
 using FoodCalc.Features.Mapping;
-
 using FoodHub.DTOs;
-
 using MediatR;
-
 using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Features.Recipes.Queries.GetAllRecipes;
 
-public class GetAllRecipesQueryHandler(FoodHubDbContext context, ILogger<GetAllRecipesQueryHandler> logger) : IRequestHandler<GetAllRecipesQuery, ErrorOr<PagedResultDto<RecipeDto>>>
+public class GetAllRecipesQueryHandler(FoodHubDbContext context, ILogger<GetAllRecipesQueryHandler> logger)
+	: IRequestHandler<GetAllRecipesQuery, ErrorOr<PagedResultDto<RecipeDto>>>
 {
-	public async Task<ErrorOr<PagedResultDto<RecipeDto>>> Handle(GetAllRecipesQuery request, CancellationToken cancellationToken)
+	public async Task<ErrorOr<PagedResultDto<RecipeDto>>> Handle(GetAllRecipesQuery request,
+																 CancellationToken cancellationToken
+	)
 	{
 		try
 		{
@@ -25,10 +24,7 @@ public class GetAllRecipesQueryHandler(FoodHubDbContext context, ILogger<GetAllR
 
 			if (!request.WithIngredient)
 			{
-				foreach (var item in paged.Items)
-				{
-					item.Ingredients = null!;
-				}
+				foreach (var item in paged.Items) { item.Ingredients = null!; }
 			}
 
 			return new PagedResultDto<RecipeDto>

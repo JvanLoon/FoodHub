@@ -1,12 +1,10 @@
 using FastEndpoints;
-
 using Microsoft.AspNetCore.Identity;
 
 namespace FoodCalc.Api.Endpoints.Authentication;
 
 /// <summary>POST api/authentication/resetpassword — Admin.</summary>
-public class ResetPasswordEndpoint(UserManager<IdentityUser> userManager)
-	: Endpoint<ResetPasswordDto>
+public class ResetPasswordEndpoint(UserManager<IdentityUser> userManager) : Endpoint<ResetPasswordDto>
 {
 	public override void Configure()
 	{

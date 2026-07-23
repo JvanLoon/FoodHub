@@ -1,5 +1,4 @@
 using FastEndpoints;
-
 using Microsoft.AspNetCore.Identity;
 
 namespace FoodCalc.Api.Endpoints.Admin;
@@ -20,8 +19,7 @@ public class ModifyUserRoleRequest
 }
 
 /// <summary>GET api/admin/userroles?email= — Admin or Moderator.</summary>
-public class GetUserRolesEndpoint(UserManager<IdentityUser> userManager)
-	: Endpoint<GetUserRolesRequest>
+public class GetUserRolesEndpoint(UserManager<IdentityUser> userManager) : Endpoint<GetUserRolesRequest>
 {
 	public override void Configure()
 	{
@@ -43,8 +41,7 @@ public class GetUserRolesEndpoint(UserManager<IdentityUser> userManager)
 }
 
 /// <summary>POST api/admin/userroles?email=&amp;role= — Admin or Moderator.</summary>
-public class AddUserRoleEndpoint(UserManager<IdentityUser> userManager)
-	: Endpoint<ModifyUserRoleRequest>
+public class AddUserRoleEndpoint(UserManager<IdentityUser> userManager) : Endpoint<ModifyUserRoleRequest>
 {
 	public override void Configure()
 	{
@@ -73,8 +70,7 @@ public class AddUserRoleEndpoint(UserManager<IdentityUser> userManager)
 }
 
 /// <summary>DELETE api/admin/userroles?email=&amp;role= — Admin or Moderator.</summary>
-public class RemoveUserRoleEndpoint(UserManager<IdentityUser> userManager)
-	: Endpoint<ModifyUserRoleRequest>
+public class RemoveUserRoleEndpoint(UserManager<IdentityUser> userManager) : Endpoint<ModifyUserRoleRequest>
 {
 	public override void Configure()
 	{

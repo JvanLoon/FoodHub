@@ -4,36 +4,44 @@
 @typeparam TValue
 
 <div class="fh-field @CssClass">
-    @if (!string.IsNullOrEmpty(Label))
-    {
-        <label class="form-label" for="@Id">@Label</label>
-    }
-    <InputSelect id="@Id"
-                 class="form-select"
-                 Value="@Value"
-                 ValueChanged="ValueChanged"
-                 ValueExpression="ValueExpression">
-        @ChildContent
-    </InputSelect>
-    @if (ValueExpression is not null)
-    {
-        <ValidationMessage For="ValueExpression" />
-    }
+	@if (!string.IsNullOrEmpty(Label))
+	{
+		<label class="form-label" for="@Id">@Label</label>
+	}
+	<InputSelect id="@Id"
+	             class="form-select"
+	             Value="@Value"
+	             ValueChanged="ValueChanged"
+	             ValueExpression="ValueExpression">
+		@ChildContent
+	</InputSelect>
+	@if (ValueExpression is not null)
+	{
+		<ValidationMessage For="ValueExpression"/>
+	}
 </div>
 
 @code {
-    [Parameter]
-    public string? Label { get; set; }
-    [Parameter]
-    public string Id { get; set; } = $"fh-field-{Guid.NewGuid():N}";
-    [Parameter]
-    public string? CssClass { get; set; }
-    [Parameter]
-    public TValue? Value { get; set; }
-    [Parameter]
-    public EventCallback<TValue?> ValueChanged { get; set; }
-    [Parameter]
-    public Expression<Func<TValue?>>? ValueExpression { get; set; }
-    [Parameter]
-    public RenderFragment? ChildContent { get; set; }
+
+	[Parameter]
+	public string? Label { get; set; }
+
+	[Parameter]
+	public string Id { get; set; } = $"fh-field-{Guid.NewGuid():N}";
+
+	[Parameter]
+	public string? CssClass { get; set; }
+
+	[Parameter]
+	public TValue? Value { get; set; }
+
+	[Parameter]
+	public EventCallback<TValue?> ValueChanged { get; set; }
+
+	[Parameter]
+	public Expression<Func<TValue?>>? ValueExpression { get; set; }
+
+	[Parameter]
+	public RenderFragment? ChildContent { get; set; }
+
 }

@@ -1,20 +1,20 @@
-using ErrorOr;
-
+﻿using ErrorOr;
 using FoodCalc.Features.Mapping;
-
 using FoodHub.DTOs;
-
 using MediatR;
-
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
-
 namespace FoodCalc.Features.Authentication.Users.Queries.GetAllUsers;
 
-public class GetAllUsersQueryHandler(FoodHubDbContext context, ILogger<GetAllUsersQueryHandler> logger, UserManager<IdentityUser> userManager) : IRequestHandler<GetAllUsersQuery, ErrorOr<PagedResultDto<UserDto>>>
+public class GetAllUsersQueryHandler(
+	FoodHubDbContext context,
+	ILogger<GetAllUsersQueryHandler> logger,
+	UserManager<IdentityUser> userManager) : IRequestHandler<GetAllUsersQuery, ErrorOr<PagedResultDto<UserDto>>>
 {
-	public async Task<ErrorOr<PagedResultDto<UserDto>>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
+	public async Task<ErrorOr<PagedResultDto<UserDto>>> Handle(GetAllUsersQuery request,
+															   CancellationToken cancellationToken
+	)
 	{
 		try
 		{

@@ -1,9 +1,6 @@
 ﻿using ErrorOr;
-
 using FoodCalc.Features;
-
 using FoodHub.DTOs;
-
 using MediatR;
 
 namespace FoodCalc.Feature.Ingredients.Queries.GetAllIngredients;

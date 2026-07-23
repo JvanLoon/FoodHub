@@ -1,7 +1,6 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json;
-
 using FoodCalc.Web.Constants;
 
 namespace FoodCalc.Web.Services.Auth;
@@ -35,8 +34,7 @@ public class AuthenticatedHttpClientService(
 		SendForDataAsync<T>(HttpMethod.Get, requestUri, content: null);
 
 	/// <summary>GET where only success/failure matters and the response body is ignored.</summary>
-	public Task<ApiResult> GetAsync(string requestUri) =>
-		SendAsync(HttpMethod.Get, requestUri, content: null);
+	public Task<ApiResult> GetAsync(string requestUri) => SendAsync(HttpMethod.Get, requestUri, content: null);
 
 	public Task<ApiResult> PostAsync<TRequest>(string requestUri, TRequest value) =>
 		SendAsync(HttpMethod.Post, requestUri, JsonContent.Create(value, options: _jsonOptions));
@@ -64,8 +62,7 @@ public class AuthenticatedHttpClientService(
 	public Task<ApiResult<TResponse>> PutAsync<TRequest, TResponse>(string requestUri, TRequest value) =>
 		SendForDataAsync<TResponse>(HttpMethod.Put, requestUri, JsonContent.Create(value, options: _jsonOptions));
 
-	public Task<ApiResult> DeleteAsync(string requestUri) =>
-		SendAsync(HttpMethod.Delete, requestUri, content: null);
+	public Task<ApiResult> DeleteAsync(string requestUri) => SendAsync(HttpMethod.Delete, requestUri, content: null);
 
 	public Task<ApiResult<TResponse>> DeleteAsync<TResponse>(string requestUri) =>
 		SendForDataAsync<TResponse>(HttpMethod.Delete, requestUri, content: null);
@@ -86,7 +83,7 @@ public class AuthenticatedHttpClientService(
 		{
 			logger.LogError(ex, "Request {Method} {Uri} failed", method, requestUri);
 			return await DecorateAsync(ApiResult.Fail(WebConstants.Messages.Client.GenericFailure,
-				(int) HttpStatusCode.InternalServerError));
+													  (int) HttpStatusCode.InternalServerError));
 		}
 	}
 
@@ -108,7 +105,7 @@ public class AuthenticatedHttpClientService(
 		{
 			logger.LogError(ex, "Request {Method} {Uri} failed", method, requestUri);
 			return await DecorateAsync(ApiResult<T>.Fail(WebConstants.Messages.Client.GenericFailure,
-				(int) HttpStatusCode.InternalServerError));
+														 (int) HttpStatusCode.InternalServerError));
 		}
 	}
 
@@ -126,7 +123,10 @@ public class AuthenticatedHttpClientService(
 	private async Task<HttpResponseMessage> SendRawAsync(HttpMethod method, string requestUri, HttpContent? content)
 	{
 		await AttachTokenAsync();
-		using var request = new HttpRequestMessage(method, requestUri) {Content = content};
+		using var request = new HttpRequestMessage(method, requestUri)
+		{
+			Content = content
+		};
 		return await httpClient.SendAsync(request);
 	}
 
@@ -151,14 +151,13 @@ public class AuthenticatedHttpClientService(
 	/// ProblemDetails <c>errors</c>, <c>detail</c>, <c>title</c>/<c>message</c>), falling back to a
 	/// status-based message. Logged at Warning level.
 	/// </summary>
-	private async Task<IReadOnlyList<string>> ExtractErrorsAsync(HttpResponseMessage response, HttpMethod method,
-		string requestUri)
+	private async Task<IReadOnlyList<string>> ExtractErrorsAsync(HttpResponseMessage response,
+																 HttpMethod method,
+																 string requestUri
+	)
 	{
 		string? body = null;
-		try
-		{
-			body = await response.Content.ReadAsStringAsync();
-		}
+		try { body = await response.Content.ReadAsStringAsync(); }
 		catch
 		{
 			// ignore — fall back to status-based message below
@@ -168,9 +167,8 @@ public class AuthenticatedHttpClientService(
 		if (messages.Count == 0)
 			messages = [StatusFallback(response.StatusCode)];
 
-		messages.ForEach(message =>
-			logger.LogWarning("Request {Method} {Uri} returned {Status}: {Message}", method, requestUri,
-				(int) response.StatusCode, message));
+		messages.ForEach(message => logger.LogWarning("Request {Method} {Uri} returned {Status}: {Message}", method,
+													  requestUri, (int) response.StatusCode, message));
 
 		return messages;
 	}
@@ -199,7 +197,7 @@ public class AuthenticatedHttpClientService(
 			}
 
 			// Single-message shapes used by ProblemDetails and various handlers.
-			foreach (var name in new[] {"detail", "title", "message", "error"})
+			foreach (var name in new[] { "detail", "title", "message", "error" })
 			{
 				if (root.TryGetProperty(name, out var prop) && prop.ValueKind == JsonValueKind.String)
 				{
@@ -249,10 +247,7 @@ public class AuthenticatedHttpClientService(
 						if (entry.ValueKind == JsonValueKind.String)
 							AddIfPresent(entry.GetString());
 				}
-				else if (field.Value.ValueKind == JsonValueKind.String)
-				{
-					AddIfPresent(field.Value.GetString());
-				}
+				else if (field.Value.ValueKind == JsonValueKind.String) { AddIfPresent(field.Value.GetString()); }
 			}
 		}
 
@@ -265,39 +260,39 @@ public class AuthenticatedHttpClientService(
 		}
 	}
 
-	private static string Trim(string body) =>
-		body.Length > 500 ? body[..500] : body;
+	private static string Trim(string body) => body.Length > 500 ? body[..500] : body;
 
-	private static string StatusFallback(HttpStatusCode status) => status switch
-	{
-		// --- 2xx Success ---
-		HttpStatusCode.OK => WebConstants.Messages.Client.OK,
-		HttpStatusCode.Created => WebConstants.Messages.Client.Created,
-		HttpStatusCode.Accepted => WebConstants.Messages.Client.Accepted,
-		HttpStatusCode.NoContent => WebConstants.Messages.Client.NoContent,
+	private static string StatusFallback(HttpStatusCode status) =>
+		status switch
+		{
+			// --- 2xx Success ---
+			HttpStatusCode.OK => WebConstants.Messages.Client.OK,
+			HttpStatusCode.Created => WebConstants.Messages.Client.Created,
+			HttpStatusCode.Accepted => WebConstants.Messages.Client.Accepted,
+			HttpStatusCode.NoContent => WebConstants.Messages.Client.NoContent,
 
-		// --- 4xx Client Errors ---
-		HttpStatusCode.BadRequest => WebConstants.Messages.Client.BadRequest,
-		HttpStatusCode.Unauthorized => WebConstants.Messages.Client.Unauthorized,
-		HttpStatusCode.Forbidden => WebConstants.Messages.Client.Forbidden,
-		HttpStatusCode.NotFound => WebConstants.Messages.Client.NotFound,
-		HttpStatusCode.RequestTimeout => WebConstants.Messages.Client.RequestTimeout,
-		HttpStatusCode.Conflict => WebConstants.Messages.Client.Conflict,
-		HttpStatusCode.UnsupportedMediaType => WebConstants.Messages.Client.UnsupportedMediaType,
-		HttpStatusCode.TooManyRequests => WebConstants.Messages.Client.TooManyRequests,
-		HttpStatusCode.RequestEntityTooLarge => WebConstants.Messages.Client.PayloadTooLarge,
-		HttpStatusCode.MethodNotAllowed => WebConstants.Messages.Client.MethodNotAllowed,
-		HttpStatusCode.UnprocessableEntity => WebConstants.Messages.Client.UnprocessableEntity,
+			// --- 4xx Client Errors ---
+			HttpStatusCode.BadRequest => WebConstants.Messages.Client.BadRequest,
+			HttpStatusCode.Unauthorized => WebConstants.Messages.Client.Unauthorized,
+			HttpStatusCode.Forbidden => WebConstants.Messages.Client.Forbidden,
+			HttpStatusCode.NotFound => WebConstants.Messages.Client.NotFound,
+			HttpStatusCode.RequestTimeout => WebConstants.Messages.Client.RequestTimeout,
+			HttpStatusCode.Conflict => WebConstants.Messages.Client.Conflict,
+			HttpStatusCode.UnsupportedMediaType => WebConstants.Messages.Client.UnsupportedMediaType,
+			HttpStatusCode.TooManyRequests => WebConstants.Messages.Client.TooManyRequests,
+			HttpStatusCode.RequestEntityTooLarge => WebConstants.Messages.Client.PayloadTooLarge,
+			HttpStatusCode.MethodNotAllowed => WebConstants.Messages.Client.MethodNotAllowed,
+			HttpStatusCode.UnprocessableEntity => WebConstants.Messages.Client.UnprocessableEntity,
 
-		// --- 5xx Server Errors ---
-		HttpStatusCode.InternalServerError => WebConstants.Messages.Client.InternalServerError,
-		HttpStatusCode.NotImplemented => WebConstants.Messages.Client.NotImplemented,
-		HttpStatusCode.BadGateway => WebConstants.Messages.Client.BadGateway,
-		HttpStatusCode.ServiceUnavailable => WebConstants.Messages.Client.ServiceUnavailable,
-		HttpStatusCode.GatewayTimeout => WebConstants.Messages.Client.GatewayTimeout,
-		HttpStatusCode.NetworkAuthenticationRequired => WebConstants.Messages.Client.NetworkAuthenticationRequired,
+			// --- 5xx Server Errors ---
+			HttpStatusCode.InternalServerError => WebConstants.Messages.Client.InternalServerError,
+			HttpStatusCode.NotImplemented => WebConstants.Messages.Client.NotImplemented,
+			HttpStatusCode.BadGateway => WebConstants.Messages.Client.BadGateway,
+			HttpStatusCode.ServiceUnavailable => WebConstants.Messages.Client.ServiceUnavailable,
+			HttpStatusCode.GatewayTimeout => WebConstants.Messages.Client.GatewayTimeout,
+			HttpStatusCode.NetworkAuthenticationRequired => WebConstants.Messages.Client.NetworkAuthenticationRequired,
 
-		// --- Fallback voor onbekende of custom statuscodes ---
-		_ => WebConstants.Messages.Client.RequestFailed((int) status)
-	};
+			// --- Fallback voor onbekende of custom statuscodes ---
+			_ => WebConstants.Messages.Client.RequestFailed((int) status)
+		};
 }

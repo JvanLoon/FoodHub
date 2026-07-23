@@ -1,5 +1,4 @@
 using FastEndpoints;
-
 using Microsoft.AspNetCore.Identity;
 
 namespace FoodCalc.Api.Endpoints.Authentication;
@@ -14,8 +13,7 @@ public class ToggleUserRequest
 }
 
 /// <summary>POST api/authentication/toggleUser?email=&amp;enable= — Admin.</summary>
-public class ToggleUserEndpoint(UserManager<IdentityUser> userManager)
-	: Endpoint<ToggleUserRequest>
+public class ToggleUserEndpoint(UserManager<IdentityUser> userManager) : Endpoint<ToggleUserRequest>
 {
 	public override void Configure()
 	{
@@ -34,10 +32,7 @@ public class ToggleUserEndpoint(UserManager<IdentityUser> userManager)
 
 		user.EmailConfirmed = req.Enable;
 
-		if (!await userManager.IsInRoleAsync(user, "User"))
-		{
-			await userManager.AddToRoleAsync(user, "User");
-		}
+		if (!await userManager.IsInRoleAsync(user, "User")) { await userManager.AddToRoleAsync(user, "User"); }
 
 		var result = await userManager.UpdateAsync(user);
 		if (!result.Succeeded)

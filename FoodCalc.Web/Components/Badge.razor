@@ -1,28 +1,33 @@
 <span class="fh-badge fh-badge--@Variant.ToString().ToLowerInvariant() @CssClass">
     @if (!string.IsNullOrEmpty(Icon))
-    {
-        <i class="bi bi-@Icon" aria-hidden="true"></i>
-    }
-    @ChildContent
+	{
+		<i class="bi bi-@Icon" aria-hidden="true"></i>
+	}
+	@ChildContent
 </span>
 
 @code {
-    public enum BadgeVariant
-    {
-        Neutral,
-        Success,
-        Danger,
-        Warning,
-        Info,
-        Accent
-    }
 
-    [Parameter]
-    public BadgeVariant Variant { get; set; } = BadgeVariant.Neutral;
-    [Parameter]
-    public string? Icon { get; set; }
-    [Parameter]
-    public string? CssClass { get; set; }
-    [Parameter]
-    public RenderFragment? ChildContent { get; set; }
+	public enum BadgeVariant
+	{
+		Neutral,
+		Success,
+		Danger,
+		Warning,
+		Info,
+		Accent
+	}
+
+	[Parameter]
+	public BadgeVariant Variant { get; set; } = BadgeVariant.Neutral;
+
+	[Parameter]
+	public string? Icon { get; set; }
+
+	[Parameter]
+	public string? CssClass { get; set; }
+
+	[Parameter]
+	public RenderFragment? ChildContent { get; set; }
+
 }

@@ -4,43 +4,56 @@
 @typeparam TItem
 
 <div class="fh-table-wrap @CssClass">
-    <table class="table table-hover fh-table align-middle">
-        <thead>
-            <tr>@HeaderContent</tr>
-        </thead>
-        <tbody>
-            @if (Items is null)
-            {
-                <tr>
-                    <td colspan="100">
-                        <LoadingSpinner Label="@LoadingText" />
-                    </td>
-                </tr>
-            }
-            else if (!Items.Any())
-            {
-                <tr>
-                    <td colspan="100">
-                        <EmptyState Icon="inbox" Title="@EmptyText" />
-                    </td>
-                </tr>
-            }
-            else
-            {
-                @foreach (var item in Items)
-                {
-                    <tr>@RowTemplate?.Invoke(item)</tr>
-                }
-            }
-        </tbody>
-    </table>
+	<table class="table table-hover fh-table align-middle">
+		<thead>
+		<tr>@HeaderContent</tr>
+		</thead>
+		<tbody>
+		@if (Items is null)
+		{
+			<tr>
+				<td colspan="100">
+					<LoadingSpinner Label="@LoadingText"/>
+				</td>
+			</tr>
+		}
+		else if (!Items.Any())
+		{
+			<tr>
+				<td colspan="100">
+					<EmptyState Icon="inbox" Title="@EmptyText"/>
+				</td>
+			</tr>
+		}
+		else
+		{
+			@foreach (var item in Items)
+			{
+				<tr>@RowTemplate?.Invoke(item)</tr>
+			}
+		}
+		</tbody>
+	</table>
 </div>
 
 @code {
-    [Parameter] public IEnumerable<TItem>? Items { get; set; }
-    [Parameter] public RenderFragment? HeaderContent { get; set; }
-    [Parameter] public RenderFragment<TItem>? RowTemplate { get; set; }
-    [Parameter] public string EmptyText { get; set; } = "Nothing here yet.";
-    [Parameter] public string LoadingText { get; set; } = "Loading...";
-    [Parameter] public string? CssClass { get; set; }
+
+	[Parameter]
+	public IEnumerable<TItem>? Items { get; set; }
+
+	[Parameter]
+	public RenderFragment? HeaderContent { get; set; }
+
+	[Parameter]
+	public RenderFragment<TItem>? RowTemplate { get; set; }
+
+	[Parameter]
+	public string EmptyText { get; set; } = "Nothing here yet.";
+
+	[Parameter]
+	public string LoadingText { get; set; } = "Loading...";
+
+	[Parameter]
+	public string? CssClass { get; set; }
+
 }

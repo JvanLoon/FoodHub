@@ -2,46 +2,45 @@
    <TabSet><Tab Title="Users">...</Tab><Tab Title="Roles">...</Tab></TabSet> *@
 
 <CascadingValue Value="this" IsFixed="true">
-    <div class="fh-tabset">
-        <div class="fh-tabset__bar" role="tablist">
-            @foreach (var tab in _tabs)
-            {
-                <button type="button"
-                        role="tab"
-                        class="fh-tabset__tab @(tab == ActiveTab ? "fh-tabset__tab--active" : null)"
-                        aria-selected="@(tab == ActiveTab)"
-                        @onclick="() => Activate(tab)">
-                    @if (!string.IsNullOrEmpty(tab.Icon))
-                    {
-                        <i class="bi bi-@tab.Icon" aria-hidden="true"></i>
-                    }
-                    @tab.Title
-                </button>
-            }
-        </div>
-        <div class="fh-tabset__panel" role="tabpanel">
-            @ChildContent
-        </div>
-    </div>
+	<div class="fh-tabset">
+		<div class="fh-tabset__bar" role="tablist">
+			@foreach (var tab in _tabs)
+			{
+				<button type="button"
+				        role="tab"
+				        class="fh-tabset__tab @(tab == ActiveTab ? "fh-tabset__tab--active" : null)"
+				        aria-selected="@(tab == ActiveTab)"
+				        @onclick="() => Activate(tab)">
+					@if (!string.IsNullOrEmpty(tab.Icon))
+					{
+						<i class="bi bi-@tab.Icon" aria-hidden="true"></i>
+					}
+					@tab.Title
+				</button>
+			}
+		</div>
+		<div class="fh-tabset__panel" role="tabpanel">
+			@ChildContent
+		</div>
+	</div>
 </CascadingValue>
 
 @code {
-    [Parameter] 
-    public RenderFragment? ChildContent { get; set; }
 
-    private readonly List<Tab> _tabs = new();
+	[Parameter]
+	public RenderFragment? ChildContent { get; set; }
 
-    internal Tab? ActiveTab { get; private set; }
+	private readonly List<Tab> _tabs = new();
 
-    internal void AddTab(Tab tab)
-    {
-        _tabs.Add(tab);
-        ActiveTab ??= tab;
-        StateHasChanged();
-    }
+	internal Tab? ActiveTab { get; private set; }
 
-    private void Activate(Tab tab)
-    {
-        ActiveTab = tab;
-    }
+	internal void AddTab(Tab tab)
+	{
+		_tabs.Add(tab);
+		ActiveTab ??= tab;
+		StateHasChanged();
+	}
+
+	private void Activate(Tab tab) { ActiveTab = tab; }
+
 }

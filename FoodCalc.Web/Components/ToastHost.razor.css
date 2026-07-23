@@ -1,75 +1,75 @@
 .fh-toast-host {
-	position: fixed;
-	bottom: var(--fh-space-5);
-	right: var(--fh-space-5);
-	z-index: 1090;
-	display: flex;
-	flex-direction: column;
-	gap: var(--fh-space-3);
-	max-width: min(24rem, calc(100vw - 2 * var(--fh-space-5)));
+    position: fixed;
+    bottom: var(--fh-space-5);
+    right: var(--fh-space-5);
+    z-index: 1090;
+    display: flex;
+    flex-direction: column;
+    gap: var(--fh-space-3);
+    max-width: min(24rem, calc(100vw - 2 * var(--fh-space-5)));
 }
 
 .fh-toast {
-	display: flex;
-	align-items: flex-start;
-	gap: var(--fh-space-3);
-	padding: var(--fh-space-4);
-	background: var(--fh-surface-raised);
-	border: 1px solid var(--fh-border);
-	border-left: 4px solid var(--fh-success);
-	border-radius: var(--fh-radius-md);
-	box-shadow: var(--fh-shadow-md);
-	color: var(--fh-text);
-	animation: fh-toast-in var(--fh-transition-slow) both;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--fh-space-3);
+    padding: var(--fh-space-4);
+    background: var(--fh-surface-raised);
+    border: 1px solid var(--fh-border);
+    border-left: 4px solid var(--fh-success);
+    border-radius: var(--fh-radius-md);
+    box-shadow: var(--fh-shadow-md);
+    color: var(--fh-text);
+    animation: fh-toast-in var(--fh-transition-slow) both;
 
-	& > .bi {
-		font-size: 1.1rem;
-		color: var(--fh-success);
-		line-height: 1.4;
-	}
+    & > .bi {
+        font-size: 1.1rem;
+        color: var(--fh-success);
+        line-height: 1.4;
+    }
 }
 
 .fh-toast--error {
-	border-left-color: var(--fh-danger);
+    border-left-color: var(--fh-danger);
 
-	& > .bi {
-		color: var(--fh-danger);
-	}
+    & > .bi {
+        color: var(--fh-danger);
+    }
 }
 
 .fh-toast__message {
-	flex: 1;
-	font-size: var(--fh-text-sm);
-	overflow-wrap: anywhere;
+    flex: 1;
+    font-size: var(--fh-text-sm);
+    overflow-wrap: anywhere;
 }
 
 .fh-toast__close {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	width: 1.5rem;
-	height: 1.5rem;
-	border: none;
-	border-radius: var(--fh-radius-sm);
-	background: transparent;
-	color: var(--fh-text-faint);
-	font-size: 0.7rem;
-	cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border: none;
+    border-radius: var(--fh-radius-sm);
+    background: transparent;
+    color: var(--fh-text-faint);
+    font-size: 0.7rem;
+    cursor: pointer;
 
-	&:hover {
-		background: var(--fh-surface-sunken);
-		color: var(--fh-text);
-	}
+    &:hover {
+        background: var(--fh-surface-sunken);
+        color: var(--fh-text);
+    }
 }
 
 @keyframes fh-toast-in {
-	from {
-		opacity: 0;
-		transform: translateY(0.5rem);
-	}
+    from {
+        opacity: 0;
+        transform: translateY(0.5rem);
+    }
 
-	to {
-		opacity: 1;
-		transform: translateY(0);
-	}
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

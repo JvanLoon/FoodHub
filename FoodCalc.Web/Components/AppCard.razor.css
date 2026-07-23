@@ -1,22 +1,22 @@
 .fh-card {
-	border: 1px solid var(--fh-border);
-	border-radius: var(--fh-radius-lg);
-	background: var(--fh-surface);
+    border: 1px solid var(--fh-border);
+    border-radius: var(--fh-radius-lg);
+    background: var(--fh-surface);
 
-	& > .card-header {
-		border-bottom: 1px solid var(--fh-border);
-		background: transparent;
-		font-weight: var(--fh-weight-semibold);
-		padding: var(--fh-space-4) var(--fh-space-5);
-	}
+    & > .card-header {
+        border-bottom: 1px solid var(--fh-border);
+        background: transparent;
+        font-weight: var(--fh-weight-semibold);
+        padding: var(--fh-space-4) var(--fh-space-5);
+    }
 
-	& > .card-body {
-		padding: var(--fh-space-5);
-	}
+    & > .card-body {
+        padding: var(--fh-space-5);
+    }
 
-	& > .card-footer {
-		border-top: 1px solid var(--fh-border);
-		background: transparent;
-		padding: var(--fh-space-3) var(--fh-space-5);
-	}
+    & > .card-footer {
+        border-top: 1px solid var(--fh-border);
+        background: transparent;
+        padding: var(--fh-space-3) var(--fh-space-5);
+    }
 }

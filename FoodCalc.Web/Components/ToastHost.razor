@@ -4,69 +4,63 @@
 @inject MessageService MessageService
 
 <div class="fh-toast-host" aria-live="polite">
-    @foreach (var toast in _toasts)
-    {
-        <div class="fh-toast @(toast.IsError ? "fh-toast--error" : "fh-toast--success")" role="status">
-            <i class="bi @(toast.IsError ? "bi-exclamation-triangle-fill" : "bi-check-circle-fill")" aria-hidden="true"></i>
-            <div class="fh-toast__message">@toast.Message</div>
-            <button type="button" class="fh-toast__close" aria-label="Dismiss" @onclick="() => Dismiss(toast)">
-                <i class="bi bi-x-lg" aria-hidden="true"></i>
-            </button>
-        </div>
-    }
+	@foreach (var toast in _toasts)
+	{
+		<div class="fh-toast @(toast.IsError ? "fh-toast--error" : "fh-toast--success")" role="status">
+			<i class="bi @(toast.IsError ? "bi-exclamation-triangle-fill" : "bi-check-circle-fill")"
+			   aria-hidden="true"></i>
+			<div class="fh-toast__message">@toast.Message</div>
+			<button type="button" class="fh-toast__close" aria-label="Dismiss" @onclick="() => Dismiss(toast)">
+				<i class="bi bi-x-lg" aria-hidden="true"></i>
+			</button>
+		</div>
+	}
 </div>
 
 @code {
-    private sealed record ToastItem(string Message, bool IsError)
-    {
-        public CancellationTokenSource Cts { get; } = new();
-    }
 
-    private readonly List<ToastItem> _toasts = new();
+	private sealed record ToastItem(string Message, bool IsError)
+	{
+		public CancellationTokenSource Cts { get; } = new();
+	}
 
-    protected override void OnInitialized()
-    {
-        MessageService.OnShowMessage += ShowToast;
-    }
+	private readonly List<ToastItem> _toasts = new();
 
-    // MessageService fires synchronously; the display/dismiss lifecycle is ours to run in the background.
-    private void ShowToast(ToastMessage message) => _ = DisplayAsync(message);
+	protected override void OnInitialized() { MessageService.OnShowMessage += ShowToast; }
 
-    private async Task DisplayAsync(ToastMessage message)
-    {
-        var toast = new ToastItem(message.Message, message.IsError);
-        _toasts.Add(toast);
-        await InvokeAsync(StateHasChanged);
+	// MessageService fires synchronously; the display/dismiss lifecycle is ours to run in the background.
+	private void ShowToast(ToastMessage message) => _ = DisplayAsync(message);
 
-        if (message.TimeInMs == 0) return;
+	private async Task DisplayAsync(ToastMessage message)
+	{
+		var toast = new ToastItem(message.Message, message.IsError);
+		_toasts.Add(toast);
+		await InvokeAsync(StateHasChanged);
 
-        using var linked = CancellationTokenSource.CreateLinkedTokenSource(toast.Cts.Token, message.CancellationToken);
-        try
-        {
-            await Task.Delay(message.TimeInMs, linked.Token);
-        }
-        catch (OperationCanceledException)
-        {
-            return;
-        }
+		if (message.TimeInMs == 0) return;
 
-        _toasts.Remove(toast);
-        await InvokeAsync(StateHasChanged);
-    }
+		using var linked = CancellationTokenSource.CreateLinkedTokenSource(toast.Cts.Token, message.CancellationToken);
+		try { await Task.Delay(message.TimeInMs, linked.Token); }
+		catch (OperationCanceledException) { return; }
 
-    private void Dismiss(ToastItem toast)
-    {
-        toast.Cts.Cancel();
-        _toasts.Remove(toast);
-    }
+		_toasts.Remove(toast);
+		await InvokeAsync(StateHasChanged);
+	}
 
-    public void Dispose()
-    {
-        MessageService.OnShowMessage -= ShowToast;
-        foreach (var toast in _toasts)
-        {
-            toast.Cts.Cancel();
-            toast.Cts.Dispose();
-        }
-    }
+	private void Dismiss(ToastItem toast)
+	{
+		toast.Cts.Cancel();
+		_toasts.Remove(toast);
+	}
+
+	public void Dispose()
+	{
+		MessageService.OnShowMessage -= ShowToast;
+		foreach (var toast in _toasts)
+		{
+			toast.Cts.Cancel();
+			toast.Cts.Dispose();
+		}
+	}
+
 }

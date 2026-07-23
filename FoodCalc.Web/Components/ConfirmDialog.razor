@@ -3,52 +3,51 @@
    var ok = await confirmDialog.ShowAsync("Delete recipe", "Are you sure?"); *@
 
 <Modal Visible="_visible" VisibleChanged="HandleVisibleChanged" Title="@_title">
-    <ChildContent>
-        <p class="fh-confirm__message">@_message</p>
-    </ChildContent>
-    <Footer>
-        <AppButton Variant="ButtonVariant.OutlineSecondary" OnClick="() => Resolve(false)">@_cancelText</AppButton>
-        <AppButton Variant="@(_danger ? ButtonVariant.Danger : ButtonVariant.Primary)" OnClick="() => Resolve(true)">@_confirmText</AppButton>
-    </Footer>
+	<ChildContent>
+		<p class="fh-confirm__message">@_message</p>
+	</ChildContent>
+	<Footer>
+		<AppButton Variant="ButtonVariant.OutlineSecondary" OnClick="() => Resolve(false)">@_cancelText</AppButton>
+		<AppButton Variant="@(_danger ? ButtonVariant.Danger : ButtonVariant.Primary)"
+		           OnClick="() => Resolve(true)">@_confirmText</AppButton>
+	</Footer>
 </Modal>
 
 @code {
-    private bool _visible;
-    private string _title = string.Empty;
-    private string _message = string.Empty;
-    private string _confirmText = "Confirm";
-    private string _cancelText = "Cancel";
-    private bool _danger;
-    private TaskCompletionSource<bool>? _tcs;
+	private bool _visible;
+	private string _title = string.Empty;
+	private string _message = string.Empty;
+	private string _confirmText = "Confirm";
+	private string _cancelText = "Cancel";
+	private bool _danger;
+	private TaskCompletionSource<bool>? _tcs;
 
-    public Task<bool> ShowAsync(string title, string message, string confirmText = "Confirm", string cancelText = "Cancel", bool danger = false)
-    {
-        _tcs?.TrySetResult(false);
-        _tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+	public Task<bool> ShowAsync(string title, string message, string confirmText = "Confirm", string cancelText = "Cancel", bool danger = false)
+	{
+		_tcs?.TrySetResult(false);
+		_tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        _title = title;
-        _message = message;
-        _confirmText = confirmText;
-        _cancelText = cancelText;
-        _danger = danger;
-        _visible = true;
-        StateHasChanged();
+		_title = title;
+		_message = message;
+		_confirmText = confirmText;
+		_cancelText = cancelText;
+		_danger = danger;
+		_visible = true;
+		StateHasChanged();
 
-        return _tcs.Task;
-    }
+		return _tcs.Task;
+	}
 
-    private void Resolve(bool confirmed)
-    {
-        _visible = false;
-        _tcs?.TrySetResult(confirmed);
-    }
+	private void Resolve(bool confirmed)
+	{
+		_visible = false;
+		_tcs?.TrySetResult(confirmed);
+	}
 
-    private void HandleVisibleChanged(bool visible)
-    {
-        _visible = visible;
-        if (!visible)
-        {
-            _tcs?.TrySetResult(false);
-        }
-    }
+	private void HandleVisibleChanged(bool visible)
+	{
+		_visible = visible;
+		if (!visible) { _tcs?.TrySetResult(false); }
+	}
+
 }

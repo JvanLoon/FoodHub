@@ -1,14 +1,11 @@
 using FastEndpoints;
-
 using FoodCalc.Features.Recipes.Queries.GetAllRecipes;
-
 using MediatR;
 
 namespace FoodCalc.Api.Endpoints.Recipes;
 
 /// <summary>GET api/recipe/getallrecipes — any authenticated user.</summary>
-public class GetRecipesEndpoint(IMediator mediator)
-	: Endpoint<GetRecipesRequest, PagedResultDto<RecipeDto>>
+public class GetRecipesEndpoint(IMediator mediator) : Endpoint<GetRecipesRequest, PagedResultDto<RecipeDto>>
 {
 	public override void Configure()
 	{
@@ -18,11 +15,9 @@ public class GetRecipesEndpoint(IMediator mediator)
 
 	public override async Task HandleAsync(GetRecipesRequest req, CancellationToken ct)
 	{
-		var result = await mediator.Send(
-			new GetAllRecipesQuery(req.WithIngredient, req.Page, req.PageSize, req.Search), ct);
+		var result = await mediator.Send(new GetAllRecipesQuery(req.WithIngredient, req.Page, req.PageSize, req.Search),
+										 ct);
 
-		await result.Match(
-			value => Send.OkAsync(value, ct),
-			errors => this.SendErrorsAsync(errors, ct: ct));
+		await result.Match(value => Send.OkAsync(value, ct), errors => this.SendErrorsAsync(errors, ct: ct));
 	}
 }

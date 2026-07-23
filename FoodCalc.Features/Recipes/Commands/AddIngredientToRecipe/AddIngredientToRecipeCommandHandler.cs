@@ -1,27 +1,28 @@
-using ErrorOr;
-
+﻿using ErrorOr;
 using FoodCalc.Features.Mapping;
-
 using FoodHub.DTOs;
 using FoodHub.Persistence.Entities;
-
 using MediatR;
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Features.Recipes.Commands.AddIngredientToRecipe;
 
-public class AddIngredientToRecipeCommandHandler(FoodHubDbContext context, ILogger<AddIngredientToRecipeCommandHandler> logger) : IRequestHandler<AddIngredientToRecipeCommand, ErrorOr<RecipeItemDto>>
+public class AddIngredientToRecipeCommandHandler(
+	FoodHubDbContext context,
+	ILogger<AddIngredientToRecipeCommandHandler> logger)
+	: IRequestHandler<AddIngredientToRecipeCommand, ErrorOr<RecipeItemDto>>
 {
-	public async Task<ErrorOr<RecipeItemDto>> Handle(AddIngredientToRecipeCommand request, CancellationToken cancellationToken)
+	public async Task<ErrorOr<RecipeItemDto>> Handle(AddIngredientToRecipeCommand request,
+													 CancellationToken cancellationToken
+	)
 	{
 		try
 		{
 			var dto = request.RecipeItem;
 
-			var existing = await context.RecipeItems
-				.FirstOrDefaultAsync(ri => ri.Id == dto.Id && ri.RecipeId == dto.RecipeId, cancellationToken);
+			var existing = await context.RecipeItems.FirstOrDefaultAsync(
+				ri => ri.Id == dto.Id && ri.RecipeId == dto.RecipeId, cancellationToken);
 
 			if (existing != null)
 			{

@@ -1,5 +1,4 @@
 using FoodCalc.Web.Services.Auth;
-
 using FoodHub.DTOs;
 
 namespace FoodCalc.Web.Services.Admin;
@@ -21,7 +20,7 @@ public class AdminService(AuthenticatedHttpClientService httpClient)
 		if (!paged.Success)
 			return ApiResult<List<UserDto>>.Fail(paged.Errors, paged.StatusCode);
 
-		return ApiResult<List<UserDto>>.Ok([.. paged.Data!.Items], paged.StatusCode);
+		return ApiResult<List<UserDto>>.Ok([..paged.Data!.Items], paged.StatusCode);
 	}
 
 	public Task<ApiResult> ToggleUserAsync(string email, bool enable = true) =>
@@ -43,7 +42,7 @@ public class AdminService(AuthenticatedHttpClientService httpClient)
 		if (!paged.Success)
 			return ApiResult<List<string>>.Fail(paged.Errors, paged.StatusCode);
 
-		return ApiResult<List<string>>.Ok([.. paged.Data!.Items], paged.StatusCode);
+		return ApiResult<List<string>>.Ok([..paged.Data!.Items], paged.StatusCode);
 	}
 
 	public Task<ApiResult<List<string>>> GetUserRolesAsync(string email) =>

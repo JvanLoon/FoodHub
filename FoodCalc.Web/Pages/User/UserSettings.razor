@@ -5,34 +5,32 @@
 <PageTitle>User Settings</PageTitle>
 
 <div class="fh-stack">
-    <PageHeader Title="User Settings" />
+	<PageHeader Title="User Settings"/>
 
-    @if (string.IsNullOrEmpty(email))
-    {
-        <LoadingSpinner Label="Loading settings..." />
-    }
-    else
-    {
-        <div class="settings-card">
-            <AppCard>
-                <Header>Account</Header>
-                <Body>
-                    <div class="settings-row">
-                        <i class="bi bi-envelope" aria-hidden="true"></i>
-                        <span class="fh-muted">Email</span>
-                        <span class="settings-row__value fh-truncate" title="@email">@email</span>
-                    </div>
-                </Body>
-            </AppCard>
-        </div>
-    }
+	@if (string.IsNullOrEmpty(email))
+	{
+		<LoadingSpinner Label="Loading settings..."/>
+	}
+	else
+	{
+		<div class="settings-card">
+			<AppCard>
+				<Header>Account</Header>
+				<Body>
+				<div class="settings-row">
+					<i class="bi bi-envelope" aria-hidden="true"></i>
+					<span class="fh-muted">Email</span>
+					<span class="settings-row__value fh-truncate" title="@email">@email</span>
+				</div>
+				</Body>
+			</AppCard>
+		</div>
+	}
 </div>
 
 @code {
-    private string? email;
+	private string? email;
 
-    protected override async Task OnInitializedAsync()
-    {
-        email = await AuthTokenService.GetEmailAsync();
-    }
+	protected override async Task OnInitializedAsync() { email = await AuthTokenService.GetEmailAsync(); }
+
 }

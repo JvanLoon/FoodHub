@@ -14,9 +14,8 @@ public static class LegacyImportConverter
 {
 	public static ImportExportAllDataDto ToCurrent(LegacyImportExportAllDataDto legacy)
 	{
-		var catalogById = legacy.Ingredients
-			.GroupBy(i => i.Id)
-			.ToDictionary(g => g.Key, g => g.First());
+		var catalogById = legacy.Ingredients.GroupBy(i => i.Id)
+								.ToDictionary(g => g.Key, g => g.First());
 
 		var items = new List<RecipeItemDto>();
 		foreach (var ri in legacy.RecipeIngredients)
@@ -24,14 +23,10 @@ public static class LegacyImportConverter
 			catalogById.TryGetValue(ri.IngredientId, out var catalog);
 
 			var name = ri.Ingredient?.Name ?? catalog?.Name;
-			if (string.IsNullOrWhiteSpace(name))
-			{
-				continue;
-			}
+			if (string.IsNullOrWhiteSpace(name)) { continue; }
 
 			var shouldBeAddedToShoppingCart = ri.Ingredient?.ShouldBeAddedToShoppingCart
-				?? catalog?.ShouldBeAddedToShoppingCart
-				?? true;
+											  ?? catalog?.ShouldBeAddedToShoppingCart ?? true;
 
 			items.Add(new RecipeItemDto
 			{

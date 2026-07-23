@@ -9,188 +9,188 @@
 <PageTitle>Home</PageTitle>
 
 <div class="home-layout">
-    <div class="home-header">
-        <PageHeader Title="Dashboard" Subtitle="An overview of your FoodHub library." />
-    </div>
+	<div class="home-header">
+		<PageHeader Title="Dashboard" Subtitle="An overview of your FoodHub library."/>
+	</div>
 
-    <div class="home-body">
-        @if (loading)
-        {
-            <LoadingSpinner Label="Loading dashboard..." />
-        }
-        else
-        {
-            <section class="fh-stat-grid">
-                <div class="fh-stat-card fh-stat-card--primary" @onclick="GoToRecipes" role="button" tabindex="0">
-                    <div class="fh-stat-icon"><i class="bi bi-journal-text"></i></div>
-                    <div class="fh-stat-body">
-                        <div class="fh-stat-label">Recipes</div>
-                        <div class="fh-stat-value">@recipeCount</div>
-                    </div>
-                </div>
+	<div class="home-body">
+		@if (loading)
+		{
+			<LoadingSpinner Label="Loading dashboard..."/>
+		}
+		else
+		{
+			<section class="fh-stat-grid">
+				<div class="fh-stat-card fh-stat-card--primary" @onclick="GoToRecipes" role="button" tabindex="0">
+					<div class="fh-stat-icon"><i class="bi bi-journal-text"></i></div>
+					<div class="fh-stat-body">
+						<div class="fh-stat-label">Recipes</div>
+						<div class="fh-stat-value">@recipeCount</div>
+					</div>
+				</div>
 
-                <div class="fh-stat-card fh-stat-card--accent" @onclick="GoToIngredients" role="button" tabindex="0">
-                    <div class="fh-stat-icon"><i class="bi bi-egg"></i></div>
-                    <div class="fh-stat-body">
-                        <div class="fh-stat-label">Ingredients</div>
-                        <div class="fh-stat-value">@ingredientCount</div>
-                    </div>
-                </div>
+				<div class="fh-stat-card fh-stat-card--accent" @onclick="GoToIngredients" role="button" tabindex="0">
+					<div class="fh-stat-icon"><i class="bi bi-egg"></i></div>
+					<div class="fh-stat-body">
+						<div class="fh-stat-label">Ingredients</div>
+						<div class="fh-stat-value">@ingredientCount</div>
+					</div>
+				</div>
 
-                @if (isAdmin)
-                {
-                    <div class="fh-stat-card fh-stat-card--info" @onclick="GoToAdmin" role="button" tabindex="0">
-                        <div class="fh-stat-icon"><i class="bi bi-people"></i></div>
-                        <div class="fh-stat-body">
-                            <div class="fh-stat-label">Users</div>
-                            <div class="fh-stat-value">@userCount</div>
-                        </div>
-                    </div>
-                }
+				@if (isAdmin)
+				{
+					<div class="fh-stat-card fh-stat-card--info" @onclick="GoToAdmin" role="button" tabindex="0">
+						<div class="fh-stat-icon"><i class="bi bi-people"></i></div>
+						<div class="fh-stat-body">
+							<div class="fh-stat-label">Users</div>
+							<div class="fh-stat-value">@userCount</div>
+						</div>
+					</div>
+				}
 
-                <div class="fh-stat-card">
-                    <div class="fh-stat-icon"><i class="bi bi-bar-chart"></i></div>
-                    <div class="fh-stat-body">
-                        <div class="fh-stat-label">Avg. ingredients / recipe</div>
-                        <div class="fh-stat-value">@avgIngredientsPerRecipe.ToString("0.0")</div>
-                    </div>
-                </div>
+				<div class="fh-stat-card">
+					<div class="fh-stat-icon"><i class="bi bi-bar-chart"></i></div>
+					<div class="fh-stat-body">
+						<div class="fh-stat-label">Avg. ingredients / recipe</div>
+						<div class="fh-stat-value">@avgIngredientsPerRecipe.ToString("0.0")</div>
+					</div>
+				</div>
 
-                <div class="fh-stat-card">
-                    <div class="fh-stat-icon"><i class="bi bi-cart3"></i></div>
-                    <div class="fh-stat-body">
-                        <div class="fh-stat-label">On shopping list</div>
-                        <div class="fh-stat-value">@shoppingCartIngredientCount</div>
-                        <div class="fh-stat-sub fh-muted">of @ingredientCount ingredients</div>
-                    </div>
-                </div>
+				<div class="fh-stat-card">
+					<div class="fh-stat-icon"><i class="bi bi-cart3"></i></div>
+					<div class="fh-stat-body">
+						<div class="fh-stat-label">On shopping list</div>
+						<div class="fh-stat-value">@shoppingCartIngredientCount</div>
+						<div class="fh-stat-sub fh-muted">of @ingredientCount ingredients</div>
+					</div>
+				</div>
 
-                <div class="fh-stat-card">
-                    <div class="fh-stat-icon"><i class="bi bi-link-45deg"></i></div>
-                    <div class="fh-stat-body">
-                        <div class="fh-stat-label">Recipe-ingredient links</div>
-                        <div class="fh-stat-value">@totalRecipeItemLinks</div>
-                    </div>
-                </div>
-            </section>
+				<div class="fh-stat-card">
+					<div class="fh-stat-icon"><i class="bi bi-link-45deg"></i></div>
+					<div class="fh-stat-body">
+						<div class="fh-stat-label">Recipe-ingredient links</div>
+						<div class="fh-stat-value">@totalRecipeItemLinks</div>
+					</div>
+				</div>
+			</section>
 
-            @if (topIngredients.Any())
-            {
-                <section class="fh-panel">
-                    <div class="fh-panel-header">
-                        <h2 class="fh-subheading">Top ingredients</h2>
-                        <span class="fh-muted">Most used across all recipes</span>
-                    </div>
-                    <ol class="fh-top-list">
-                        @foreach (var item in topIngredients)
-                        {
-                            var pct = maxTopUsage == 0 ? 0 : (int)Math.Round(item.UsageCount * 100.0 / maxTopUsage);
-                            <li>
-                                <div class="fh-top-row">
-                                    <span class="fh-top-name">@item.Name</span>
-                                    <span class="fh-top-count fh-muted">@item.UsageCount recipe@(item.UsageCount == 1 ? "" : "s")</span>
-                                </div>
-                                <div class="fh-top-bar"><span style="width:@(pct)%;"></span></div>
-                            </li>
-                        }
-                    </ol>
-                </section>
-            }
-        }
-    </div>
+			@if (topIngredients.Any())
+			{
+				<section class="fh-panel">
+					<div class="fh-panel-header">
+						<h2 class="fh-subheading">Top ingredients</h2>
+						<span class="fh-muted">Most used across all recipes</span>
+					</div>
+					<ol class="fh-top-list">
+						@foreach (var item in topIngredients)
+						{
+							var pct = maxTopUsage == 0 ? 0 : (int) Math.Round(item.UsageCount * 100.0 / maxTopUsage);
+							<li>
+								<div class="fh-top-row">
+									<span class="fh-top-name">@item.Name</span>
+									<span
+										class="fh-top-count fh-muted">@item.UsageCount recipe@(item.UsageCount == 1 ? "" : "s")</span>
+								</div>
+								<div class="fh-top-bar"><span style="width:@(pct)%;"></span></div>
+							</li>
+						}
+					</ol>
+				</section>
+			}
+		}
+	</div>
 </div>
 
 @code {
-    private bool loading = true;
-    private bool isAdmin;
+	private bool loading = true;
+	private bool isAdmin;
 
-    private int recipeCount;
-    private int ingredientCount;
-    private int userCount;
-    private int shoppingCartIngredientCount;
-    private int totalRecipeItemLinks;
-    private double avgIngredientsPerRecipe;
+	private int recipeCount;
+	private int ingredientCount;
+	private int userCount;
+	private int shoppingCartIngredientCount;
+	private int totalRecipeItemLinks;
+	private double avgIngredientsPerRecipe;
 
-    private List<IngredientUsage> topIngredients = new();
-    private int maxTopUsage;
+	private List<IngredientUsage> topIngredients = new();
+	private int maxTopUsage;
 
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            isAdmin = await AuthStateService.IsAdminAsync();
-        }
-        catch
-        {
-            isAdmin = false;
-        }
+	protected override async Task OnInitializedAsync()
+	{
+		try { isAdmin = await AuthStateService.IsAdminAsync(); }
+		catch { isAdmin = false; }
 
-        var recipes = await RecipeService.GetAllRecipesAsync(withIngredients: true).OrDefault(new List<RecipeDto>());
-        var ingredientsPage = await IngredientService.GetPagedIngredientsAsync(1, 1)
-        .OrDefault(new PagedResultDto<IngredientDto>());
+		var recipes = await RecipeService.GetAllRecipesAsync(withIngredients: true)
+		                                 .OrDefault(new List<RecipeDto>());
+		var ingredientsPage = await IngredientService.GetPagedIngredientsAsync(1, 1)
+		                                             .OrDefault(new PagedResultDto<IngredientDto>());
 
-        recipeCount = recipes.Count;
-        ingredientCount = ingredientsPage.TotalCount;
+		recipeCount = recipes.Count;
+		ingredientCount = ingredientsPage.TotalCount;
 
-        if (isAdmin)
-        {
-            var usersResult = await AdminService.GetPagedUsersAsync(1, 1)
-            .OrDefault(new PagedResultDto<UserDto>());
-            userCount = usersResult.TotalCount;
-        }
+		if (isAdmin)
+		{
+			var usersResult = await AdminService.GetPagedUsersAsync(1, 1)
+			                                    .OrDefault(new PagedResultDto<UserDto>());
+			userCount = usersResult.TotalCount;
+		}
 
-        ComputeRecipeStats(recipes);
+		ComputeRecipeStats(recipes);
 
-        loading = false;
-    }
+		loading = false;
+	}
 
-    private void ComputeRecipeStats(List<RecipeDto> recipes)
-    {
-        totalRecipeItemLinks = recipes.Sum(r => r.Ingredients?.Count ?? 0);
-        avgIngredientsPerRecipe = recipes.Count == 0 ? 0 : (double)totalRecipeItemLinks / recipes.Count;
+	private void ComputeRecipeStats(List<RecipeDto> recipes)
+	{
+		totalRecipeItemLinks = recipes.Sum(r => r.Ingredients?.Count ?? 0);
+		avgIngredientsPerRecipe = recipes.Count == 0 ? 0 : (double) totalRecipeItemLinks / recipes.Count;
 
-        var seenShoppingIngredients = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var usage = new Dictionary<string, IngredientUsage>(StringComparer.OrdinalIgnoreCase);
+		var seenShoppingIngredients = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+		var usage = new Dictionary<string, IngredientUsage>(StringComparer.OrdinalIgnoreCase);
 
-        foreach (var recipe in recipes)
-        {
-            if (recipe.Ingredients == null) continue;
-            var recipeItemNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            foreach (var ri in recipe.Ingredients)
-            {
-                if (ri.ShouldBeAddedToShoppingCart)
-                    seenShoppingIngredients.Add(ri.Name);
+		foreach (var recipe in recipes)
+		{
+			if (recipe.Ingredients == null) continue;
+			var recipeItemNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+			foreach (var ri in recipe.Ingredients)
+			{
+				if (ri.ShouldBeAddedToShoppingCart)
+					seenShoppingIngredients.Add(ri.Name);
 
-                if (recipeItemNames.Add(ri.Name))
-                {
-                    if (!usage.TryGetValue(ri.Name, out var u))
-                    {
-                        u = new IngredientUsage { Name = ri.Name };
-                        usage[ri.Name] = u;
-                    }
-                    u.UsageCount++;
-                }
-            }
-        }
+				if (recipeItemNames.Add(ri.Name))
+				{
+					if (!usage.TryGetValue(ri.Name, out var u))
+					{
+						u = new IngredientUsage
+						{
+							Name = ri.Name
+						};
+						usage[ri.Name] = u;
+					}
 
-        shoppingCartIngredientCount = seenShoppingIngredients.Count;
+					u.UsageCount++;
+				}
+			}
+		}
 
-        topIngredients = usage.Values
-            .OrderByDescending(u => u.UsageCount)
-            .ThenBy(u => u.Name)
-            .Take(5)
-            .ToList();
+		shoppingCartIngredientCount = seenShoppingIngredients.Count;
 
-        maxTopUsage = topIngredients.Count == 0 ? 0 : topIngredients.Max(t => t.UsageCount);
-    }
+		topIngredients = usage.Values.OrderByDescending(u => u.UsageCount)
+		                      .ThenBy(u => u.Name)
+		                      .Take(5)
+		                      .ToList();
 
-    private void GoToRecipes() => NavigationManager.NavigateTo("/recipes");
-    private void GoToIngredients() => NavigationManager.NavigateTo("/ingredients");
-    private void GoToAdmin() => NavigationManager.NavigateTo("/admin");
+		maxTopUsage = topIngredients.Count == 0 ? 0 : topIngredients.Max(t => t.UsageCount);
+	}
 
-    private class IngredientUsage
-    {
-        public string Name { get; set; } = string.Empty;
-        public int UsageCount { get; set; }
-    }
+	private void GoToRecipes() => NavigationManager.NavigateTo("/recipes");
+	private void GoToIngredients() => NavigationManager.NavigateTo("/ingredients");
+	private void GoToAdmin() => NavigationManager.NavigateTo("/admin");
+
+	private class IngredientUsage
+	{
+		public string Name { get; set; } = string.Empty;
+		public int UsageCount { get; set; }
+	}
+
 }

@@ -1,23 +1,23 @@
 # API results & the `ApiResult` helpers
 
 How the frontend talks to the API and surfaces errors, and how the fluent
-`ApiResult` helpers (`OnSuccess`, `OnFailure`, `OrDefault`) collapse the
-repetitive success/error plumbing at call sites.
+`ApiResult` helpers (`OnSuccess`, `OnFailure`, `OrDefault`) collapse the repetitive success/error plumbing at call
+sites.
 
 ## The pieces
 
-| Type | Job |
-| --- | --- |
+| Type                             | Job                                                                                                                                                                                                                        |
+|----------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `AuthenticatedHttpClientService` | The single choke-point for every API call. Attaches the bearer token, sends the request, **never throws**, and returns an `ApiResult`. On failure it reads the response body to recover every message the server reported. |
-| `ApiResult` / `ApiResult<T>` | The outcome of a call: `Success`, a user-ready `Errors` list, a `StatusCode`, and (for `ApiResult<T>`) a `Data` payload. |
-| `ApiResultExtensions` | Fluent helpers (`OnSuccess`, `OnFailure`, `OrDefault`) so components handle that outcome in one line. |
-| `MessageService` | Synchronous toast relay. `ShowMessage(text, isError, timeInMs)` raises a toast; `ToastHost` renders and auto-dismisses it. |
+| `ApiResult` / `ApiResult<T>`     | The outcome of a call: `Success`, a user-ready `Errors` list, a `StatusCode`, and (for `ApiResult<T>`) a `Data` payload.                                                                                                   |
+| `ApiResultExtensions`            | Fluent helpers (`OnSuccess`, `OnFailure`, `OrDefault`) so components handle that outcome in one line.                                                                                                                      |
+| `MessageService`                 | Synchronous toast relay. `ShowMessage(text, isError, timeInMs)` raises a toast; `ToastHost` renders and auto-dismisses it.                                                                                                 |
 
 Two things the helpers depend on:
 
-- **The error messages are already parsed for you** by the HTTP client. By the
-  time a component sees an `ApiResult`, `Errors` holds clean, user-ready strings.
-  Components never parse response bodies. See [error-handling.md](error-handling.md)
+- **The error messages are already parsed for you** by the HTTP client. By the time a component sees an `ApiResult`,
+  `Errors` holds clean, user-ready strings. Components never parse response bodies.
+  See [error-handling.md](error-handling.md)
   for how those messages are recovered from the server response.
 - **The `MessageService` is already attached.** `AuthenticatedHttpClientService`
   stamps it onto every result, so you never pass it to a helper.
@@ -42,21 +42,18 @@ Guarantees the helpers rely on:
 
 - On **failure**, `Errors` holds at least one message.
 - On **success** of an `ApiResult<T>`, `Data` is present.
-- `StatusCode` is always a real code. The `Ok`/`Fail` factories take it as a
-  required argument — there is no default — because failure messages are prefixed
-  with it, and a defaulted `0` would show up in the toast. Failures with no HTTP
-  response of their own (transport errors, client-side guards) pass the status
-  that best describes them: `500` for a request that never completed, `400` for a
-  malformed server payload, and so on.
+- `StatusCode` is always a real code. The `Ok`/`Fail` factories take it as a required argument — there is no default —
+  because failure messages are prefixed with it, and a defaulted `0` would show up in the toast. Failures with no HTTP
+  response of their own (transport errors, client-side guards) pass the status that best describes them: `500` for a
+  request that never completed, `400` for a malformed server payload, and so on.
 
-`Errors` is a list because the API reports *every* problem it found, not just the
-first. Most responses still carry exactly one.
+`Errors` is a list because the API reports *every* problem it found, not just the first. Most responses still carry
+exactly one.
 
 ## The helpers
 
-All of them live in `ApiResultExtensions`. They are extension methods on
-**`Task<ApiResult>`**, not on `ApiResult` — so you chain directly onto the service
-call and `await` the whole chain, rather than awaiting first:
+All of them live in `ApiResultExtensions`. They are extension methods on **`Task<ApiResult>`**, not on `ApiResult` — so
+you chain directly onto the service call and `await` the whole chain, rather than awaiting first:
 
 ```csharp
 await RecipeService.DeleteRecipe(id).OnSuccess(...).OnFailure();
@@ -87,12 +84,11 @@ The generic overload is constrained to `where T : class`.
 .OnFailure(errors => ...)       // ...and hands you the IReadOnlyList<string>
 ```
 
-**`OnFailure()` is what surfaces errors.** `OnSuccess` alone toasts nothing on
-failure, so a chain that omits `OnFailure()` fails silently. The only exception is
+**`OnFailure()` is what surfaces errors.** `OnSuccess` alone toasts nothing on failure, so a chain that omits
+`OnFailure()` fails silently. The only exception is
 `OrDefault`, which toasts on its own.
 
-One toast per message — usually one, but an endpoint may return several and none
-of them are dropped.
+One toast per message — usually one, but an endpoint may return several and none of them are dropped.
 
 ### `OrDefault` — payload or a fallback
 
@@ -105,8 +101,8 @@ Toasts the errors as a side effect, so it does **not** need a trailing
 
 ### Toast timing
 
-Fixed at `MessageService.DefaultDisplayTimeInMs` (12 000 ms). There is no
-per-call override; for anything else call `MessageService.ShowMessage(...)`
+Fixed at `MessageService.DefaultDisplayTimeInMs` (12 000 ms). There is no per-call override; for anything else call
+`MessageService.ShowMessage(...)`
 directly.
 
 ## Recipes (the common shapes)
@@ -136,8 +132,7 @@ await IngredientService.GetAllIngredientsAsync()
 
 ### 2. Mutate + toast both outcomes
 
-`OnSuccess` does the local state change and the success toast; `OnFailure` covers
-the error.
+`OnSuccess` does the local state change and the success toast; `OnFailure` covers the error.
 
 ```csharp
 // UserRoles.razor
@@ -171,8 +166,8 @@ await LoginService.RegisterAsync(registerModel)
 
 ## When *not* to use them
 
-- **Direct messages** that aren't the outcome of an `ApiResult` — validation
-  hints, exception messages in a `catch` — call `MessageService.ShowMessage(...)`
+- **Direct messages** that aren't the outcome of an `ApiResult` — validation hints, exception messages in a `catch` —
+  call `MessageService.ShowMessage(...)`
   directly:
 
   ```csharp
@@ -183,15 +178,14 @@ await LoginService.RegisterAsync(registerModel)
   }
   ```
 
-- **Branching that needs the payload before deciding what to toast** (e.g. login
-  distinguishing "request failed" from "no token in response") — a plain
+- **Branching that needs the payload before deciding what to toast** (e.g. login distinguishing "request failed" from
+  "no token in response") — a plain
   `if (result.Success)` is clearer than forcing it through a helper.
 
 ## Notes
 
-- Helpers are synchronous internally — `MessageService.ShowMessage` is
-  fire-and-forget, so there's nothing to `await` inside a chain. Await the chain
-  itself.
+- Helpers are synchronous internally — `MessageService.ShowMessage` is fire-and-forget, so there's nothing to `await`
+  inside a chain. Await the chain itself.
 - `OrDefault` returns `Data` on success (guaranteed non-null) or your fallback.
 
 ## Related

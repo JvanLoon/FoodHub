@@ -1,53 +1,48 @@
-
-using ErrorOr;
-
+﻿using ErrorOr;
 using FoodHub.DTOs;
 using FoodHub.Persistence.Entities;
-
 using MediatR;
-
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Features.ImportExport.Import.Commands.ImportJSON;
 
-public class ImportAllCommandHandler(FoodHubDbContext context, UserManager<IdentityUser> userManager, ILogger<ImportAllCommandHandler> logger) : IRequestHandler<ImportAllCommand, ErrorOr<bool>>
+public class ImportAllCommandHandler(
+	FoodHubDbContext context,
+	UserManager<IdentityUser> userManager,
+	ILogger<ImportAllCommandHandler> logger) : IRequestHandler<ImportAllCommand, ErrorOr<bool>>
 {
 	public async Task<ErrorOr<bool>> Handle(ImportAllCommand request, CancellationToken cancellationToken)
 	{
 		try
 		{
 			var data = request.Data;
-			if (data == null)
-			{
-				return Error.Failure(description: ErrorMessages.ImportExport.NoImportData);
-			}
+			if (data == null) { return Error.Failure(description: ErrorMessages.ImportExport.NoImportData); }
 
 			await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
 
 			// Import Ingredients (catalog)
 			foreach (var ingredientDto in data.Ingredients)
 			{
-				var existingById = await context.Ingredients.SingleOrDefaultAsync(i => i.Id == ingredientDto.Id, cancellationToken);
+				var existingById =
+					await context.Ingredients.SingleOrDefaultAsync(i => i.Id == ingredientDto.Id, cancellationToken);
 				if (existingById != null)
 				{
-					if (existingById.Name != ingredientDto.Name)
-					{
-						existingById.Name = ingredientDto.Name;
-					}
+					if (existingById.Name != ingredientDto.Name) { existingById.Name = ingredientDto.Name; }
+
 					if (existingById.ShouldBeAddedToShoppingCart != ingredientDto.ShouldBeAddedToShoppingCart)
 					{
 						existingById.ShouldBeAddedToShoppingCart = ingredientDto.ShouldBeAddedToShoppingCart;
 					}
+
 					continue;
 				}
 
-				var existingByName = await context.Ingredients.SingleOrDefaultAsync(i => i.Name == ingredientDto.Name, cancellationToken);
-				if (existingByName != null)
-				{
-					continue;
-				}
+				var existingByName =
+					await context.Ingredients.SingleOrDefaultAsync(i => i.Name == ingredientDto.Name,
+																   cancellationToken);
+				if (existingByName != null) { continue; }
 
 				context.Ingredients.Add(new Ingredient
 				{
@@ -63,10 +58,7 @@ public class ImportAllCommandHandler(FoodHubDbContext context, UserManager<Ident
 				var existing = await context.Recipes.SingleOrDefaultAsync(r => r.Id == recipeDto.Id, cancellationToken);
 				if (existing != null)
 				{
-					if (existing.Name != recipeDto.Name)
-					{
-						existing.Name = recipeDto.Name;
-					}
+					if (existing.Name != recipeDto.Name) { existing.Name = recipeDto.Name; }
 				}
 				else
 				{
@@ -81,7 +73,8 @@ public class ImportAllCommandHandler(FoodHubDbContext context, UserManager<Ident
 			// Import RecipeItems (ingredient lines snapshotted onto the recipe)
 			foreach (RecipeItemDto riDto in data.RecipeItems)
 			{
-				var existingRi = await context.RecipeItems.SingleOrDefaultAsync(ri => ri.Id == riDto.Id, cancellationToken);
+				var existingRi =
+					await context.RecipeItems.SingleOrDefaultAsync(ri => ri.Id == riDto.Id, cancellationToken);
 				if (existingRi != null)
 				{
 					existingRi.Name = riDto.Name;
@@ -121,11 +114,9 @@ public class ImportAllCommandHandler(FoodHubDbContext context, UserManager<Ident
 						await userManager.CreateAsync(user);
 						if (userDto.Roles != null)
 						{
-							foreach (var role in userDto.Roles)
-							{
-								await userManager.AddToRoleAsync(user, role);
-							}
+							foreach (var role in userDto.Roles) { await userManager.AddToRoleAsync(user, role); }
 						}
+
 						continue;
 					}
 
@@ -135,6 +126,7 @@ public class ImportAllCommandHandler(FoodHubDbContext context, UserManager<Ident
 						existing.EmailConfirmed = userDto.EmailConfirmed;
 						changed = true;
 					}
+
 					if (existing.LockoutEnabled != userDto.LockoutEnabled)
 					{
 						existing.LockoutEnabled = userDto.LockoutEnabled;
@@ -146,8 +138,10 @@ public class ImportAllCommandHandler(FoodHubDbContext context, UserManager<Ident
 					var importedRoles = userDto.Roles?.ToHashSet() ?? [];
 					var existingRolesSet = existingRoles.ToHashSet();
 
-					var rolesToAdd = importedRoles.Except(existingRolesSet).ToList();
-					var rolesToRemove = existingRolesSet.Except(importedRoles).ToList();
+					var rolesToAdd = importedRoles.Except(existingRolesSet)
+												  .ToList();
+					var rolesToRemove = existingRolesSet.Except(importedRoles)
+														.ToList();
 
 					if (rolesToAdd.Count > 0)
 						await userManager.AddToRolesAsync(existing, rolesToAdd);

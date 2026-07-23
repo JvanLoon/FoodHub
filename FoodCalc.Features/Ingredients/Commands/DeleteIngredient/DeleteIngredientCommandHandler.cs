@@ -1,13 +1,12 @@
 using ErrorOr;
-
 using MediatR;
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Features.Ingredients.Commands.DeleteIngredient;
 
-public class DeleteIngredientCommandHandler(FoodHubDbContext context, ILogger<DeleteIngredientCommandHandler> logger) : IRequestHandler<DeleteIngredientCommand, ErrorOr<bool>>
+public class DeleteIngredientCommandHandler(FoodHubDbContext context, ILogger<DeleteIngredientCommandHandler> logger)
+	: IRequestHandler<DeleteIngredientCommand, ErrorOr<bool>>
 {
 	public async Task<ErrorOr<bool>> Handle(DeleteIngredientCommand request, CancellationToken cancellationToken)
 	{

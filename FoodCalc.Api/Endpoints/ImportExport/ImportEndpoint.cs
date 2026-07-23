@@ -1,9 +1,6 @@
 using FastEndpoints;
-
 using FoodCalc.Features.ImportExport.Import.Commands.ImportJSON;
-
 using MediatR;
-
 using System.Text.Json;
 
 namespace FoodCalc.Api.Endpoints.ImportExport;
@@ -15,8 +12,7 @@ public class ImportRequest
 }
 
 /// <summary>POST api/importexport/import — Admin. Accepts a multipart JSON file.</summary>
-public class ImportEndpoint(IMediator mediator)
-	: Endpoint<ImportRequest>
+public class ImportEndpoint(IMediator mediator) : Endpoint<ImportRequest>
 {
 	public override void Configure()
 	{
@@ -51,8 +47,7 @@ public class ImportEndpoint(IMediator mediator)
 
 		var result = await mediator.Send(new ImportAllCommand(importData), ct);
 
-		await result.Match(
-			_ => Send.StringAsync("Import successful.", cancellation: ct),
-			errors => this.SendErrorsAsync(errors, ct: ct));
+		await result.Match(_ => Send.StringAsync("Import successful.", cancellation: ct),
+						   errors => this.SendErrorsAsync(errors, ct: ct));
 	}
 }

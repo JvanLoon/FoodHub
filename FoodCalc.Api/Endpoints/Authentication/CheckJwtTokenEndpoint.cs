@@ -1,7 +1,5 @@
 using FastEndpoints;
-
 using Microsoft.IdentityModel.Tokens;
-
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
@@ -14,8 +12,7 @@ public class CheckJwtTokenRequest
 }
 
 /// <summary>POST api/authentication/checkjwttoken?token= — anonymous. Returns a JSON bool.</summary>
-public class CheckJwtTokenEndpoint(IConfiguration configuration)
-	: Endpoint<CheckJwtTokenRequest, bool>
+public class CheckJwtTokenEndpoint(IConfiguration configuration) : Endpoint<CheckJwtTokenRequest, bool>
 {
 	public override void Configure()
 	{
@@ -49,9 +46,6 @@ public class CheckJwtTokenEndpoint(IConfiguration configuration)
 
 			await Send.OkAsync(true, ct);
 		}
-		catch
-		{
-			await Send.OkAsync(false, ct);
-		}
+		catch { await Send.OkAsync(false, ct); }
 	}
 }

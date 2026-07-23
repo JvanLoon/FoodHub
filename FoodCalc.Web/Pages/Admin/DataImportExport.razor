@@ -7,101 +7,92 @@
 <PageTitle>Data Import/Export</PageTitle>
 
 <div class="fh-stack">
-    <PageHeader Title="Data Import/Export" />
+	<PageHeader Title="Data Import/Export"/>
 
-    <div class="row g-4">
-        <div class="col-md-6">
-            <AppCard>
-                <Header>Export</Header>
-                <Body>
-                    <p class="fh-muted">Download all data as a .json file.</p>
-                    <AppButton Icon="download" OnClick="ExportData">Export</AppButton>
-                </Body>
-            </AppCard>
-        </div>
+	<div class="row g-4">
+		<div class="col-md-6">
+			<AppCard>
+				<Header>Export</Header>
+				<Body>
+				<p class="fh-muted">Download all data as a .json file.</p>
+				<AppButton Icon="download" OnClick="ExportData">Export</AppButton>
+				</Body>
+			</AppCard>
+		</div>
 
-        <div class="col-md-6">
-            <AppCard>
-                <Header>Import</Header>
-                <Body>
-                    <div class="fh-field">
-                        <label class="form-label" for="importFile">Import file (.json)</label>
-                        <InputFile id="importFile" class="form-control" OnChange="HandleFileSelected" accept=".json" />
-                    </div>
-                    <div class="fh-cluster">
-                        <AppButton Icon="upload" OnClick="ImportData">Import</AppButton>
-                        <AppButton Variant="ButtonVariant.OutlineSecondary" Icon="clock-history" OnClick="ImportOldData">Import (old format)</AppButton>
-                    </div>
-                    <p class="fh-muted">Use "old format" for exports created before the ingredient rework.</p>
-                </Body>
-            </AppCard>
-        </div>
-    </div>
+		<div class="col-md-6">
+			<AppCard>
+				<Header>Import</Header>
+				<Body>
+				<div class="fh-field">
+					<label class="form-label" for="importFile">Import file (.json)</label>
+					<InputFile id="importFile" class="form-control" OnChange="HandleFileSelected" accept=".json"/>
+				</div>
+				<div class="fh-cluster">
+					<AppButton Icon="upload" OnClick="ImportData">Import</AppButton>
+					<AppButton Variant="ButtonVariant.OutlineSecondary" Icon="clock-history" OnClick="ImportOldData">
+						Import (old format)
+					</AppButton>
+				</div>
+				<p class="fh-muted">Use "old format" for exports created before the ingredient rework.</p>
+				</Body>
+			</AppCard>
+		</div>
+	</div>
 </div>
 
 @code {
-    private const string ExportFormat = "json";
-    private IBrowserFile? _selectedFile;
+	private const string ExportFormat = "json";
+	private IBrowserFile? _selectedFile;
 
-    private void HandleFileSelected(InputFileChangeEventArgs e)
-    {
-        _selectedFile = e.File;
-    }
+	private void HandleFileSelected(InputFileChangeEventArgs e) { _selectedFile = e.File; }
 
-    private async Task ExportData()
-    {
-        try
-        {
-            messageService.ShowMessage(WebConstants.Messages.ImportExport.PreparingExport, false, 0);
-            await importExportService.ExportAsync(ExportFormat);
-        }
-        catch (Exception ex)
-        {
-            messageService.ShowMessage($"Export failed: {ex.Message}", true);
-        }
-    }
+	private async Task ExportData()
+	{
+		try
+		{
+			messageService.ShowMessage(WebConstants.Messages.ImportExport.PreparingExport, false, 0);
+			await importExportService.ExportAsync(ExportFormat);
+		}
+		catch (Exception ex) { messageService.ShowMessage($"Export failed: {ex.Message}", true); }
+	}
 
-    private Task ImportData() =>
-        RunImportAsync((bytes, name) => importExportService.ImportAsync(bytes, name));
+	private Task ImportData() => RunImportAsync((bytes, name) => importExportService.ImportAsync(bytes, name));
 
-    private Task ImportOldData() =>
-        RunImportAsync((bytes, name) => importExportService.ImportOldAsync(bytes, name));
+	private Task ImportOldData() => RunImportAsync((bytes, name) => importExportService.ImportOldAsync(bytes, name));
 
-    private async Task RunImportAsync(Func<byte[], string, Task<ApiResult>> import)
-    {
-        try
-        {
-            if (_selectedFile == null)
-            {
-                messageService.ShowMessage(WebConstants.Messages.ImportExport.SelectFileFirst, true);
-                return;
-            }
+	private async Task RunImportAsync(Func<byte[], string, Task<ApiResult>> import)
+	{
+		try
+		{
+			if (_selectedFile == null)
+			{
+				messageService.ShowMessage(WebConstants.Messages.ImportExport.SelectFileFirst, true);
+				return;
+			}
 
-            if (!_selectedFile.Name.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
-            {
-                messageService.ShowMessage(WebConstants.Messages.ImportExport.OnlyJsonAccepted, true);
-                return;
-            }
+			if (!_selectedFile.Name.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+			{
+				messageService.ShowMessage(WebConstants.Messages.ImportExport.OnlyJsonAccepted, true);
+				return;
+			}
 
-            using var stream = _selectedFile.OpenReadStream(maxAllowedSize: ImportExportSettings.DefaultMaxFileSizeInBytes);
-            using var ms = new MemoryStream();
-            await stream.CopyToAsync(ms);
-            var bytes = ms.ToArray();
+			using var stream = _selectedFile.OpenReadStream(maxAllowedSize: ImportExportSettings.DefaultMaxFileSizeInBytes);
+			using var ms = new MemoryStream();
+			await stream.CopyToAsync(ms);
+			var bytes = ms.ToArray();
 
-            if (bytes.Length == 0)
-            {
-                messageService.ShowMessage(WebConstants.Messages.ImportExport.CouldNotReadFile, true);
-                return;
-            }
+			if (bytes.Length == 0)
+			{
+				messageService.ShowMessage(WebConstants.Messages.ImportExport.CouldNotReadFile, true);
+				return;
+			}
 
-            var result = await import(bytes, _selectedFile.Name)
-            .OnSuccess(message: WebConstants.Messages.ImportExport.ImportSucceeded)
-            .OnFailure();
+			var result = await import(bytes, _selectedFile.Name)
+			                   .OnSuccess(message: WebConstants.Messages.ImportExport.ImportSucceeded)
+			                   .OnFailure();
+		}
+		catch (Exception ex) { messageService.ShowMessage($"Import failed: {ex.Message}", true); }
+	}
 
-        }
-        catch (Exception ex)
-        {
-            messageService.ShowMessage($"Import failed: {ex.Message}", true);
-        }
-    }
 }

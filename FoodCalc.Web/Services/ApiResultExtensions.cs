@@ -14,15 +14,19 @@ public static class ApiResultExtensions
 	// ==========================================
 
 	// ----- OnSuccess -----
-	public static async Task<ApiResult> OnSuccess(this Task<ApiResult> resultTask, Action? action = null,
-		string? message = null)
+	public static async Task<ApiResult> OnSuccess(this Task<ApiResult> resultTask,
+												  Action? action = null,
+												  string? message = null
+	)
 	{
 		var result = await resultTask;
 		return result.OnSuccess(action, message);
 	}
 
-	public static async Task<ApiResult<T>> OnSuccess<T>(this Task<ApiResult<T>> resultTask, Action<T>? action = null,
-		string? message = null) where T : class
+	public static async Task<ApiResult<T>> OnSuccess<T>(this Task<ApiResult<T>> resultTask,
+														Action<T>? action = null,
+														string? message = null
+	) where T : class
 	{
 		var result = await resultTask;
 		return result.OnSuccess(action, message);
@@ -36,7 +40,8 @@ public static class ApiResultExtensions
 	}
 
 	public static async Task<ApiResult<T>> OnFailure<T>(this Task<ApiResult<T>> resultTask,
-		Action<IReadOnlyList<string>>? action = null) where T : class
+														Action<IReadOnlyList<string>>? action = null
+	) where T : class
 	{
 		var result = await resultTask;
 		return result.OnFailure(action);
@@ -78,8 +83,10 @@ public static class ApiResultExtensions
 		return result;
 	}
 
-	private static ApiResult<T> OnFailure<T>(this ApiResult<T> result, Action<IReadOnlyList<string>>? action,
-		string? message = null) where T : class
+	private static ApiResult<T> OnFailure<T>(this ApiResult<T> result,
+											 Action<IReadOnlyList<string>>? action,
+											 string? message = null
+	) where T : class
 	{
 		NotifyFail(result, () => action?.Invoke(result.Errors));
 
@@ -120,8 +127,10 @@ public static class ApiResultExtensions
 	}
 
 	/// <inheritdoc cref="NotifySuccess(ApiResult, MessageService, string?, int, int)"/>
-	private static ApiResult<T> NotifySuccess<T>(this ApiResult<T> result, string? message = null,
-		Action? action = null) where T : class
+	private static ApiResult<T> NotifySuccess<T>(this ApiResult<T> result,
+												 string? message = null,
+												 Action? action = null
+	) where T : class
 	{
 		// Cast to the base type so the non-generic overload runs (avoids recursion).
 		((ApiResult) result).NotifySuccess(message, action);

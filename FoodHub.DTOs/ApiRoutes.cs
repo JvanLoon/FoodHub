@@ -41,6 +41,7 @@ public static class ApiRoutes
 
 		public static string GetById(Guid id) => GetByIdTemplate.Replace("{id}", id.ToString());
 		public static string DeleteRecipe(Guid id) => DeleteRecipeTemplate.Replace("{id}", id.ToString());
+
 		public static string DeleteIngredient(Guid recipeItemId) =>
 			DeleteIngredientTemplate.Replace("{id}", recipeItemId.ToString());
 	}

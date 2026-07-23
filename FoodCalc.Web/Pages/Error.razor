@@ -4,33 +4,32 @@
 <PageTitle>Error</PageTitle>
 
 <div class="error-page">
-    <i class="bi bi-emoji-dizzy" aria-hidden="true"></i>
-    <h1>Something went wrong.</h1>
-    <p>An error occurred while processing your request.</p>
+	<i class="bi bi-emoji-dizzy" aria-hidden="true"></i>
+	<h1>Something went wrong.</h1>
+	<p>An error occurred while processing your request.</p>
 
-    @if (ShowRequestId)
-    {
-        <p class="error-page__request">
-            <strong>Request ID:</strong> <code>@requestId</code>
-        </p>
-    }
+	@if (ShowRequestId)
+	{
+		<p class="error-page__request">
+			<strong>Request ID:</strong> <code>@requestId</code>
+		</p>
+	}
 
-    <p class="error-page__hint">
-        Swapping to the <strong>Development</strong> environment (set <code>ASPNETCORE_ENVIRONMENT=Development</code>
-        and restart the app) displays detailed error information. Don't enable it for deployed applications —
-        it can expose sensitive information from exceptions to end users.
-    </p>
+	<p class="error-page__hint">
+		Swapping to the <strong>Development</strong> environment (set <code>ASPNETCORE_ENVIRONMENT=Development</code>
+		and restart the app) displays detailed error information. Don't enable it for deployed applications —
+		it can expose sensitive information from exceptions to end users.
+	</p>
 </div>
 
 @code {
-    [CascadingParameter]
-    public HttpContext? HttpContext { get; set; }
 
-    private string? requestId;
-    private bool ShowRequestId => !string.IsNullOrEmpty(requestId);
+	[CascadingParameter]
+	public HttpContext? HttpContext { get; set; }
 
-    protected override void OnInitialized()
-    {
-        requestId = Activity.Current?.Id ?? HttpContext?.TraceIdentifier;
-    }
+	private string? requestId;
+	private bool ShowRequestId => !string.IsNullOrEmpty(requestId);
+
+	protected override void OnInitialized() { requestId = Activity.Current?.Id ?? HttpContext?.TraceIdentifier; }
+
 }

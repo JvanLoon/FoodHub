@@ -1,19 +1,15 @@
-using ErrorOr;
-
+﻿using ErrorOr;
 using FoodCalc.Features.Mapping;
 using FoodCalc.Features.Recipes.Queries.GetAllRecipes;
-
 using FoodHub.DTOs;
-
 using MediatR;
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-
 namespace FoodCalc.Features.Authentication.Users.Queries.GetUserByEmail;
 
-public class GetUserByEmailQueryHandler(FoodHubDbContext context, ILogger<GetAllRecipesQueryHandler> logger) : IRequestHandler<GetUserByEmailQuery, ErrorOr<UserDto>>
+public class GetUserByEmailQueryHandler(FoodHubDbContext context, ILogger<GetAllRecipesQueryHandler> logger)
+	: IRequestHandler<GetUserByEmailQuery, ErrorOr<UserDto>>
 {
 	public async Task<ErrorOr<UserDto>> Handle(GetUserByEmailQuery request, CancellationToken cancellationToken)
 	{

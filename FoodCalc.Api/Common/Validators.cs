@@ -1,7 +1,5 @@
 using FastEndpoints;
-
 using FluentValidation;
-
 using FoodCalc.Api.Endpoints.Admin;
 using FoodCalc.Api.Endpoints.Authentication;
 using FoodCalc.Api.Endpoints.ImportExport;
@@ -105,7 +103,8 @@ public class GetUserRolesRequestValidator : Validator<GetUserRolesRequest>
 {
 	public GetUserRolesRequestValidator()
 	{
-		RuleFor(x => x.Email).NotEmpty();
+		RuleFor(x => x.Email)
+			.NotEmpty();
 	}
 }
 
@@ -113,8 +112,10 @@ public class ModifyUserRoleRequestValidator : Validator<ModifyUserRoleRequest>
 {
 	public ModifyUserRoleRequestValidator()
 	{
-		RuleFor(x => x.Email).NotEmpty();
-		RuleFor(x => x.Role).NotEmpty();
+		RuleFor(x => x.Email)
+			.NotEmpty();
+		RuleFor(x => x.Role)
+			.NotEmpty();
 	}
 }
 
@@ -140,8 +141,12 @@ public class RegisterValidator : Validator<RegisterDto>
 {
 	public RegisterValidator()
 	{
-		RuleFor(x => x.Email).NotEmpty().EmailAddress();
-		RuleFor(x => x.Password).NotEmpty().Length(6, 100);
+		RuleFor(x => x.Email)
+			.NotEmpty()
+			.EmailAddress();
+		RuleFor(x => x.Password)
+			.NotEmpty()
+			.Length(6, 100);
 	}
 }
 
@@ -150,8 +155,12 @@ public class ResetPasswordValidator : Validator<ResetPasswordDto>
 {
 	public ResetPasswordValidator()
 	{
-		RuleFor(x => x.Email).NotEmpty().EmailAddress();
-		RuleFor(x => x.Password).NotEmpty().Length(6, 100);
+		RuleFor(x => x.Email)
+			.NotEmpty()
+			.EmailAddress();
+		RuleFor(x => x.Password)
+			.NotEmpty()
+			.Length(6, 100);
 	}
 }
 
@@ -160,8 +169,10 @@ public class LoginValidator : Validator<LoginDto>
 {
 	public LoginValidator()
 	{
-		RuleFor(x => x.Email).NotEmpty();
-		RuleFor(x => x.Password).NotEmpty();
+		RuleFor(x => x.Email)
+			.NotEmpty();
+		RuleFor(x => x.Password)
+			.NotEmpty();
 	}
 }
 
@@ -170,7 +181,8 @@ public class ToggleUserRequestValidator : Validator<ToggleUserRequest>
 {
 	public ToggleUserRequestValidator()
 	{
-		RuleFor(x => x.Email).NotEmpty();
+		RuleFor(x => x.Email)
+			.NotEmpty();
 	}
 }
 
@@ -183,6 +195,7 @@ public class ExportRequestValidator : Validator<ExportRequest>
 {
 	public ExportRequestValidator()
 	{
-		RuleFor(x => x.Format).NotEmpty();
+		RuleFor(x => x.Format)
+			.NotEmpty();
 	}
 }

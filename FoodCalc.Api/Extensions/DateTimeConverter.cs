@@ -7,7 +7,8 @@ public class DateTimeConverter : JsonConverter<DateTime>
 {
 	public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 	{
-		return DateTime.SpecifyKind(reader.GetDateTime(), DateTimeKind.Utc).ToLocalTime();
+		return DateTime.SpecifyKind(reader.GetDateTime(), DateTimeKind.Utc)
+					   .ToLocalTime();
 	}
 
 	public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)

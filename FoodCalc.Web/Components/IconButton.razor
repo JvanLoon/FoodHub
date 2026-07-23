@@ -8,37 +8,56 @@
         disabled="@Disabled"
         @onclick="HandleClick"
         @onclick:stopPropagation="StopPropagation">
-    <i class="bi bi-@Icon" aria-hidden="true"></i>
+	<i class="bi bi-@Icon" aria-hidden="true"></i>
 </button>
 
 @code {
-    [Parameter, EditorRequired] public string Icon { get; set; } = string.Empty;
-    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
-    [Parameter] public ButtonVariant Variant { get; set; } = ButtonVariant.Ghost;
-    [Parameter] public ButtonSize Size { get; set; } = ButtonSize.Medium;
-    [Parameter] public bool Disabled { get; set; }
-    [Parameter] public bool StopPropagation { get; set; }
-    [Parameter] public string? CssClass { get; set; }
-    [Parameter] public EventCallback OnClick { get; set; }
 
-    private string VariantClass => Variant switch
-    {
-        ButtonVariant.Primary => "fh-icon-btn--primary",
-        ButtonVariant.Danger or ButtonVariant.OutlineDanger => "fh-icon-btn--danger",
-        ButtonVariant.Success or ButtonVariant.OutlineSuccess => "fh-icon-btn--success",
-        _ => "fh-icon-btn--ghost"
-    };
+	[Parameter, EditorRequired]
+	public string Icon { get; set; } = string.Empty;
 
-    private string? SizeClass => Size switch
-    {
-        ButtonSize.Small => "fh-icon-btn--sm",
-        ButtonSize.Large => "fh-icon-btn--lg",
-        _ => null
-    };
+	[Parameter, EditorRequired]
+	public string Title { get; set; } = string.Empty;
 
-    private async Task HandleClick()
-    {
-        if (Disabled) return;
-        await OnClick.InvokeAsync();
-    }
+	[Parameter]
+	public ButtonVariant Variant { get; set; } = ButtonVariant.Ghost;
+
+	[Parameter]
+	public ButtonSize Size { get; set; } = ButtonSize.Medium;
+
+	[Parameter]
+	public bool Disabled { get; set; }
+
+	[Parameter]
+	public bool StopPropagation { get; set; }
+
+	[Parameter]
+	public string? CssClass { get; set; }
+
+	[Parameter]
+	public EventCallback OnClick { get; set; }
+
+	private string VariantClass =>
+		Variant switch
+		{
+			ButtonVariant.Primary => "fh-icon-btn--primary",
+			ButtonVariant.Danger or ButtonVariant.OutlineDanger => "fh-icon-btn--danger",
+			ButtonVariant.Success or ButtonVariant.OutlineSuccess => "fh-icon-btn--success",
+			_ => "fh-icon-btn--ghost"
+		};
+
+	private string? SizeClass =>
+		Size switch
+		{
+			ButtonSize.Small => "fh-icon-btn--sm",
+			ButtonSize.Large => "fh-icon-btn--lg",
+			_ => null
+		};
+
+	private async Task HandleClick()
+	{
+		if (Disabled) return;
+		await OnClick.InvokeAsync();
+	}
+
 }

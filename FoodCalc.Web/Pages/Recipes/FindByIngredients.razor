@@ -11,7 +11,7 @@
 
 <div class="find-layout">
 	<PageHeader Title="Find recipes"
-				Subtitle="Add the ingredients you have, then discover what you can cook." />
+	            Subtitle="Add the ingredients you have, then discover what you can cook."/>
 
 	<div class="find-content">
 		@* --- Left: ingredient list builder + settings --- *@
@@ -23,90 +23,90 @@
 					</span>
 				</Header>
 				<Body>
-					<div class="find-combo">
-						<div class="find-add">
-							<input type="text"
-								   class="form-control"
-								   placeholder="e.g. eggs, flour, tomato..."
-								   aria-label="Add an ingredient"
-								   autocomplete="off"
-								   role="combobox"
-								   aria-expanded="@showSuggestions"
-								   value="@newIngredient"
-								   @oninput="OnQueryInput"
-								   @onfocus="ShowSuggestions"
-								   @onblur="OnInputBlur"
-								   @onkeydown="OnInputKeyDown" />
-							<AppButton Variant="ButtonVariant.Primary"
-									   Icon="plus-lg"
-									   Title="Add ingredient"
-									   Disabled="@string.IsNullOrWhiteSpace(newIngredient)"
-									   OnClick="AddCurrent" />
-						</div>
-
-						@if (showSuggestions)
-						{
-							List<string> options = FilteredSuggestions;
-							if (options.Count > 0 || !string.IsNullOrWhiteSpace(newIngredient))
-							{
-								<ul class="find-combo__menu" role="listbox">
-									@for (int i = 0; i < options.Count; i++)
-									{
-										int index = i;
-										string name = options[i];
-										<li role="option"
-											aria-selected="@(index == activeIndex)"
-											class="find-combo__option @(index == activeIndex ? "is-active" : null)"
-											@onmousedown:preventDefault="true"
-											@onmousedown="() => SelectSuggestion(name)">
-											<i class="bi bi-plus-circle" aria-hidden="true"></i>
-											<span>@name</span>
-										</li>
-									}
-									@if (options.Count == 0 && !string.IsNullOrWhiteSpace(newIngredient))
-									{
-										<li class="find-combo__option find-combo__option--new"
-											@onmousedown:preventDefault="true"
-											@onmousedown="AddCurrent">
-											<i class="bi bi-plus-lg" aria-hidden="true"></i>
-											<span>Add &ldquo;@newIngredient.Trim()&rdquo;</span>
-										</li>
-									}
-								</ul>
-							}
-						}
+				<div class="find-combo">
+					<div class="find-add">
+						<input type="text"
+						       class="form-control"
+						       placeholder="e.g. eggs, flour, tomato..."
+						       aria-label="Add an ingredient"
+						       autocomplete="off"
+						       role="combobox"
+						       aria-expanded="@showSuggestions"
+						       value="@newIngredient"
+						       @oninput="OnQueryInput"
+						       @onfocus="ShowSuggestions"
+						       @onblur="OnInputBlur"
+						       @onkeydown="OnInputKeyDown"/>
+						<AppButton Variant="ButtonVariant.Primary"
+						           Icon="plus-lg"
+						           Title="Add ingredient"
+						           Disabled="@string.IsNullOrWhiteSpace(newIngredient)"
+						           OnClick="AddCurrent"/>
 					</div>
 
-					@if (prefs.Ingredients.Count == 0)
+					@if (showSuggestions)
 					{
-						<p class="find-hint fh-muted">
-							Nothing added yet. Type an ingredient above and press Enter.
-						</p>
+						List<string> options = FilteredSuggestions;
+						if (options.Count > 0 || !string.IsNullOrWhiteSpace(newIngredient))
+						{
+							<ul class="find-combo__menu" role="listbox">
+								@for (int i = 0; i < options.Count; i++)
+								{
+									int index = i;
+									string name = options[i];
+									<li role="option"
+									    aria-selected="@(index == activeIndex)"
+									    class="find-combo__option @(index == activeIndex ? "is-active" : null)"
+									    @onmousedown:preventDefault="true"
+									    @onmousedown="() => SelectSuggestion(name)">
+										<i class="bi bi-plus-circle" aria-hidden="true"></i>
+										<span>@name</span>
+									</li>
+								}
+								@if (options.Count == 0 && !string.IsNullOrWhiteSpace(newIngredient))
+								{
+									<li class="find-combo__option find-combo__option--new"
+									    @onmousedown:preventDefault="true"
+									    @onmousedown="AddCurrent">
+										<i class="bi bi-plus-lg" aria-hidden="true"></i>
+										<span>Add &ldquo;@newIngredient.Trim()&rdquo;</span>
+									</li>
+								}
+							</ul>
+						}
 					}
-					else
-					{
-						<div class="find-chips">
-							@foreach (string ingredient in prefs.Ingredients)
-							{
-								<span class="find-chip">
+				</div>
+
+				@if (prefs.Ingredients.Count == 0)
+				{
+					<p class="find-hint fh-muted">
+						Nothing added yet. Type an ingredient above and press Enter.
+					</p>
+				}
+				else
+				{
+					<div class="find-chips">
+						@foreach (string ingredient in prefs.Ingredients)
+						{
+							<span class="find-chip">
 									<span class="find-chip__label" title="@ingredient">@ingredient</span>
 									<button type="button"
-											class="find-chip__remove"
-											aria-label="@($"Remove {ingredient}")"
-											@onclick="() => RemoveIngredient(ingredient)">
+									        class="find-chip__remove"
+									        aria-label="@($"Remove {ingredient}")"
+									        @onclick="() => RemoveIngredient(ingredient)">
 										<i class="bi bi-x" aria-hidden="true"></i>
 									</button>
 								</span>
-							}
-						</div>
-						<AppButton Variant="ButtonVariant.Link"
-								   Size="ButtonSize.Small"
-								   Icon="trash"
-								   CssClass="find-clear"
-								   OnClick="ClearIngredients">
-							Clear all
-						</AppButton>
-					}
+						}
+					</div>
+					<AppButton Variant="ButtonVariant.Link"
+					           Size="ButtonSize.Small"
+					           Icon="trash"
+					           CssClass="find-clear"
+					           OnClick="ClearIngredients">
+						Clear all
+					</AppButton>
+				}
 				</Body>
 			</AppCard>
 
@@ -117,32 +117,32 @@
 					</span>
 				</Header>
 				<Body>
-					<EditForm Model="prefs" FormName="find-options">
-						<SelectField TValue="MatchMode"
-									 Label="Match"
-									 @bind-Value="prefs.Mode"
-									 @bind-Value:after="PersistAndRecompute">
-							<option value="@nameof(MatchMode.Any)">Contains any of my ingredients</option>
-							<option value="@nameof(MatchMode.All)">Must contain all my ingredients</option>
-						</SelectField>
+				<EditForm Model="prefs" FormName="find-options">
+					<SelectField TValue="MatchMode"
+					             Label="Match"
+					             @bind-Value="prefs.Mode"
+					             @bind-Value:after="PersistAndRecompute">
+						<option value="@nameof(MatchMode.Any)">Contains any of my ingredients</option>
+						<option value="@nameof(MatchMode.All)">Must contain all my ingredients</option>
+					</SelectField>
 
-						<SelectField TValue="SortMode"
-									 Label="Sort by"
-									 @bind-Value="prefs.Sort"
-									 @bind-Value:after="PersistAndRecompute">
-							<option value="@nameof(SortMode.MostMatches)">Most of my ingredients</option>
-							<option value="@nameof(SortMode.FewestMissing)">Fewest missing ingredients</option>
-							<option value="@nameof(SortMode.Name)">Name (A–Z)</option>
-						</SelectField>
+					<SelectField TValue="SortMode"
+					             Label="Sort by"
+					             @bind-Value="prefs.Sort"
+					             @bind-Value:after="PersistAndRecompute">
+						<option value="@nameof(SortMode.MostMatches)">Most of my ingredients</option>
+						<option value="@nameof(SortMode.FewestMissing)">Fewest missing ingredients</option>
+						<option value="@nameof(SortMode.Name)">Name (A–Z)</option>
+					</SelectField>
 
-						<label class="find-check">
-							<input type="checkbox"
-								   class="form-check-input"
-								   checked="@prefs.Highlight"
-								   @onchange="OnHighlightChanged" />
-							<span>Highlight my ingredients in each recipe</span>
-						</label>
-					</EditForm>
+					<label class="find-check">
+						<input type="checkbox"
+						       class="form-check-input"
+						       checked="@prefs.Highlight"
+						       @onchange="OnHighlightChanged"/>
+						<span>Highlight my ingredients in each recipe</span>
+					</label>
+				</EditForm>
 				</Body>
 			</AppCard>
 		</aside>
@@ -151,19 +151,19 @@
 		<section class="find-results">
 			@if (allRecipes == null)
 			{
-				<LoadingSpinner Label="Loading recipes..." />
+				<LoadingSpinner Label="Loading recipes..."/>
 			}
 			else if (prefs.Ingredients.Count == 0)
 			{
 				<EmptyState Icon="basket"
-							Title="Add some ingredients"
-							Message="Build your ingredient list on the left to see matching recipes." />
+				            Title="Add some ingredients"
+				            Message="Build your ingredient list on the left to see matching recipes."/>
 			}
 			else if (results.Count == 0)
 			{
 				<EmptyState Icon="search"
-							Title="No matching recipes"
-							Message="@NoResultsMessage" />
+				            Title="No matching recipes"
+				            Message="@NoResultsMessage"/>
 			}
 			else
 			{
@@ -178,8 +178,9 @@
 								<h5 class="card-title" title="@match.Recipe.Name">@match.Recipe.Name</h5>
 							</div>
 							<div class="badge-container">
-								<Badge Variant="@(match.IsFullMatch ? Badge.BadgeVariant.Success : Badge.BadgeVariant.Accent)"
-									   Icon="check2-circle">
+								<Badge
+									Variant="@(match.IsFullMatch ? Badge.BadgeVariant.Success : Badge.BadgeVariant.Accent)"
+									Icon="check2-circle">
 									@match.MatchedCount / @prefs.Ingredients.Count
 								</Badge>
 							</div>
@@ -189,10 +190,7 @@
 									{
 										bool hit = prefs.Highlight && match.MatchedNames.Contains(ingredient.Name);
 										<li class="@(hit ? "find-ingredients__hit" : null)">
-											@if (hit)
-											{
-												<i class="bi bi-check-lg" aria-hidden="true"></i>
-											}
+											@if (hit) { <i class="bi bi-check-lg" aria-hidden="true"></i> }
 											<span>@ingredient.Name</span>
 											<span class="fh-muted find-ingredients__amount">
 												@ingredient.Amount.ToFormattedString() @ingredient.IngredientAmount.ToString()
@@ -215,9 +213,9 @@
 									</span>
 								}
 								<AppButton Variant="ButtonVariant.OutlineSecondary"
-										   Size="ButtonSize.Small"
-										   Icon="box-arrow-up-right"
-										   OnClick="() => OpenRecipe(match.Recipe.Id)">
+								           Size="ButtonSize.Small"
+								           Icon="box-arrow-up-right"
+								           OnClick="() => OpenRecipe(match.Recipe.Id)">
 									Open
 								</AppButton>
 							</div>
@@ -243,12 +241,18 @@
 	{
 		prefs = await LocalStorage.GetItemAsync<Preferences>(WebConstants.Storage.PantryPreferences) ?? new Preferences();
 
-		allRecipes = await recipeService.GetAllRecipesAsync(withIngredients: true).OrDefault(new List<RecipeDto>());
+		allRecipes = await recipeService.GetAllRecipesAsync(withIngredients: true)
+		                                .OrDefault(new List<RecipeDto>());
 
 		// Known ingredient names power the type-ahead suggestions; failure here is non-fatal.
 		var ingredients = await ingredientService.GetAllIngredientsAsync();
 		if (ingredients.Success && ingredients.Data is not null)
-			knownIngredientNames = [.. ingredients.Data.Select(i => i.Name).Where(n => !string.IsNullOrWhiteSpace(n)).Distinct()];
+			knownIngredientNames =
+			[
+				..ingredients.Data.Select(i => i.Name)
+				             .Where(n => !string.IsNullOrWhiteSpace(n))
+				             .Distinct()
+			];
 
 		Recompute();
 	}
@@ -262,17 +266,14 @@
 		get
 		{
 			string query = newIngredient.Trim();
-			return knownIngredientNames
-				.Where(n => !prefs.Ingredients.Contains(n, StringComparer.OrdinalIgnoreCase))
-				.Where(n => query.Length == 0 || n.Contains(query, StringComparison.OrdinalIgnoreCase))
-				.OrderBy(n => n)
-				.ToList();
+			return knownIngredientNames.Where(n => !prefs.Ingredients.Contains(n, StringComparer.OrdinalIgnoreCase))
+			                           .Where(n => query.Length == 0 || n.Contains(query, StringComparison.OrdinalIgnoreCase))
+			                           .OrderBy(n => n)
+			                           .ToList();
 		}
 	}
 
-	private string NoResultsMessage => prefs.Mode == MatchMode.All
-		? "No recipe contains all of those ingredients. Try switching Match to \"any\"."
-		: "None of your ingredients appear in a recipe yet.";
+	private string NoResultsMessage => prefs.Mode == MatchMode.All ? "No recipe contains all of those ingredients. Try switching Match to \"any\"." : "None of your ingredients appear in a recipe yet.";
 
 	private void ShowSuggestions() => showSuggestions = true;
 
@@ -301,21 +302,21 @@
 				showSuggestions = true;
 				if (options.Count > 0)
 					activeIndex = (activeIndex + 1) % options.Count;
-				break;
+			break;
 			case "ArrowUp":
 				if (options.Count > 0)
 					activeIndex = activeIndex <= 0 ? options.Count - 1 : activeIndex - 1;
-				break;
+			break;
 			case "Enter":
 				if (activeIndex >= 0 && activeIndex < options.Count)
 					await SelectSuggestion(options[activeIndex]);
 				else
 					await AddCurrent();
-				break;
+			break;
 			case "Escape":
 				showSuggestions = false;
 				activeIndex = -1;
-				break;
+			break;
 		}
 	}
 
@@ -359,10 +360,7 @@
 		// Highlight only affects rendering, no re-match needed.
 	}
 
-	private void OpenRecipe(Guid recipeId)
-	{
-		NavigationManager.NavigateTo($"/recipes/edit/{recipeId}");
-	}
+	private void OpenRecipe(Guid recipeId) { NavigationManager.NavigateTo($"/recipes/edit/{recipeId}"); }
 
 	private async Task PersistAndRecompute()
 	{
@@ -380,7 +378,11 @@
 		if (allRecipes is null)
 			return;
 
-		string[] terms = [.. prefs.Ingredients.Select(i => i.Trim()).Where(t => t.Length > 0)];
+		string[] terms =
+		[
+			..prefs.Ingredients.Select(i => i.Trim())
+			       .Where(t => t.Length > 0)
+		];
 		var matches = new List<RecipeMatch>();
 
 		foreach (RecipeDto recipe in allRecipes)
@@ -409,26 +411,22 @@
 			matches.Add(new RecipeMatch(recipe, matchedTerms, matchedNames, missing));
 		}
 
-		IEnumerable<RecipeMatch> filtered = prefs.Mode == MatchMode.All
-			? matches.Where(m => m.MatchedCount == terms.Length && terms.Length > 0)
-			: matches.Where(m => m.MatchedCount > 0);
+		IEnumerable<RecipeMatch> filtered = prefs.Mode == MatchMode.All ? matches.Where(m => m.MatchedCount == terms.Length && terms.Length > 0) : matches.Where(m => m.MatchedCount > 0);
 
-		results = [.. Sort(filtered)];
+		results = [..Sort(filtered)];
 	}
 
-	private IEnumerable<RecipeMatch> Sort(IEnumerable<RecipeMatch> source) => prefs.Sort switch
-	{
-		SortMode.FewestMissing => source
-			.OrderBy(m => m.MissingCount)
-			.ThenByDescending(m => m.MatchedCount)
-			.ThenBy(m => m.Recipe.Name),
-		SortMode.Name => source
-			.OrderBy(m => m.Recipe.Name),
-		_ => source
-			.OrderByDescending(m => m.MatchedCount)
-			.ThenBy(m => m.MissingCount)
-			.ThenBy(m => m.Recipe.Name),
-	};
+	private IEnumerable<RecipeMatch> Sort(IEnumerable<RecipeMatch> source) =>
+		prefs.Sort switch
+		{
+			SortMode.FewestMissing => source.OrderBy(m => m.MissingCount)
+			                                .ThenByDescending(m => m.MatchedCount)
+			                                .ThenBy(m => m.Recipe.Name),
+			SortMode.Name => source.OrderBy(m => m.Recipe.Name),
+			_ => source.OrderByDescending(m => m.MatchedCount)
+			           .ThenBy(m => m.MissingCount)
+			           .ThenBy(m => m.Recipe.Name),
+		};
 
 	public enum MatchMode
 	{
@@ -455,4 +453,5 @@
 	{
 		public bool IsFullMatch => MatchedCount > 0 && MissingCount == 0;
 	}
+
 }

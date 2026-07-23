@@ -1,8 +1,6 @@
 ﻿using FoodHub.Persistence.Entities;
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-
 
 namespace FoodHub.Persistence.Configuration;
 
@@ -10,13 +8,17 @@ public class RecipeBlackListConfiguration : IEntityTypeConfiguration<RecipeBlack
 {
 	public void Configure(EntityTypeBuilder<RecipeBlackList> builder)
 	{
-		builder.HasKey(x => new { x.UserId, x.RecipeId });
+		builder.HasKey(x => new
+		{
+			x.UserId,
+			x.RecipeId
+		});
 
 		builder.Property(x => x.UserId)
-			.IsRequired();
+			   .IsRequired();
 
 		builder.Property(x => x.RecipeId)
-			.IsRequired();
+			   .IsRequired();
 
 		// Optionally, configure relationships if you have User or Recipe entities
 		//builder.HasOne<AspUsers>().WithMany().HasForeignKey(x => x.UserId);

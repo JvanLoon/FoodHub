@@ -1,8 +1,6 @@
 using FastEndpoints;
-
 using FoodCalc.Features.Authentication.Roles.Queries.GetAllRoles;
 using FoodCalc.Features.Authentication.Users.Queries.GetAllUsers;
-
 using MediatR;
 
 namespace FoodCalc.Api.Endpoints.Users;
@@ -20,8 +18,7 @@ public class GetUsersRequest : IPagedSearchRequest
 }
 
 /// <summary>GET api/user/users — Admin, Moderator or User.</summary>
-public class GetUsersEndpoint(IMediator mediator)
-	: Endpoint<GetUsersRequest, PagedResultDto<UserDto>>
+public class GetUsersEndpoint(IMediator mediator) : Endpoint<GetUsersRequest, PagedResultDto<UserDto>>
 {
 	public override void Configure()
 	{
@@ -33,9 +30,7 @@ public class GetUsersEndpoint(IMediator mediator)
 	{
 		var result = await mediator.Send(new GetAllUsersQuery(req.Page, req.PageSize, req.Search), ct);
 
-		await result.Match(
-			value => Send.OkAsync(value, ct),
-			errors => this.SendErrorsAsync(errors, ct: ct));
+		await result.Match(value => Send.OkAsync(value, ct), errors => this.SendErrorsAsync(errors, ct: ct));
 	}
 }
 
@@ -43,8 +38,7 @@ public class GetUsersEndpoint(IMediator mediator)
 /// GET api/user/allroles — Admin, Moderator or User.
 /// Returns a paged list of role names (see the Admin variant).
 /// </summary>
-public class GetAllRolesEndpoint(IMediator mediator)
-	: Endpoint<GetRolesRequest, PagedResultDto<string>>
+public class GetAllRolesEndpoint(IMediator mediator) : Endpoint<GetRolesRequest, PagedResultDto<string>>
 {
 	public override void Configure()
 	{
@@ -56,8 +50,6 @@ public class GetAllRolesEndpoint(IMediator mediator)
 	{
 		var result = await mediator.Send(new GetAllRolesQuery(req.Page, req.PageSize, req.Search), ct);
 
-		await result.Match(
-			value => Send.OkAsync(value, ct),
-			errors => this.SendErrorsAsync(errors, ct: ct));
+		await result.Match(value => Send.OkAsync(value, ct), errors => this.SendErrorsAsync(errors, ct: ct));
 	}
 }

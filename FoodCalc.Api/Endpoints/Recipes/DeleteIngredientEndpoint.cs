@@ -1,14 +1,11 @@
 using FastEndpoints;
-
 using FoodCalc.Features.Ingredients.Commands.DeleteIngredientFromRecipe;
-
 using MediatR;
 
 namespace FoodCalc.Api.Endpoints.Recipes;
 
 /// <summary>DELETE api/recipe/deleteingredient/{id} — Admin only.</summary>
-public class DeleteIngredientEndpoint(IMediator mediator)
-	: Endpoint<RecipeItemByIdRequest, bool>
+public class DeleteIngredientEndpoint(IMediator mediator) : Endpoint<RecipeItemByIdRequest, bool>
 {
 	public override void Configure()
 	{
@@ -20,8 +17,6 @@ public class DeleteIngredientEndpoint(IMediator mediator)
 	{
 		var result = await mediator.Send(new DeleteIngredientFromRecipeCommand(req.Id), ct);
 
-		await result.Match(
-			value => Send.OkAsync(value, ct),
-			errors => this.SendErrorsAsync(errors, ct: ct));
+		await result.Match(value => Send.OkAsync(value, ct), errors => this.SendErrorsAsync(errors, ct: ct));
 	}
 }

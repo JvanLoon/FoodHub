@@ -1,8 +1,6 @@
 using FastEndpoints;
 using FastEndpoints.Swagger;
-
 using FoodCalc.Api.Extensions;
-
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -38,38 +36,34 @@ public class Program
 		});
 
 		// Add services to the container.
-		builder.Services.AddDbContext<FoodHubDbContext>(options =>
-			options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+		builder.Services.AddDbContext<FoodHubDbContext>(options => options.UseSqlServer(
+															builder.Configuration.GetConnectionString(
+																"DefaultConnection")));
 
 		// Add Identity
 		builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
-		{
-			options.SignIn.RequireConfirmedAccount = false;
-			options.User.RequireUniqueEmail = true;
+			   {
+				   options.SignIn.RequireConfirmedAccount = false;
+				   options.User.RequireUniqueEmail = true;
 
-			options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
-			options.Lockout.MaxFailedAccessAttempts = 5;
-			options.Lockout.AllowedForNewUsers = true;
-		})
-		.AddEntityFrameworkStores<FoodHubDbContext>()
-		.AddDefaultTokenProviders();
+				   options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
+				   options.Lockout.MaxFailedAccessAttempts = 5;
+				   options.Lockout.AllowedForNewUsers = true;
+			   })
+			   .AddEntityFrameworkStores<FoodHubDbContext>()
+			   .AddDefaultTokenProviders();
 
 		builder.Services.AddAuthorization(options =>
 		{
-			options.AddPolicy("Admin,Moderator,User", policy =>
-				policy.RequireRole("Admin", "Moderator", "User"));
+			options.AddPolicy("Admin,Moderator,User", policy => policy.RequireRole("Admin", "Moderator", "User"));
 
-			options.AddPolicy("Admin,Moderator", policy =>
-				policy.RequireRole("Admin", "Moderator"));
+			options.AddPolicy("Admin,Moderator", policy => policy.RequireRole("Admin", "Moderator"));
 
-			options.AddPolicy("Admin", policy =>
-				policy.RequireRole("Admin"));
+			options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
 
-			options.AddPolicy("Moderator", policy =>
-				policy.RequireRole("Moderator"));
+			options.AddPolicy("Moderator", policy => policy.RequireRole("Moderator"));
 
-			options.AddPolicy("User", policy =>
-				policy.RequireRole("User"));
+			options.AddPolicy("User", policy => policy.RequireRole("User"));
 		});
 
 		// Configure JWT authentication
@@ -80,26 +74,28 @@ public class Program
 			throw new InvalidOperationException("JWT key is not configured.");
 
 		builder.Services.AddAuthentication(options =>
-		{
-			options.DefaultAuthenticateScheme = "JwtBearer";
-			options.DefaultChallengeScheme = "JwtBearer";
-		})
-		.AddJwtBearer("JwtBearer", options =>
-		{
-			options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-			{
-				ValidateIssuer = true,
-				ValidateAudience = false,
-				ValidAudience = jwtSettings["Audience"],
-				ValidateLifetime = true,
-				ValidateIssuerSigningKey = true,
-				ValidIssuer = jwtSettings["Issuer"],
-				IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(key)),
-				ClockSkew = TimeSpan.Zero
-			};
+			   {
+				   options.DefaultAuthenticateScheme = "JwtBearer";
+				   options.DefaultChallengeScheme = "JwtBearer";
+			   })
+			   .AddJwtBearer("JwtBearer", options =>
+			   {
+				   options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+				   {
+					   ValidateIssuer = true,
+					   ValidateAudience = false,
+					   ValidAudience = jwtSettings["Audience"],
+					   ValidateLifetime = true,
+					   ValidateIssuerSigningKey = true,
+					   ValidIssuer = jwtSettings["Issuer"],
+					   IssuerSigningKey =
+						   new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
+							   System.Text.Encoding.UTF8.GetBytes(key)),
+					   ClockSkew = TimeSpan.Zero
+				   };
 
-			options.SaveToken = true;
-		});
+				   options.SaveToken = true;
+			   });
 
 		// Use the custom service registration method
 		builder.Services.AddApplicationMediatR();
@@ -107,12 +103,10 @@ public class Program
 		// CORS config
 		builder.Services.AddCors(options =>
 		{
-			options.AddPolicy("AllowWebApp",
-				builder => builder
-					.WithOrigins(webBaseAddress)
-					.AllowAnyHeader()
-					.AllowAnyMethod()
-					.AllowCredentials());
+			options.AddPolicy("AllowWebApp", builder => builder.WithOrigins(webBaseAddress)
+															   .AllowAnyHeader()
+															   .AllowAnyMethod()
+															   .AllowCredentials());
 		});
 
 		var app = builder.Build();
@@ -128,10 +122,7 @@ public class Program
 		app.UseExceptionHandler();
 
 		// Configure the HTTP request pipeline.
-		if (app.Environment.IsDevelopment())
-		{
-			app.UseDeveloperExceptionPage();
-		}
+		if (app.Environment.IsDevelopment()) { app.UseDeveloperExceptionPage(); }
 
 		app.UseHttpsRedirection();
 		//app.UseStaticFiles();

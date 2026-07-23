@@ -4,12 +4,10 @@
 	{
 		public static string NormalizeToUpper(this string value)
 		{
-			if (string.IsNullOrEmpty(value) || value == null)
-			{
-				return string.Empty;
-			}
+			if (string.IsNullOrEmpty(value) || value == null) { return string.Empty; }
 
-			return value.Trim().ToUpperInvariant();
+			return value.Trim()
+						.ToUpperInvariant();
 		}
 	}
 }

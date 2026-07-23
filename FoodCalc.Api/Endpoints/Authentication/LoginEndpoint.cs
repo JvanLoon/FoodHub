@@ -1,8 +1,6 @@
 using FastEndpoints;
-
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
-
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -13,8 +11,7 @@ namespace FoodCalc.Api.Endpoints.Authentication;
 public class LoginEndpoint(
 	IConfiguration configuration,
 	UserManager<IdentityUser> userManager,
-	SignInManager<IdentityUser> signInManager)
-	: Endpoint<LoginDto, AuthResponseDto>
+	SignInManager<IdentityUser> signInManager) : Endpoint<LoginDto, AuthResponseDto>
 {
 	public override void Configure()
 	{
@@ -39,10 +36,7 @@ public class LoginEndpoint(
 
 		if (user.LockoutEnabled)
 		{
-			if (user.LockoutEnd < DateTime.Now)
-			{
-				await userManager.SetLockoutEnabledAsync(user, false);
-			}
+			if (user.LockoutEnd < DateTime.Now) { await userManager.SetLockoutEnabledAsync(user, false); }
 			else
 			{
 				await Send.StringAsync("User Lockedout", 401, cancellation: ct);
@@ -60,24 +54,16 @@ public class LoginEndpoint(
 
 		List<Claim> claims =
 		[
-			new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-			new Claim(JwtRegisteredClaimNames.Email, user.Email!),
+			new Claim(JwtRegisteredClaimNames.Sub, user.Id), new Claim(JwtRegisteredClaimNames.Email, user.Email!),
 		];
 
 		var roles = await userManager.GetRolesAsync(user);
-		foreach (var role in roles)
-		{
-			claims.Add(new Claim(ClaimTypes.Role, role));
-		}
+		foreach (var role in roles) { claims.Add(new Claim(ClaimTypes.Role, role)); }
 
 		var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!));
 		var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-		var token = new JwtSecurityToken(
-			issuer: configuration["Jwt:Issuer"],
-			claims: claims,
-			expires: DateTime.UtcNow.AddHours(12),
-			signingCredentials: creds
-		);
+		var token = new JwtSecurityToken(issuer: configuration["Jwt:Issuer"], claims: claims,
+										 expires: DateTime.UtcNow.AddHours(12), signingCredentials: creds);
 
 		var response = new AuthResponseDto
 		{

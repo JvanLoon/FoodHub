@@ -7,12 +7,12 @@
     padding: var(--fh-space-5);
     background: var(--fh-bg);
     background-image: radial-gradient(circle at 15% 20%, var(--fh-green-100) 0%, transparent 45%),
-        radial-gradient(circle at 85% 80%, var(--fh-accent-subtle) 0%, transparent 45%);
+    radial-gradient(circle at 85% 80%, var(--fh-accent-subtle) 0%, transparent 45%);
 }
 
 [data-bs-theme="dark"] .login-layout {
     background-image: radial-gradient(circle at 15% 20%, rgba(45, 122, 62, 0.2) 0%, transparent 45%),
-        radial-gradient(circle at 85% 80%, rgba(232, 118, 45, 0.12) 0%, transparent 45%);
+    radial-gradient(circle at 85% 80%, rgba(232, 118, 45, 0.12) 0%, transparent 45%);
 }
 
 .login-layout__theme {
