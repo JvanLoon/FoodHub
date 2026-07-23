@@ -1,0 +1,36 @@
+@page "/register"
+@layout Layout.LoginLayout
+@inject LoginService LoginService
+
+@inject NavigationManager Navigation
+
+<PageTitle>Register</PageTitle>
+
+<div class="auth-card">
+    <div class="auth-card__brand">
+        <i class="bi bi-basket2-fill" aria-hidden="true"></i>
+        <span>FoodHub</span>
+    </div>
+    <h3 class="auth-card__title">Create your account</h3>
+    <EditForm Model="registerModel" OnValidSubmit="HandleRegister" FormName="register-form">
+        <DataAnnotationsValidator />
+        <ValidationSummary class="mb-3" />
+        <TextField Label="Email" Placeholder="Enter your email" Autocomplete="username" @bind-Value="registerModel.Email" />
+        <TextField Label="Password" Type="password" Placeholder="Enter your password" Autocomplete="new-password" @bind-Value="registerModel.Password" />
+        <AppButton Type="submit" Variant="ButtonVariant.Success" Icon="person-plus" CssClass="w-100">Register</AppButton>
+    </EditForm>
+    <div class="auth-card__alt">
+        <a href="/login">Already have an account? Login</a>
+    </div>
+</div>
+
+@code {
+    private RegisterDto registerModel { get; set; } = new();
+
+    private async Task HandleRegister()
+    {
+        await LoginService.RegisterAsync(registerModel)
+        .OnSuccess(() => Navigation.NavigateTo("/login"), WebConstants.Messages.Auth.RegisterSuccess)
+        .OnFailure();
+    }
+}

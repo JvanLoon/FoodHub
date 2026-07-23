@@ -1,0 +1,37 @@
+@page "/recipes/create"
+@using FoodCalc.Web.Constants
+@using FoodCalc.Web.Services
+@using FoodHub.DTOs
+@inject RecipeService RecipeService
+@inject MessageService MessageService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create Recipe</PageTitle>
+
+<div class="fh-stack">
+    <PageHeader Title="Create a New Recipe" />
+
+    <div class="create-card">
+        <AppCard>
+            <EditForm Model="recipe" OnValidSubmit="CreateRecipeAsync" FormName="create-recipe-form">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <TextField Label="Recipe Name" Placeholder="e.g. Spaghetti Bolognese" @bind-Value="recipe.Name" />
+
+                <AppButton Type="submit" Icon="plus-lg">Create</AppButton>
+            </EditForm>
+        </AppCard>
+    </div>
+</div>
+
+@code {
+    private CreateRecipeDto recipe = new();
+
+    private async Task CreateRecipeAsync()
+    {
+        await RecipeService.AddRecipe(recipe)
+        .OnSuccess((data) => NavigationManager.NavigateTo($"/recipes/edit/{data.Id}"), WebConstants.Messages.Recipe.Created)
+        .OnFailure();
+    }
+}

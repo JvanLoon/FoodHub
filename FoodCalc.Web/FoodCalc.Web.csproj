@@ -19,7 +19,7 @@
 
   <ItemGroup>
     <!-- User-facing message + key constants available to services and components. -->
-    <Using Include="FoodCalc.Web.Components.Constants" />
+    <Using Include="FoodCalc.Web.Constants" />
   </ItemGroup>
 
 </Project>

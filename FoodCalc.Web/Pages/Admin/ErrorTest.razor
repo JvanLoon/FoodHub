@@ -1,0 +1,131 @@
+@using FoodCalc.Web.Services
+@using FoodCalc.Web.Services.Admin
+@inject AdminService AdminService
+@inject MessageService MessageService
+
+<div class="fh-stack">
+    <AppCard>
+        <p class="text-body-secondary">
+            Asks the API to fail through the same path every real endpoint uses. Each error should
+            appear as its own toast <em>and</em> in the result below.
+        </p>
+        <ul class="text-body-secondary">
+            <li>
+                <strong>Count &gt; 0</strong> — the server supplies the messages, so you are testing
+                the parser: <em>n</em> errors in, <em>n</em> toasts out.
+            </li>
+            <li>
+                <strong>Count = 0</strong> — the server sends an empty body, so the client falls back
+                to its own message for that status. That is how you check the
+                <code>WebConstants.Messages.Client</code> wording.
+            </li>
+            <li>
+                <strong>A 2xx status</strong> — always a success, whatever the count. The server
+                returns its status text (e.g. <code>200 => OK</code>), which is toasted.
+            </li>
+        </ul>
+
+        <EditForm Model="form" OnValidSubmit="TriggerAsync" FormName="error-test-form">
+            <div class="error-test__controls">
+                <NumberField TValue="int" Label="Number of errors" @bind-Value="form.Count" />
+
+                <SelectField TValue="int" Label="Status code" @bind-Value="form.StatusCode">
+                    <optgroup label="2xx — Success">
+                        <option value="200">200 — OK</option>
+                        <option value="201">201 — Created</option>
+                        <option value="202">202 — Accepted</option>
+                        <option value="204">204 — No Content</option>
+                    </optgroup>
+                    <optgroup label="4xx — Client">
+                        <option value="400">400 — Bad Request</option>
+                        <option value="401">401 — Unauthorized</option>
+                        <option value="403">403 — Forbidden</option>
+                        <option value="404">404 — Not Found</option>
+                        <option value="405">405 — Method Not Allowed</option>
+                        <option value="408">408 — Request Timeout</option>
+                        <option value="409">409 — Conflict</option>
+                        <option value="413">413 — Payload Too Large</option>
+                        <option value="415">415 — Unsupported Media Type</option>
+                        <option value="422">422 — Unprocessable Entity</option>
+                        <option value="429">429 — Too Many Requests</option>
+                        <option value="418">418 — I'm a teapot (unmapped)</option>
+                    </optgroup>
+                    <optgroup label="5xx — Server">
+                        <option value="500">500 — Internal Server Error</option>
+                        <option value="501">501 — Not Implemented</option>
+                        <option value="502">502 — Bad Gateway</option>
+                        <option value="503">503 — Service Unavailable</option>
+                        <option value="504">504 — Gateway Timeout</option>
+                        <option value="511">511 — Network Authentication Required</option>
+                    </optgroup>
+                </SelectField>
+            </div>
+
+            <AppButton Type="submit" Icon="exclamation-triangle" Loading="running">
+                Trigger
+            </AppButton>
+        </EditForm>
+    </AppCard>
+
+    @if (result is not null)
+    {
+        <AppCard>
+            <h3 class="h5">Last result</h3>
+
+            <p>
+                <Badge Variant="@(result.Success ? Badge.BadgeVariant.Success : Badge.BadgeVariant.Danger)">
+                    @(result.Success ? "Success" : "Failed")
+                </Badge>
+                <span class="text-body-secondary">HTTP @result.StatusCode</span>
+            </p>
+
+            @if (result.Errors.Count == 0)
+            {
+                <EmptyState Icon="check-circle" Title="No errors returned" />
+            }
+            else
+            {
+                <p class="text-body-secondary">@result.Errors.Count error(s) parsed from the response:</p>
+                <ol class="error-test__list">
+                    @foreach (var error in result.Errors)
+                    {
+                        <li>@error</li>
+                    }
+                </ol>
+            }
+        </AppCard>
+    }
+</div>
+
+@code {
+    private sealed class ErrorTestForm
+    {
+        public int Count { get; set; } = 3;
+        public int StatusCode { get; set; } = 400;
+    }
+
+    private readonly ErrorTestForm form = new();
+    private ApiResult? result;
+    private bool running;
+
+    private async Task TriggerAsync()
+    {
+        running = true;
+
+        // OnFailure() raises the toasts; the returned result is what the panel below renders,
+        // so the two views of the same failure can be compared.
+        result = await AdminService.TriggerErrorTestAsync(form.Count, form.StatusCode)
+        .OnSuccess(ShowSuccess)
+        .OnFailure();
+
+        running = false;
+    }
+
+    // 204 No Content comes back with an empty body (a body is forbidden on 204), so there is
+    // nothing to toast — stay silent rather than showing a blank message.
+    private void ShowSuccess(string message)
+    {
+        if (!string.IsNullOrWhiteSpace(message))
+            MessageService.ShowMessage(message, false);
+    }
+}

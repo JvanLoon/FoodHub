@@ -1,0 +1,189 @@
+@page "/recipes"
+
+@using Blazored.LocalStorage
+@using FoodCalc.Web.Constants
+@inject IJSRuntime JS
+@inject RecipeService recipeService
+@inject ILocalStorageService LocalStorage
+@inject MessageService MessageService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Recipes</PageTitle>
+
+<div class="recipes-layout">
+    <div class="recipes-header">
+        <PageHeader Title="Recipes" Subtitle="Select recipes to build a shopping list">
+            <SearchBox Placeholder="Search recipes..." Value="@searchTerm" ValueChanged="OnSearchChanged" />
+            <AppButton Variant="ButtonVariant.Primary" Icon="cart3"
+                       Disabled="@(!SelectedRecipeIds.Any())"
+                       OnClick="OpenAggregatedIngredientsPage">
+                Generate shopping list
+            </AppButton>
+        </PageHeader>
+    </div>
+
+    <div class="recipes-body">
+        @if (pagedResult == null)
+        {
+            <LoadingSpinner Label="Loading recipes..." />
+        }
+        else if (pagedResult.Items.Any())
+        {
+            <div class="fh-grid">
+                @foreach (RecipeDto recipe in pagedResult.Items)
+                {
+                    <RecipeCard Title="@(recipe.Name ?? string.Empty)"
+                                Selected="@SelectedRecipeIds.Contains(recipe.Id)"
+                                OnToggle="() => ToggleRecipeSelection(recipe.Id, !SelectedRecipeIds.Contains(recipe.Id))"
+                                OnEdit="() => EditRecipe(recipe.Id)"
+                                OnDelete="() => DeleteRecipe(recipe.Id)">
+                        <p class="ingredients-label">Ingredients</p>
+                        <ul class="ingredients-list">
+                            @if (recipe.Ingredients != null)
+                            {
+                                foreach (RecipeItemDto ingredient in recipe.Ingredients)
+                                {
+                                    <li>
+                                        <span>@ingredient.Name</span>
+                                        <span class="fh-muted">@ingredient.Amount.ToFormattedString() @ingredient.IngredientAmount.ToString()</span>
+                                    </li>
+                                }
+                            }
+                        </ul>
+                    </RecipeCard>
+                }
+            </div>
+        }
+        else
+        {
+            <EmptyState Icon="journal-x" Title="No recipes found."
+                        Message="Try a different search, or add a new recipe." />
+        }
+    </div>
+
+    <div class="recipes-footer">
+        @if (pagedResult != null && pagedResult.Items.Any())
+        {
+            <Paginator TotalCount="pagedResult.TotalCount"
+                       Page="pagedResult.Page"
+                       PageSize="pagedResult.PageSize"
+                       PageChanged="OnPageChanged"
+                       PageSizeChanged="OnPageSizeChanged" />
+        }
+    </div>
+</div>
+
+<ConfirmDialog @ref="confirmDialog" />
+
+@code {
+    private PagedResultDto<RecipeDto>? pagedResult;
+    private int currentPage = 1;
+    private int pageSize = 10;
+    private string searchTerm = string.Empty;
+    private HashSet<Guid> SelectedRecipeIds = new();
+    private List<RecipeItemDto> AggregatedIngredients = new();
+    private ConfirmDialog? confirmDialog;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadRecipesAsync();
+    }
+
+    private async Task LoadRecipesAsync()
+    {
+        pagedResult = await recipeService.GetPagedRecipesAsync(currentPage, pageSize, searchTerm)
+        .OrDefault(new PagedResultDto<RecipeDto>());
+    }
+
+    private async Task OnPageChanged(int page)
+    {
+        currentPage = page;
+        await LoadRecipesAsync();
+    }
+
+    private async Task OnPageSizeChanged(int size)
+    {
+        pageSize = size;
+        currentPage = 1;
+        await LoadRecipesAsync();
+    }
+
+    private async Task OnSearchChanged(string value)
+    {
+        searchTerm = value;
+        currentPage = 1;
+        await LoadRecipesAsync();
+    }
+
+    private async Task OpenAggregatedIngredientsPage()
+    {
+        AggregateIngredients();
+        await LocalStorage.SetItemAsync(WebConstants.Storage.AggregatedIngredients, AggregatedIngredients);
+        await JS.InvokeVoidAsync("window.open", "/aggregated-ingredients", "_blank");
+        AggregatedIngredients = new();
+    }
+
+    private void ToggleRecipeSelection(Guid recipeId, bool? isChecked)
+    {
+        if (isChecked == true)
+            SelectedRecipeIds.Add(recipeId);
+        else
+            SelectedRecipeIds.Remove(recipeId);
+    }
+
+    private void AggregateIngredients()
+    {
+        var ingredientDict = new Dictionary<(string Name, IngredientAmountTypeDto AmountType), RecipeItemDto>();
+
+        foreach (var recipe in (pagedResult?.Items ?? []).Where(r => SelectedRecipeIds.Contains(r.Id)))
+        {
+            if (recipe.Ingredients == null) continue;
+
+            foreach (var ri in recipe.Ingredients)
+            {
+                if (ri.ShouldBeAddedToShoppingCart)
+                {
+                    var key = (ri.Name.ToLowerInvariant(), ri.IngredientAmount);
+                    if (ingredientDict.TryGetValue(key, out var existing))
+                    {
+                        existing.Amount += ri.Amount;
+                    }
+                    else
+                    {
+                        // Clone to avoid mutating original
+                        ingredientDict[key] = new RecipeItemDto
+                        {
+                            Name = ri.Name,
+                            IngredientAmount = ri.IngredientAmount,
+                            Amount = ri.Amount,
+                            ShouldBeAddedToShoppingCart = ri.ShouldBeAddedToShoppingCart
+                        };
+                    }
+                }
+            }
+        }
+
+        AggregatedIngredients = ingredientDict.Values.OrderBy(i => i.Name).ToList();
+    }
+
+    private void EditRecipe(Guid recipeId)
+    {
+        NavigationManager.NavigateTo($"/recipes/edit/{recipeId}");
+    }
+
+    private async Task DeleteRecipe(Guid recipeId)
+    {
+        var confirmed = confirmDialog is not null
+            && await confirmDialog.ShowAsync("Delete recipe", "Are you sure you want to delete this recipe?", "Delete", danger: true);
+        if (!confirmed)
+            return;
+
+        await recipeService.DeleteRecipe(recipeId)
+        .OnSuccess(async () =>
+        {
+            await LoadRecipesAsync();
+            StateHasChanged();
+        }, WebConstants.Messages.Recipe.Deleted)
+        .OnFailure();
+    }
+}

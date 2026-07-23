@@ -1,0 +1,169 @@
+@page "/ingredients"
+
+@using FoodCalc.Web.Constants
+@using FoodCalc.Web.Services
+@using FoodHub.DTOs
+@inject IngredientService IngredientService
+@inject MessageService MessageService
+
+<PageTitle>Ingredients</PageTitle>
+
+<div class="ingredient-layout">
+    <div class="ingredient-header">
+        <PageHeader Title="Ingredients">
+            <SearchBox Placeholder="Search ingredients..." Value="@searchTerm" ValueChanged="OnSearchChanged" />
+        </PageHeader>
+    </div>
+
+    <div class="ingredient-body">
+        <DataTable TItem="IngredientDto"
+                   Items="pagedResult?.Items"
+                   EmptyText="No ingredients found."
+                   LoadingText="Loading ingredients...">
+            <HeaderContent>
+                <th class="w-100">Name</th>
+                <th class="text-center text-nowrap">Shopping Cart</th>
+                <th class="text-end text-nowrap">Actions</th>
+            </HeaderContent>
+            <RowTemplate Context="ingredient">
+                <td class="w-100 text-wrap">
+                    @if (editingIngredientId == ingredient.Id)
+                    {
+                        <input type="text" class="form-control form-control-sm" @bind="editingName"
+                               @onkeydown="(e) => OnEditInputKeyDown(e, ingredient)" />
+                    }
+                    else
+                    {
+                        @ingredient.Name
+                    }
+                </td>
+                <td class="text-center text-nowrap">
+                    <input type="checkbox" class="form-check-input"
+                           checked="@ingredient.ShouldBeAddedToShoppingCart"
+                           @onchange="(e) => OnCheckboxChanged(ingredient, e)" />
+                </td>
+                <td class="text-end text-nowrap">
+                    @if (editingIngredientId == ingredient.Id)
+                    {
+                        <AppButton Variant="ButtonVariant.Success" Size="ButtonSize.Small" Icon="check-lg"
+                                   OnClick="() => SaveEdit(ingredient)">Save</AppButton>
+                    }
+                    else
+                    {
+                        <AppButton Variant="ButtonVariant.OutlineSecondary" Size="ButtonSize.Small" Icon="pencil"
+                                   OnClick="() => StartEdit(ingredient)">Edit</AppButton>
+                    }
+                    <AppButton Variant="ButtonVariant.OutlineDanger" Size="ButtonSize.Small" Icon="trash"
+                               CssClass="ms-2" OnClick="() => DeleteIngredient(ingredient.Id)">Delete</AppButton>
+                </td>
+            </RowTemplate>
+        </DataTable>
+    </div>
+
+    <div class="ingredient-footer">
+        @if (pagedResult != null)
+        {
+            <Paginator TotalCount="pagedResult.TotalCount"
+                       Page="pagedResult.Page"
+                       PageSize="pagedResult.PageSize"
+                       PageChanged="OnPageChanged"
+                       PageSizeChanged="OnPageSizeChanged" />
+        }
+    </div>
+</div>
+
+@code {
+    private PagedResultDto<IngredientDto>? pagedResult;
+    private int currentPage = 1;
+    private int pageSize = 10;
+    private Guid? editingIngredientId = null;
+    private string editingName = string.Empty;
+    private string searchTerm = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadIngredientsAsync();
+    }
+
+    private async Task LoadIngredientsAsync()
+    {
+        pagedResult = await IngredientService.GetPagedIngredientsAsync(currentPage, pageSize, searchTerm)
+            .OrDefault<PagedResultDto<IngredientDto>>(new());
+    }
+
+    private async Task OnPageChanged(int page)
+    {
+        currentPage = page;
+        await LoadIngredientsAsync();
+    }
+
+    private async Task OnPageSizeChanged(int size)
+    {
+        pageSize = size;
+        currentPage = 1;
+        await LoadIngredientsAsync();
+    }
+
+    private async Task OnSearchChanged(string value)
+    {
+        searchTerm = value;
+        currentPage = 1;
+        await LoadIngredientsAsync();
+    }
+
+    private async Task OnCheckboxChanged(IngredientDto ingredient, ChangeEventArgs e)
+    {
+        ingredient.ShouldBeAddedToShoppingCart = (bool)e.Value!;
+
+        var updateDto = new UpdateIngredientDto
+        {
+            Id = ingredient.Id,
+            Name = ingredient.Name,
+            ShouldBeAddedToShoppingCart = ingredient.ShouldBeAddedToShoppingCart
+        };
+        await IngredientService.UpdateIngredient(updateDto)
+        .OnSuccess()
+        .OnFailure();
+    }
+
+    private void StartEdit(IngredientDto ingredient)
+    {
+        editingIngredientId = ingredient.Id;
+        editingName = ingredient.Name;
+    }
+
+    private async Task SaveEdit(IngredientDto ingredient)
+    {
+        if (!string.IsNullOrWhiteSpace(editingName) && editingName != ingredient.Name)
+        {
+            ingredient.Name = editingName;
+            var updateDto = new UpdateIngredientDto
+            {
+                Id = ingredient.Id,
+                Name = ingredient.Name,
+                ShouldBeAddedToShoppingCart = ingredient.ShouldBeAddedToShoppingCart
+            };
+            await IngredientService.UpdateIngredient(updateDto)
+            .OnSuccess(message: WebConstants.Messages.Ingredient.NameUpdated)
+            .OnFailure();
+        }
+        editingIngredientId = null;
+        editingName = string.Empty;
+    }
+
+    private async Task OnEditInputKeyDown(KeyboardEventArgs e, IngredientDto ingredient)
+    {
+        if (e.Key == "Enter")
+        {
+            await SaveEdit(ingredient);
+        }
+    }
+
+    private async Task DeleteIngredient(Guid id)
+    {
+        //todo: checken of ook echt stopt als het foutgaat
+        await IngredientService.DeleteIngredient(id)
+        .OnSuccess(async () => await LoadIngredientsAsync(), WebConstants.Messages.Ingredient.DeletedWithReload)
+        .OnFailure();
+    }
+}
