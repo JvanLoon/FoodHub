@@ -365,3 +365,23 @@ FodyWeavers.xsd
 # /FoodCalc.Api/appsettings.Development.json
 
 keys/
+
+# Default ignored files
+/shelf/
+/workspace.xml
+# Editor-based HTTP Client requests
+/httpRequests/
+# Rider ignored files
+/modules.xml
+/contentModel.xml
+/projectSettingsUpdater.xml
+/.idea.FoodHub.iml
+# Ignored default folder with query files
+/queries/
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+/.idea/.idea.FoodHub/.idea/.gitignore
+/.idea/.idea.FoodHub/.idea/encodings.xml
+/.idea/.idea.FoodHub/.idea/indexLayout.xml
+/.idea/.idea.FoodHub/.idea/vcs.xml
