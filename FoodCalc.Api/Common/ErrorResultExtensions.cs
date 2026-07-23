@@ -1,7 +1,5 @@
 using ErrorOr;
-
 using FastEndpoints;
-
 using FluentValidation.Results;
 
 namespace FoodCalc.Api.Common;

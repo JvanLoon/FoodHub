@@ -1,5 +1,4 @@
 using FoodCalc.Web.Services.Auth;
-
 using FoodHub.DTOs;
 
 namespace FoodCalc.Web.Services;
@@ -39,7 +38,11 @@ public class RecipeService(AuthenticatedHttpClientService httpClient)
 
 	public Task<ApiResult> UpdateRecipeName(Guid recipeId, string recipeName)
 	{
-		var payload = new FoodHub.DTOs.RecipeNameUpdateDto {Id = recipeId, Name = recipeName};
+		var payload = new FoodHub.DTOs.RecipeNameUpdateDto
+		{
+			Id = recipeId,
+			Name = recipeName
+		};
 		return httpClient.PutAsync(ApiRoutes.Recipe.UpdateName, payload);
 	}
 

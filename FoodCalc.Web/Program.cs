@@ -1,12 +1,10 @@
 using Blazored.LocalStorage;
-
 using FoodCalc.Web.App;
 using FoodCalc.Web.Components;
 using FoodCalc.Web.Services;
 using FoodCalc.Web.Services.Admin;
 using FoodCalc.Web.Services.Auth;
 using FoodCalc.Web.Services.User;
-
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.Json;

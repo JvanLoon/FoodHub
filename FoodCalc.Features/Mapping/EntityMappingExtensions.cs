@@ -1,6 +1,5 @@
 using FoodHub.DTOs;
 using FoodHub.Persistence.Entities;
-
 using Microsoft.AspNetCore.Identity;
 
 namespace FoodCalc.Features.Mapping;

@@ -1,11 +1,7 @@
-using ErrorOr;
-
+﻿using ErrorOr;
 using FoodCalc.Features.Authentication.Users.Queries.GetAllUsers;
-
 using FoodHub.DTOs;
-
 using MediatR;
-
 using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Features.Authentication.Roles.Queries.GetAllRoles;

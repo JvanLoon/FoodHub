@@ -1,16 +1,16 @@
 .user-search {
-	max-width: 24rem;
+    max-width: 24rem;
 }
 
 .user-list {
-	list-style: none;
-	margin: 0;
-	padding: 0;
-	background: var(--fh-surface);
-	border: 1px solid var(--fh-border);
-	border-radius: var(--fh-radius-lg);
-	box-shadow: var(--fh-shadow-sm);
-	overflow: hidden;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    background: var(--fh-surface);
+    border: 1px solid var(--fh-border);
+    border-radius: var(--fh-radius-lg);
+    box-shadow: var(--fh-shadow-sm);
+    overflow: hidden;
 }
 
 .user-list li {
@@ -31,20 +31,20 @@
 }
 
 .user-list__link {
-	display: flex;
-	align-items: center;
-	gap: var(--fh-space-3);
-	flex: 1;
-	min-width: 0;
-	color: var(--fh-text);
-	text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: var(--fh-space-3);
+    flex: 1;
+    min-width: 0;
+    color: var(--fh-text);
+    text-decoration: none;
 
-	.bi {
-		font-size: 1.25rem;
-		color: var(--fh-text-faint);
-	}
+    .bi {
+        font-size: 1.25rem;
+        color: var(--fh-text-faint);
+    }
 }
 
 .user-list__email {
-	font-weight: var(--fh-weight-medium);
+    font-weight: var(--fh-weight-medium);
 }

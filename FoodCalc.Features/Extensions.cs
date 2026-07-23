@@ -1,5 +1,4 @@
 ﻿using FoodCalc.Features.Recipes.Queries.GetAllRecipes;
-
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.Extensions.Hosting;

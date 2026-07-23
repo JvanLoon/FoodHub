@@ -207,8 +207,8 @@
 					if (!usage.TryGetValue(ri.Name, out var u))
 					{
 						u = new IngredientUsage {Name = ri.Name};
-						usage[ri.Name] = u;
-					}
+						usage[ri.Name] = u;}
+					
 
 					u.UsageCount++;
 				}

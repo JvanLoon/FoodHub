@@ -1,7 +1,5 @@
 using FastEndpoints;
-
 using FoodCalc.Features.Ingredients.Commands.AddIngredient;
-
 using MediatR;
 
 namespace FoodCalc.Api.Endpoints.Ingredients;

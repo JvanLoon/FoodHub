@@ -1,5 +1,4 @@
 using FastEndpoints;
-
 using Microsoft.AspNetCore.Identity;
 
 namespace FoodCalc.Api.Endpoints.Authentication;

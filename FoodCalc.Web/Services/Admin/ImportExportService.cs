@@ -1,11 +1,8 @@
 using System.Net;
 using System.Net.Http.Headers;
-
 using FoodCalc.Web.Constants;
 using FoodCalc.Web.Services.Auth;
-
 using FoodHub.DTOs;
-
 using Microsoft.JSInterop;
 
 namespace FoodCalc.Web.Services.Admin;

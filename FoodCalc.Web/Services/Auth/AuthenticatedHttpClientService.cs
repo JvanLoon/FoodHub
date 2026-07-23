@@ -1,7 +1,6 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json;
-
 using FoodCalc.Web.Constants;
 
 namespace FoodCalc.Web.Services.Auth;
@@ -124,7 +123,10 @@ public class AuthenticatedHttpClientService(
 	private async Task<HttpResponseMessage> SendRawAsync(HttpMethod method, string requestUri, HttpContent? content)
 	{
 		await AttachTokenAsync();
-		using var request = new HttpRequestMessage(method, requestUri) {Content = content};
+		using var request = new HttpRequestMessage(method, requestUri)
+		{
+			Content = content
+		};
 		return await httpClient.SendAsync(request);
 	}
 
@@ -195,7 +197,7 @@ public class AuthenticatedHttpClientService(
 			}
 
 			// Single-message shapes used by ProblemDetails and various handlers.
-			foreach (var name in new[] {"detail", "title", "message", "error"})
+			foreach (var name in new[] { "detail", "title", "message", "error" })
 			{
 				if (root.TryGetProperty(name, out var prop) && prop.ValueKind == JsonValueKind.String)
 				{

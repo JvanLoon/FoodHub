@@ -1,7 +1,5 @@
 using FastEndpoints;
-
 using FluentValidation;
-
 using FoodCalc.Api.Endpoints.Admin;
 using FoodCalc.Api.Endpoints.Authentication;
 using FoodCalc.Api.Endpoints.ImportExport;

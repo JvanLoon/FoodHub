@@ -8,4 +8,5 @@ builder.AddProject<Projects.FoodCalc_Web>("webfrontend")
 	   .WaitFor(apiService);
 
 builder.Build()
+	   
 	   .Run();

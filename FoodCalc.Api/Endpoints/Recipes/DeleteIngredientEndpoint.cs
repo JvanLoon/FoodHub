@@ -1,7 +1,5 @@
 using FastEndpoints;
-
 using FoodCalc.Features.Ingredients.Commands.DeleteIngredientFromRecipe;
-
 using MediatR;
 
 namespace FoodCalc.Api.Endpoints.Recipes;

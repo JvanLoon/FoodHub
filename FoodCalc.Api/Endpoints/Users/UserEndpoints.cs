@@ -1,8 +1,6 @@
 using FastEndpoints;
-
 using FoodCalc.Features.Authentication.Roles.Queries.GetAllRoles;
 using FoodCalc.Features.Authentication.Users.Queries.GetAllUsers;
-
 using MediatR;
 
 namespace FoodCalc.Api.Endpoints.Users;

@@ -2,20 +2,18 @@
 
 <PageTitle>Admin</PageTitle>
 
-<RoleGuard AllowedRoles="Admin">
-	<div class="fh-stack">
-		<PageHeader Title="Admin Panel"/>
+<div class="fh-stack">
+	<PageHeader Title="Admin Panel"/>
 
-		<TabSet>
-			<Tab Title="Users" Icon="people">
-				<UserList/>
-			</Tab>
-			<Tab Title="Import/Export" Icon="arrow-down-up">
-				<DataImportExport/>
-			</Tab>
-			<Tab Title="Error test" Icon="bug">
-				<ErrorTest/>
-			</Tab>
-		</TabSet>
-	</div>
-</RoleGuard>
+	<TabSet>
+		<Tab Title="Users" Icon="people">
+			<UserList/>
+		</Tab>
+		<Tab Title="Import/Export" Icon="arrow-down-up">
+			<DataImportExport/>
+		</Tab>
+		<Tab Title="Error test" Icon="bug">
+			<ErrorTest/>
+		</Tab>
+	</TabSet>
+</div>

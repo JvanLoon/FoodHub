@@ -15,18 +15,23 @@ public static class ErrorMessages
 	public static class Common
 	{
 		private const string _notFoundTemplate = "{0} not found";
+
 		public static string NotFound(string entityName) => string.Format(_notFoundTemplate, entityName);
 
 		private const string _getAllFailedTemplate = "Failed to get all {0}";
+
 		public static string GetAllFailed(string entityName) => string.Format(_getAllFailedTemplate, entityName);
 
 		private const string _addFailedTemplate = "Failed to add {0}";
+
 		public static string AddFailed(string entityName) => string.Format(_addFailedTemplate, entityName);
 
 		private const string _updateFailedTemplate = "Failed to update {0}";
+
 		public static string UpdateFailed(string entityName) => string.Format(_updateFailedTemplate, entityName);
 
 		private const string _deleteFailedTemplate = "Failed to delete {0}";
+
 		public static string DeleteFailed(string entityName) => string.Format(_deleteFailedTemplate, entityName);
 	}
 

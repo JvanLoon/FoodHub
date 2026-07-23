@@ -37,29 +37,29 @@ public static class IdentitySeed
 	public static void Seed(ModelBuilder modelBuilder)
 	{
 		modelBuilder.Entity<IdentityRole>()
-					.HasData(
-						new IdentityRole
+					
+						.HasData(new IdentityRole
 						{
 							Id = AdminRoleId,
 							Name = "Admin",
 							NormalizedName = "ADMIN",
 							ConcurrencyStamp = AdminRoleId
-						},
-						new IdentityRole
+						
+						},new IdentityRole
 						{
 							Id = ModeratorRoleId,
 							Name = "Moderator",
 							NormalizedName = "MODERATOR",
 							ConcurrencyStamp = ModeratorRoleId
-						},
-						new IdentityRole
+						
+						},new IdentityRole
 						{
 							Id = UserRoleId, Name = "User", NormalizedName = "USER", ConcurrencyStamp = UserRoleId
 						});
 
 		modelBuilder.Entity<IdentityUser>()
-					.HasData(
-						new IdentityUser
+					
+						.HasData(new IdentityUser
 						{
 							Id = AdminUserId,
 							UserName = AdminEmail,
@@ -71,8 +71,8 @@ public static class IdentitySeed
 							SecurityStamp = AdminUserId,
 							ConcurrencyStamp = AdminUserId,
 							LockoutEnabled = false,
-						},
-						new IdentityUser
+						
+						},new IdentityUser
 						{
 							Id = UserUserId,
 							UserName = UserEmail,
@@ -87,9 +87,9 @@ public static class IdentitySeed
 						});
 
 		modelBuilder.Entity<IdentityUserRole<string>>()
-					.HasData(new IdentityUserRole<string> {UserId = AdminUserId, RoleId = AdminRoleId},
-							 new IdentityUserRole<string> {UserId = AdminUserId, RoleId = ModeratorRoleId},
-							 new IdentityUserRole<string> {UserId = AdminUserId, RoleId = UserRoleId},
-							 new IdentityUserRole<string> {UserId = UserUserId, RoleId = UserRoleId});
+					.HasData(new IdentityUserRole<string> {UserId = AdminUserId, RoleId = AdminRoleId
+							 },new IdentityUserRole<string> {UserId = AdminUserId, RoleId = ModeratorRoleId
+							 },new IdentityUserRole<string> {UserId = AdminUserId, RoleId = UserRoleId
+							 },new IdentityUserRole<string> {UserId = UserUserId, RoleId = UserRoleId});
 	}
 }

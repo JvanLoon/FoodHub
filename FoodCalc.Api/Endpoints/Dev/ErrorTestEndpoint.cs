@@ -1,7 +1,5 @@
 using ErrorOr;
-
 using FastEndpoints;
-
 using System.Net;
 
 namespace FoodCalc.Api.Endpoints.Dev;

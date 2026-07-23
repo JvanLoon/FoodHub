@@ -1,7 +1,5 @@
 using FastEndpoints;
-
 using FoodCalc.Features.Recipes.Queries.GetById;
-
 using MediatR;
 
 namespace FoodCalc.Api.Endpoints.Recipes;

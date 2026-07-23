@@ -201,7 +201,11 @@
 	{
 		ingredientSearch = string.Empty;
 		amountInput = null;
-		recipeItem = new RecipeItemDto {Id = Guid.NewGuid(), RecipeId = RecipeId};
+		recipeItem = new RecipeItemDto
+		{
+			Id = Guid.NewGuid(),
+			RecipeId = RecipeId
+		};
 	}
 
 	private async Task SaveRecipeName()

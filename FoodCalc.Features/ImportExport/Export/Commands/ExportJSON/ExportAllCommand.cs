@@ -1,5 +1,4 @@
 ﻿using ErrorOr;
-
 using MediatR;
 
 namespace FoodCalc.Features.ImportExport.Export.Commands.ExportJSON;

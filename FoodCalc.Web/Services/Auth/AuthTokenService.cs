@@ -1,7 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
-
 using Blazored.LocalStorage;
-
 using FoodCalc.Web.Constants;
 
 namespace FoodCalc.Web.Services.Auth;

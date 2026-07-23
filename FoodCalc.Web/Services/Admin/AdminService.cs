@@ -1,5 +1,4 @@
 using FoodCalc.Web.Services.Auth;
-
 using FoodHub.DTOs;
 
 namespace FoodCalc.Web.Services.Admin;
