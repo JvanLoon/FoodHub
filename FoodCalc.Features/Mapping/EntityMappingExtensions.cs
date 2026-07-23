@@ -92,6 +92,18 @@ public static class EntityMappingExtensions
 		Name = d.Name
 	};
 
+	// ---------- MealPlanEntry ----------
+	public static MealPlanEntryDto ToDto(this MealPlanEntry e) => new()
+	{
+		Id = e.Id,
+		Date = e.Date,
+		RecipeId = e.RecipeId,
+		RecipeName = e.Recipe?.Name ?? string.Empty
+	};
+
+	public static List<MealPlanEntryDto> ToDtoList(this IEnumerable<MealPlanEntry> items)
+		=> items.Select(m => m.ToDto()).ToList();
+
 	// ---------- User ----------
 	// Roles are populated separately by the caller (as before).
 	public static UserDto ToUserDto(this IdentityUser u) => new()

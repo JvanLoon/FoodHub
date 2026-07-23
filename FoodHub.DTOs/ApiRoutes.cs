@@ -71,6 +71,17 @@ public static class ApiRoutes
 		public const string AllRoles = Base + "/allroles";
 	}
 
+	public static class MealPlan
+	{
+		private const string Base = "api/mealplan";
+		public const string GetRange = Base;   // GET, from/to via query string
+		public const string Add = Base;        // POST
+		public const string Randomize = Base + "/randomize"; // POST
+
+		public const string DeleteTemplate = Base + "/{id}";
+		public static string Delete(Guid id) => DeleteTemplate.Replace("{id}", id.ToString());
+	}
+
 	/// <summary>Development-only diagnostics. These return 404 outside the Development environment.</summary>
 	public static class Dev
 	{
