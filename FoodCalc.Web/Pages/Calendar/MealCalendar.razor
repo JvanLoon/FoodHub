@@ -240,7 +240,7 @@
 	private List<string> allIngredientNames = new();
 	private bool ingredientMenuOpen;
 
-	private static readonly string[] DayOfWeekHeaders = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
+	private static readonly string[] DayOfWeekHeaders = { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -460,7 +460,13 @@
 
 		randomizing = true;
 		var dayCount = selectedDates.Count;
-		var request = new RandomizeMealPlanDto {Dates = selectedDates.ToList(), Ingredients = wantedIngredients.ToList(), RecipesPerDay = recipesPerDay, Overwrite = overwriteDays};
+		var request = new RandomizeMealPlanDto
+		{
+			Dates = selectedDates.ToList(),
+			Ingredients = wantedIngredients.ToList(),
+			RecipesPerDay = recipesPerDay,
+			Overwrite = overwriteDays
+		};
 
 		var result = await MealPlanService.RandomizeAsync(request);
 		randomizing = false;
