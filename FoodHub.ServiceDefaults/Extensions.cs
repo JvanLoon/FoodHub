@@ -87,11 +87,12 @@ public static class Extensions
 	//	return builder;
 	//}
 
-	public static TBuilder AddDefaultHealthChecks<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
+	public static TBuilder AddDefaultHealthChecks<TBuilder>(this TBuilder builder)
+		where TBuilder : IHostApplicationBuilder
 	{
 		builder.Services.AddHealthChecks()
-			// Add a default liveness check to ensure app is responsive
-			.AddCheck("self", () => HealthCheckResult.Healthy(), ["live"]);
+			   // Add a default liveness check to ensure app is responsive
+			   .AddCheck("self", () => HealthCheckResult.Healthy(), ["live"]);
 
 		return builder;
 	}
@@ -106,10 +107,7 @@ public static class Extensions
 			app.MapHealthChecks("/health");
 
 			// Only health checks tagged with the "live" tag must pass for app to be considered alive
-			app.MapHealthChecks("/alive", new HealthCheckOptions
-			{
-				Predicate = r => r.Tags.Contains("live")
-			});
+			app.MapHealthChecks("/alive", new HealthCheckOptions {Predicate = r => r.Tags.Contains("live")});
 		}
 
 		return app;

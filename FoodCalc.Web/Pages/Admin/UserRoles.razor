@@ -10,144 +10,151 @@
 <PageTitle>User Roles</PageTitle>
 
 <div class="fh-stack">
-    <PageHeader Title="Manage Roles" Subtitle="@email" />
+	<PageHeader Title="Manage Roles" Subtitle="@email"/>
 
-    @if (roles == null || allRoles == null)
-    {
-        <LoadingSpinner Label="Loading roles..." />
-    }
-    else
-    {
-        <div class="row g-4">
-            <div class="col-md-6">
-                <AppCard>
-                    <Header>Add role</Header>
-                    <Body>
-                        <label for="addRole" class="form-label">Role</label>
-                        <div class="input-group">
-                            <select id="addRole" class="form-select" @bind="selectedRole">
-                                <option value="">Select a role...</option>
-                                @foreach (var role in allRoles.Except(roles))
-                                {
-                                    <option value="@role">@role</option>
-                                }
-                            </select>
-                            <AppButton Variant="ButtonVariant.Success" Icon="plus-lg"
-                                       Disabled="@(string.IsNullOrEmpty(selectedRole))" OnClick="AddRole">Add</AppButton>
-                        </div>
-                    </Body>
-                </AppCard>
-            </div>
+	@if (roles == null || allRoles == null)
+	{
+		<LoadingSpinner Label="Loading roles..."/>
+	}
+	else
+	{
+		<div class="row g-4">
+			<div class="col-md-6">
+				<AppCard>
+					<Header>Add role</Header>
+					<Body>
+					<label for="addRole" class="form-label">Role</label>
+					<div class="input-group">
+						<select id="addRole" class="form-select" @bind="selectedRole">
+							<option value="">Select a role...</option>
+							@foreach (var role in allRoles.Except(roles))
+							{
+								<option value="@role">@role</option>
+							}
+						</select>
+						<AppButton Variant="ButtonVariant.Success" Icon="plus-lg"
+						           Disabled="@(string.IsNullOrEmpty(selectedRole))" OnClick="AddRole">Add
+						</AppButton>
+					</div>
+					</Body>
+				</AppCard>
+			</div>
 
-            <div class="col-md-6">
-                <AppCard>
-                    <Header>Assigned roles</Header>
-                    <Body>
-                        @if (roles.Any())
-                        {
-                            <ul class="role-list">
-                                @foreach (var role in roles)
-                                {
-                                    <li>
-                                        <Badge Icon="shield-check">@role</Badge>
-                                        <IconButton Icon="trash" Title="Remove role" Size="ButtonSize.Small"
-                                                    Variant="ButtonVariant.Danger" OnClick="() => RemoveRole(role)" />
-                                    </li>
-                                }
-                            </ul>
-                        }
-                        else
-                        {
-                            <EmptyState Icon="shield" Title="No roles assigned" />
-                        }
-                    </Body>
-                </AppCard>
-            </div>
-        </div>
+			<div class="col-md-6">
+				<AppCard>
+					<Header>Assigned roles</Header>
+					<Body>
+					@if (roles.Any())
+					{
+						<ul class="role-list">
+							@foreach (var role in roles)
+							{
+								<li>
+									<Badge Icon="shield-check">@role</Badge>
+									<IconButton Icon="trash" Title="Remove role" Size="ButtonSize.Small"
+									            Variant="ButtonVariant.Danger" OnClick="() => RemoveRole(role)"/>
+								</li>
+							}
+						</ul>
+					}
+					else
+					{
+						<EmptyState Icon="shield" Title="No roles assigned"/>
+					}
+					</Body>
+				</AppCard>
+			</div>
+		</div>
 
-        <div class="row">
-            <div class="col-md-6">
-                <AppCard>
-                    <Header>Reset password</Header>
-                    <Body>
-                        <EditForm Model="resetModel" OnValidSubmit="ResetPassword" FormName="reset-password-form">
-                            <DataAnnotationsValidator />
-                            <ValidationSummary />
+		<div class="row">
+			<div class="col-md-6">
+				<AppCard>
+					<Header>Reset password</Header>
+					<Body>
+					<EditForm Model="resetModel" OnValidSubmit="ResetPassword" FormName="reset-password-form">
+						<DataAnnotationsValidator/>
+						<ValidationSummary/>
 
-                            <TextField Label="New password" Type="password" Autocomplete="new-password"
-                                       @bind-Value="resetModel.password" />
+						<TextField Label="New password" Type="password" Autocomplete="new-password"
+						           @bind-Value="resetModel.password"/>
 
-                            <AppButton Type="submit" Icon="key">Reset</AppButton>
-                        </EditForm>
-                    </Body>
-                </AppCard>
-            </div>
-        </div>
-    }
+						<AppButton Type="submit" Icon="key">Reset</AppButton>
+					</EditForm>
+					</Body>
+				</AppCard>
+			</div>
+		</div>
+	}
 </div>
 
 @code {
-    [Parameter]
-    public string email { get; set; } = null!;
 
-    private List<string> roles = [];
-    private List<string> allRoles = [];
-    private string selectedRole = null!;
-    public PasswordResetModel resetModel = new();
+	[Parameter]
+	public string email { get; set; } = null!;
 
-    protected override async Task OnInitializedAsync()
-    {
-        if (!await AuthStateService.IsInAnyRoleAsync("Admin"))
-        {
-            Navigation.NavigateTo("/");
-            return;
-        }
+	private List<string> roles = [];
+	private List<string> allRoles = [];
+	private string selectedRole = null!;
+	public PasswordResetModel resetModel = new();
 
-        await AdminService.GetUserRolesAsync(email).OnSuccess(r => roles = r).OnFailure();
+	protected override async Task OnInitializedAsync()
+	{
+		if (!await AuthStateService.IsInAnyRoleAsync("Admin"))
+		{
+			Navigation.NavigateTo("/");
+			return;
+		}
 
-        await AdminService.GetAllRolesAsync().OnSuccess(r => allRoles = r).OnFailure();
-    }
+		await AdminService.GetUserRolesAsync(email)
+		                  .OnSuccess(r => roles = r)
+		                  .OnFailure();
 
-    private async Task AddRole()
-    {
-        if (!string.IsNullOrEmpty(selectedRole) && !roles.Contains(selectedRole))
-        {
-            await AdminService.UpdateUserRolesAsync(email, selectedRole).OnSuccess(() =>
-                {
-                    roles.Add(selectedRole);
-                    selectedRole = string.Empty;
-                },
-                WebConstants.Messages.Roles.Added)
-                .OnFailure();
-        }
-    }
+		await AdminService.GetAllRolesAsync()
+		                  .OnSuccess(r => allRoles = r)
+		                  .OnFailure();
+	}
 
-    private async Task RemoveRole(string role)
-    {
-        await AdminService.RemoveUserRoleAsync(email, role)
-        .OnSuccess(() => roles.Remove(role), WebConstants.Messages.Roles.Removed)
-        .OnFailure();
-    }
+	private async Task AddRole()
+	{
+		if (!string.IsNullOrEmpty(selectedRole) && !roles.Contains(selectedRole))
+		{
+			await AdminService.UpdateUserRolesAsync(email, selectedRole)
+			                  .OnSuccess(() =>
+			                  {
+				                  roles.Add(selectedRole);
+				                  selectedRole = string.Empty;
+			                  }, WebConstants.Messages.Roles.Added)
+			                  .OnFailure();
+		}
+	}
 
-    private ResetPasswordDto resetPasswordDto = new();
+	private async Task RemoveRole(string role)
+	{
+		await AdminService.RemoveUserRoleAsync(email, role)
+		                  .OnSuccess(() => roles.Remove(role), WebConstants.Messages.Roles.Removed)
+		                  .OnFailure();
+	}
 
-    private async Task ResetPassword()
-    {
-        resetPasswordDto.Email = email;
-        resetPasswordDto.Password = resetModel.password;
+	private ResetPasswordDto resetPasswordDto = new();
 
-        await LoginService.ResetPassword(resetPasswordDto)
-        .OnSuccess(() => resetModel.password = string.Empty, WebConstants.Messages.Roles.PasswordReset)
-        .OnFailure();
-    }
+	private async Task ResetPassword()
+	{
+		resetPasswordDto.Email = email;
+		resetPasswordDto.Password = resetModel.password;
 
-    public class PasswordResetModel
-    {
-        public string password { get; set; } = string.Empty;
-    }
+		await LoginService.ResetPassword(resetPasswordDto)
+		                  .OnSuccess(() => resetModel.password = string.Empty, WebConstants.Messages.Roles.PasswordReset)
+		                  .OnFailure();
+	}
 
-    public class RoleModel
-    {
-        public string Roles { get; set; } = string.Empty;
-    }
+	public class PasswordResetModel
+	{
+		public string password { get; set; } = string.Empty;
+	}
+
+	public class RoleModel
+	{
+		public string Roles { get; set; } = string.Empty;
+	}
+
 }

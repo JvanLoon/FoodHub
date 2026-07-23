@@ -1,13 +1,13 @@
 ﻿@inject NavigationManager Navigation
 
 <Router AppAssembly="typeof(Program).Assembly">
-    <Found Context="routeData">
-        <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
-        <FocusOnNavigate RouteData="routeData" Selector="h1" />
-    </Found>
-    <NotFound>
-        @{
-            Navigation.NavigateTo("/login", true);
-        }
-    </NotFound>
+	<Found Context="routeData">
+		<RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)"/>
+		<FocusOnNavigate RouteData="routeData" Selector="h1"/>
+	</Found>
+	<NotFound>
+		@{
+			Navigation.NavigateTo("/login", true);
+		}
+	</NotFound>
 </Router>

@@ -14,7 +14,9 @@ namespace FoodCalc.Features.Ingredients.Commands.AddIngredient
 	public class AddIngredientCommandHandler(FoodHubDbContext context, ILogger<AddIngredientCommandHandler> logger)
 		: IRequestHandler<AddIngredientCommand, ErrorOr<IngredientDto>>
 	{
-		public async Task<ErrorOr<IngredientDto>> Handle(AddIngredientCommand request, CancellationToken cancellationToken)
+		public async Task<ErrorOr<IngredientDto>> Handle(AddIngredientCommand request,
+														 CancellationToken cancellationToken
+		)
 		{
 			try
 			{

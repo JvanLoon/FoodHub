@@ -10,8 +10,7 @@ using MediatR;
 namespace FoodCalc.Api.Endpoints.MealPlan;
 
 /// <summary>GET api/mealplan?from=&amp;to= — the calling user's calendar entries in the range.</summary>
-public class GetMealPlanEndpoint(IMediator mediator)
-	: Endpoint<GetMealPlanRequest, List<MealPlanEntryDto>>
+public class GetMealPlanEndpoint(IMediator mediator) : Endpoint<GetMealPlanRequest, List<MealPlanEntryDto>>
 {
 	public override void Configure()
 	{
@@ -30,8 +29,6 @@ public class GetMealPlanEndpoint(IMediator mediator)
 
 		var result = await mediator.Send(new GetMealPlanQuery(userId, req.From, req.To), ct);
 
-		await result.Match(
-			value => Send.OkAsync(value, ct),
-			errors => this.SendErrorsAsync(errors, ct: ct));
+		await result.Match(value => Send.OkAsync(value, ct), errors => this.SendErrorsAsync(errors, ct: ct));
 	}
 }

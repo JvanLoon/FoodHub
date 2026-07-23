@@ -17,12 +17,11 @@ public class MealPlanService(AuthenticatedHttpClientService httpClient)
 
 	public Task<ApiResult<MealPlanEntryDto>> AddAsync(DateOnly date, Guid recipeId)
 	{
-		var payload = new AddMealPlanEntryDto { Date = date, RecipeId = recipeId };
+		var payload = new AddMealPlanEntryDto {Date = date, RecipeId = recipeId};
 		return httpClient.PostAsync<AddMealPlanEntryDto, MealPlanEntryDto>(ApiRoutes.MealPlan.Add, payload);
 	}
 
-	public Task<ApiResult> DeleteAsync(Guid id) =>
-		httpClient.DeleteAsync(ApiRoutes.MealPlan.Delete(id));
+	public Task<ApiResult> DeleteAsync(Guid id) => httpClient.DeleteAsync(ApiRoutes.MealPlan.Delete(id));
 
 	public Task<ApiResult<List<MealPlanEntryDto>>> RandomizeAsync(RandomizeMealPlanDto request) =>
 		httpClient.PostAsync<RandomizeMealPlanDto, List<MealPlanEntryDto>>(ApiRoutes.MealPlan.Randomize, request);

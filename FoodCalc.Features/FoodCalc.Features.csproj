@@ -1,25 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="ErrorOr" Version="2.1.1" />
-    <PackageReference Include="MediatR" Version="12.5.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.10" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="ErrorOr" Version="2.1.1"/>
+		<PackageReference Include="MediatR" Version="12.5.0"/>
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.10"/>
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\FoodHub.DTOs\FoodHub.DTOs.csproj" />
-    <ProjectReference Include="..\FoodHub.Persistence\FoodHub.Persistence.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\FoodHub.DTOs\FoodHub.DTOs.csproj"/>
+		<ProjectReference Include="..\FoodHub.Persistence\FoodHub.Persistence.csproj"/>
+	</ItemGroup>
 
-  <ItemGroup>
-    <!-- Shared error/log message constants available to every handler. -->
-    <Using Include="FoodCalc.Features.Constants" />
-  </ItemGroup>
+	<ItemGroup>
+		<!-- Shared error/log message constants available to every handler. -->
+		<Using Include="FoodCalc.Features.Constants"/>
+	</ItemGroup>
 
 </Project>

@@ -7,8 +7,7 @@ using MediatR;
 namespace FoodCalc.Api.Endpoints.Ingredients;
 
 /// <summary>POST api/ingredient — Admin only.</summary>
-public class CreateIngredientEndpoint(IMediator mediator)
-	: Endpoint<CreateIngredientDto, IngredientDto>
+public class CreateIngredientEndpoint(IMediator mediator) : Endpoint<CreateIngredientDto, IngredientDto>
 {
 	public override void Configure()
 	{
@@ -20,8 +19,6 @@ public class CreateIngredientEndpoint(IMediator mediator)
 	{
 		var result = await mediator.Send(new AddIngredientCommand(req), ct);
 
-		await result.Match(
-			value => Send.OkAsync(value, ct),
-			errors => this.SendErrorsAsync(errors, ct: ct));
+		await result.Match(value => Send.OkAsync(value, ct), errors => this.SendErrorsAsync(errors, ct: ct));
 	}
 }

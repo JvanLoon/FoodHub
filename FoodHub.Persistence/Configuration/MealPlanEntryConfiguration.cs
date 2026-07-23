@@ -12,18 +12,18 @@ public class MealPlanEntryConfiguration : IEntityTypeConfiguration<MealPlanEntry
 		builder.HasKey(x => x.Id);
 
 		builder.Property(x => x.UserId)
-			.IsRequired();
+			   .IsRequired();
 
 		builder.Property(x => x.Date)
-			.IsRequired();
+			   .IsRequired();
 
 		// Fast lookups for "give me this user's plan for a date range".
-		builder.HasIndex(x => new { x.UserId, x.Date });
+		builder.HasIndex(x => new {x.UserId, x.Date});
 
 		builder.HasOne(x => x.Recipe)
-			.WithMany()
-			.HasForeignKey(x => x.RecipeId)
-			.OnDelete(DeleteBehavior.Cascade);
+			   .WithMany()
+			   .HasForeignKey(x => x.RecipeId)
+			   .OnDelete(DeleteBehavior.Cascade);
 
 		builder.ToTable("MealPlanEntries");
 	}

@@ -41,6 +41,7 @@ public static class ApiRoutes
 
 		public static string GetById(Guid id) => GetByIdTemplate.Replace("{id}", id.ToString());
 		public static string DeleteRecipe(Guid id) => DeleteRecipeTemplate.Replace("{id}", id.ToString());
+
 		public static string DeleteIngredient(Guid recipeItemId) =>
 			DeleteIngredientTemplate.Replace("{id}", recipeItemId.ToString());
 	}
@@ -74,8 +75,8 @@ public static class ApiRoutes
 	public static class MealPlan
 	{
 		private const string Base = "api/mealplan";
-		public const string GetRange = Base;   // GET, from/to via query string
-		public const string Add = Base;        // POST
+		public const string GetRange = Base;                 // GET, from/to via query string
+		public const string Add = Base;                      // POST
 		public const string Randomize = Base + "/randomize"; // POST
 
 		public const string DeleteTemplate = Base + "/{id}";

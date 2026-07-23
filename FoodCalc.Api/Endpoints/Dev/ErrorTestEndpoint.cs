@@ -68,7 +68,8 @@ public class ErrorTestEndpoint(IWebHostEnvironment env) : Endpoint<ErrorTestRequ
 			}
 
 			var reason = ((HttpStatusCode) req.StatusCode).ToString();
-			await Send.ResultAsync(Results.Text($"{req.StatusCode} => {reason}", contentType: "text/plain", statusCode: req.StatusCode));
+			await Send.ResultAsync(Results.Text($"{req.StatusCode} => {reason}", contentType: "text/plain",
+												statusCode: req.StatusCode));
 			return;
 		}
 
@@ -85,8 +86,9 @@ public class ErrorTestEndpoint(IWebHostEnvironment env) : Endpoint<ErrorTestRequ
 		// Deliberately all Error.Failure with the default code, matching what the real handlers
 		// produce — that is the case AllowDuplicateErrors has to survive.
 		var errors = Enumerable.Range(1, count)
-			.Select(i => Error.Failure(description: $"{req.StatusCode} => Test error {i} of {count}."))
-			.ToList();
+							   .Select(i => Error.Failure(
+										   description: $"{req.StatusCode} => Test error {i} of {count}."))
+							   .ToList();
 
 		await this.SendErrorsAsync(errors, req.StatusCode, ct);
 	}

@@ -6,8 +6,12 @@ namespace FoodCalc.Web.Services;
 
 public class RecipeService(AuthenticatedHttpClientService httpClient)
 {
-	public Task<ApiResult<PagedResultDto<RecipeDto>>> GetPagedRecipesAsync(int page, int pageSize,
-		string? search = null, bool withIngredients = true)
+	public Task<ApiResult<PagedResultDto<RecipeDto>>> GetPagedRecipesAsync(
+		int page,
+		int pageSize,
+		string? search = null,
+		bool withIngredients = true
+	)
 	{
 		var url = $"{ApiRoutes.Recipe.GetAll}?withingredient={withIngredients}&page={page}&pageSize={pageSize}";
 		if (!string.IsNullOrWhiteSpace(search))
@@ -22,7 +26,7 @@ public class RecipeService(AuthenticatedHttpClientService httpClient)
 		if (!paged.Success)
 			return ApiResult<List<RecipeDto>>.Fail(paged.Errors, paged.StatusCode);
 
-		return ApiResult<List<RecipeDto>>.Ok([.. paged.Data!.Items], paged.StatusCode);
+		return ApiResult<List<RecipeDto>>.Ok([..paged.Data!.Items], paged.StatusCode);
 	}
 
 	public Task<ApiResult<RecipeDto>> GetRecipeByIdAsync(Guid recipeId) =>
@@ -31,8 +35,7 @@ public class RecipeService(AuthenticatedHttpClientService httpClient)
 	public Task<ApiResult<RecipeDto>> AddRecipe(CreateRecipeDto recipe) =>
 		httpClient.PostAsync<CreateRecipeDto, RecipeDto>(ApiRoutes.Recipe.Create, recipe);
 
-	public Task<ApiResult> UpdateRecipe(UpdateRecipeDto recipe) =>
-		httpClient.PutAsync(ApiRoutes.Recipe.Update, recipe);
+	public Task<ApiResult> UpdateRecipe(UpdateRecipeDto recipe) => httpClient.PutAsync(ApiRoutes.Recipe.Update, recipe);
 
 	public Task<ApiResult> UpdateRecipeName(Guid recipeId, string recipeName)
 	{

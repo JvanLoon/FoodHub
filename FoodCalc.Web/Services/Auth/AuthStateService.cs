@@ -4,14 +4,11 @@ public class AuthStateService(AuthTokenService authTokenService)
 {
 	public event Func<Task>? OnAuthStateChanged;
 
-	public async Task<bool> IsLoggedInAsync()
-		=> !await authTokenService.IsTokenExpiredAsync();
+	public async Task<bool> IsLoggedInAsync() => !await authTokenService.IsTokenExpiredAsync();
 
-	public async Task<string?> GetEmailAsync()
-		=> await authTokenService.GetEmailAsync();
+	public async Task<string?> GetEmailAsync() => await authTokenService.GetEmailAsync();
 
-	public async Task<List<string>> GetRolesAsync()
-		=> await authTokenService.GetRolesAsync();
+	public async Task<List<string>> GetRolesAsync() => await authTokenService.GetRolesAsync();
 
 	public async Task<bool> IsAdminAsync()
 	{
@@ -41,15 +38,11 @@ public class AuthStateService(AuthTokenService authTokenService)
 	public async Task NotifyAuthStateChangedAsync()
 	{
 		if (OnAuthStateChanged == null) return;
-		foreach (var handler in OnAuthStateChanged.GetInvocationList().Cast<Func<Task>>())
+		foreach (var handler in OnAuthStateChanged.GetInvocationList()
+												  .Cast<Func<Task>>())
 		{
-			try
-			{
-				await handler();
-			}
-			catch
-			{
-			}
+			try { await handler(); }
+			catch {}
 		}
 	}
 }

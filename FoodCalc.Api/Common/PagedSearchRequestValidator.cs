@@ -13,12 +13,13 @@ namespace FoodCalc.Api.Common;
 /// keeps a thin subclass (e.g. GetRecipesRequestValidator : this&lt;GetRecipesRequest&gt;).
 /// Shared rules live here; request-specific rules go in the subclass body.
 /// </summary>
-public class PagedSearchRequestValidator<TRequest> : Validator<TRequest>
-	where TRequest : class, IPagedSearchRequest
+public class PagedSearchRequestValidator<TRequest> : Validator<TRequest> where TRequest : class, IPagedSearchRequest
 {
 	public PagedSearchRequestValidator()
 	{
-		RuleFor(x => x.Page).GreaterThanOrEqualTo(1);
-		RuleFor(x => x.PageSize).GreaterThanOrEqualTo(1);
+		RuleFor(x => x.Page)
+			.GreaterThanOrEqualTo(1);
+		RuleFor(x => x.PageSize)
+			.GreaterThanOrEqualTo(1);
 	}
 }

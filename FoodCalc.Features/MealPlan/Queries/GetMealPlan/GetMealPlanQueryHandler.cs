@@ -14,16 +14,20 @@ namespace FoodCalc.Features.MealPlan.Queries.GetMealPlan;
 public class GetMealPlanQueryHandler(FoodHubDbContext context, ILogger<GetMealPlanQueryHandler> logger)
 	: IRequestHandler<GetMealPlanQuery, ErrorOr<List<MealPlanEntryDto>>>
 {
-	public async Task<ErrorOr<List<MealPlanEntryDto>>> Handle(GetMealPlanQuery request, CancellationToken cancellationToken)
+	public async Task<ErrorOr<List<MealPlanEntryDto>>> Handle(GetMealPlanQuery request,
+															  CancellationToken cancellationToken
+	)
 	{
 		try
 		{
 			var entries = await context.MealPlanEntries
-				.Where(m => m.UserId == request.UserId && m.Date >= request.From && m.Date <= request.To)
-				.Include(m => m.Recipe)
-				.OrderBy(m => m.Date)
-				.ThenBy(m => m.CreatedDate)
-				.ToListAsync(cancellationToken);
+									   .Where(m => m.UserId == request.UserId
+												   && m.Date >= request.From
+												   && m.Date <= request.To)
+									   .Include(m => m.Recipe)
+									   .OrderBy(m => m.Date)
+									   .ThenBy(m => m.CreatedDate)
+									   .ToListAsync(cancellationToken);
 
 			return entries.ToDtoList();
 		}

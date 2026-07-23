@@ -10,23 +10,14 @@ public class AuthTokenService(ILocalStorageService localStorage)
 {
 	private readonly string _tokenName = WebConstants.Storage.AuthToken;
 
-	public async Task<string?> GetTokenAsync()
-	{
-		return await localStorage.GetItemAsync<string>(_tokenName);
-	}
+	public async Task<string?> GetTokenAsync() { return await localStorage.GetItemAsync<string>(_tokenName); }
 
 	public async Task SetTokenAsync(string token)
 	{
-		if (!string.IsNullOrEmpty(token))
-		{
-			await localStorage.SetItemAsync(_tokenName, token);
-		}
+		if (!string.IsNullOrEmpty(token)) { await localStorage.SetItemAsync(_tokenName, token); }
 	}
 
-	public async Task RemoveTokenAsync()
-	{
-		await localStorage.RemoveItemAsync(_tokenName);
-	}
+	public async Task RemoveTokenAsync() { await localStorage.RemoveItemAsync(_tokenName); }
 
 	public async Task<string?> GetEmailAsync()
 	{
@@ -49,7 +40,8 @@ public class AuthTokenService(ILocalStorageService localStorage)
 
 		var handler = new JwtSecurityTokenHandler();
 		var jwt = handler.ReadJwtToken(token);
-		var exp = jwt.Claims.FirstOrDefault(c => c.Type == "exp")?.Value;
+		var exp = jwt.Claims.FirstOrDefault(c => c.Type == "exp")
+					 ?.Value;
 
 		if (exp == null)
 			return true;
@@ -66,7 +58,9 @@ public class AuthTokenService(ILocalStorageService localStorage)
 
 		var handler = new JwtSecurityTokenHandler();
 		var jwt = handler.ReadJwtToken(token);
-		var roles = jwt.Claims.Where(c => c.Type.Contains("role")).Select(c => c.Value).ToList();
+		var roles = jwt.Claims.Where(c => c.Type.Contains("role"))
+					   .Select(c => c.Value)
+					   .ToList();
 
 		return roles;
 	}

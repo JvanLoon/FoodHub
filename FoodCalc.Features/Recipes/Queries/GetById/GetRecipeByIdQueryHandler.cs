@@ -11,7 +11,8 @@ using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Features.Recipes.Queries.GetById;
 
-public class GetRecipeByIdQueryHandler(FoodHubDbContext context, ILogger<GetRecipeByIdQueryHandler> logger) : IRequestHandler<GetRecipeByIdQuery, ErrorOr<RecipeDto?>>
+public class GetRecipeByIdQueryHandler(FoodHubDbContext context, ILogger<GetRecipeByIdQueryHandler> logger)
+	: IRequestHandler<GetRecipeByIdQuery, ErrorOr<RecipeDto?>>
 {
 	public async Task<ErrorOr<RecipeDto?>> Handle(GetRecipeByIdQuery request, CancellationToken cancellationToken)
 	{
@@ -19,10 +20,8 @@ public class GetRecipeByIdQueryHandler(FoodHubDbContext context, ILogger<GetReci
 		{
 			var recipe = await context.Recipes.SingleOrDefaultAsync(r => r.Id == request.Id, cancellationToken);
 
-			if (recipe is null)
-			{
-				return Error.Failure(description: ErrorMessages.Common.NotFound("Recipe"));
-			}
+			if (recipe is null) { return Error.Failure(description: ErrorMessages.Common.NotFound("Recipe")); }
+
 			return recipe.ToDto();
 		}
 		catch (Exception ex)

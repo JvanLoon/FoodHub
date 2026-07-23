@@ -25,14 +25,13 @@ public static class EntityCollectionExtensions
 	/// <param name="keyOfIncoming">Extracts the match key from an incoming item.</param>
 	/// <param name="create">Builds a new entity from an incoming item with no matching entity.</param>
 	/// <param name="update">Applies an incoming item onto its matching existing entity.</param>
-	public static void Sync<TEntity, TSource, TKey>(
-		this ICollection<TEntity> target,
-		IEnumerable<TSource>? source,
-		Func<TEntity, TKey> keyOfExisting,
-		Func<TSource, TKey> keyOfIncoming,
-		Func<TSource, TEntity> create,
-		Action<TSource, TEntity> update)
-		where TKey : notnull
+	public static void Sync<TEntity, TSource, TKey>(this ICollection<TEntity> target,
+													IEnumerable<TSource>? source,
+													Func<TEntity, TKey> keyOfExisting,
+													Func<TSource, TKey> keyOfIncoming,
+													Func<TSource, TEntity> create,
+													Action<TSource, TEntity> update
+	) where TKey : notnull
 	{
 		ArgumentNullException.ThrowIfNull(target);
 		ArgumentNullException.ThrowIfNull(keyOfExisting);
@@ -43,10 +42,7 @@ public static class EntityCollectionExtensions
 		var incoming = source?.ToList() ?? [];
 
 		var existingByKey = new Dictionary<TKey, TEntity>();
-		foreach (var entity in target)
-		{
-			existingByKey[keyOfExisting(entity)] = entity;
-		}
+		foreach (var entity in target) { existingByKey[keyOfExisting(entity)] = entity; }
 
 		var seenKeys = new HashSet<TKey>();
 
@@ -56,23 +52,14 @@ public static class EntityCollectionExtensions
 			var key = keyOfIncoming(item);
 			seenKeys.Add(key);
 
-			if (existingByKey.TryGetValue(key, out var existing))
-			{
-				update(item, existing);
-			}
-			else
-			{
-				target.Add(create(item));
-			}
+			if (existingByKey.TryGetValue(key, out var existing)) { update(item, existing); }
+			else { target.Add(create(item)); }
 		}
 
 		// Remove entities that are no longer present in the incoming set.
 		foreach (var entity in target.ToList())
 		{
-			if (!seenKeys.Contains(keyOfExisting(entity)))
-			{
-				target.Remove(entity);
-			}
+			if (!seenKeys.Contains(keyOfExisting(entity))) { target.Remove(entity); }
 		}
 	}
 }

@@ -1,23 +1,25 @@
-@if (TabSet?.ActiveTab == this)
-{
-    @ChildContent
-}
+@if (TabSet?.ActiveTab == this) { @ChildContent }
 
 @code {
-    [CascadingParameter] private TabSet? TabSet { get; set; }
 
-    [Parameter, EditorRequired] 
-    public string Title { get; set; } = string.Empty;
-    [Parameter] 
-    public string? Icon { get; set; }
-    [Parameter] 
-    public RenderFragment? ChildContent { get; set; }
+	[CascadingParameter]
+	private TabSet? TabSet { get; set; }
 
-    protected override void OnInitialized()
-    {
-        if (TabSet is null)
-            throw new InvalidOperationException($"{nameof(Tab)} must be placed inside a {nameof(TabSet)}.");
+	[Parameter, EditorRequired]
+	public string Title { get; set; } = string.Empty;
 
-        TabSet.AddTab(this);
-    }
+	[Parameter]
+	public string? Icon { get; set; }
+
+	[Parameter]
+	public RenderFragment? ChildContent { get; set; }
+
+	protected override void OnInitialized()
+	{
+		if (TabSet is null)
+			throw new InvalidOperationException($"{nameof(Tab)} must be placed inside a {nameof(TabSet)}.");
+
+		TabSet.AddTab(this);
+	}
+
 }

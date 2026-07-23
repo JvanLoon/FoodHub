@@ -6,8 +6,11 @@ namespace FoodCalc.Web.Services;
 
 public class IngredientService(AuthenticatedHttpClientService httpClient)
 {
-	public Task<ApiResult<PagedResultDto<IngredientDto>>> GetPagedIngredientsAsync(int page, int pageSize,
-		string? search = null)
+	public Task<ApiResult<PagedResultDto<IngredientDto>>> GetPagedIngredientsAsync(
+		int page,
+		int pageSize,
+		string? search = null
+	)
 	{
 		var url = $"{ApiRoutes.Ingredient.GetAll}?page={page}&pageSize={pageSize}";
 		if (!string.IsNullOrWhiteSpace(search))
@@ -22,7 +25,7 @@ public class IngredientService(AuthenticatedHttpClientService httpClient)
 		if (!paged.Success)
 			return ApiResult<List<IngredientDto>>.Fail(paged.Errors, paged.StatusCode);
 
-		return ApiResult<List<IngredientDto>>.Ok([.. paged.Data!.Items], paged.StatusCode);
+		return ApiResult<List<IngredientDto>>.Ok([..paged.Data!.Items], paged.StatusCode);
 	}
 
 	public Task<ApiResult> UpdateIngredient(UpdateIngredientDto ingredient) =>

@@ -13,10 +13,12 @@ using Microsoft.Extensions.Logging;
 
 using System.Text.Json;
 
-
 namespace FoodCalc.Features.ImportExport.Export.Commands.ExportJSON;
 
-public class ExportAllCommandHandler(FoodHubDbContext context, UserManager<IdentityUser> userManager, ILogger<ExportAllCommandHandler> logger) : IRequestHandler<ExportAllCommand, ErrorOr<string>>
+public class ExportAllCommandHandler(
+	FoodHubDbContext context,
+	UserManager<IdentityUser> userManager,
+	ILogger<ExportAllCommandHandler> logger) : IRequestHandler<ExportAllCommand, ErrorOr<string>>
 {
 	public async Task<ErrorOr<string>> Handle(ExportAllCommand request, CancellationToken cancellationToken)
 	{
@@ -58,16 +60,15 @@ public class ExportAllCommandHandler(FoodHubDbContext context, UserManager<Ident
 
 			var exportData = new ImportExportAllDataDto
 			{
-				Recipes = recipes.OrderBy(r => r.Name).ToDtoList(),
-				Ingredients = ingredients.OrderBy(i => i.Name).ToDtoList(),
+				Recipes = recipes.OrderBy(r => r.Name)
+								 .ToDtoList(),
+				Ingredients = ingredients.OrderBy(i => i.Name)
+										 .ToDtoList(),
 				RecipeItems = recipeItems.ToDtoList(),
 				Users = usersWithRoles
 			};
 
-			var json = JsonSerializer.Serialize(exportData, new JsonSerializerOptions
-			{
-				WriteIndented = true
-			});
+			var json = JsonSerializer.Serialize(exportData, new JsonSerializerOptions {WriteIndented = true});
 
 			return json;
 		}

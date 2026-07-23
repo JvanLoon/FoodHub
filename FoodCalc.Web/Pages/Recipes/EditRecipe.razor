@@ -63,10 +63,9 @@
 									@ingredient.Name
 								</button>
 							}
-							@if (!FilteredIngredients.Any())
-							{
-								<div class="dropdown-item disabled">No ingredients found. Click + to add.</div>
-							}
+							@if (!FilteredIngredients.Any()) { <div class="dropdown-item disabled">No ingredients found.
+								Click + to add.
+							</div> }
 						</div>
 					</div>
 
@@ -90,7 +89,10 @@
 
 		<!-- Right: current ingredients -->
 		<div class="col-md-6">
-			@if (recipe?.Ingredients is {Count: > 0} ingredientsList)
+			@if (recipe?.Ingredients is
+				     {
+					     Count: > 0
+				     } ingredientsList)
 			{
 				<ul class="ingredient-list">
 					@foreach (var ingredient in ingredientsList)
@@ -132,10 +134,7 @@
 	private bool isEditingName = false;
 	private string ingredientSearch = string.Empty;
 
-	private IEnumerable<IngredientDto> FilteredIngredients =>
-		string.IsNullOrWhiteSpace(ingredientSearch)
-			? ingredients
-			: ingredients.Where(i => i.Name.Contains(ingredientSearch, StringComparison.OrdinalIgnoreCase));
+	private IEnumerable<IngredientDto> FilteredIngredients => string.IsNullOrWhiteSpace(ingredientSearch) ? ingredients : ingredients.Where(i => i.Name.Contains(ingredientSearch, StringComparison.OrdinalIgnoreCase));
 
 	private decimal? amountInput;
 	private bool dropdownOpen = false;
@@ -150,19 +149,22 @@
 		}
 
 		recipe = await RecipeService.GetRecipeByIdAsync(RecipeId)
-			.OrDefault<RecipeDto>(new());
+		                            .OrDefault<RecipeDto>(new());
 
 		await IngredientService.GetAllIngredientsAsync()
-			.OnSuccess((data) =>
-			{
-				ingredients = data;
-				ClearForm();
-			}).OnFailure();
+		                       .OnSuccess((data) =>
+		                       {
+			                       ingredients = data;
+			                       ClearForm();
+		                       })
+		                       .OnFailure();
 	}
 
 	private async Task RefreshRecipeAsync()
 	{
-		await RecipeService.GetRecipeByIdAsync(RecipeId).OnSuccess((data) => recipe = data).OnFailure();
+		await RecipeService.GetRecipeByIdAsync(RecipeId)
+		                   .OnSuccess((data) => recipe = data)
+		                   .OnFailure();
 	}
 
 	private async Task AddOrUpdateIngredient()
@@ -171,8 +173,8 @@
 		recipeItem.Amount = amountInput ?? 0;
 
 		await RecipeService.AddIngredient(recipeItem)
-			.OnSuccess(message: WebConstants.Messages.Ingredient.AddedOrUpdated)
-			.OnFailure();
+		                   .OnSuccess(message: WebConstants.Messages.Ingredient.AddedOrUpdated)
+		                   .OnFailure();
 
 		ClearForm();
 		await RefreshRecipeAsync(); // Refresh the list
@@ -180,15 +182,7 @@
 
 	private void EditIngredient(RecipeItemDto ingredient)
 	{
-		recipeItem = new RecipeItemDto
-		{
-			Id = ingredient.Id,
-			RecipeId = RecipeId,
-			Name = ingredient.Name,
-			Amount = ingredient.Amount,
-			IngredientAmount = ingredient.IngredientAmount,
-			ShouldBeAddedToShoppingCart = ingredient.ShouldBeAddedToShoppingCart
-		};
+		recipeItem = new RecipeItemDto {Id = ingredient.Id, RecipeId = RecipeId, Name = ingredient.Name, Amount = ingredient.Amount, IngredientAmount = ingredient.IngredientAmount, ShouldBeAddedToShoppingCart = ingredient.ShouldBeAddedToShoppingCart};
 		amountInput = ingredient.Amount == 0 ? null : ingredient.Amount;
 		ingredientSearch = ingredient.Name;
 	}
@@ -196,8 +190,8 @@
 	private async Task DeleteIngredient(Guid recipeItemId)
 	{
 		await RecipeService.DeleteIngredient(recipeItemId)
-			.OnSuccess(message: WebConstants.Messages.Ingredient.Deleted)
-			.OnFailure();
+		                   .OnSuccess(message: WebConstants.Messages.Ingredient.Deleted)
+		                   .OnFailure();
 
 		ClearForm();
 		await RefreshRecipeAsync(); // Refresh the list
@@ -213,8 +207,8 @@
 	private async Task SaveRecipeName()
 	{
 		await RecipeService.UpdateRecipeName(RecipeId, recipe.Name!)
-			.OnSuccess(message: WebConstants.Messages.Recipe.NameUpdated)
-			.OnFailure();
+		                   .OnSuccess(message: WebConstants.Messages.Recipe.NameUpdated)
+		                   .OnFailure();
 
 		isEditingName = false;
 		await RefreshRecipeAsync(); // Refresh
@@ -222,26 +216,24 @@
 
 	private async Task AddIngredient()
 	{
-		await IngredientService.AddIngredientAsync(new CreateIngredientDto {Name = ingredientSearch}).OnSuccess(async () =>
-			{
-				await IngredientService.GetAllIngredientsAsync()
-					.OnSuccess((data) => ingredients = data)
-					.OnFailure();
+		await IngredientService.AddIngredientAsync(new CreateIngredientDto {Name = ingredientSearch})
+		                       .OnSuccess(async () =>
+		                       {
+			                       await IngredientService.GetAllIngredientsAsync()
+			                                              .OnSuccess((data) => ingredients = data)
+			                                              .OnFailure();
 
-				var created = ingredients.FirstOrDefault(i => i.Name == ingredientSearch);
+			                       var created = ingredients.FirstOrDefault(i => i.Name == ingredientSearch);
 
-				//only clear when failed
-				if (created is not null)
-				{
-					recipeItem.Name = created.Name;
-					recipeItem.ShouldBeAddedToShoppingCart = created.ShouldBeAddedToShoppingCart;
-				}
-				else
-				{
-					ingredientSearch = string.Empty;
-				}
-			}, WebConstants.Messages.Ingredient.Added)
-			.OnFailure();
+			                       //only clear when failed
+			                       if (created is not null)
+			                       {
+				                       recipeItem.Name = created.Name;
+				                       recipeItem.ShouldBeAddedToShoppingCart = created.ShouldBeAddedToShoppingCart;
+			                       }
+			                       else { ingredientSearch = string.Empty; }
+		                       }, WebConstants.Messages.Ingredient.Added)
+		                       .OnFailure();
 	}
 
 	private void SelectIngredient(IngredientDto ingredient)
@@ -259,17 +251,11 @@
 		dropdownOpen = false;
 	}
 
-	private void CancelEditName()
-	{
-		isEditingName = false;
-	}
+	private void CancelEditName() { isEditingName = false; }
 
 	private async Task HandleIngredientSearchKeydown(KeyboardEventArgs e)
 	{
-		if (e.Key == "Enter")
-		{
-			await AddIngredient();
-		}
+		if (e.Key == "Enter") { await AddIngredient(); }
 	}
 
 }

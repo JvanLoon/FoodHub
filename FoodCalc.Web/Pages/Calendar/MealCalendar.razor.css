@@ -1,259 +1,259 @@
 .cal-layout {
-    display: flex;
-    flex-direction: column;
-    gap: var(--fh-space-5);
+	display: flex;
+	flex-direction: column;
+	gap: var(--fh-space-5);
 }
 
 .cal-views {
-    display: block;
+	display: block;
 }
 
 /* View toggle (Week / Month) */
 .cal-toggle {
-    display: inline-flex;
-    border: 1px solid var(--fh-border);
-    border-radius: var(--fh-radius-md);
-    overflow: hidden;
-    background: var(--fh-surface);
+	display: inline-flex;
+	border: 1px solid var(--fh-border);
+	border-radius: var(--fh-radius-md);
+	overflow: hidden;
+	background: var(--fh-surface);
 }
 
 .cal-toggle__btn {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--fh-space-1);
-    padding: var(--fh-space-2) var(--fh-space-3);
-    border: none;
-    background: transparent;
-    color: var(--fh-text-muted);
-    cursor: pointer;
-    font: inherit;
+	display: inline-flex;
+	align-items: center;
+	gap: var(--fh-space-1);
+	padding: var(--fh-space-2) var(--fh-space-3);
+	border: none;
+	background: transparent;
+	color: var(--fh-text-muted);
+	cursor: pointer;
+	font: inherit;
 }
 
 .cal-toggle__btn + .cal-toggle__btn {
-    border-left: 1px solid var(--fh-border);
+	border-left: 1px solid var(--fh-border);
 }
 
 .cal-toggle__btn--active {
-    background: var(--fh-accent);
-    color: #fff;
+	background: var(--fh-accent);
+	color: #fff;
 }
 
 .cal-panel {
-    background: var(--fh-surface);
-    border: 1px solid var(--fh-border);
-    border-radius: var(--fh-radius-lg);
-    box-shadow: var(--fh-shadow-sm);
-    padding: var(--fh-space-4);
+	background: var(--fh-surface);
+	border: 1px solid var(--fh-border);
+	border-radius: var(--fh-radius-lg);
+	box-shadow: var(--fh-shadow-sm);
+	padding: var(--fh-space-4);
 }
 
 .cal-panel__head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: var(--fh-space-3);
-    gap: var(--fh-space-3);
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: var(--fh-space-3);
+	gap: var(--fh-space-3);
 }
 
 .cal-nav {
-    display: flex;
-    align-items: center;
-    gap: var(--fh-space-2);
+	display: flex;
+	align-items: center;
+	gap: var(--fh-space-2);
 }
 
 .cal-nav__label {
-    min-width: 10rem;
-    text-align: center;
-    font-weight: 600;
-    color: var(--fh-text);
+	min-width: 10rem;
+	text-align: center;
+	font-weight: 600;
+	color: var(--fh-text);
 }
 
 /* Week: a single column of tall day rows. */
 .cal-week {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--fh-space-2);
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: var(--fh-space-2);
 }
 
 /* Month: 7-column grid, headers then day cells. */
 .cal-month {
-    display: grid;
-    grid-template-columns: repeat(7, minmax(0, 1fr));
-    gap: var(--fh-space-1);
+	display: grid;
+	grid-template-columns: repeat(7, minmax(0, 1fr));
+	gap: var(--fh-space-1);
 }
 
 .cal-month__dow {
-    text-align: center;
-    font-size: var(--fh-text-sm);
-    font-weight: 600;
-    color: var(--fh-text-muted);
-    padding-bottom: var(--fh-space-1);
+	text-align: center;
+	font-size: var(--fh-text-sm);
+	font-weight: 600;
+	color: var(--fh-text-muted);
+	padding-bottom: var(--fh-space-1);
 }
 
 /* ---- Recipe picker ---- */
 .cal-picker {
-    display: flex;
-    flex-direction: column;
-    gap: var(--fh-space-1);
-    max-height: 55vh;
-    overflow-y: auto;
-    margin-top: var(--fh-space-3);
+	display: flex;
+	flex-direction: column;
+	gap: var(--fh-space-1);
+	max-height: 55vh;
+	overflow-y: auto;
+	margin-top: var(--fh-space-3);
 }
 
 .cal-picker__item {
-    display: flex;
-    align-items: center;
-    gap: var(--fh-space-2);
-    width: 100%;
-    text-align: left;
-    padding: var(--fh-space-2) var(--fh-space-3);
-    background: var(--fh-surface);
-    border: 1px solid var(--fh-border);
-    border-radius: var(--fh-radius-md);
-    color: var(--fh-text);
-    cursor: pointer;
+	display: flex;
+	align-items: center;
+	gap: var(--fh-space-2);
+	width: 100%;
+	text-align: left;
+	padding: var(--fh-space-2) var(--fh-space-3);
+	background: var(--fh-surface);
+	border: 1px solid var(--fh-border);
+	border-radius: var(--fh-radius-md);
+	color: var(--fh-text);
+	cursor: pointer;
 }
 
 .cal-picker__item:hover {
-    background: var(--fh-surface-sunken);
-    border-color: var(--fh-accent);
+	background: var(--fh-surface-sunken);
+	border-color: var(--fh-accent);
 }
 
 .cal-picker__add {
-    margin-left: auto;
-    color: var(--fh-accent);
+	margin-left: auto;
+	color: var(--fh-accent);
 }
 
 /* ---- Randomize popup ---- */
 .cal-input {
-    width: 100%;
-    padding: var(--fh-space-2) var(--fh-space-3);
-    border: 1px solid var(--fh-border);
-    border-radius: var(--fh-radius-md);
-    background: var(--fh-surface);
-    color: var(--fh-text);
+	width: 100%;
+	padding: var(--fh-space-2) var(--fh-space-3);
+	border: 1px solid var(--fh-border);
+	border-radius: var(--fh-radius-md);
+	background: var(--fh-surface);
+	color: var(--fh-text);
 }
 
 .cal-input:focus {
-    outline: none;
-    border-color: var(--fh-accent);
-    box-shadow: var(--fh-focus-ring);
+	outline: none;
+	border-color: var(--fh-accent);
+	box-shadow: var(--fh-focus-ring);
 }
 
 /* Ingredient combobox */
 .cal-combo {
-    position: relative;
+	position: relative;
 }
 
 .cal-combo__control {
-    display: flex;
-    align-items: stretch;
-    border: 1px solid var(--fh-border);
-    border-radius: var(--fh-radius-md);
-    background: var(--fh-surface);
-    overflow: hidden;
+	display: flex;
+	align-items: stretch;
+	border: 1px solid var(--fh-border);
+	border-radius: var(--fh-radius-md);
+	background: var(--fh-surface);
+	overflow: hidden;
 }
 
 .cal-combo__control:focus-within {
-    border-color: var(--fh-accent);
-    box-shadow: var(--fh-focus-ring);
+	border-color: var(--fh-accent);
+	box-shadow: var(--fh-focus-ring);
 }
 
 .cal-combo__control .cal-input {
-    border: none;
-    border-radius: 0;
-    flex: 1 1 auto;
+	border: none;
+	border-radius: 0;
+	flex: 1 1 auto;
 }
 
 .cal-combo__control .cal-input:focus {
-    box-shadow: none;
+	box-shadow: none;
 }
 
 .cal-combo__toggle {
-    border: none;
-    border-left: 1px solid var(--fh-border);
-    background: var(--fh-surface-sunken);
-    color: var(--fh-text-muted);
-    cursor: pointer;
-    padding: 0 var(--fh-space-3);
-    display: inline-flex;
-    align-items: center;
+	border: none;
+	border-left: 1px solid var(--fh-border);
+	background: var(--fh-surface-sunken);
+	color: var(--fh-text-muted);
+	cursor: pointer;
+	padding: 0 var(--fh-space-3);
+	display: inline-flex;
+	align-items: center;
 }
 
 .cal-combo__menu {
-    list-style: none;
-    margin: 4px 0 0;
-    padding: 4px;
-    position: absolute;
-    z-index: 20;
-    left: 0;
-    right: 0;
-    max-height: 14rem;
-    overflow-y: auto;
-    background: var(--fh-surface-raised);
-    border: 1px solid var(--fh-border);
-    border-radius: var(--fh-radius-md);
-    box-shadow: var(--fh-shadow-md);
+	list-style: none;
+	margin: 4px 0 0;
+	padding: 4px;
+	position: absolute;
+	z-index: 20;
+	left: 0;
+	right: 0;
+	max-height: 14rem;
+	overflow-y: auto;
+	background: var(--fh-surface-raised);
+	border: 1px solid var(--fh-border);
+	border-radius: var(--fh-radius-md);
+	box-shadow: var(--fh-shadow-md);
 }
 
 .cal-combo__item {
-    display: block;
-    width: 100%;
-    text-align: left;
-    padding: var(--fh-space-2) var(--fh-space-3);
-    border: none;
-    background: transparent;
-    color: var(--fh-text);
-    border-radius: var(--fh-radius-sm);
-    cursor: pointer;
-    font: inherit;
+	display: block;
+	width: 100%;
+	text-align: left;
+	padding: var(--fh-space-2) var(--fh-space-3);
+	border: none;
+	background: transparent;
+	color: var(--fh-text);
+	border-radius: var(--fh-radius-sm);
+	cursor: pointer;
+	font: inherit;
 }
 
 .cal-combo__item:hover {
-    background: var(--fh-accent-subtle);
+	background: var(--fh-accent-subtle);
 }
 
 .cal-combo__empty {
-    padding: var(--fh-space-2) var(--fh-space-3);
-    color: var(--fh-text-muted);
-    font-size: var(--fh-text-sm);
+	padding: var(--fh-space-2) var(--fh-space-3);
+	color: var(--fh-text-muted);
+	font-size: var(--fh-text-sm);
 }
 
 .cal-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--fh-space-2);
-    margin-bottom: var(--fh-space-2);
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--fh-space-2);
+	margin-bottom: var(--fh-space-2);
 }
 
 .cal-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--fh-space-1);
-    padding: 0.15rem 0.35rem 0.15rem 0.6rem;
-    background: var(--fh-accent-subtle);
-    color: var(--fh-text);
-    border-radius: var(--fh-radius-pill);
-    font-size: var(--fh-text-sm);
+	display: inline-flex;
+	align-items: center;
+	gap: var(--fh-space-1);
+	padding: 0.15rem 0.35rem 0.15rem 0.6rem;
+	background: var(--fh-accent-subtle);
+	color: var(--fh-text);
+	border-radius: var(--fh-radius-pill);
+	font-size: var(--fh-text-sm);
 }
 
 .cal-chip__x {
-    border: none;
-    background: transparent;
-    color: var(--fh-text-muted);
-    cursor: pointer;
-    display: inline-flex;
-    padding: 0;
+	border: none;
+	background: transparent;
+	color: var(--fh-text-muted);
+	cursor: pointer;
+	display: inline-flex;
+	padding: 0;
 }
 
 .cal-chip__x:hover {
-    color: var(--fh-danger);
+	color: var(--fh-danger);
 }
 
 .cal-check {
-    display: flex;
-    align-items: center;
-    gap: var(--fh-space-2);
-    margin-top: var(--fh-space-3);
-    cursor: pointer;
-    color: var(--fh-text);
+	display: flex;
+	align-items: center;
+	gap: var(--fh-space-2);
+	margin-top: var(--fh-space-3);
+	cursor: pointer;
+	color: var(--fh-text);
 }

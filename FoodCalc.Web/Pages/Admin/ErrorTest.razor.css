@@ -1,18 +1,18 @@
 .error-test__controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--fh-space-4);
-    margin-block-end: var(--fh-space-4);
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--fh-space-4);
+	margin-block-end: var(--fh-space-4);
 }
 
 .error-test__controls > * {
-    flex: 1 1 14rem;
+	flex: 1 1 14rem;
 }
 
 .error-test__list {
-    display: flex;
-    flex-direction: column;
-    gap: var(--fh-space-2);
-    margin: 0;
-    padding-inline-start: var(--fh-space-5);
+	display: flex;
+	flex-direction: column;
+	gap: var(--fh-space-2);
+	margin: 0;
+	padding-inline-start: var(--fh-space-5);
 }

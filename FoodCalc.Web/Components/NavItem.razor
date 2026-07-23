@@ -1,19 +1,24 @@
 @* Sidebar navigation entry: Bootstrap-Icons glyph + label on a NavLink. *@
 
 <div class="fh-nav-item">
-    <NavLink class="nav-link" href="@Href" Match="@Match">
-        <i class="bi bi-@Icon" aria-hidden="true"></i>
-        <span>@Label</span>
-    </NavLink>
+	<NavLink class="nav-link" href="@Href" Match="@Match">
+		<i class="bi bi-@Icon" aria-hidden="true"></i>
+		<span>@Label</span>
+	</NavLink>
 </div>
 
 @code {
-    [Parameter, EditorRequired]
-    public string Href { get; set; } = string.Empty;
-    [Parameter, EditorRequired]
-    public string Icon { get; set; } = string.Empty;
-    [Parameter, EditorRequired]
-    public string Label { get; set; } = string.Empty;
-    [Parameter]
-    public NavLinkMatch Match { get; set; } = NavLinkMatch.Prefix;
+
+	[Parameter, EditorRequired]
+	public string Href { get; set; } = string.Empty;
+
+	[Parameter, EditorRequired]
+	public string Icon { get; set; } = string.Empty;
+
+	[Parameter, EditorRequired]
+	public string Label { get; set; } = string.Empty;
+
+	[Parameter]
+	public NavLinkMatch Match { get; set; } = NavLinkMatch.Prefix;
+
 }

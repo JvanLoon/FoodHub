@@ -5,66 +5,60 @@
 @inject MessageService MessageService
 
 <div class="brand-row">
-    <a class="brand" href="">
-        <i class="bi bi-basket2-fill" aria-hidden="true"></i>
-        <span>FoodHub</span>
-    </a>
+	<a class="brand" href="">
+		<i class="bi bi-basket2-fill" aria-hidden="true"></i>
+		<span>FoodHub</span>
+	</a>
 </div>
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+<input type="checkbox" title="Navigation menu" class="navbar-toggler"/>
 
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="nav-list">
-        @if (isLoggedIn)
-        {
-            <NavItem Href="" Icon="house-door-fill" Label="Home" Match="NavLinkMatch.All" />
-            <NavItem Href="/calendar" Icon="calendar-week" Label="Calendar" />
-            <NavItem Href="/recipes" Icon="journal-text" Label="Recipes" />
-            <NavItem Href="/recipes/find" Icon="search-heart" Label="Find recipes" />
+	<nav class="nav-list">
+		@if (isLoggedIn)
+		{
+			<NavItem Href="" Icon="house-door-fill" Label="Home" Match="NavLinkMatch.All"/>
+			<NavItem Href="/calendar" Icon="calendar-week" Label="Calendar"/>
+			<NavItem Href="/recipes" Icon="journal-text" Label="Recipes"/>
+			<NavItem Href="/recipes/find" Icon="search-heart" Label="Find recipes"/>
 
-            @if (isAdmin)
-            {
-                <NavItem Href="/recipes/create" Icon="plus-circle" Label="Add recipe" />
-                <NavItem Href="/ingredients" Icon="egg" Label="Edit Ingredients" />
-                <NavItem Href="/admin" Icon="gear" Label="Admin" />
-            }
+			@if (isAdmin)
+			{
+				<NavItem Href="/recipes/create" Icon="plus-circle" Label="Add recipe"/>
+				<NavItem Href="/ingredients" Icon="egg" Label="Edit Ingredients"/>
+				<NavItem Href="/admin" Icon="gear" Label="Admin"/>
+			}
 
-            <NavItem Href="/usersettings" Icon="person" Label="User Settings" />
-        }
-    </nav>
+			<NavItem Href="/usersettings" Icon="person" Label="User Settings"/>
+		}
+	</nav>
 </div>
 
 @code {
-    private bool isAdmin;
-    private bool isLoggedIn;
+	private bool isAdmin;
+	private bool isLoggedIn;
 
-    protected override async Task OnInitializedAsync()
-    {
-        AuthStateService.OnAuthStateChanged += HandleAuthStateChangedAsync;
-        await RefreshStateAsync();
-    }
+	protected override async Task OnInitializedAsync()
+	{
+		AuthStateService.OnAuthStateChanged += HandleAuthStateChangedAsync;
+		await RefreshStateAsync();
+	}
 
-    private async Task HandleAuthStateChangedAsync()
-    {
-        await RefreshStateAsync();
-        await InvokeAsync(StateHasChanged);
-    }
+	private async Task HandleAuthStateChangedAsync()
+	{
+		await RefreshStateAsync();
+		await InvokeAsync(StateHasChanged);
+	}
 
-    private async Task RefreshStateAsync()
-    {
-        try
-        {
-            isLoggedIn = await AuthStateService.IsLoggedInAsync();
-            isAdmin = isLoggedIn && await AuthStateService.IsAdminAsync();
-        }
-        catch (Exception ex)
-        {
-            MessageService.ShowMessage(ex.Message, true, 0);
-        }
-    }
+	private async Task RefreshStateAsync()
+	{
+		try
+		{
+			isLoggedIn = await AuthStateService.IsLoggedInAsync();
+			isAdmin = isLoggedIn && await AuthStateService.IsAdminAsync();
+		}
+		catch (Exception ex) { MessageService.ShowMessage(ex.Message, true, 0); }
+	}
 
-    public void Dispose()
-    {
-        AuthStateService.OnAuthStateChanged -= HandleAuthStateChangedAsync;
-    }
+	public void Dispose() { AuthStateService.OnAuthStateChanged -= HandleAuthStateChangedAsync; }
 }

@@ -2,51 +2,70 @@
    the + and × buttons stop propagation so they don't toggle. *@
 
 <div class="@CssClass" @onclick="OnSelect">
-    <div class="cal-day__head">
-        <span class="cal-day__num">@(Compact ? Day.Day.ToString() : Day.ToString("ddd d"))</span>
-        <button type="button" class="cal-day__add" title="Add recipe"
-                @onclick="OnAdd" @onclick:stopPropagation="true">
-            <i class="bi bi-plus-lg"></i>
-        </button>
-    </div>
-    <ul class="cal-day__list">
-        @foreach (var entry in Entries)
-        {
-            <li class="cal-meal" title="@entry.RecipeName">
-                <button type="button" class="cal-meal__name" title="Open recipe"
-                        @onclick="() => OnOpen.InvokeAsync(entry)" @onclick:stopPropagation="true">
-                    @entry.RecipeName
-                </button>
-                <button type="button" class="cal-meal__x" title="Remove"
-                        @onclick="() => OnRemove.InvokeAsync(entry)" @onclick:stopPropagation="true">
-                    <i class="bi bi-x"></i>
-                </button>
-            </li>
-        }
-    </ul>
+	<div class="cal-day__head">
+		<span class="cal-day__num">@(Compact ? Day.Day.ToString() : Day.ToString("ddd d"))</span>
+		<button type="button" class="cal-day__add" title="Add recipe"
+		        @onclick="OnAdd" @onclick:stopPropagation="true">
+			<i class="bi bi-plus-lg"></i>
+		</button>
+	</div>
+	<ul class="cal-day__list">
+		@foreach (var entry in Entries)
+		{
+			<li class="cal-meal" title="@entry.RecipeName">
+				<button type="button" class="cal-meal__name" title="Open recipe"
+				        @onclick="() => OnOpen.InvokeAsync(entry)" @onclick:stopPropagation="true">
+					@entry.RecipeName
+				</button>
+				<button type="button" class="cal-meal__x" title="Remove"
+				        @onclick="() => OnRemove.InvokeAsync(entry)" @onclick:stopPropagation="true">
+					<i class="bi bi-x"></i>
+				</button>
+			</li>
+		}
+	</ul>
 </div>
 
 @code {
-    [Parameter, EditorRequired] public DateOnly Day { get; set; }
-    [Parameter] public bool Compact { get; set; }
-    [Parameter] public bool Selected { get; set; }
-    [Parameter] public bool IsOtherMonth { get; set; }
-    [Parameter] public List<MealPlanEntryDto> Entries { get; set; } = new();
-    [Parameter] public EventCallback OnSelect { get; set; }
-    [Parameter] public EventCallback OnAdd { get; set; }
-    [Parameter] public EventCallback<MealPlanEntryDto> OnRemove { get; set; }
-    [Parameter] public EventCallback<MealPlanEntryDto> OnOpen { get; set; }
 
-    private string CssClass
-    {
-        get
-        {
-            var cls = "cal-day";
-            if (Compact) cls += " cal-day--compact";
-            if (Selected) cls += " cal-day--selected";
-            if (Day == DateOnly.FromDateTime(DateTime.Today)) cls += " cal-day--today";
-            if (IsOtherMonth) cls += " cal-day--muted";
-            return cls;
-        }
-    }
+	[Parameter, EditorRequired]
+	public DateOnly Day { get; set; }
+
+	[Parameter]
+	public bool Compact { get; set; }
+
+	[Parameter]
+	public bool Selected { get; set; }
+
+	[Parameter]
+	public bool IsOtherMonth { get; set; }
+
+	[Parameter]
+	public List<MealPlanEntryDto> Entries { get; set; } = new();
+
+	[Parameter]
+	public EventCallback OnSelect { get; set; }
+
+	[Parameter]
+	public EventCallback OnAdd { get; set; }
+
+	[Parameter]
+	public EventCallback<MealPlanEntryDto> OnRemove { get; set; }
+
+	[Parameter]
+	public EventCallback<MealPlanEntryDto> OnOpen { get; set; }
+
+	private string CssClass
+	{
+		get
+		{
+			var cls = "cal-day";
+			if (Compact) cls += " cal-day--compact";
+			if (Selected) cls += " cal-day--selected";
+			if (Day == DateOnly.FromDateTime(DateTime.Today)) cls += " cal-day--today";
+			if (IsOtherMonth) cls += " cal-day--muted";
+			return cls;
+		}
+	}
+
 }

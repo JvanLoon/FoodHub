@@ -15,8 +15,7 @@ namespace FoodCalc.Api.Endpoints.ImportExport;
 /// legacy (pre-RecipeItem) export format and imports it via the normal import
 /// pipeline after converting it to the current shape.
 /// </summary>
-public class ImportOldEndpoint(IMediator mediator)
-	: Endpoint<ImportRequest>
+public class ImportOldEndpoint(IMediator mediator) : Endpoint<ImportRequest>
 {
 	public override void Configure()
 	{
@@ -46,9 +45,7 @@ public class ImportOldEndpoint(IMediator mediator)
 		try
 		{
 			legacy = await JsonSerializer.DeserializeAsync<LegacyImportExportAllDataDto>(
-				stream,
-				new JsonSerializerOptions { PropertyNameCaseInsensitive = true },
-				ct);
+				stream, new JsonSerializerOptions {PropertyNameCaseInsensitive = true}, ct);
 		}
 		catch (JsonException)
 		{
@@ -65,8 +62,7 @@ public class ImportOldEndpoint(IMediator mediator)
 		var importData = LegacyImportConverter.ToCurrent(legacy);
 		var result = await mediator.Send(new ImportAllCommand(importData), ct);
 
-		await result.Match(
-			_ => Send.StringAsync("Import successful.", cancellation: ct),
-			errors => this.SendErrorsAsync(errors, ct: ct));
+		await result.Match(_ => Send.StringAsync("Import successful.", cancellation: ct),
+						   errors => this.SendErrorsAsync(errors, ct: ct));
 	}
 }

@@ -3,70 +3,70 @@
 @implements IDisposable
 
 <div class="fh-search @CssClass">
-    <i class="bi bi-search fh-search__icon" aria-hidden="true"></i>
-    <input type="text"
-           class="form-control"
-           placeholder="@Placeholder"
-           aria-label="@Placeholder"
-           value="@Value"
-           @oninput="HandleInput" />
-    @if (!string.IsNullOrEmpty(Value))
-    {
-        <button type="button" class="fh-search__clear" aria-label="Clear search" @onclick="ClearAsync">
-            <i class="bi bi-x-lg" aria-hidden="true"></i>
-        </button>
-    }
+	<i class="bi bi-search fh-search__icon" aria-hidden="true"></i>
+	<input type="text"
+	       class="form-control"
+	       placeholder="@Placeholder"
+	       aria-label="@Placeholder"
+	       value="@Value"
+	       @oninput="HandleInput"/>
+	@if (!string.IsNullOrEmpty(Value))
+	{
+		<button type="button" class="fh-search__clear" aria-label="Clear search" @onclick="ClearAsync">
+			<i class="bi bi-x-lg" aria-hidden="true"></i>
+		</button>
+	}
 </div>
 
 @code {
-    [Parameter]
-    public string Value { get; set; } = string.Empty;
-    [Parameter]
-    public EventCallback<string> ValueChanged { get; set; }
-    [Parameter]
-    public string Placeholder { get; set; } = "Search...";
-    [Parameter]
-    public int DebounceMs { get; set; } = 300;
-    [Parameter]
-    public string? CssClass { get; set; }
 
-    private CancellationTokenSource _cts = new();
+	[Parameter]
+	public string Value { get; set; } = string.Empty;
 
-    private async Task HandleInput(ChangeEventArgs e)
-    {
-        var text = e.Value?.ToString() ?? string.Empty;
-        Value = text;
+	[Parameter]
+	public EventCallback<string> ValueChanged { get; set; }
 
-        _cts.Cancel();
-        _cts.Dispose();
-        _cts = new CancellationTokenSource();
-        var token = _cts.Token;
+	[Parameter]
+	public string Placeholder { get; set; } = "Search...";
 
-        if (DebounceMs > 0)
-        {
-            try
-            {
-                await Task.Delay(DebounceMs, token);
-            }
-            catch (OperationCanceledException)
-            {
-                return;
-            }
-        }
+	[Parameter]
+	public int DebounceMs { get; set; } = 300;
 
-        await ValueChanged.InvokeAsync(text);
-    }
+	[Parameter]
+	public string? CssClass { get; set; }
 
-    private async Task ClearAsync()
-    {
-        _cts.Cancel();
-        Value = string.Empty;
-        await ValueChanged.InvokeAsync(string.Empty);
-    }
+	private CancellationTokenSource _cts = new();
 
-    public void Dispose()
-    {
-        _cts.Cancel();
-        _cts.Dispose();
-    }
+	private async Task HandleInput(ChangeEventArgs e)
+	{
+		var text = e.Value?.ToString() ?? string.Empty;
+		Value = text;
+
+		_cts.Cancel();
+		_cts.Dispose();
+		_cts = new CancellationTokenSource();
+		var token = _cts.Token;
+
+		if (DebounceMs > 0)
+		{
+			try { await Task.Delay(DebounceMs, token); }
+			catch (OperationCanceledException) { return; }
+		}
+
+		await ValueChanged.InvokeAsync(text);
+	}
+
+	private async Task ClearAsync()
+	{
+		_cts.Cancel();
+		Value = string.Empty;
+		await ValueChanged.InvokeAsync(string.Empty);
+	}
+
+	public void Dispose()
+	{
+		_cts.Cancel();
+		_cts.Dispose();
+	}
+
 }

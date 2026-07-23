@@ -13,22 +13,22 @@
 	overflow: hidden;
 }
 
-	.user-list li {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: var(--fh-space-3);
-		padding: var(--fh-space-3) var(--fh-space-4);
-		border-bottom: 1px solid var(--fh-border);
+.user-list li {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--fh-space-3);
+	padding: var(--fh-space-3) var(--fh-space-4);
+	border-bottom: 1px solid var(--fh-border);
 
-		&:last-child {
-			border-bottom: none;
-		}
-
-		&:hover {
-			background: var(--fh-surface-sunken);
-		}
+	&:last-child {
+		border-bottom: none;
 	}
+
+	&:hover {
+		background: var(--fh-surface-sunken);
+	}
+}
 
 .user-list__link {
 	display: flex;

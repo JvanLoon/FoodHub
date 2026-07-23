@@ -14,12 +14,12 @@ public class ImportExportService(AuthenticatedHttpClientService httpClient, IJSR
 {
 	private readonly string _exportFileName = WebConstants.Files.ExportBaseName;
 
-	public Task<ApiResult> ImportAsync(byte[] fileContent, string fileName)
-		=> UploadAsync(ApiRoutes.ImportExport.Import, fileContent, fileName);
+	public Task<ApiResult> ImportAsync(byte[] fileContent, string fileName) =>
+		UploadAsync(ApiRoutes.ImportExport.Import, fileContent, fileName);
 
 	/// <summary>Imports a JSON export produced before the RecipeItem rework (legacy format).</summary>
-	public Task<ApiResult> ImportOldAsync(byte[] fileContent, string fileName)
-		=> UploadAsync(ApiRoutes.ImportExport.ImportOld, fileContent, fileName);
+	public Task<ApiResult> ImportOldAsync(byte[] fileContent, string fileName) =>
+		UploadAsync(ApiRoutes.ImportExport.ImportOld, fileContent, fileName);
 
 	private async Task<ApiResult> UploadAsync(string route, byte[] fileContent, string fileName)
 	{
@@ -49,7 +49,8 @@ public class ImportExportService(AuthenticatedHttpClientService httpClient, IJSR
 			using var doc = System.Text.Json.JsonDocument.Parse(result.Data!);
 
 			// Extract the base64 file contents and content type
-			base64 = doc.RootElement.GetProperty("fileContents").GetString();
+			base64 = doc.RootElement.GetProperty("fileContents")
+						.GetString();
 			mimeType = doc.RootElement.TryGetProperty("contentType", out var ct)
 				? ct.GetString() ?? "application/octet-stream"
 				: "application/octet-stream";
@@ -57,7 +58,7 @@ public class ImportExportService(AuthenticatedHttpClientService httpClient, IJSR
 		catch (Exception)
 		{
 			return ApiResult.Fail(WebConstants.Messages.ImportExport.ExportUnexpectedResponse,
-				(int) HttpStatusCode.BadRequest);
+								  (int) HttpStatusCode.BadRequest);
 		}
 
 		if (string.IsNullOrWhiteSpace(base64))

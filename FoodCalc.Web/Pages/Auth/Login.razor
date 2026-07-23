@@ -9,38 +9,42 @@
 <PageTitle>Login</PageTitle>
 
 <div class="auth-card">
-    <div class="auth-card__brand">
-        <i class="bi bi-basket2-fill" aria-hidden="true"></i>
-        <span>FoodHub</span>
-    </div>
-    <h3 class="auth-card__title">Welcome back</h3>
-    <EditForm Model="loginModel" OnValidSubmit="HandleLogin" FormName="login-form">
-        <DataAnnotationsValidator />
-        <ValidationSummary class="mb-3" />
-        <TextField Label="Email" Placeholder="Enter your email" Autocomplete="username" @bind-Value="loginModel.Email" />
-        <TextField Label="Password" Type="password" Placeholder="Enter your password" Autocomplete="current-password" @bind-Value="loginModel.Password" />
-        <AppButton Type="submit" Icon="box-arrow-in-right" CssClass="w-100">Login</AppButton>
-    </EditForm>
-    <div class="auth-card__alt">
-        <a href="/register">Create an account</a>
-    </div>
+	<div class="auth-card__brand">
+		<i class="bi bi-basket2-fill" aria-hidden="true"></i>
+		<span>FoodHub</span>
+	</div>
+	<h3 class="auth-card__title">Welcome back</h3>
+	<EditForm Model="loginModel" OnValidSubmit="HandleLogin" FormName="login-form">
+		<DataAnnotationsValidator/>
+		<ValidationSummary class="mb-3"/>
+		<TextField Label="Email" Placeholder="Enter your email" Autocomplete="username" @bind-Value="loginModel.Email"/>
+		<TextField Label="Password" Type="password" Placeholder="Enter your password" Autocomplete="current-password"
+		           @bind-Value="loginModel.Password"/>
+		<AppButton Type="submit" Icon="box-arrow-in-right" CssClass="w-100">Login</AppButton>
+	</EditForm>
+	<div class="auth-card__alt">
+		<a href="/register">Create an account</a>
+	</div>
 </div>
 
 @code {
-    private LoginDto loginModel = new();
+	private LoginDto loginModel = new();
 
-    private async Task HandleLogin()
-    {
-        await LoginService.LoginAsync(loginModel).OnSuccess(async void (data) =>
-        {
-	        if (data?.Token == null)
-	        {
-		        MessageService.ShowMessage(WebConstants.Messages.Auth.LoginInvalidResponse, true);
-		        return;
-	        }
+	private async Task HandleLogin()
+	{
+		await LoginService.LoginAsync(loginModel)
+		                  .OnSuccess(async void (data) =>
+		                  {
+			                  if (data?.Token == null)
+			                  {
+				                  MessageService.ShowMessage(WebConstants.Messages.Auth.LoginInvalidResponse, true);
+				                  return;
+			                  }
 
-	        await AuthStateService.SignInAsync(data.Token);
-	        Navigation.NavigateTo("/");
-        }).OnFailure();
-    }
+			                  await AuthStateService.SignInAsync(data.Token);
+			                  Navigation.NavigateTo("/");
+		                  })
+		                  .OnFailure();
+	}
+
 }

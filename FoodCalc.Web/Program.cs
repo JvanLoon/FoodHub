@@ -22,11 +22,11 @@ public class Program
 
 		// Add services to the container.
 		builder.Services.AddRazorComponents()
-			.AddInteractiveServerComponents()
-			.AddHubOptions(options =>
-			{
-				options.MaximumReceiveMessageSize = ImportExportSettings.DefaultMaxFileSizeInBytes;
-			});
+			   .AddInteractiveServerComponents()
+			   .AddHubOptions(options =>
+			   {
+				   options.MaximumReceiveMessageSize = ImportExportSettings.DefaultMaxFileSizeInBytes;
+			   });
 
 		builder.Services.AddOutputCache();
 
@@ -39,14 +39,13 @@ public class Program
 
 		builder.Services.AddHttpClient("ApiClient", client => { client.BaseAddress = new Uri(apiBaseAddress); });
 
-		var keysPath = Path.Combine(
-			Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-			"FoodHub", "dataprotection-keys");
+		var keysPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+									"FoodHub", "dataprotection-keys");
 		Directory.CreateDirectory(keysPath);
 
 		builder.Services.AddDataProtection()
-			.PersistKeysToFileSystem(new DirectoryInfo(keysPath))
-			.SetApplicationName("FoodHub");
+			   .PersistKeysToFileSystem(new DirectoryInfo(keysPath))
+			   .SetApplicationName("FoodHub");
 
 		builder.Services.AddScoped<AuthTokenService>();
 		builder.Services.AddScoped<AuthStateService>();
@@ -65,19 +64,17 @@ public class Program
 			var authTokenService = sp.GetRequiredService<AuthTokenService>();
 			var httpClient = httpClientFactory.CreateClient("ApiClient");
 			return new AuthenticatedHttpClientService(httpClient, authTokenService,
-				sp.GetRequiredService<ILogger<AuthenticatedHttpClientService>>(),
-				sp.GetRequiredService<MessageService>());
+													  sp.GetRequiredService<ILogger<AuthenticatedHttpClientService>>(),
+													  sp.GetRequiredService<MessageService>());
 		});
 
 		// CORS config
 		builder.Services.AddCors(options =>
 		{
-			options.AddPolicy("AllowAPI",
-				builder => builder
-					.WithOrigins(apiBaseAddress)
-					.AllowAnyHeader()
-					.AllowAnyMethod()
-					.AllowCredentials());
+			options.AddPolicy("AllowAPI", builder => builder.WithOrigins(apiBaseAddress)
+															.AllowAnyHeader()
+															.AllowAnyMethod()
+															.AllowCredentials());
 		});
 
 		builder.Services.Configure<JsonOptions>(options =>
@@ -88,36 +85,35 @@ public class Program
 		});
 
 		builder.Services.AddAuthentication("JwtBearer")
-			.AddJwtBearer("JwtBearer", options =>
-			{
-				IConfigurationSection jwtSettings = builder.Configuration.GetSection("Jwt");
-				var key = jwtSettings["Key"];
+			   .AddJwtBearer("JwtBearer", options =>
+			   {
+				   IConfigurationSection jwtSettings = builder.Configuration.GetSection("Jwt");
+				   var key = jwtSettings["Key"];
 
-				if (string.IsNullOrWhiteSpace(key))
-					throw new InvalidOperationException("JWT key is not configured.");
+				   if (string.IsNullOrWhiteSpace(key))
+					   throw new InvalidOperationException("JWT key is not configured.");
 
-				options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-				{
-					ValidateIssuer = true,
-					ValidateAudience = false,
-					ValidAudience = jwtSettings["Audience"],
-					ValidateLifetime = true,
-					ValidateIssuerSigningKey = true,
-					ValidIssuer = jwtSettings["Issuer"],
-					IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
-						System.Text.Encoding.UTF8.GetBytes(key)
-					),
-					ClockSkew = TimeSpan.Zero
-				};
+				   options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+				   {
+					   ValidateIssuer = true,
+					   ValidateAudience = false,
+					   ValidAudience = jwtSettings["Audience"],
+					   ValidateLifetime = true,
+					   ValidateIssuerSigningKey = true,
+					   ValidIssuer = jwtSettings["Issuer"],
+					   IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
+						   System.Text.Encoding.UTF8.GetBytes(key)),
+					   ClockSkew = TimeSpan.Zero
+				   };
 
-				options.SaveToken = true;
+				   options.SaveToken = true;
 
-				options.Events = new JwtBearerEvents
-				{
-					//Allows you to hook into JWT authentication events (e.g., for logging, custom validation).
-					OnAuthenticationFailed = context => { return Task.CompletedTask; }
-				};
-			});
+				   options.Events = new JwtBearerEvents
+				   {
+					   //Allows you to hook into JWT authentication events (e.g., for logging, custom validation).
+					   OnAuthenticationFailed = context => { return Task.CompletedTask; }
+				   };
+			   });
 		builder.Services.AddAuthorization();
 
 		var app = builder.Build();
@@ -141,7 +137,7 @@ public class Program
 
 
 		app.MapRazorComponents<App>()
-			.AddInteractiveServerRenderMode();
+		   .AddInteractiveServerRenderMode();
 
 		app.MapDefaultEndpoints();
 

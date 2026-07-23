@@ -3,15 +3,22 @@
 
 @if (ChildContent is not null)
 {
-    <span class="fh-icon @CssClass" aria-hidden="true">@ChildContent</span>
+	<span class="fh-icon @CssClass" aria-hidden="true">@ChildContent</span>
 }
 else
 {
-    <i class="bi bi-@Name @CssClass" aria-hidden="true"></i>
+	<i class="bi bi-@Name @CssClass" aria-hidden="true"></i>
 }
 
 @code {
-    [Parameter] public string? Name { get; set; }
-    [Parameter] public string? CssClass { get; set; }
-    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+	[Parameter]
+	public string? Name { get; set; }
+
+	[Parameter]
+	public string? CssClass { get; set; }
+
+	[Parameter]
+	public RenderFragment? ChildContent { get; set; }
+
 }

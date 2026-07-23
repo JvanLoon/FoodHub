@@ -6,32 +6,31 @@
 @inject AuthStateService AuthStateService
 @inject NavigationManager Navigation
 
-@if (_authorized)
-{
-    @ChildContent
-}
+@if (_authorized) { @ChildContent }
 
 @code {
-    /// <summary>Comma-separated roles allowed to view the wrapped content, e.g. "Admin,Moderator".</summary>
-    [Parameter, EditorRequired]
-    public string AllowedRoles { get; set; } = string.Empty;
 
-    [Parameter]
-    public RenderFragment? ChildContent { get; set; }
+	/// <summary>Comma-separated roles allowed to view the wrapped content, e.g. "Admin,Moderator".</summary>
+	[Parameter, EditorRequired]
+	public string AllowedRoles { get; set; } = string.Empty;
 
-    private bool _authorized;
+	[Parameter]
+	public RenderFragment? ChildContent { get; set; }
 
-    protected override async Task OnInitializedAsync()
-    {
-        var allowed = AllowedRoles.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+	private bool _authorized;
 
-        List<string> roles;
-        try { roles = await AuthStateService.GetRolesAsync(); }
-        catch { roles = new(); }
+	protected override async Task OnInitializedAsync()
+	{
+		var allowed = AllowedRoles.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
-        _authorized = roles.Any(r => allowed.Contains(r, StringComparer.OrdinalIgnoreCase));
+		List<string> roles;
+		try { roles = await AuthStateService.GetRolesAsync(); }
+		catch { roles = new(); }
 
-        if (!_authorized)
-            Navigation.NavigateTo("/");
-    }
+		_authorized = roles.Any(r => allowed.Contains(r, StringComparer.OrdinalIgnoreCase));
+
+		if (!_authorized)
+			Navigation.NavigateTo("/");
+	}
+
 }

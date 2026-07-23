@@ -6,9 +6,14 @@ using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Features.Authentication.Users.Commands.RemoveRecipeFromBlackList;
 
-public class RemoveRecipeFromBlackListCommandHandler(FoodHubDbContext context, ILogger<RemoveRecipeFromBlackListCommandHandler> logger) : IRequestHandler<RemoveRecipeFromBlackListCommand, ErrorOr<bool>>
+public class RemoveRecipeFromBlackListCommandHandler(
+	FoodHubDbContext context,
+	ILogger<RemoveRecipeFromBlackListCommandHandler> logger)
+	: IRequestHandler<RemoveRecipeFromBlackListCommand, ErrorOr<bool>>
 {
-	public async Task<ErrorOr<bool>> Handle(RemoveRecipeFromBlackListCommand request, CancellationToken cancellationToken)
+	public async Task<ErrorOr<bool>> Handle(RemoveRecipeFromBlackListCommand request,
+											CancellationToken cancellationToken
+	)
 	{
 		try
 		{

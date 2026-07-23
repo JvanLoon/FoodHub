@@ -11,8 +11,7 @@ namespace FoodCalc.Api.Endpoints.Admin;
 /// Returns a paged list of role names. The Blazor AdminService fetches them all
 /// via pageSize = int.MaxValue and reads Items.
 /// </summary>
-public class GetAllRolesEndpoint(IMediator mediator)
-	: Endpoint<GetRolesRequest, PagedResultDto<string>>
+public class GetAllRolesEndpoint(IMediator mediator) : Endpoint<GetRolesRequest, PagedResultDto<string>>
 {
 	public override void Configure()
 	{
@@ -24,8 +23,6 @@ public class GetAllRolesEndpoint(IMediator mediator)
 	{
 		var result = await mediator.Send(new GetAllRolesQuery(req.Page, req.PageSize, req.Search), ct);
 
-		await result.Match(
-			value => Send.OkAsync(value, ct),
-			errors => this.SendErrorsAsync(errors, ct: ct));
+		await result.Match(value => Send.OkAsync(value, ct), errors => this.SendErrorsAsync(errors, ct: ct));
 	}
 }

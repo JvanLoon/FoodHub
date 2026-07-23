@@ -3,9 +3,10 @@ using FoodHub.Persistence.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+
 public class FoodHubDbContext : IdentityDbContext<IdentityUser>
 {
-	public FoodHubDbContext(DbContextOptions<FoodHubDbContext> options) : base(options) { }
+	public FoodHubDbContext(DbContextOptions<FoodHubDbContext> options) : base(options) {}
 
 	// Define your DbSets here
 	public DbSet<Recipe> Recipes { get; set; }
@@ -21,11 +22,9 @@ public class FoodHubDbContext : IdentityDbContext<IdentityUser>
 		var entries = ChangeTracker.Entries<BaseEntity>();
 		foreach (var entry in entries)
 		{
-			if (entry.State == EntityState.Modified)
-			{
-				entry.Entity.ModifiedDate = DateTime.UtcNow;
-			}
+			if (entry.State == EntityState.Modified) { entry.Entity.ModifiedDate = DateTime.UtcNow; }
 		}
+
 		return base.SaveChanges();
 	}
 
@@ -34,11 +33,9 @@ public class FoodHubDbContext : IdentityDbContext<IdentityUser>
 		var entries = ChangeTracker.Entries<BaseEntity>();
 		foreach (var entry in entries)
 		{
-			if (entry.State == EntityState.Modified)
-			{
-				entry.Entity.ModifiedDate = DateTime.UtcNow;
-			}
+			if (entry.State == EntityState.Modified) { entry.Entity.ModifiedDate = DateTime.UtcNow; }
 		}
+
 		return base.SaveChangesAsync(cancellationToken);
 	}
 

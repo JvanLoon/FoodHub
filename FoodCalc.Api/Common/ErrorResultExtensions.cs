@@ -30,20 +30,30 @@ public static class ErrorResultExtensions
 	/// lands on the right property without any change here; ErrorOr's placeholder code is mapped to
 	/// the general bucket rather than leaked into the response.
 	/// </summary>
-	public static Task SendErrorsAsync(this BaseEndpoint ep, List<Error> errors, int statusCode = 400, CancellationToken ct = default) =>
+	public static Task SendErrorsAsync(this BaseEndpoint ep,
+									   List<Error> errors,
+									   int statusCode = 400,
+									   CancellationToken ct = default
+	) =>
 		ep.SendFailuresAsync(errors.Select(e => new ValidationFailure(FieldNameFor(e), e.Description)), statusCode, ct);
 
 	private static string FieldNameFor(Error error) =>
-		string.IsNullOrWhiteSpace(error.Code) || error.Code == _defaultErrorOrCode
-			? _generalErrorsField
-			: error.Code;
+		string.IsNullOrWhiteSpace(error.Code) || error.Code == _defaultErrorOrCode ? _generalErrorsField : error.Code;
 
 	/// <summary>
 	/// Sends a set of plain messages (e.g. <c>IdentityResult.Errors</c>) as general errors.
 	/// </summary>
-	public static Task SendErrorsAsync(this BaseEndpoint ep, IEnumerable<string> messages, int statusCode = 400, CancellationToken ct = default) =>
+	public static Task SendErrorsAsync(this BaseEndpoint ep,
+									   IEnumerable<string> messages,
+									   int statusCode = 400,
+									   CancellationToken ct = default
+	) =>
 		ep.SendFailuresAsync(messages.Select(m => new ValidationFailure(_generalErrorsField, m)), statusCode, ct);
 
-	private static Task SendFailuresAsync(this BaseEndpoint ep, IEnumerable<ValidationFailure> failures, int statusCode, CancellationToken ct) =>
-		ep.HttpContext.Response.SendErrorsAsync([.. failures], statusCode, cancellation: ct);
+	private static Task SendFailuresAsync(this BaseEndpoint ep,
+										  IEnumerable<ValidationFailure> failures,
+										  int statusCode,
+										  CancellationToken ct
+	) =>
+		ep.HttpContext.Response.SendErrorsAsync([..failures], statusCode, cancellation: ct);
 }

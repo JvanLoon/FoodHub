@@ -30,48 +30,66 @@ public static class IdentitySeed
 	// admin => "Admin123!", user => "User123!".
 	private const string AdminPasswordHash =
 		"AQAAAAIAAYagAAAAEI9e1iMqykqith/CN4pGUK+H1zrVfp5ERttCqYZzKAMBWKvik5W8jJt1ukNyZIw+6g==";
+
 	private const string UserPasswordHash =
 		"AQAAAAIAAYagAAAAEMQmfpGbK2nWDteIHDEYhwcLUe0UDntdRwKgvrKQ5Jatcian7eTgcM4yD6Q10kKcHg==";
 
 	public static void Seed(ModelBuilder modelBuilder)
 	{
-		modelBuilder.Entity<IdentityRole>().HasData(
-			new IdentityRole { Id = AdminRoleId, Name = "Admin", NormalizedName = "ADMIN", ConcurrencyStamp = AdminRoleId },
-			new IdentityRole { Id = ModeratorRoleId, Name = "Moderator", NormalizedName = "MODERATOR", ConcurrencyStamp = ModeratorRoleId },
-			new IdentityRole { Id = UserRoleId, Name = "User", NormalizedName = "USER", ConcurrencyStamp = UserRoleId });
+		modelBuilder.Entity<IdentityRole>()
+					.HasData(
+						new IdentityRole
+						{
+							Id = AdminRoleId,
+							Name = "Admin",
+							NormalizedName = "ADMIN",
+							ConcurrencyStamp = AdminRoleId
+						},
+						new IdentityRole
+						{
+							Id = ModeratorRoleId,
+							Name = "Moderator",
+							NormalizedName = "MODERATOR",
+							ConcurrencyStamp = ModeratorRoleId
+						},
+						new IdentityRole
+						{
+							Id = UserRoleId, Name = "User", NormalizedName = "USER", ConcurrencyStamp = UserRoleId
+						});
 
-		modelBuilder.Entity<IdentityUser>().HasData(
-			new IdentityUser
-			{
-				Id = AdminUserId,
-				UserName = AdminEmail,
-				NormalizedUserName = AdminEmail.ToUpperInvariant(),
-				Email = AdminEmail,
-				NormalizedEmail = AdminEmail.ToUpperInvariant(),
-				EmailConfirmed = true,
-				PasswordHash = AdminPasswordHash,
-				SecurityStamp = AdminUserId,
-				ConcurrencyStamp = AdminUserId,
-				LockoutEnabled = false,
-			},
-			new IdentityUser
-			{
-				Id = UserUserId,
-				UserName = UserEmail,
-				NormalizedUserName = UserEmail.ToUpperInvariant(),
-				Email = UserEmail,
-				NormalizedEmail = UserEmail.ToUpperInvariant(),
-				EmailConfirmed = true,
-				PasswordHash = UserPasswordHash,
-				SecurityStamp = UserUserId,
-				ConcurrencyStamp = UserUserId,
-				LockoutEnabled = false,
-			});
+		modelBuilder.Entity<IdentityUser>()
+					.HasData(
+						new IdentityUser
+						{
+							Id = AdminUserId,
+							UserName = AdminEmail,
+							NormalizedUserName = AdminEmail.ToUpperInvariant(),
+							Email = AdminEmail,
+							NormalizedEmail = AdminEmail.ToUpperInvariant(),
+							EmailConfirmed = true,
+							PasswordHash = AdminPasswordHash,
+							SecurityStamp = AdminUserId,
+							ConcurrencyStamp = AdminUserId,
+							LockoutEnabled = false,
+						},
+						new IdentityUser
+						{
+							Id = UserUserId,
+							UserName = UserEmail,
+							NormalizedUserName = UserEmail.ToUpperInvariant(),
+							Email = UserEmail,
+							NormalizedEmail = UserEmail.ToUpperInvariant(),
+							EmailConfirmed = true,
+							PasswordHash = UserPasswordHash,
+							SecurityStamp = UserUserId,
+							ConcurrencyStamp = UserUserId,
+							LockoutEnabled = false,
+						});
 
-		modelBuilder.Entity<IdentityUserRole<string>>().HasData(
-			new IdentityUserRole<string> { UserId = AdminUserId, RoleId = AdminRoleId },
-			new IdentityUserRole<string> { UserId = AdminUserId, RoleId = ModeratorRoleId },
-			new IdentityUserRole<string> { UserId = AdminUserId, RoleId = UserRoleId },
-			new IdentityUserRole<string> { UserId = UserUserId, RoleId = UserRoleId });
+		modelBuilder.Entity<IdentityUserRole<string>>()
+					.HasData(new IdentityUserRole<string> {UserId = AdminUserId, RoleId = AdminRoleId},
+							 new IdentityUserRole<string> {UserId = AdminUserId, RoleId = ModeratorRoleId},
+							 new IdentityUserRole<string> {UserId = AdminUserId, RoleId = UserRoleId},
+							 new IdentityUserRole<string> {UserId = UserUserId, RoleId = UserRoleId});
 	}
 }

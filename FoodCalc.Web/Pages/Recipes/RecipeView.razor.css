@@ -2,7 +2,7 @@
 	display: flex;
 	justify-content: space-between;
 	gap: 16px;
-	
+
 	.recipe-view__card {
 		min-width: 450px;
 	}

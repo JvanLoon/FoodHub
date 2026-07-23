@@ -27,11 +27,9 @@ public class ApiResult
 	/// </summary>
 	public int StatusCode { get; init; }
 
-	public static ApiResult Ok(int statusCode) =>
-		new() {Success = true, StatusCode = statusCode};
+	public static ApiResult Ok(int statusCode) => new() {Success = true, StatusCode = statusCode};
 
-	public static ApiResult Fail(string error, int statusCode) =>
-		Fail([$"{statusCode} {error}"], statusCode);
+	public static ApiResult Fail(string error, int statusCode) => Fail([$"{statusCode} {error}"], statusCode);
 
 	public static ApiResult Fail(IReadOnlyList<string> errors, int statusCode) =>
 		new() {Success = false, Errors = errors, StatusCode = statusCode};
@@ -45,8 +43,7 @@ public class ApiResult<T> : ApiResult
 	public static ApiResult<T> Ok(T data, int statusCode) =>
 		new() {Success = true, Data = data, StatusCode = statusCode};
 
-	public static new ApiResult<T> Fail(string error, int statusCode) =>
-		Fail([$"{statusCode} {error}"], statusCode);
+	public static new ApiResult<T> Fail(string error, int statusCode) => Fail([$"{statusCode} {error}"], statusCode);
 
 	public static new ApiResult<T> Fail(IReadOnlyList<string> errors, int statusCode) =>
 		new() {Success = false, Errors = errors, StatusCode = statusCode};

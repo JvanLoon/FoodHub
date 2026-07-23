@@ -11,9 +11,12 @@ using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Feature.Ingredients.Queries.GetAllIngredients;
 
-public class GetAllIngredientsQueryHandler(FoodHubDbContext context, ILogger<GetAllIngredientsQueryHandler> logger) : IRequestHandler<GetAllIngredientsQuery, ErrorOr<PagedResultDto<IngredientDto>>>
+public class GetAllIngredientsQueryHandler(FoodHubDbContext context, ILogger<GetAllIngredientsQueryHandler> logger)
+	: IRequestHandler<GetAllIngredientsQuery, ErrorOr<PagedResultDto<IngredientDto>>>
 {
-	public async Task<ErrorOr<PagedResultDto<IngredientDto>>> Handle(GetAllIngredientsQuery request, CancellationToken cancellationToken)
+	public async Task<ErrorOr<PagedResultDto<IngredientDto>>> Handle(GetAllIngredientsQuery request,
+																	 CancellationToken cancellationToken
+	)
 	{
 		try
 		{

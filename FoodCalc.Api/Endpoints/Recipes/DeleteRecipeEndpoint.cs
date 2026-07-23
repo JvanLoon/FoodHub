@@ -7,8 +7,7 @@ using MediatR;
 namespace FoodCalc.Api.Endpoints.Recipes;
 
 /// <summary>DELETE api/recipe/deleterecipe/{id} — Admin only.</summary>
-public class DeleteRecipeEndpoint(IMediator mediator)
-	: Endpoint<RecipeByIdRequest, bool>
+public class DeleteRecipeEndpoint(IMediator mediator) : Endpoint<RecipeByIdRequest, bool>
 {
 	public override void Configure()
 	{
@@ -20,8 +19,6 @@ public class DeleteRecipeEndpoint(IMediator mediator)
 	{
 		var result = await mediator.Send(new DeleteRecipeCommand(req.Id), ct);
 
-		await result.Match(
-			value => Send.OkAsync(value, ct),
-			errors => this.SendErrorsAsync(errors, ct: ct));
+		await result.Match(value => Send.OkAsync(value, ct), errors => this.SendErrorsAsync(errors, ct: ct));
 	}
 }

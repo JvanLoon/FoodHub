@@ -5,59 +5,68 @@
 <div class="card fh-recipe-card @(Selected ? "fh-recipe-card--selected" : null)"
      draggable="false"
      @onmousedown="OnToggle">
-    <div class="fh-recipe-card__media">
-        @if (!string.IsNullOrEmpty(ImageUrl))
-        {
-            <img src="@ImageUrl" alt="" draggable="false" />
-        }
-        else
-        {
-            <i class="bi bi-egg-fried" aria-hidden="true"></i>
-        }
-        <span class="fh-recipe-card__check" aria-hidden="@(!Selected)">
+	<div class="fh-recipe-card__media">
+		@if (!string.IsNullOrEmpty(ImageUrl))
+		{
+			<img src="@ImageUrl" alt="" draggable="false"/>
+		}
+		else { <i class="bi bi-egg-fried" aria-hidden="true"></i> }
+		<span class="fh-recipe-card__check" aria-hidden="@(!Selected)">
             <i class="bi bi-check-circle-fill"></i>
         </span>
-    </div>
-    <div class="card-body">
-        @if (OnOpen.HasDelegate)
-        {
-            <button type="button" class="card-title card-title--link" title="@Title"
-                    @onmousedown:stopPropagation @onclick="OnOpen">@Title</button>
-        }
-        else
-        {
-            <h5 class="card-title" title="@Title">@Title</h5>
-        }
-        @ChildContent
-    </div>
-    @if (ShowActions)
-    {
-    <div class="card-footer" @onmousedown:stopPropagation>
-        <AppButton Variant="ButtonVariant.OutlineSecondary" Size="ButtonSize.Small" Icon="pencil"
-                   StopPropagation OnClick="OnEdit">Edit</AppButton>
-        <AppButton Variant="ButtonVariant.OutlineDanger" Size="ButtonSize.Small" Icon="trash"
-                   StopPropagation OnClick="OnDelete">Delete</AppButton>
-    </div>
-    }
+	</div>
+	<div class="card-body">
+		@if (OnOpen.HasDelegate)
+		{
+			<button type="button" class="card-title card-title--link" title="@Title"
+			        @onmousedown:stopPropagation @onclick="OnOpen">@Title</button>
+		}
+		else
+		{
+			<h5 class="card-title" title="@Title">@Title</h5>
+		}
+		@ChildContent
+	</div>
+	@if (ShowActions)
+	{
+		<div class="card-footer" @onmousedown:stopPropagation>
+			<AppButton Variant="ButtonVariant.OutlineSecondary" Size="ButtonSize.Small" Icon="pencil"
+			           StopPropagation OnClick="OnEdit">Edit
+			</AppButton>
+			<AppButton Variant="ButtonVariant.OutlineDanger" Size="ButtonSize.Small" Icon="trash"
+			           StopPropagation OnClick="OnDelete">Delete
+			</AppButton>
+		</div>
+	}
 </div>
 
 @code {
-    [Parameter, EditorRequired]
-    public string Title { get; set; } = string.Empty;
-    [Parameter]
-    public string? ImageUrl { get; set; }
-    [Parameter]
-    public bool Selected { get; set; }
-    [Parameter]
-    public bool ShowActions { get; set; } = true;
-    [Parameter]
-    public EventCallback OnToggle { get; set; }
-    [Parameter]
-    public EventCallback OnOpen { get; set; }
-    [Parameter]
-    public EventCallback OnEdit { get; set; }
-    [Parameter]
-    public EventCallback OnDelete { get; set; }
-    [Parameter]
-    public RenderFragment? ChildContent { get; set; }
+
+	[Parameter, EditorRequired]
+	public string Title { get; set; } = string.Empty;
+
+	[Parameter]
+	public string? ImageUrl { get; set; }
+
+	[Parameter]
+	public bool Selected { get; set; }
+
+	[Parameter]
+	public bool ShowActions { get; set; } = true;
+
+	[Parameter]
+	public EventCallback OnToggle { get; set; }
+
+	[Parameter]
+	public EventCallback OnOpen { get; set; }
+
+	[Parameter]
+	public EventCallback OnEdit { get; set; }
+
+	[Parameter]
+	public EventCallback OnDelete { get; set; }
+
+	[Parameter]
+	public RenderFragment? ChildContent { get; set; }
+
 }

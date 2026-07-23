@@ -14,8 +14,7 @@ public class CheckJwtTokenRequest
 }
 
 /// <summary>POST api/authentication/checkjwttoken?token= — anonymous. Returns a JSON bool.</summary>
-public class CheckJwtTokenEndpoint(IConfiguration configuration)
-	: Endpoint<CheckJwtTokenRequest, bool>
+public class CheckJwtTokenEndpoint(IConfiguration configuration) : Endpoint<CheckJwtTokenRequest, bool>
 {
 	public override void Configure()
 	{
@@ -35,23 +34,22 @@ public class CheckJwtTokenEndpoint(IConfiguration configuration)
 		var key = Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!);
 		try
 		{
-			tokenHandler.ValidateToken(req.Token, new TokenValidationParameters
-			{
-				ValidateIssuer = true,
-				ValidIssuer = configuration["Jwt:Issuer"],
-				ValidateAudience = true,
-				ValidAudience = configuration["Jwt:Audience"],
-				ValidateLifetime = true,
-				IssuerSigningKey = new SymmetricSecurityKey(key),
-				ValidateIssuerSigningKey = true,
-				ClockSkew = TimeSpan.Zero
-			}, out _);
+			tokenHandler.ValidateToken(
+				req.Token,
+				new TokenValidationParameters
+				{
+					ValidateIssuer = true,
+					ValidIssuer = configuration["Jwt:Issuer"],
+					ValidateAudience = true,
+					ValidAudience = configuration["Jwt:Audience"],
+					ValidateLifetime = true,
+					IssuerSigningKey = new SymmetricSecurityKey(key),
+					ValidateIssuerSigningKey = true,
+					ClockSkew = TimeSpan.Zero
+				}, out _);
 
 			await Send.OkAsync(true, ct);
 		}
-		catch
-		{
-			await Send.OkAsync(false, ct);
-		}
+		catch { await Send.OkAsync(false, ct); }
 	}
 }

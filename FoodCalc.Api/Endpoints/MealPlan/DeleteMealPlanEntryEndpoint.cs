@@ -8,8 +8,7 @@ using MediatR;
 namespace FoodCalc.Api.Endpoints.MealPlan;
 
 /// <summary>DELETE api/mealplan/{id} — remove one of the calling user's own entries.</summary>
-public class DeleteMealPlanEntryEndpoint(IMediator mediator)
-	: Endpoint<MealPlanEntryByIdRequest, bool>
+public class DeleteMealPlanEntryEndpoint(IMediator mediator) : Endpoint<MealPlanEntryByIdRequest, bool>
 {
 	public override void Configure()
 	{
@@ -28,8 +27,6 @@ public class DeleteMealPlanEntryEndpoint(IMediator mediator)
 
 		var result = await mediator.Send(new DeleteMealPlanEntryCommand(userId, req.Id), ct);
 
-		await result.Match(
-			value => Send.OkAsync(value, ct),
-			errors => this.SendErrorsAsync(errors, ct: ct));
+		await result.Match(value => Send.OkAsync(value, ct), errors => this.SendErrorsAsync(errors, ct: ct));
 	}
 }

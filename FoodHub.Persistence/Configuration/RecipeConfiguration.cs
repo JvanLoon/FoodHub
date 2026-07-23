@@ -12,17 +12,18 @@ public class RecipeConfiguration : IEntityTypeConfiguration<Recipe>
 		builder.HasKey(r => r.Id);
 
 		builder.HasIndex(r => r.Name)
-			.IsUnique();
+			   .IsUnique();
 
 		builder.Property(r => r.Name)
-			.HasMaxLength(450)
-			.IsRequired();
+			   .HasMaxLength(450)
+			   .IsRequired();
 
 		builder.HasMany(r => r.Ingredients)
-			.WithOne()
-			.HasForeignKey(k => k.RecipeId)
-			.OnDelete(DeleteBehavior.Cascade);
+			   .WithOne()
+			   .HasForeignKey(k => k.RecipeId)
+			   .OnDelete(DeleteBehavior.Cascade);
 
-		builder.Navigation(r => r.Ingredients).AutoInclude();
+		builder.Navigation(r => r.Ingredients)
+			   .AutoInclude();
 	}
 }

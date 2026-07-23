@@ -13,8 +13,11 @@ public class MessageService
 	public event Action<ToastMessage>? OnShowMessage;
 
 	/// <param name="timeInMs">How long to show the toast; <c>0</c> keeps it until dismissed.</param>
-	public void ShowMessage(string message, bool isError, int timeInMs = DefaultDisplayTimeInMs,
-		CancellationToken cancellationToken = default) =>
+	public void ShowMessage(string message,
+							bool isError,
+							int timeInMs = DefaultDisplayTimeInMs,
+							CancellationToken cancellationToken = default
+	) =>
 		OnShowMessage?.Invoke(new ToastMessage(message, isError, timeInMs, cancellationToken));
 }
 

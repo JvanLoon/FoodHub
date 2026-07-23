@@ -9,12 +9,16 @@ using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
-
 namespace FoodCalc.Features.Authentication.Users.Queries.GetAllUsers;
 
-public class GetAllUsersQueryHandler(FoodHubDbContext context, ILogger<GetAllUsersQueryHandler> logger, UserManager<IdentityUser> userManager) : IRequestHandler<GetAllUsersQuery, ErrorOr<PagedResultDto<UserDto>>>
+public class GetAllUsersQueryHandler(
+	FoodHubDbContext context,
+	ILogger<GetAllUsersQueryHandler> logger,
+	UserManager<IdentityUser> userManager) : IRequestHandler<GetAllUsersQuery, ErrorOr<PagedResultDto<UserDto>>>
 {
-	public async Task<ErrorOr<PagedResultDto<UserDto>>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
+	public async Task<ErrorOr<PagedResultDto<UserDto>>> Handle(GetAllUsersQuery request,
+															   CancellationToken cancellationToken
+	)
 	{
 		try
 		{
@@ -37,10 +41,7 @@ public class GetAllUsersQueryHandler(FoodHubDbContext context, ILogger<GetAllUse
 
 			return new PagedResultDto<UserDto>
 			{
-				Items = userDtos,
-				TotalCount = paged.TotalCount,
-				Page = paged.Page,
-				PageSize = paged.PageSize
+				Items = userDtos, TotalCount = paged.TotalCount, Page = paged.Page, PageSize = paged.PageSize
 			};
 		}
 		catch (Exception ex)

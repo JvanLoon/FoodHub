@@ -7,8 +7,7 @@ using MediatR;
 namespace FoodCalc.Api.Endpoints.Recipes;
 
 /// <summary>PUT api/recipe — Admin only. Body validated by UpdateRecipeValidator.</summary>
-public class UpdateRecipeEndpoint(IMediator mediator)
-	: Endpoint<UpdateRecipeDto, RecipeDto>
+public class UpdateRecipeEndpoint(IMediator mediator) : Endpoint<UpdateRecipeDto, RecipeDto>
 {
 	public override void Configure()
 	{
@@ -20,8 +19,6 @@ public class UpdateRecipeEndpoint(IMediator mediator)
 	{
 		var result = await mediator.Send(new UpdateRecipeCommand(req), ct);
 
-		await result.Match(
-			value => Send.OkAsync(value, ct),
-			errors => this.SendErrorsAsync(errors, ct: ct));
+		await result.Match(value => Send.OkAsync(value, ct), errors => this.SendErrorsAsync(errors, ct: ct));
 	}
 }

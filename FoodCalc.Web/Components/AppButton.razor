@@ -4,66 +4,77 @@
         title="@Title"
         @onclick="HandleClick"
         @onclick:stopPropagation="StopPropagation">
-    @if (Loading)
-    {
-        <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
-    }
-    else if (!string.IsNullOrEmpty(Icon))
-    {
-        <i class="bi bi-@Icon" aria-hidden="true"></i>
-    }
-    @ChildContent
+	@if (Loading) { <span class="spinner-border spinner-border-sm" aria-hidden="true"></span> }
+	else if (!string.IsNullOrEmpty(Icon))
+	{
+		<i class="bi bi-@Icon" aria-hidden="true"></i>
+	}
+	@ChildContent
 </button>
 
 @code {
-    [Parameter]
-    public ButtonVariant Variant { get; set; } = ButtonVariant.Primary;
-    [Parameter]
-    public ButtonSize Size { get; set; } = ButtonSize.Medium;
-    [Parameter]
-    public string Type { get; set; } = "button";
-    [Parameter]
-    public string? Icon { get; set; }
-    [Parameter]
-    public string? Title { get; set; }
-    [Parameter]
-    public bool Loading { get; set; }
-    [Parameter]
-    public bool Disabled { get; set; }
-    [Parameter]
-    public bool StopPropagation { get; set; }
-    [Parameter]
-    public string? CssClass { get; set; }
-    [Parameter]
-    public EventCallback OnClick { get; set; }
-    [Parameter]
-    public RenderFragment? ChildContent { get; set; }
 
-    private string VariantClass => Variant switch
-    {
-        ButtonVariant.Primary => "btn-primary",
-        ButtonVariant.Secondary => "btn-secondary",
-        ButtonVariant.Success => "btn-success",
-        ButtonVariant.Danger => "btn-danger",
-        ButtonVariant.OutlinePrimary => "btn-outline-primary",
-        ButtonVariant.OutlineSecondary => "btn-outline-secondary",
-        ButtonVariant.OutlineSuccess => "btn-outline-success",
-        ButtonVariant.OutlineDanger => "btn-outline-danger",
-        ButtonVariant.Ghost => "fh-btn-ghost",
-        ButtonVariant.Link => "btn-link",
-        _ => "btn-primary"
-    };
+	[Parameter]
+	public ButtonVariant Variant { get; set; } = ButtonVariant.Primary;
 
-    private string? SizeClass => Size switch
-    {
-        ButtonSize.Small => "btn-sm",
-        ButtonSize.Large => "btn-lg",
-        _ => null
-    };
+	[Parameter]
+	public ButtonSize Size { get; set; } = ButtonSize.Medium;
 
-    private async Task HandleClick()
-    {
-        if (Disabled || Loading) return;
-        await OnClick.InvokeAsync();
-    }
+	[Parameter]
+	public string Type { get; set; } = "button";
+
+	[Parameter]
+	public string? Icon { get; set; }
+
+	[Parameter]
+	public string? Title { get; set; }
+
+	[Parameter]
+	public bool Loading { get; set; }
+
+	[Parameter]
+	public bool Disabled { get; set; }
+
+	[Parameter]
+	public bool StopPropagation { get; set; }
+
+	[Parameter]
+	public string? CssClass { get; set; }
+
+	[Parameter]
+	public EventCallback OnClick { get; set; }
+
+	[Parameter]
+	public RenderFragment? ChildContent { get; set; }
+
+	private string VariantClass =>
+		Variant switch
+		{
+			ButtonVariant.Primary => "btn-primary",
+			ButtonVariant.Secondary => "btn-secondary",
+			ButtonVariant.Success => "btn-success",
+			ButtonVariant.Danger => "btn-danger",
+			ButtonVariant.OutlinePrimary => "btn-outline-primary",
+			ButtonVariant.OutlineSecondary => "btn-outline-secondary",
+			ButtonVariant.OutlineSuccess => "btn-outline-success",
+			ButtonVariant.OutlineDanger => "btn-outline-danger",
+			ButtonVariant.Ghost => "fh-btn-ghost",
+			ButtonVariant.Link => "btn-link",
+			_ => "btn-primary"
+		};
+
+	private string? SizeClass =>
+		Size switch
+		{
+			ButtonSize.Small => "btn-sm",
+			ButtonSize.Large => "btn-lg",
+			_ => null
+		};
+
+	private async Task HandleClick()
+	{
+		if (Disabled || Loading) return;
+		await OnClick.InvokeAsync();
+	}
+
 }
