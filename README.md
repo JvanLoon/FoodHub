@@ -9,10 +9,11 @@ FoodHub will become more than just a recipe app. It will evolve into a comprehen
 ## ✨ Features
 
 - 📝 **Recipe Management**: Create, edit, and organize your favorite recipes
+- 📅 **Meal Calendar**: Plan recipes per day in side-by-side week and month views, saved per user. Select two or more days and **Randomize** to auto-fill them with random recipes (optionally biased by ingredients you want)
 - 🥘 **Ingredient Management**: Manage ingredients with quantities and measurement units
 - 🛒 **Shopping List Generation**: Automatically generate shopping lists from selected recipes
 - 📊 **Ingredient Aggregation**: Combine ingredients across multiple recipes to avoid duplicates
-- 🔐 **Authentication & Roles**: JWT-based login with admin user/role management
+- 🔐 **Authentication & Roles**: JWT-based login with admin user/role management. Regular users get a focused experience (Home, Calendar, Recipes, Find recipes, User settings); admin-only pages redirect insufficient roles to Home, and admins land on the stats dashboard
 - 🌗 **Light & Dark Mode**: Persisted theme toggle, defaults to your system preference
 - 🌐 **Modern Web Interface**: Responsive Blazor Server UI with a custom component library
 - 🔄 **API**: Fast, minimal HTTP API built on FastEndpoints
@@ -193,5 +194,5 @@ If you encounter any issues or have questions:
 - [ ] Recipe sharing and community features
 - [ ] Mobile app (Xamarin/MAUI)
 - [ ] Recipe import from popular cooking websites
-- [ ] Meal planning calendar
+- [x] Meal planning calendar (week/month views, per-day recipes, randomize)
 - [ ] Inventory management
