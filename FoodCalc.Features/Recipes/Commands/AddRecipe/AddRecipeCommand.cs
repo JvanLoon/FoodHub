@@ -4,4 +4,4 @@ using MediatR;
 
 namespace FoodCalc.Features.Recipes.Commands.AddRecipe;
 
-public record AddRecipeCommand(CreateRecipeDto recipe) : IRequest<ErrorOr<RecipeDto>>;
+public record AddRecipeCommand(CreateRecipeDto recipe, string? CreatedByUserId = null) : IRequest<ErrorOr<RecipeDto>>;

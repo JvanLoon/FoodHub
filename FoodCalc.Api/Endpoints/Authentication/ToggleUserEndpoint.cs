@@ -32,6 +32,19 @@ public class ToggleUserEndpoint(UserManager<IdentityUser> userManager) : Endpoin
 
 		user.EmailConfirmed = req.Enable;
 
+		if (req.Enable)
+		{
+			// Enable: clear any lockout so the account can sign in again.
+			user.LockoutEnabled = false;
+			user.LockoutEnd = null;
+		}
+		else
+		{
+			// Disable: truly lock the account out (login blocks on both EmailConfirmed and this).
+			user.LockoutEnabled = true;
+			user.LockoutEnd = DateTimeOffset.MaxValue;
+		}
+
 		if (!await userManager.IsInRoleAsync(user, "User")) { await userManager.AddToRoleAsync(user, "User"); }
 
 		var result = await userManager.UpdateAsync(user);

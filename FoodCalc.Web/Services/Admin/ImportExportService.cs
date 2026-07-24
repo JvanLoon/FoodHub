@@ -20,7 +20,7 @@ public class ImportExportService(AuthenticatedHttpClientService httpClient, IJSR
 
 	private async Task<ApiResult> UploadAsync(string route, byte[] fileContent, string fileName)
 	{
-		if (fileContent == null || fileContent.Length == 0)
+		if (fileContent.Length == 0)
 			return ApiResult.Fail(WebConstants.Messages.ImportExport.NoFileContent, (int) HttpStatusCode.NoContent);
 
 		using var content = new MultipartFormDataContent();

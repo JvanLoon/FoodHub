@@ -1,126 +1,144 @@
+@page "/recipes/create"
 @page "/recipes/edit/{RecipeId:guid}"
 @inject RecipeService RecipeService
 @inject IngredientService IngredientService
 @inject AuthStateService AuthStateService
+@inject MessageService MessageService
 @inject NavigationManager Navigation
 
-<PageTitle>Edit Recipe</PageTitle>
+<PageTitle>@(IsNew ? "Create Recipe" : "Edit Recipe")</PageTitle>
 
 <div class="fh-stack">
-	<div class="recipe-name">
-		@if (!isEditingName)
-		{
-			<h1 class="fh-heading">@recipe?.Name</h1>
-			<IconButton Icon="pencil" Title="Edit recipe name" OnClick="() => isEditingName = true"/>
-		}
-		else
-		{
-			<EditForm Model="recipe" OnValidSubmit="SaveRecipeName" class="recipe-name__form"
-			          FormName="edit-recipe-name">
-				<InputText @bind-Value="recipe.Name" class="form-control"/>
-				<AppButton Type="submit" Size="ButtonSize.Small" Icon="check-lg">Save</AppButton>
-				<AppButton Variant="ButtonVariant.OutlineSecondary" Size="ButtonSize.Small" OnClick="CancelEditName">
-					Cancel
-				</AppButton>
-			</EditForm>
-		}
-	</div>
+	@if (IsNew)
+	{
+		<PageHeader Title="Create a New Recipe"/>
 
-	<div class="row g-4">
-		<!-- Left: ingredient form -->
-		<div class="col-md-6">
+		<div class="create-card">
 			<AppCard>
-				<div class="fh-field">
-					<label for="ingredientSearch" class="form-label">Search Ingredient</label>
-					<div class="input-group">
-						<input id="ingredientSearch"
-						       class="form-control"
-						       type="text"
-						       placeholder="Type to search..."
-						       @bind="ingredientSearch"
-						       @bind:event="oninput"
-						       @onfocus="() => dropdownOpen = true"
-						       @onblur="OnDropdownBlur"
-						       autocomplete="off"
-						       @onkeydown="HandleIngredientSearchKeydown"
-						       @onkeydown:preventDefault="@(ingredientSearchFocused)"/>
-						<button class="btn btn-outline-success" type="button" title="Add new ingredient"
-						        @onclick="AddIngredient">
-							<i class="bi bi-plus-lg" aria-hidden="true"></i>
-						</button>
-					</div>
-				</div>
-
-				<EditForm Model="recipeItem" OnValidSubmit="AddOrUpdateIngredient"
-				          FormName="add-or-update-ingredient-form">
-					<div class="ingredient-dropdown">
-						<div class="ingredient-dropdown__menu dropdown-menu @(dropdownOpen ? "show" : null)">
-							@foreach (var ingredient in FilteredIngredients)
-							{
-								<button type="button"
-								        class="dropdown-item @(recipeItem.Name == ingredient.Name ? "active" : "")"
-								        @onclick="() => SelectIngredient(ingredient)">
-									@ingredient.Name
-								</button>
-							}
-							@if (!FilteredIngredients.Any()) { <div class="dropdown-item disabled">No ingredients found.
-								Click + to add.
-							</div> }
-						</div>
-					</div>
-
-					<NumberField TValue="decimal?" Label="Amount" @bind-Value="amountInput"/>
-
-					<SelectField TValue="IngredientAmountTypeDto" Label="Amount Type"
-					             @bind-Value="recipeItem.IngredientAmount">
-						@foreach (IngredientAmountTypeDto amountType in Enum.GetValues<IngredientAmountTypeDto>())
-						{
-							<option value="@amountType">@amountType</option>
-						}
-					</SelectField>
-
-					<div class="fh-cluster">
-						<AppButton Type="submit" Icon="check-lg">Add/Save</AppButton>
-						<AppButton Variant="ButtonVariant.OutlinePrimary" OnClick="ClearForm">Clear</AppButton>
-					</div>
+				<EditForm Model="nameModel" OnValidSubmit="CreateRecipeAsync" FormName="create-recipe-form">
+					<TextField Label="Recipe Name" Placeholder="e.g. Spaghetti Bolognese" @bind-Value="editedName"/>
+					<AppButton Type="submit" Icon="plus-lg">Create</AppButton>
 				</EditForm>
 			</AppCard>
 		</div>
-
-		<!-- Right: current ingredients -->
-		<div class="col-md-6">
-			@if (recipe?.Ingredients is
-				     {
-					     Count: > 0
-				     } ingredientsList)
+	}
+	else
+	{
+		<div class="recipe-name">
+			@if (!isEditingName)
 			{
-				<ul class="ingredient-list">
-					@foreach (var ingredient in ingredientsList)
-					{
-						<li>
+				<h1 class="fh-heading">@recipe?.Name</h1>
+				<IconButton Icon="pencil" Title="Edit recipe name" OnClick="StartEditName"/>
+			}
+			else
+			{
+				<EditForm Model="nameModel" OnValidSubmit="SaveRecipeName" class="recipe-name__form"
+				          FormName="edit-recipe-name">
+					<InputText @bind-Value="editedName" class="form-control"/>
+					<AppButton Type="submit" Size="ButtonSize.Small" Icon="check-lg">Save</AppButton>
+					<AppButton Variant="ButtonVariant.OutlineSecondary" Size="ButtonSize.Small" OnClick="CancelEditName">
+						Cancel
+					</AppButton>
+				</EditForm>
+			}
+		</div>
+
+		<div class="row g-4">
+			<!-- Left: ingredient form -->
+			<div class="col-md-6">
+				<AppCard>
+					<div class="fh-field">
+						<label for="ingredientSearch" class="form-label">Search Ingredient</label>
+						<div class="input-group">
+							<input id="ingredientSearch"
+							       class="form-control"
+							       type="text"
+							       placeholder="Type to search..."
+							       @bind="ingredientSearch"
+							       @bind:event="oninput"
+							       @onfocus="() => dropdownOpen = true"
+							       @onblur="OnDropdownBlur"
+							       autocomplete="off"
+							       @onkeydown="HandleIngredientSearchKeydown"
+							       @onkeydown:preventDefault="@(ingredientSearchFocused)"/>
+							<button class="btn btn-outline-success" type="button" title="Add new ingredient"
+							        @onclick="AddIngredient">
+								<i class="bi bi-plus-lg" aria-hidden="true"></i>
+							</button>
+						</div>
+					</div>
+
+					<EditForm Model="recipeItem" OnValidSubmit="AddOrUpdateIngredient"
+					          FormName="add-or-update-ingredient-form">
+						<div class="ingredient-dropdown">
+							<div class="ingredient-dropdown__menu dropdown-menu @(dropdownOpen ? "show" : null)">
+								@foreach (var ingredient in FilteredIngredients)
+								{
+									<button type="button"
+									        class="dropdown-item @(recipeItem.Name == ingredient.Name ? "active" : "")"
+									        @onclick="() => SelectIngredient(ingredient)">
+										@ingredient.Name
+									</button>
+								}
+								@if (!FilteredIngredients.Any()) { <div class="dropdown-item disabled">No ingredients found.
+									Click + to add.
+								</div> }
+							</div>
+						</div>
+
+						<NumberField TValue="decimal?" Label="Amount" @bind-Value="amountInput"/>
+
+						<SelectField TValue="IngredientAmountTypeDto" Label="Amount Type"
+						             @bind-Value="recipeItem.IngredientAmount">
+							@foreach (IngredientAmountTypeDto amountType in Enum.GetValues<IngredientAmountTypeDto>())
+							{
+								<option value="@amountType">@amountType</option>
+							}
+						</SelectField>
+
+						<div class="fh-cluster">
+							<AppButton Type="submit" Icon="check-lg">Add/Save</AppButton>
+							<AppButton Variant="ButtonVariant.OutlinePrimary" OnClick="ClearForm">Clear</AppButton>
+						</div>
+					</EditForm>
+				</AppCard>
+			</div>
+
+			<!-- Right: current ingredients -->
+			<div class="col-md-6">
+				@if (recipe?.Ingredients is
+					     {
+						     Count: > 0
+					     } ingredientsList)
+				{
+					<ul class="ingredient-list">
+						@foreach (var ingredient in ingredientsList)
+						{
+							<li>
                             <span>
                                 @ingredient.Name
 	                            <span
 		                            class="fh-muted">@ingredient.Amount.ToFormattedString() @ingredient.IngredientAmount</span>
                             </span>
-							<span class="ingredient-list__actions">
+								<span class="ingredient-list__actions">
                                 <IconButton Icon="pencil" Title="Edit ingredient" Size="ButtonSize.Small"
                                             OnClick="() => EditIngredient(ingredient)"/>
                                 <IconButton Icon="trash" Title="Delete ingredient" Size="ButtonSize.Small"
                                             Variant="ButtonVariant.Danger"
                                             OnClick="() => DeleteIngredient(ingredient.Id)"/>
                             </span>
-						</li>
-					}
-				</ul>
-			}
-			else
-			{
-				<EmptyState Icon="basket" Title="No ingredients yet."
-				            Message="Search or add an ingredient on the left to build this recipe."/>
-			}
+							</li>
+						}
+					</ul>
+				}
+				else
+				{
+					<EmptyState Icon="basket" Title="No ingredients yet."
+					            Message="Search or add an ingredient on the left to build this recipe."/>
+				}
+			</div>
 		</div>
-	</div>
+	}
 </div>
 
 @code {
@@ -128,17 +146,30 @@
 	[Parameter]
 	public Guid RecipeId { get; set; }
 
+	// True on the /recipes/create route (no id supplied). Creating a recipe and editing one
+	// share this page; ingredients can only be added once the recipe exists (needs its id).
+	private bool IsNew => RecipeId == Guid.Empty;
+
 	private RecipeDto recipe = new();
 	private List<IngredientDto> ingredients = new();
 	private RecipeItemDto recipeItem = new();
 	private bool isEditingName = false;
 	private string ingredientSearch = string.Empty;
 
+	// Scratch buffer for the name field. The live name is only committed to `recipe.Name`
+	// (and the server) on an explicit Save, so cancelling — or navigating away — never
+	// mutates the actual recipe name. Also reused as the create-form's name input.
+	private string editedName = string.Empty;
+
+	// EditForm needs a model instance; the name lives in `editedName`, so this is just a handle.
+	private readonly object nameModel = new();
+
 	private IEnumerable<IngredientDto> FilteredIngredients => string.IsNullOrWhiteSpace(ingredientSearch) ? ingredients : ingredients.Where(i => i.Name.Contains(ingredientSearch, StringComparison.OrdinalIgnoreCase));
 
 	private decimal? amountInput;
 	private bool dropdownOpen = false;
 	private bool ingredientSearchFocused = false;
+	private bool initialized;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -148,9 +179,6 @@
 			return;
 		}
 
-		recipe = await RecipeService.GetRecipeByIdAsync(RecipeId)
-		                            .OrDefault<RecipeDto>(new());
-
 		await IngredientService.GetAllIngredientsAsync()
 		                       .OnSuccess((data) =>
 		                       {
@@ -158,12 +186,46 @@
 			                       ClearForm();
 		                       })
 		                       .OnFailure();
+
+		initialized = true;
+	}
+
+	// Runs on first render and whenever RecipeId changes (e.g. after create navigates to the
+	// edit URL). Loads the recipe for edit mode; resets to a blank recipe for create mode.
+	protected override async Task OnParametersSetAsync()
+	{
+		if (!initialized)
+			return;
+
+		if (IsNew)
+		{
+			recipe = new();
+			editedName = string.Empty;
+			isEditingName = false;
+			return;
+		}
+
+		await RefreshRecipeAsync();
 	}
 
 	private async Task RefreshRecipeAsync()
 	{
 		await RecipeService.GetRecipeByIdAsync(RecipeId)
 		                   .OnSuccess((data) => recipe = data)
+		                   .OnFailure();
+	}
+
+	private async Task CreateRecipeAsync()
+	{
+		if (string.IsNullOrWhiteSpace(editedName))
+		{
+			MessageService.ShowMessage(WebConstants.Messages.Recipe.NameRequired, isError: true);
+			return;
+		}
+
+		await RecipeService.AddRecipe(new CreateRecipeDto {Name = editedName.Trim()})
+		                   .OnSuccess((data) => Navigation.NavigateTo($"/recipes/edit/{data.Id}"),
+			                   WebConstants.Messages.Recipe.Created)
 		                   .OnFailure();
 	}
 
@@ -208,14 +270,26 @@
 		};
 	}
 
+	private void StartEditName()
+	{
+		editedName = recipe.Name ?? string.Empty;
+		isEditingName = true;
+	}
+
 	private async Task SaveRecipeName()
 	{
-		await RecipeService.UpdateRecipeName(RecipeId, recipe.Name!)
+		if (string.IsNullOrWhiteSpace(editedName))
+		{
+			MessageService.ShowMessage(WebConstants.Messages.Recipe.NameRequired, isError: true);
+			return;
+		}
+
+		await RecipeService.UpdateRecipeName(RecipeId, editedName.Trim())
 		                   .OnSuccess(message: WebConstants.Messages.Recipe.NameUpdated)
 		                   .OnFailure();
 
 		isEditingName = false;
-		await RefreshRecipeAsync(); // Refresh
+		await RefreshRecipeAsync(); // Refresh — pulls the committed name back from the server
 	}
 
 	private async Task AddIngredient()
@@ -255,7 +329,12 @@
 		dropdownOpen = false;
 	}
 
-	private void CancelEditName() { isEditingName = false; }
+	private void CancelEditName()
+	{
+		// Discard the scratch buffer; recipe.Name was never touched.
+		isEditingName = false;
+		editedName = string.Empty;
+	}
 
 	private async Task HandleIngredientSearchKeydown(KeyboardEventArgs e)
 	{

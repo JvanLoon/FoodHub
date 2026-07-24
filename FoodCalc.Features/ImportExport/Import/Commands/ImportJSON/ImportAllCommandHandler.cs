@@ -29,7 +29,8 @@ public class ImportAllCommandHandler(
 					await context.Ingredients.SingleOrDefaultAsync(i => i.Id == ingredientDto.Id, cancellationToken);
 				if (existingById != null)
 				{
-					if (existingById.Name != ingredientDto.Name) { existingById.Name = ingredientDto.Name; }
+					if (existingById.Name != ingredientDto.Name)
+						existingById.Name = ingredientDto.Name;
 
 					if (existingById.ShouldBeAddedToShoppingCart != ingredientDto.ShouldBeAddedToShoppingCart)
 					{
@@ -60,7 +61,15 @@ public class ImportAllCommandHandler(
 				{
 					if (existing.Name != recipeDto.Name) { existing.Name = recipeDto.Name; }
 				}
-				else { context.Recipes.Add(new Recipe {Id = recipeDto.Id, Name = recipeDto.Name,}); }
+				else
+				{
+					context.Recipes.Add(new Recipe
+					{
+						Id = recipeDto.Id,
+						Name = recipeDto.Name,
+						CreatedByUserId = request.ImportedByUserId
+					});
+				}
 			}
 
 			// Import RecipeItems (ingredient lines snapshotted onto the recipe)

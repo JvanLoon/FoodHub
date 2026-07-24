@@ -3,16 +3,16 @@
     flex-direction: column;
     gap: var(--fh-space-1);
     margin-bottom: var(--fh-space-4);
+}
 
-    &::deep .form-label {
-        margin-bottom: 0;
-        font-size: var(--fh-text-sm);
-        font-weight: var(--fh-weight-medium);
-        color: var(--fh-text-muted);
-    }
+.fh-field ::deep .form-label {
+    margin-bottom: 0;
+    font-size: var(--fh-text-sm);
+    font-weight: var(--fh-weight-medium);
+    color: var(--fh-text-muted);
+}
 
-    &:deep .validation-message {
-        font-size: var(--fh-text-sm);
-        color: var(--fh-danger);
-    }
+.fh-field ::deep .validation-message {
+    font-size: var(--fh-text-sm);
+    color: var(--fh-danger);
 }

@@ -4,4 +4,4 @@ using MediatR;
 
 namespace FoodCalc.Features.ImportExport.Import.Commands.ImportJSON;
 
-public record ImportAllCommand(ImportExportAllDataDto Data) : IRequest<ErrorOr<bool>>;
+public record ImportAllCommand(ImportExportAllDataDto Data, string ImportedByUserId) : IRequest<ErrorOr<bool>>;

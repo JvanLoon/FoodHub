@@ -1,15 +1,19 @@
+.create-card {
+    max-width: 32rem;
+}
+
 .recipe-name {
     display: flex;
     align-items: center;
     gap: var(--fh-space-3);
+}
 
-    &::deep .recipe-name__form {
-        display: flex;
-        align-items: center;
-        gap: var(--fh-space-2);
-        flex: 1;
-        max-width: 32rem;
-    }
+.recipe-name ::deep .recipe-name__form {
+    display: flex;
+    align-items: center;
+    gap: var(--fh-space-2);
+    flex: 1;
+    max-width: 32rem;
 }
 
 .ingredient-dropdown {

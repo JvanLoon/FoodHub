@@ -15,8 +15,10 @@ public class CreateRecipeEndpoint(IMediator mediator) : Endpoint<CreateRecipeDto
 
 	public override async Task HandleAsync(CreateRecipeDto req, CancellationToken ct)
 	{
-		var result = await mediator.Send(new AddRecipeCommand(req), ct);
+		var result = await mediator.Send(new AddRecipeCommand(req, User.GetUserId()), ct);
 
-		await result.Match(value => Send.OkAsync(value, ct), errors => this.SendErrorsAsync(errors, ct: ct));
+		await result.Match(
+			value => Send.OkAsync(value, ct), 
+			errors => this.SendErrorsAsync(errors, ct: ct));
 	}
 }

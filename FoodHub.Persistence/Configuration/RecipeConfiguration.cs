@@ -17,6 +17,13 @@ public class RecipeConfiguration : IEntityTypeConfiguration<Recipe>
 			   .HasMaxLength(450)
 			   .IsRequired();
 
+		// Required author (legacy rows backfilled to the first admin by migration);
+		// indexed for "recipes by user" lookups.
+		builder.Property(r => r.CreatedByUserId)
+			   .IsRequired();
+
+		builder.HasIndex(r => r.CreatedByUserId);
+
 		builder.HasMany(r => r.Ingredients)
 			   .WithOne()
 			   .HasForeignKey(k => k.RecipeId)

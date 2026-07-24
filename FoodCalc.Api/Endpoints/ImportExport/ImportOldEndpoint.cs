@@ -54,9 +54,16 @@ public class ImportOldEndpoint(IMediator mediator) : Endpoint<ImportRequest>
 			await Send.StringAsync("Invalid file content.", 400, cancellation: ct);
 			return;
 		}
+		
+		var userid = User.GetUserId();
+		if (string.IsNullOrEmpty(userid))
+		{
+			await Send.StringAsync("Invalid user id.", 400, cancellation: ct);
+			return;
+		}
 
 		var importData = LegacyImportConverter.ToCurrent(legacy);
-		var result = await mediator.Send(new ImportAllCommand(importData), ct);
+		var result = await mediator.Send(new ImportAllCommand(importData, userid), ct);
 
 		await result.Match(_ => Send.StringAsync("Import successful.", cancellation: ct),
 						   errors => this.SendErrorsAsync(errors, ct: ct));

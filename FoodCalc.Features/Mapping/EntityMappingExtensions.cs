@@ -70,12 +70,9 @@ public static class EntityMappingExtensions
 		new()
 		{
 			Id = e.Id,
-			Name = e.Name ?? string.Empty,
-			// Null collection -> empty list (GetAllRecipes nulls this out when
-			// WithIngredient is false), matching the old AutoMapper behaviour.
-			Ingredients = e.Ingredients?.Select(ri => ri.ToDto())
-						   .ToList()
-						  ?? []
+			Name = e.Name,
+			CreatedByUserId = e.CreatedByUserId,
+			Ingredients = [..e.Ingredients.Select(ri => ri.ToDto())]
 		};
 
 	public static List<RecipeDto> ToDtoList(this IEnumerable<Recipe> items) =>
@@ -89,9 +86,7 @@ public static class EntityMappingExtensions
 	public static MealPlanEntryDto ToDto(this MealPlanEntry e) =>
 		new() {Id = e.Id, Date = e.Date, RecipeId = e.RecipeId, RecipeName = e.Recipe?.Name ?? string.Empty};
 
-	public static List<MealPlanEntryDto> ToDtoList(this IEnumerable<MealPlanEntry> items) =>
-		items.Select(m => m.ToDto())
-			 .ToList();
+	public static List<MealPlanEntryDto> ToDtoList(this IEnumerable<MealPlanEntry> items) => [..items.Select(m => m.ToDto())];
 
 	// ---------- User ----------
 	// Roles are populated separately by the caller (as before).
@@ -101,7 +96,8 @@ public static class EntityMappingExtensions
 			Id = u.Id,
 			Name = u.UserName ?? string.Empty,
 			Email = u.Email ?? string.Empty,
-			Enabled = u.LockoutEnabled,
+			// Enable/disable is gated on EmailConfirmed (see ToggleUserEndpoint / LoginEndpoint).
+			Enabled = u.EmailConfirmed,
 			EmailConfirmed = u.EmailConfirmed,
 			Roles = []
 		};

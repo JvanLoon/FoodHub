@@ -2,10 +2,10 @@
     display: inline-flex;
     align-items: center;
     line-height: 1;
+}
 
-    &::deep svg {
-        width: 1em;
-        height: 1em;
-        fill: currentColor;
-    }
+.fh-icon ::deep svg {
+    width: 1em;
+    height: 1em;
+    fill: currentColor;
 }

@@ -95,6 +95,7 @@ public static class WebConstants
 		{
 			public const string Created = "Recipe created successfully!";
 			public const string NameUpdated = "Recipe name updated successfully!";
+			public const string NameRequired = "Please enter a recipe name.";
 			public const string Deleted = "Recipe deleted successfully!";
 			public const string Updated = "Recipe updated successfully!";
 		}
