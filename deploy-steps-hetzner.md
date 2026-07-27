@@ -21,19 +21,55 @@ build headroom. 40 GB of disk is plenty.
 
 ## 1. Provision
 
-1. Create the server (Ubuntu LTS, x86). Add your SSH public key **during** creation —
-   don't use password login.
-2. Note the IPv4 address.
-3. In the Hetzner Cloud firewall, allow inbound **22, 80, 443** only. Deny everything
-   else, in particular 5432.
+When creating the server:
+
+1. **Image**: Ubuntu LTS, x86.
+2. **SSH keys**: select your key. This puts it on `root`.
+3. **Cloud config**: paste [`deploy/cloud-init.yaml`](deploy/cloud-init.yaml), with the
+   `ssh_authorized_keys` placeholder replaced by the output of
+   `cat ~/.ssh/id_ed25519.pub`. This creates the `foodhub` user, the firewall, and
+   Docker on first boot — steps 2 and 3 below are its manual equivalent.
+4. **Firewall**: allow inbound **22, 80, 443** only. Deny everything else, in
+   particular 5432. (Belt and braces — cloud-init also configures ufw on the host.)
+5. Note the IPv4 address.
+
+Cloud-init runs for a minute or two after the server reports ready. Wait for the
+marker before doing anything else:
+
+```bash
+ssh root@<server-ip> "ls -l /var/log/foodhub-cloud-init-done && cloud-init status"
+```
+
+`status: done` means it finished. If it says `error`, read `/var/log/cloud-init-output.log`.
+
+## 2. Verify, then close the root door
+
+**First confirm the unprivileged account works**, because the next command removes
+your fallback:
+
+```bash
+ssh foodhub@<server-ip> "id && docker run --rm hello-world"
+```
+
+That must print `sudo` and `docker` in the group list and run the container. If it
+fails, fix it over `ssh root@<server-ip>` — do not continue.
+
+Once it works, turn root SSH off completely:
+
+```bash
+ssh foodhub@<server-ip> "sudo sed -i 's/^PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config.d/99-foodhub.conf && sudo systemctl restart ssh"
+```
+
+**Keep this session open** and confirm in a second terminal that `ssh foodhub@…`
+still connects and `ssh root@…` is refused. Getting this wrong locks you out, and
+the way back is Hetzner's rescue system.
+
+<details>
+<summary>Doing steps 1–2 by hand instead of with cloud-init</summary>
 
 ```bash
 ssh root@<server-ip>
-```
 
-## 2. Harden the host
-
-```bash
 apt update && apt upgrade -y
 apt install -y ufw fail2ban git
 
@@ -44,35 +80,23 @@ rsync --archive --chown=foodhub:foodhub ~/.ssh /home/foodhub
 ufw default deny incoming
 ufw default allow outgoing
 ufw allow 22/tcp && ufw allow 80/tcp && ufw allow 443/tcp
-ufw enable
-```
+ufw --force enable
 
-Disable password and root SSH login in `/etc/ssh/sshd_config`:
-
-```
-PermitRootLogin no
-PasswordAuthentication no
-```
-
-```bash
-systemctl restart ssh
-```
-
-**Open a second terminal and confirm `ssh foodhub@<server-ip>` works before closing
-the first one.** Getting this wrong locks you out and the only way back is Hetzner's
-web console.
-
-## 3. Install Docker
-
-```bash
 curl -fsSL https://get.docker.com | sh
 usermod -aG docker foodhub
 ```
 
-Log out and back in as `foodhub` so the group membership applies, then check:
+Then set `PermitRootLogin no` and `PasswordAuthentication no` in
+`/etc/ssh/sshd_config`, `systemctl restart ssh`, and verify as above.
+
+</details>
+
+## 3. Confirm Docker
+
+Log in as `foodhub` (a fresh session, so the `docker` group applies):
 
 ```bash
-docker run --rm hello-world
+ssh foodhub@<server-ip> "docker --version && docker compose version"
 ```
 
 ## 4. DNS

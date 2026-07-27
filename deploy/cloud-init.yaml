@@ -1,0 +1,88 @@
+#cloud-config
+#
+# Paste into the "Cloud config" box when creating the Hetzner Cloud server.
+# It performs §2 (harden) and §3 (Docker) of deploy-steps-hetzner.md on first boot,
+# so you land on a server that is already firewalled and Docker-ready.
+#
+# ─── BEFORE YOU PASTE ────────────────────────────────────────────────────────
+# Replace the placeholder under ssh_authorized_keys with the single line from
+#   cat ~/.ssh/id_ed25519.pub
+# and ALSO select that same key in Hetzner's "SSH keys" section on the same page.
+# The two do different things: Hetzner's selection puts the key on root, this file
+# puts it on the foodhub user. Having both is the lockout insurance — if the key
+# pasted here is wrong, root still works and you can fix it without rescue mode.
+#
+# Root SSH is left at prohibit-password (key-only) on purpose. §2 of the deploy
+# steps turns it off completely, once you have confirmed foodhub login works.
+# Doing it here instead would risk locking you out on a typo.
+# ─────────────────────────────────────────────────────────────────────────────
+
+package_update: true
+package_upgrade: true
+
+packages:
+  - ufw
+  - fail2ban
+  - git
+  - curl
+  - ca-certificates
+  - unattended-upgrades
+
+users:
+  - name: foodhub
+    shell: /bin/bash
+    groups: [sudo]
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    # No password at all — this account is key-only by construction.
+    lock_passwd: true
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAREPLACE_THIS_WITH_THE_CONTENTS_OF_YOUR_id_ed25519.pub
+
+# No password logins anywhere, for any account.
+ssh_pwauth: false
+
+write_files:
+  # A drop-in rather than edits to sshd_config, so a distro upgrade cannot
+  # silently revert it.
+  - path: /etc/ssh/sshd_config.d/99-foodhub.conf
+    permissions: '0644'
+    content: |
+      # Key-only root for now; deploy-steps-hetzner.md §2 changes this to "no"
+      # once login as foodhub is confirmed.
+      PermitRootLogin prohibit-password
+      PasswordAuthentication no
+      KbdInteractiveAuthentication no
+
+  # Security updates apply themselves. Without this the package is installed but
+  # idle, which is a common and quiet mistake.
+  - path: /etc/apt/apt.conf.d/20auto-upgrades
+    permissions: '0644'
+    content: |
+      APT::Periodic::Update-Package-Lists "1";
+      APT::Periodic::Unattended-Upgrade "1";
+
+runcmd:
+  # Firewall. Allow SSH BEFORE enabling, or this command locks cloud-init out of
+  # the machine it is configuring. Port 5432 is deliberately absent: Postgres is
+  # reached through an SSH tunnel, never over the internet.
+  - ufw default deny incoming
+  - ufw default allow outgoing
+  - ufw allow 22/tcp
+  - ufw allow 80/tcp
+  - ufw allow 443/tcp
+  - ufw --force enable
+
+  # Docker, from the official convenience script.
+  - curl -fsSL https://get.docker.com -o /tmp/get-docker.sh
+  - sh /tmp/get-docker.sh
+  - rm -f /tmp/get-docker.sh
+  # The docker group only exists after the install above, which is why this is
+  # here and not in the users: block.
+  - usermod -aG docker foodhub
+
+  - systemctl enable --now docker
+  - systemctl enable --now fail2ban
+  - systemctl restart ssh
+
+  # Marker so you can tell a finished run from one still in progress.
+  - touch /var/log/foodhub-cloud-init-done
