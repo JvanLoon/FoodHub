@@ -381,7 +381,4 @@ keys/
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
-/.idea/.idea.FoodHub/.idea/.gitignore
-/.idea/.idea.FoodHub/.idea/encodings.xml
-/.idea/.idea.FoodHub/.idea/indexLayout.xml
-/.idea/.idea.FoodHub/.idea/vcs.xml
+/.idea/
