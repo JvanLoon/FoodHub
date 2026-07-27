@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FoodCalc.Api;
 
-public class Program
+public static class Program
 {
 	public static void Main(string[] args)
 	{
@@ -36,9 +36,14 @@ public class Program
 		});
 
 		// Add services to the container.
-		builder.Services.AddDbContext<FoodHubDbContext>(options => options.UseSqlServer(
-															builder.Configuration.GetConnectionString(
-																"DefaultConnection")));
+		// Aspire injects the Postgres connection string under the resource name
+		// ("foodcalc"); the docker-compose stack and a plain local run supply it
+		// as "DefaultConnection". Prefer the Aspire one, fall back to the latter.
+		var connectionString = builder.Configuration.GetConnectionString("foodcalc")
+							 ?? builder.Configuration.GetConnectionString("DefaultConnection")
+							 ?? throw new InvalidOperationException("No database connection string is configured.");
+
+		builder.Services.AddDbContext<FoodHubDbContext>(options => options.UseNpgsql(connectionString));
 
 		// Add Identity
 		builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>

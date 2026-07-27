@@ -28,8 +28,8 @@ all your culinary needs, making it easier to cook, shop, and eat healthily.
 
 - **Backend**: .NET 10, [FastEndpoints](https://fast-endpoints.com/) (REPR pattern), FluentValidation
 - **Frontend**: Blazor Server (interactive server rendering), Bootstrap 5.3, Bootstrap Icons
-- **Database**: SQL Server with Entity Framework Core (Code-First migrations)
-- **Orchestration**: .NET Aspire AppHost
+- **Database**: PostgreSQL with Entity Framework Core (Code-First migrations, Npgsql provider)
+- **Orchestration**: .NET Aspire AppHost — provisions PostgreSQL + pgAdmin as Docker containers
 - **Mapping**: Hand-written mapping (no AutoMapper)
 - **Dependency Injection**: Built-in .NET DI container
 
@@ -53,8 +53,8 @@ Blazor-state-driven.
 ### Prerequisites
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
-- [SQL Server](https://www.microsoft.com/en-us/sql-server/sql-server-downloads)
-  or [SQL Server Express](https://www.microsoft.com/en-us/sql-server/sql-server-editions-express)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) — the Aspire AppHost runs PostgreSQL and
+  pgAdmin as containers, so **no local PostgreSQL install is needed**
 
 ### Getting Started
 
@@ -69,28 +69,28 @@ Blazor-state-driven.
    dotnet restore
    ```
 
-3. **Update connection string**
-   Update the connection string in `FoodCalc.Api/appsettings.json` to point to your SQL Server instance.
-
-4. **Run database migrations**
-   ```bash
-   dotnet ef database update --project FoodHub.Persistence --startup-project FoodCalc.Api
-   ```
-
-5. **Start the application**
+3. **Start the application**
    ```bash
    dotnet run --project FoodHub.AppHost
    ```
+   Aspire starts a **PostgreSQL** container (recreated on each run; data persists in the `foodhub-pgdata`
+   volume) and a **pgAdmin** container, then runs the API and Web projects pointed at that database. The API
+   applies EF Core migrations on boot, so the schema is created automatically — no manual migration step and no
+   connection string to edit.
 
-6. **Access the application**
-	- Web Application: The URL will be displayed in the console (typically https://localhost:7xxx)
+4. **Access the application**
+	- Web Application, API, and **pgAdmin** links are all listed in the Aspire dashboard that opens on start
 	- API Documentation: Available at the API's `/swagger` endpoint in development
+
+> To run without Aspire (plain `dotnet run` on the API), point `ConnectionStrings:DefaultConnection` in
+> `FoodCalc.Api/appsettings.Development.json` at a reachable PostgreSQL instance — e.g. start just the database
+> with `docker compose up -d db pgadmin`.
 
 ## 🐳 Run with Docker
 
-A self-contained stack (SQL Server **db** + **api** + **web**, no Aspire AppHost) is defined in [
-`docker-compose.yml`](docker-compose.yml). Everything runs over HTTP on the internal Docker network (port `8080`); only
-the web app needs to be reached from a browser.
+A self-contained stack (PostgreSQL **db** + **pgAdmin** + **api** + **web**, no Aspire AppHost) is defined in [
+`docker-compose.yml`](docker-compose.yml). The app services run over HTTP on the internal Docker network (port `8080`);
+only the web app and pgAdmin need to be reached from a browser.
 
 ```bash
 # Build images and start the stack in the background
@@ -99,11 +99,14 @@ docker compose up -d --build
 
 - **Web app**: http://localhost:5002
 - **API**: http://localhost:5001 (optional; the Blazor server calls it internally)
-- **SQL Server**: `localhost:1433`
+- **pgAdmin**: http://localhost:5050 (login `admin@foodhub.local` / `admin`)
+- **PostgreSQL**: `localhost:5432` (user `foodhub`, database `FoodCalc`)
 
 Startup order is handled automatically: `db` (waited on via healthcheck) → `api` →
-`web`. The API connects as `sa` and runs EF Core migrations on boot, which create the
-`FoodCalc` database and the entire schema — no separate init script is required.
+`web`. The API runs EF Core migrations on boot, which create the entire schema — no separate init script is required.
+
+To browse tables in pgAdmin, add a server pointing at host `db`, port `5432`, user `foodhub`. Its
+**restore/import** feature is the easiest way to reset the data.
 
 ### Default accounts
 
@@ -120,7 +123,7 @@ database has a working login:
 
 ### Data persistence
 
-The database is stored in the named volume `mssql-data`, and DataProtection keys (auth/antiforgery) in
+The database is stored in the named volume `pgdata`, and DataProtection keys (auth/antiforgery) in
 `dataprotection-keys`. Both survive container recreation:
 
 ```bash

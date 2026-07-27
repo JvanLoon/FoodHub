@@ -17,12 +17,14 @@ public class RecipeItemConfigurator : IEntityTypeConfiguration<RecipeItem>
 		builder.Property(ri => ri.Amount)
 			   .IsRequired()
 			   .HasColumnType("decimal(10,2)");
-		builder.ToTable(t => t.HasCheckConstraint("CK_RecipeItem_Amount", "Amount > 0"));
+		// Column names must be quoted: PostgreSQL folds unquoted identifiers to
+		// lower-case, so `Amount` would resolve to a non-existent `amount` column.
+		builder.ToTable(t => t.HasCheckConstraint("CK_RecipeItem_Amount", "\"Amount\" > 0"));
 
 		builder.Property(ri => ri.IngredientAmount)
 			   .IsRequired();
 		//IngredientAmount may not be IngredientAmount.None
-		builder.ToTable(t => t.HasCheckConstraint("CK_RecipeItem_IngredientAmount", "IngredientAmount > 0"));
+		builder.ToTable(t => t.HasCheckConstraint("CK_RecipeItem_IngredientAmount", "\"IngredientAmount\" > 0"));
 
 		builder.Property(ri => ri.ShouldBeAddedToShoppingCart)
 			   .HasDefaultValue(true);

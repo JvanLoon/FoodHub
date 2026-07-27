@@ -365,7 +365,11 @@
 		addModalVisible = true;
 	}
 
-	private void OnRecipeSearchChanged(string value) => recipeSearch = value;
+	private void OnRecipeSearchChanged(string value)
+	{
+		recipeSearch = value;
+		StateHasChanged();
+	}
 
 	private void OpenRecipe(MealPlanEntryDto entry) => Navigation.NavigateTo($"/recipe/{entry.RecipeId}");
 
