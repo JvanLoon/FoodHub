@@ -131,10 +131,23 @@ it in `docker compose logs api`.
 | File | Change |
 | --- | --- |
 | `FoodCalc.Api/appsettings*.json` | **Deleted.** All API config now comes from `.env` / environment variables |
-| `FoodCalc.Web/appsettings*.json` | `API:BaseAddress` and `Jwt:Key` emptied; non-secret defaults kept |
+| `FoodCalc.Web/appsettings*.json` | **Deleted.** Same treatment |
+| `FoodHub.AppHost/appsettings*.json` | **Kept.** Logging levels only, no secrets, and the AppHost is never deployed |
 | `docker-compose.yml`, `docker-compose.prod.yml` | All passwords now `${VAR:?}` — compose fails loudly if unset |
 | `.env.example` (root, `FoodCalc.Api/`, `FoodCalc.Web/`) | **New.** Templates, placeholders only |
 | `.gitignore` | **New entries.** `.env`, `.env.*`, `appsettings.Production.json` |
+
+Both apps call `DotNetEnv.Env.NoClobber().Load()` at the top of `Main`, guarded by
+`File.Exists(".env")` so it is a no-op inside a container.
+
+Two settings did not survive the move, deliberately:
+
+- **`AllowedHosts: "*"`** — that is the framework default when the key is absent, so
+  nothing changed. Still worth setting to the real hostname once you have one.
+- **`ImportExport:MaxFileSizeInBytes`** — it was already dead. Nothing binds
+  `ImportExportSettings`, and both call sites use the `DefaultMaxFileSizeInBytes`
+  constant instead. Changing the JSON never did anything. If you want it
+  configurable, that needs a `Configure<ImportExportSettings>` registration first.
 
 `${VAR:?message}` is deliberate: an unset variable stops `docker compose` with the
 message instead of silently starting Postgres with an empty password.
@@ -231,6 +244,11 @@ openssl rand -base64 48        # Jwt__Key — paste the SAME value into both fil
 ```
 
 Then fill in the Postgres password in `FoodCalc.Api/.env`.
+
+Neither project has an `appsettings.json` any more, so **without a `.env` the app does
+not start** — it fails on `WebServer:BaseAddress` or `Jwt:Key` being absent. That is
+intentional: a missing config file is a loud failure, an empty committed default is a
+silent one.
 
 **Running through the Aspire AppHost is unaffected** — it injects its own `foodcalc`
 connection string, and `NoClobber` means it wins over the file. Only `Jwt__Key` needs

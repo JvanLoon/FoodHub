@@ -65,7 +65,9 @@ public static class IdentityBootstrapExtensions
 		{
 			UserName = email,
 			Email = email,
-			EmailConfirmed = true // Enabled/disabled is gated on EmailConfirmed, see ToggleUserEndpoint.
+			EmailConfirmed = true, // Enabled/disabled is gated on EmailConfirmed, see ToggleUserEndpoint.
+			LockoutEnabled = false,
+			LockoutEnd = null
 		};
 
 		var result = await userManager.CreateAsync(admin, password);
