@@ -5,58 +5,17 @@ Server-side procedure. The code changes it depends on are in
 
 ---
 
-## 0. Read this before booking anything
+**Target: a Hetzner Cloud server (CX/CPX line) running Ubuntu LTS, with root.**
 
-**Webhosting L is very unlikely to be able to run this application, and I'd want you
-to confirm that before spending time on the rest of this document.**
+Hetzner's *Webhosting* line was evaluated and ruled out: it is shared PHP hosting
+(hence the PHP Configuration and WordPress entries in konsoleH), with no .NET runtime,
+no Docker and no root. FoodHub is a containerised ASP.NET Core app whose front end
+holds an open WebSocket per visitor, so it needs a machine it controls. The
+PostgreSQL and Redis entries on that plan are managed services for PHP apps to
+connect to; they don't change the application tier.
 
-Hetzner's *Webhosting* line is shared PHP hosting managed through konsoleH. The
-service list in your screenshot is the tell: **PHP Configuration**, a **WordPress**
-installer, **WebFTP**. Those exist because the platform serves PHP through a
-web server that Hetzner controls, on a machine you share with other customers.
-
-FoodHub needs three things that shared PHP hosting does not offer:
-
-| Requirement | Why | Available on shared hosting? |
-| --- | --- | --- |
-| A long-running .NET 10 process | ASP.NET Core *is* the web server | No .NET runtime, and user processes are reaped |
-| A persistent WebSocket per visitor | Blazor Server holds an open SignalR circuit for the whole session | Needs a process listening on a port you control |
-| Docker, or root | The whole stack is containerised | No root, no Docker daemon |
-
-The PostgreSQL and Redis entries in that menu are *managed database services* for
-PHP apps to connect to. They don't change the picture for the application tier.
-
-### Confirm it yourself
-
-SSH in and run these. It takes two minutes and settles the question:
-
-```bash
-uname -a; cat /etc/os-release; id
-which docker dotnet; docker ps
-python3 -c "import socket; s=socket.socket(); s.bind(('0.0.0.0',8080)); print('bound 8080 OK')"
-```
-
-You are looking for: a real shell, `docker` present and usable, non-shared kernel,
-and a successful bind on a high port. On Webhosting expect `docker: not found`, no
-`dotnet`, a `uid` inside a shared range, and either a refused bind or a port that
-isn't reachable from the internet.
-
-If all four somehow pass, tell me and I'll rewrite this document around it.
-
-### What to use instead
-
-A **Hetzner Cloud server** (the CX/CPX line) or any root server. You get root, Docker,
-your own IP and firewall — and the rest of this document applies as written. Sizing
-for this stack: 2 vCPU and 4 GB RAM is comfortable for Postgres + two .NET containers
-plus build headroom; 40 GB of disk is plenty, since your 100 GB figure is the
-Webhosting quota and not something this app will approach. Check current specs and
-pricing on Hetzner's site — they change.
-
-Everything below assumes a fresh Ubuntu LTS cloud server with root SSH.
-
-> If you're committed to Webhosting L, the only shape that fits is rewriting the
-> front end as static files plus a PHP backend. That's a different application, not
-> a deployment.
+Sizing: 2 vCPU / 4 GB RAM is comfortable for Postgres plus two .NET containers with
+build headroom. 40 GB of disk is plenty.
 
 ---
 
@@ -289,14 +248,10 @@ check out the older code — in that order.
 
 ## Open questions for you
 
-1. **Which Hetzner product will this actually run on?** Everything above assumes a
-   root server. Run the checks in §0 and tell me what you get.
-2. **What hostname?** Needed for `PUBLIC_HOSTNAME`, the Caddy certificate, and the
-   CORS origin.
-3. **Do you want the API reachable from outside?** Right now it isn't — only the web
-   container calls it. Exposing it means a Caddy route and a CORS review.
-4. **Email.** Nothing sends mail today, so there is no password reset. Worth deciding
+1. **What hostname?** Needed for `PUBLIC_HOSTNAME`, the Caddy certificate, and the
+   CORS origin. Nothing in §4 onward can be done without it.
+2. **Do you want the API reachable from outside?** Right now it isn't — only the web
+   container calls it over the internal network. Exposing it means a Caddy route and
+   a CORS review.
+3. **Email.** Nothing sends mail today, so there is no password reset. Worth deciding
    before real users exist.
-
-Send me the SSH details once you've settled 1 and 2 and I'll work through the steps
-with you — but do the §0 checks first, since everything else depends on the answer.
