@@ -72,7 +72,7 @@ public static class EntityMappingExtensions
 			Id = e.Id,
 			Name = e.Name,
 			CreatedByUserId = e.CreatedByUserId,
-			Ingredients = [..e.Ingredients.Select(ri => ri.ToDto())]
+			Ingredients = e.Ingredients is null ? [] : [..e.Ingredients.Select(ri => ri.ToDto())]
 		};
 
 	public static List<RecipeDto> ToDtoList(this IEnumerable<Recipe> items) =>

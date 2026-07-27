@@ -13,5 +13,5 @@ public class Recipe : BaseEntity
 	/// </summary>
 	public string CreatedByUserId { get; set; } = string.Empty;
 
-	public List<RecipeItem> Ingredients { get; set; } = [];
+	public List<RecipeItem>? Ingredients { get; set; } = [];
 }

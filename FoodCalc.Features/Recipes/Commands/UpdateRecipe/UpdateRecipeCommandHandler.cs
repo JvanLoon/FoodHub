@@ -24,7 +24,7 @@ public class UpdateRecipeCommandHandler(FoodHubDbContext context, ILogger<Update
 
 			// Reconcile the recipe's items with the set provided in the request:
 			// update the ones still present, remove the missing, add the new.
-			recipe.Ingredients.Sync(request.Recipe.Ingredients, keyOfExisting: item => item.Id,
+			recipe.Ingredients?.Sync(request.Recipe.Ingredients, keyOfExisting: item => item.Id,
 									keyOfIncoming: dto => dto.Id, create: dto => dto.ToEntity(),
 									update: (dto, item) => dto.ApplyTo(item));
 

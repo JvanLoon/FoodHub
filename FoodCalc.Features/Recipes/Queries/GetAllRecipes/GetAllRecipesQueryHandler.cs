@@ -22,14 +22,19 @@ public class GetAllRecipesQueryHandler(FoodHubDbContext context, ILogger<GetAllR
 
 			var paged = await query.ToPagedResultAsync(request, cancellationToken);
 
+			var items = paged.Items.ToDtoList();
+
+			// Callers that only need names (the calendar picker) ask for recipes without
+			// ingredients. Strip them off the DTO — never off the tracked entity, which
+			// would both break the mapping below and dirty the change tracker.
 			if (!request.WithIngredient)
 			{
-				foreach (var item in paged.Items) { item.Ingredients = null!; }
+				foreach (var item in items) { item.Ingredients = null!; }
 			}
 
 			return new PagedResultDto<RecipeDto>
 			{
-				Items = paged.Items.ToDtoList(),
+				Items = items,
 				TotalCount = paged.TotalCount,
 				Page = paged.Page,
 				PageSize = paged.PageSize

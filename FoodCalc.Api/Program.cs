@@ -9,163 +9,167 @@ namespace FoodCalc.Api;
 
 public static class Program
 {
-	public static void Main(string[] args)
-	{
-		var builder = WebApplication.CreateBuilder(args);
+    public static void Main(string[] args)
+    {
+        var builder = WebApplication.CreateBuilder(args);
 
-		var webBaseAddress = builder.Configuration["WebServer:BaseAddress"];
-		if (string.IsNullOrEmpty(webBaseAddress))
-			throw new InvalidOperationException("Web server base address is not configured.");
+        var webBaseAddress = builder.Configuration["WebServer:BaseAddress"];
+        if (string.IsNullOrEmpty(webBaseAddress))
+            throw new InvalidOperationException("Web server base address is not configured.");
 
-		// Add service defaults & Aspire client integrations.
-		builder.AddServiceDefaults();
+        // Add service defaults & Aspire client integrations.
+        builder.AddServiceDefaults();
 
-		// Add services to the container.
-		builder.Services.AddProblemDetails();
+        // Add services to the container.
+        builder.Services.AddProblemDetails();
 
-		builder.Services.AddFastEndpoints();
-		builder.Services.SwaggerDocument();
+        builder.Services.AddFastEndpoints();
+        builder.Services.SwaggerDocument();
 
-		builder.Services.Configure<JsonOptions>(options =>
-		{
-			options.SerializerOptions.IncludeFields = false;
-			options.SerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
-			options.SerializerOptions.WriteIndented = true;
-			options.SerializerOptions.Converters.Add(new DateTimeConverter());
-			//options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-		});
+        builder.Services.Configure<JsonOptions>(options =>
+        {
+            options.SerializerOptions.IncludeFields = false;
+            options.SerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+            options.SerializerOptions.WriteIndented = true;
+            options.SerializerOptions.Converters.Add(new DateTimeConverter());
+            //options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+        });
 
-		// Add services to the container.
-		// Aspire injects the Postgres connection string under the resource name
-		// ("foodcalc"); the docker-compose stack and a plain local run supply it
-		// as "DefaultConnection". Prefer the Aspire one, fall back to the latter.
-		var connectionString = builder.Configuration.GetConnectionString("foodcalc")
-							 ?? builder.Configuration.GetConnectionString("DefaultConnection")
-							 ?? throw new InvalidOperationException("No database connection string is configured.");
+        // Add services to the container.
+        // Aspire injects the Postgres connection string under the resource name
+        // ("foodcalc"); the docker-compose stack and a plain local run supply it
+        // as "DefaultConnection". Prefer the Aspire one, fall back to the latter.
+        var connectionString = builder.Configuration.GetConnectionString("foodcalc") ??
+                               builder.Configuration.GetConnectionString("DefaultConnection") ??
+                               throw new InvalidOperationException("No database connection string is configured.");
 
-		builder.Services.AddDbContext<FoodHubDbContext>(options => options.UseNpgsql(connectionString));
+        builder.Services.AddDbContext<FoodHubDbContext>(options => options.UseNpgsql(connectionString));
 
-		// Add Identity
-		builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
-			   {
-				   options.SignIn.RequireConfirmedAccount = false;
-				   options.User.RequireUniqueEmail = true;
+        // Add Identity
+        builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+            {
+                options.SignIn.RequireConfirmedAccount = false;
+                options.User.RequireUniqueEmail = true;
 
-				   options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
-				   options.Lockout.MaxFailedAccessAttempts = 5;
-				   options.Lockout.AllowedForNewUsers = true;
-			   })
-			   .AddEntityFrameworkStores<FoodHubDbContext>()
-			   .AddDefaultTokenProviders();
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
+                options.Lockout.MaxFailedAccessAttempts = 5;
+                options.Lockout.AllowedForNewUsers = true;
+            })
+            .AddEntityFrameworkStores<FoodHubDbContext>()
+            .AddDefaultTokenProviders();
 
-		builder.Services.AddAuthorization(options =>
-		{
-			options.AddPolicy("Admin,Moderator,User", policy => policy.RequireRole("Admin", "Moderator", "User"));
+        builder.Services.AddAuthorization(options =>
+        {
+            options.AddPolicy("Admin,Moderator,User", policy => policy.RequireRole("Admin", "Moderator", "User"));
 
-			options.AddPolicy("Admin,Moderator", policy => policy.RequireRole("Admin", "Moderator"));
+            options.AddPolicy("Admin,Moderator", policy => policy.RequireRole("Admin", "Moderator"));
 
-			options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
+            options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
 
-			options.AddPolicy("Moderator", policy => policy.RequireRole("Moderator"));
+            options.AddPolicy("Moderator", policy => policy.RequireRole("Moderator"));
 
-			options.AddPolicy("User", policy => policy.RequireRole("User"));
-		});
+            options.AddPolicy("User", policy => policy.RequireRole("User"));
+        });
 
-		// Configure JWT authentication
-		var jwtSettings = builder.Configuration.GetSection("Jwt");
-		var key = jwtSettings["Key"];
+        // Configure JWT authentication
+        var jwtSettings = builder.Configuration.GetSection("Jwt");
+        var key = jwtSettings["Key"];
 
-		if (string.IsNullOrEmpty(key))
-			throw new InvalidOperationException("JWT key is not configured.");
+        if (string.IsNullOrEmpty(key))
+            throw new InvalidOperationException("JWT key is not configured.");
 
-		builder.Services.AddAuthentication(options =>
-			   {
-				   options.DefaultAuthenticateScheme = "JwtBearer";
-				   options.DefaultChallengeScheme = "JwtBearer";
-			   })
-			   .AddJwtBearer("JwtBearer", options =>
-			   {
-				   options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-				   {
-					   ValidateIssuer = true,
-					   ValidateAudience = false,
-					   ValidAudience = jwtSettings["Audience"],
-					   ValidateLifetime = true,
-					   ValidateIssuerSigningKey = true,
-					   ValidIssuer = jwtSettings["Issuer"],
-					   IssuerSigningKey =
-						   new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
-							   System.Text.Encoding.UTF8.GetBytes(key)),
-					   ClockSkew = TimeSpan.Zero
-				   };
+        builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = "JwtBearer";
+                options.DefaultChallengeScheme = "JwtBearer";
+            })
+            .AddJwtBearer("JwtBearer", options =>
+            {
+                options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = false,
+                    ValidAudience = jwtSettings["Audience"],
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = jwtSettings["Issuer"],
+                    IssuerSigningKey =
+                        new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
+                            System.Text.Encoding.UTF8.GetBytes(key)),
+                    ClockSkew = TimeSpan.Zero
+                };
 
-				   options.SaveToken = true;
-			   });
+                options.SaveToken = true;
+            });
 
-		// Use the custom service registration method
-		builder.Services.AddApplicationMediatR();
+        // Use the custom service registration method
+        builder.Services.AddApplicationMediatR();
 
-		// CORS config
-		builder.Services.AddCors(options =>
-		{
-			options.AddPolicy("AllowWebApp", builder => builder.WithOrigins(webBaseAddress)
-															   .AllowAnyHeader()
-															   .AllowAnyMethod()
-															   .AllowCredentials());
-		});
+        // CORS config
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowWebApp", builder2 => builder2.WithOrigins(webBaseAddress)
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials());
+        });
 
-		var app = builder.Build();
+        var app = builder.Build();
 
-		// Run migrations at startup
-		using (var scope = app.Services.CreateScope())
-		{
-			var db = scope.ServiceProvider.GetRequiredService<FoodHubDbContext>();
-			db.Database.Migrate();
-		}
+        try
+        {
+            // Run migrations at startup
+            using (var scope = app.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<FoodHubDbContext>();
+                db.Database.Migrate();
+            }
+        }
+        catch (Exception ex) { throw; }
 
-		// Configure the HTTP request pipeline.
-		app.UseExceptionHandler();
+        // Configure the HTTP request pipeline.
+        app.UseExceptionHandler();
 
-		// Configure the HTTP request pipeline.
-		if (app.Environment.IsDevelopment()) { app.UseDeveloperExceptionPage(); }
+        // Configure the HTTP request pipeline.
+        if (app.Environment.IsDevelopment()) { app.UseDeveloperExceptionPage(); }
 
-		app.UseHttpsRedirection();
-		//app.UseStaticFiles();
-		app.UseRouting();
-		app.UseCors("AllowWebApp");
-		app.UseAuthentication();
-		app.UseAuthorization();
+        app.UseHttpsRedirection();
+        //app.UseStaticFiles();
+        app.UseRouting();
+        app.UseCors("AllowWebApp");
+        app.UseAuthentication();
+        app.UseAuthorization();
 
-		app.UseFastEndpoints(c =>
-		{
-			// FastEndpoints honors the global Microsoft.AspNetCore.Http.Json
-			// options, which enable ReferenceHandler.Preserve. That serializes
-			// collections as { "$id":.., "$values":[..] }, which the Blazor
-			// clients cannot deserialize into PagedResultDto<T>. The old MVC
-			// controllers serialized via Mvc.JsonOptions (plain web defaults, no
-			// Preserve), so match that wire format to keep the clients working.
-			c.Serializer.Options.ReferenceHandler = null;
-			c.Serializer.Options.WriteIndented = false;
+        app.UseFastEndpoints(c =>
+        {
+            // FastEndpoints honors the global Microsoft.AspNetCore.Http.Json
+            // options, which enable ReferenceHandler.Preserve. That serializes
+            // collections as { "$id":.., "$values":[..] }, which the Blazor
+            // clients cannot deserialize into PagedResultDto<T>. The old MVC
+            // controllers serialized via Mvc.JsonOptions (plain web defaults, no
+            // Preserve), so match that wire format to keep the clients working.
+            c.Serializer.Options.ReferenceHandler = null;
+            c.Serializer.Options.WriteIndented = false;
 
-			// One error shape for everything: validator failures and domain failures
-			// (see ErrorResultExtensions) both serialize as RFC9457 ProblemDetails with a
-			// flat "errors": [{ name, reason }] array, so the client parses one thing.
-			c.Errors.UseProblemDetails(p =>
-			{
-				// Domain errors all share the same field name; without this only the
-				// first of them would survive into the response.
-				p.AllowDuplicateErrors = true;
-			});
-		});
-		if (app.Environment.IsDevelopment())
-		{
-			// FastEndpoints/NSwag Swagger is now the only Swagger provider, served
-			// at the conventional /swagger.
-			app.UseSwaggerGen();
-		}
+            // One error shape for everything: validator failures and domain failures
+            // (see ErrorResultExtensions) both serialize as RFC9457 ProblemDetails with a
+            // flat "errors": [{ name, reason }] array, so the client parses one thing.
+            c.Errors.UseProblemDetails(p =>
+            {
+                // Domain errors all share the same field name; without this only the
+                // first of them would survive into the response.
+                p.AllowDuplicateErrors = true;
+            });
+        });
+        if (app.Environment.IsDevelopment())
+        {
+            // FastEndpoints/NSwag Swagger is now the only Swagger provider, served
+            // at the conventional /swagger.
+            app.UseSwaggerGen();
+        }
 
-		app.MapDefaultEndpoints();
+        app.MapDefaultEndpoints();
 
-		app.Run();
-	}
+        app.Run();
+    }
 }
