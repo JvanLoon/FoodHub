@@ -1,0 +1,46 @@
+# Caddy terminates TLS and proxies everything to the Blazor Server front end.
+# Certificates are obtained from Let's Encrypt automatically on first start —
+# port 80 and 443 must be reachable from the internet and DNS must already point
+# at this host, or the challenge fails.
+
+{
+	email {$ACME_EMAIL}
+}
+
+{$PUBLIC_HOSTNAME} {
+	encode zstd gzip
+
+	# Blazor Server keeps a WebSocket open for the whole session. Caddy upgrades
+	# these transparently, but the default 2-minute write timeout would cut idle
+	# circuits, so the app-level reconnect banner would flash constantly.
+	reverse_proxy web:8080 {
+		header_up X-Forwarded-Proto {scheme}
+		header_up X-Forwarded-For {remote_host}
+		header_up Host {host}
+
+		# Matches the SignalR client's own keep-alive expectations.
+		transport http {
+			read_timeout 0
+			write_timeout 0
+		}
+	}
+
+	# The API is not published. The browser never talks to it directly — the web
+	# container calls it over the internal network — so there is no route here.
+	# Add one only if you decide to expose /api publicly, and re-check CORS if so.
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "SAMEORIGIN"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+
+	log {
+		output file /data/access.log {
+			roll_size 10MiB
+			roll_keep 5
+		}
+	}
+}

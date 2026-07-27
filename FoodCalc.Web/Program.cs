@@ -8,11 +8,18 @@ using FoodCalc.Web.Services.User;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.Json;
+using Microsoft.AspNetCore.HttpOverrides;
 
 public class Program
 {
 	public static void Main(string[] args)
 	{
+		// See the matching block in FoodCalc.Api/Program.cs. NoClobber keeps real
+		// environment variables authoritative; absent in a container, so it no-ops.
+		if (File.Exists(".env"))
+			DotNetEnv.Env.NoClobber()
+					 .Load();
+
 		var builder = WebApplication.CreateBuilder(args);
 
 		// Add service defaults & Aspire client integrations.
@@ -75,6 +82,17 @@ public class Program
 															.AllowCredentials());
 		});
 
+		// See the matching block in FoodCalc.Api/Program.cs. This matters more here than
+		// on the API: Blazor Server negotiates its SignalR circuit against an absolute
+		// URL, and without the forwarded scheme it would try ws:// from an https page
+		// and be blocked as mixed content.
+		builder.Services.Configure<ForwardedHeadersOptions>(options =>
+		{
+			options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+			options.KnownIPNetworks.Clear();
+			options.KnownProxies.Clear();
+		});
+
 		builder.Services.Configure<JsonOptions>(options =>
 		{
 			options.SerializerOptions.IncludeFields = false;
@@ -116,6 +134,12 @@ public class Program
 
 		var app = builder.Build();
 
+		var behindProxy = app.Configuration.GetValue("ReverseProxy:Enabled", !app.Environment.IsDevelopment());
+
+		// Must run before anything that reads the scheme or the client IP.
+		if (behindProxy)
+			app.UseForwardedHeaders();
+
 		if (!app.Environment.IsDevelopment())
 		{
 			app.UseExceptionHandler("/Error", createScopeForErrors: true);
@@ -123,7 +147,11 @@ public class Program
 			app.UseHsts();
 		}
 
-		app.UseHttpsRedirection();
+		// The edge proxy already forces https in Production; redirecting again inside
+		// the container only breaks its plain-HTTP health probe.
+		if (!behindProxy)
+			app.UseHttpsRedirection();
+
 		app.UseStaticFiles();
 		app.UseAntiforgery();
 

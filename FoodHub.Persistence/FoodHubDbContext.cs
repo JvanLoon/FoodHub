@@ -41,9 +41,12 @@ public class FoodHubDbContext : IdentityDbContext<IdentityUser>
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
 		// Configure Identity + relational conventions first, then apply our
-		// entity configurations and seed the default roles/users.
+		// entity configurations.
+		//
+		// NB: no HasData seeding here. Roles and the first admin account are created
+		// at runtime by the API's identity bootstrapper, so no account — and above all
+		// no password hash — is baked into a migration and committed to a public repo.
 		base.OnModelCreating(modelBuilder);
 		modelBuilder.ApplyConfigurationsFromAssembly(typeof(FoodHubDbContext).Assembly);
-		FoodHub.Persistence.Configuration.IdentitySeed.Seed(modelBuilder);
 	}
 }

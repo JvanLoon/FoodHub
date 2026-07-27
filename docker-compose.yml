@@ -11,12 +11,17 @@
 # pointing at host `db`, port 5432, user `foodhub` to browse tables and use the
 # restore/import feature to reset the data.
 
+# Secrets come from a local .env file (see .env.example); none are committed.
+# NB: POSTGRES_PASSWORD is only read when the volume is EMPTY. Changing it later
+# does not change the role's password on an existing `pgdata` volume — you have to
+# ALTER USER inside the container, or `docker compose down -v` and start over.
+
 services:
   db:
     image: postgres:17
     environment:
       POSTGRES_USER: foodhub
-      POSTGRES_PASSWORD: aj7a!unEe#Ms*BqTE7WJ2a4tX1$^y7
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
       POSTGRES_DB: FoodCalc
     ports:
       - "5432:5432"
@@ -33,7 +38,7 @@ services:
     image: dpage/pgadmin4:latest
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@foodhub.local
-      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:?set PGADMIN_PASSWORD in .env}
       # Skip the connect-time master-password prompt on this local-only panel.
       PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
     ports:
@@ -54,7 +59,14 @@ services:
       - WebServer__BaseAddress=http://web:8080
       # EF Core migrations (run at API startup) create the whole schema, so no
       # init script is needed. `db` is the docker-network hostname of Postgres.
-      - "ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=FoodCalc;Username=foodhub;Password=aj7a!unEe#Ms*BqTE7WJ2a4tX1$^y7"
+      - "ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=FoodCalc;Username=foodhub;Password=${POSTGRES_PASSWORD:?}"
+      - Jwt__Key=${JWT_KEY:?set JWT_KEY in .env}
+      - Jwt__Issuer=FoodCalc
+      - Jwt__Audience=FoodHub-Api-user
+      # One-shot: creates the first admin only while the users table is empty.
+      # Clear both once you have signed in and changed the password.
+      - Bootstrap__AdminEmail=${BOOTSTRAP_ADMIN_EMAIL:-}
+      - Bootstrap__AdminPassword=${BOOTSTRAP_ADMIN_PASSWORD:-}
     depends_on:
       db:
         condition: service_healthy
@@ -69,6 +81,10 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       # Internal docker-network address of the API.
       - API__BaseAddress=http://api:8080
+      # Must match the API's key — the web front end validates the same tokens.
+      - Jwt__Key=${JWT_KEY:?set JWT_KEY in .env}
+      - Jwt__Issuer=FoodCalc
+      - Jwt__Audience=FoodHub-Api-user
     volumes:
       # DataProtection keys: persisted so auth/antiforgery survive a recompose.
       # Path matches Environment.SpecialFolder.LocalApplicationData for root.

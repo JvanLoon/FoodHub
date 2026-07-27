@@ -1,0 +1,97 @@
+# Production stack: Caddy (TLS) -> web -> api -> db.
+#
+#   docker compose -f docker-compose.prod.yml up -d --build
+#
+# Differences from the development docker-compose.yml:
+#   • Caddy is the ONLY container with published ports. db/api/web are reachable
+#     only on the internal network, which is what makes clearing KnownIPNetworks
+#     in the ForwardedHeaders config safe.
+#   • No pgAdmin. Reach the database over an SSH tunnel instead of exposing it.
+#   • Postgres has no host port mapping.
+#   • restart: unless-stopped everywhere, so the stack survives a reboot.
+#
+# Every value comes from .env — see .env.example.
+
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      PUBLIC_HOSTNAME: ${PUBLIC_HOSTNAME:?set PUBLIC_HOSTNAME in .env}
+      ACME_EMAIL: ${ACME_EMAIL:?set ACME_EMAIL in .env}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      # Certificates and ACME account keys. Losing this volume means re-issuing
+      # certs, and Let's Encrypt rate-limits that — keep it.
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - web
+
+  db:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: foodhub
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: FoodCalc
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U foodhub -d FoodCalc" ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  api:
+    build:
+      context: .
+      dockerfile: FoodCalc.Api/DockerFile
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      # Public origin of the front end — this is the CORS allow-list entry, so it
+      # must be the browser-visible URL, not the internal container address.
+      - WebServer__BaseAddress=https://${PUBLIC_HOSTNAME}
+      - "ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=FoodCalc;Username=foodhub;Password=${POSTGRES_PASSWORD:?}"
+      - Jwt__Key=${JWT_KEY:?set JWT_KEY in .env}
+      # FoodCalc.Api/appsettings.json is no longer committed, so these non-secret
+      # values have to be supplied here — token validation checks the issuer.
+      - Jwt__Issuer=FoodCalc
+      - Jwt__Audience=FoodHub-Api-user
+      # First boot only. Blank these and `up -d` again once you have signed in.
+      - Bootstrap__AdminEmail=${BOOTSTRAP_ADMIN_EMAIL:-}
+      - Bootstrap__AdminPassword=${BOOTSTRAP_ADMIN_PASSWORD:-}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: FoodCalc.Web/DockerFile
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - API__BaseAddress=http://api:8080
+      - Jwt__Key=${JWT_KEY:?set JWT_KEY in .env}
+      # FoodCalc.Api/appsettings.json is no longer committed, so these non-secret
+      # values have to be supplied here — token validation checks the issuer.
+      - Jwt__Issuer=FoodCalc
+      - Jwt__Audience=FoodHub-Api-user
+    volumes:
+      # DataProtection keys. If this volume is lost every session cookie and
+      # antiforgery token is invalidated and users are silently logged out.
+      - dataprotection-keys:/root/.local/share/FoodHub/dataprotection-keys
+    depends_on:
+      - api
+
+volumes:
+  pgdata:
+  dataprotection-keys:
+  caddy-data:
+  caddy-config:

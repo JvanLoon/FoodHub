@@ -383,3 +383,13 @@ keys/
 /dataSources.local.xml
 .idea/
 *.idea/
+
+# ---- Deployment secrets (see .env.example) ----
+# Never commit a filled-in .env: this repository is public.
+*/.env
+.env
+.env.*
+!.env.example
+appsettings.Production.json
+appsettings.*.Local.json
+deploy/**/*.secret
