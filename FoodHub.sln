@@ -18,6 +18,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 		deploy-steps-hetzner.md = deploy-steps-hetzner.md
 		docker-compose.prod.yml = docker-compose.prod.yml
+		deploy\Caddyfile = deploy\Caddyfile
+		deploy\cloud-init.yaml = deploy\cloud-init.yaml
+		deploy\sql\remove-seeded-identity.sql = deploy\sql\remove-seeded-identity.sql
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoodCalc.Api", "FoodCalc.Api\FoodCalc.Api.csproj", "{F0D03E3D-8C14-D7A4-7E13-BB84C241300E}"

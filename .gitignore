@@ -393,3 +393,4 @@ keys/
 appsettings.Production.json
 appsettings.*.Local.json
 deploy/**/*.secret
+deploy/
