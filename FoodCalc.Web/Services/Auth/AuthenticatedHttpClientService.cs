@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Text.Json;
 using FoodCalc.Web.Constants;
 
@@ -123,6 +124,16 @@ public class AuthenticatedHttpClientService(
 	private async Task<HttpResponseMessage> SendRawAsync(HttpMethod method, string requestUri, HttpContent? content)
 	{
 		await AttachTokenAsync();
+
+		// A POST/PUT/PATCH with no body carries no Content-Type either, and the API
+		// answers 415 Unsupported Media Type before the endpoint ever runs — which
+		// surfaced in the UI as "That file type isn't supported". The endpoints this
+		// affects take everything from the query string (ToggleUser, UserRoles), so
+		// an empty JSON object satisfies the model binder without changing what is
+		// sent. DELETE is left alone: it is legitimately bodyless.
+		if (content is null && method != HttpMethod.Delete)
+			content = new StringContent("{}", Encoding.UTF8, "application/json");
+
 		using var request = new HttpRequestMessage(method, requestUri)
 		{
 			Content = content
