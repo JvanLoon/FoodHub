@@ -70,6 +70,45 @@ public static class IdentityBootstrapExtensions
 			LockoutEnd = null
 		};
 
+		// ─── TEMPORARY DEBUG — delete before going live ──────────────────────────
+		// Two questions this answers: what did the password actually arrive as
+		// (a stripped symbol or a trailing \r from a CRLF .env both look like a
+		// valid value in an editor), and which configuration provider supplied
+		// it. The value is not logged unless Bootstrap:DebugRevealPassword is
+		// explicitly set — `docker logs` is not a safe place for a password.
+		logger.LogWarning(
+			"BOOTSTRAP DEBUG: length={Length} upper={Upper} lower={Lower} digit={Digit} "
+		  + "nonAlphanumeric={Symbol} hasOuterWhitespace={Whitespace}",
+			password.Length,
+			password.Any(char.IsUpper),
+			password.Any(char.IsLower),
+			password.Any(char.IsDigit),
+			password.Any(c => !char.IsLetterOrDigit(c)),
+			password != password.Trim());
+
+		foreach (var validator in userManager.PasswordValidators)
+		{
+			var check = await validator.ValidateAsync(userManager, admin, password);
+			logger.LogWarning("BOOTSTRAP DEBUG: {Validator} -> {Result}",
+				validator.GetType().Name,
+				check.Succeeded ? "OK" : Describe(check));
+		}
+
+		// Which provider won. If this says JsonConfigurationProvider rather than
+		// EnvironmentVariablesConfigurationProvider, an appsettings.json baked
+		// into the image is overriding what compose passes.
+		if (app.Configuration is IConfigurationRoot configRoot)
+			foreach (var provider in configRoot.Providers)
+				if (provider.TryGet("Bootstrap:AdminPassword", out _))
+					logger.LogWarning("BOOTSTRAP DEBUG: Bootstrap:AdminPassword came from {Provider}.",
+						provider);
+
+		// Opt-in, for when the checks above are not enough. The >>> <<< markers
+		// make leading/trailing whitespace visible.
+		if (app.Configuration.GetValue("Bootstrap:DebugRevealPassword", false))
+			logger.LogWarning("BOOTSTRAP DEBUG: raw value >>>{Password}<<<", password);
+		// ─── END TEMPORARY DEBUG ─────────────────────────────────────────────────
+
 		var result = await userManager.CreateAsync(admin, password);
 		if (!result.Succeeded)
 			throw new InvalidOperationException(
