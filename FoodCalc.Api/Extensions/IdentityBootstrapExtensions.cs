@@ -114,6 +114,16 @@ public static class IdentityBootstrapExtensions
 			throw new InvalidOperationException(
 				$"Could not create the bootstrap admin account: {Describe(result)}");
 
+		// LockoutEnabled = false on the entity above does NOT survive creation:
+		// UserManager.CreateAsync re-enables lockout on every new user whenever
+		// Lockout.AllowedForNewUsers is set, which Program.cs does. It has to be
+		// turned off again afterwards, or the one account that can reach the admin
+		// UI can be locked out of it by five bad guesses — including your own.
+		var unlocked = await userManager.SetLockoutEnabledAsync(admin, false);
+		if (!unlocked.Succeeded)
+			throw new InvalidOperationException(
+				$"Created the bootstrap admin but could not disable its lockout: {Describe(unlocked)}");
+
 		var roled = await userManager.AddToRolesAsync(admin, ApplicationRoles);
 		if (!roled.Succeeded)
 			throw new InvalidOperationException(
