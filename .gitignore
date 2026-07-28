@@ -394,3 +394,4 @@ appsettings.Production.json
 appsettings.*.Local.json
 deploy/**/*.secret
 deploy/
+cloud-init.yaml
