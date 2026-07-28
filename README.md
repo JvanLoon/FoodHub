@@ -108,23 +108,18 @@ Startup order is handled automatically: `db` (waited on via healthcheck) → `ap
 To browse tables in pgAdmin, add a server pointing at host `db`, port `5432`, user `foodhub`. Its
 **restore/import** feature is the easiest way to reset the data.
 
-### Getting a first account
+### Default accounts
 
-**Nothing is seeded.** There are no default accounts, and the two that used to be
-committed here (`admin@foodhub.local` / `user@foodhub.local`) are deleted by the
-`RemoveSeededIdentityData` migration. Assume their published passwords are burned.
+The `SeedDefaultUsers` migration seeds the `Admin`/`Moderator`/`User` roles and two sign-in-ready accounts so a fresh
+database has a working login:
 
-The `Admin`/`Moderator`/`User` roles are created at runtime on every boot. To get
-the first account, set these two variables **once** and start the API:
+| Account | Email                 | Password    | Roles                  |
+|---------|-----------------------|-------------|------------------------|
+| Admin   | `admin@foodhub.local` | `Admin123!` | Admin, Moderator, User |
+| User    | `user@foodhub.local`  | `User123!`  | User                   |
 
-```
-Bootstrap__AdminEmail=you@example.com
-Bootstrap__AdminPassword=<generated>
-```
-
-The account is created only while the users table is completely empty, so it cannot
-overwrite anything or run twice. Sign in, change the password, then clear both
-variables. See [deployment.md](deployment.md) for the full story.
+> 🔒 These are development defaults committed to the repo — **change the passwords
+> after the first login** (or delete/replace the accounts) before exposing the app.
 
 ### Data persistence
 
