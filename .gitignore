@@ -383,3 +383,5 @@ keys/
 /dataSources.local.xml
 .idea/
 *.idea/
+*.env
+*/.env
