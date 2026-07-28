@@ -82,13 +82,11 @@ public static class Program
         });
 
         // Configure JWT authentication
-        var jwtSettings = builder.Configuration.GetSection("Jwt")
-            .Get<JwtOptions>();
-        var key = jwtSettings?.Key;
+        var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtOptions>();
+        string key = jwtSettings?.Key;
 
         if (string.IsNullOrEmpty(key))
-            throw new InvalidOperationException(
-                "JWT key is not configured. Set Jwt__Key in the environment (see deployment.md).");
+            throw new InvalidOperationException("JWT key is not configured. Set Jwt__Key in the environment (see deployment.md).");
 
         // HMAC-SHA256 keys shorter than the 256-bit hash add no security and make the
         // signature trivially brute-forceable. Enforced everywhere, not just Production,
@@ -112,9 +110,7 @@ public static class Program
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = jwtSettings?.Issuer,
-                    IssuerSigningKey =
-                        new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
-                            System.Text.Encoding.UTF8.GetBytes(key)),
+                    IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(key)),
                     ClockSkew = TimeSpan.Zero
                 };
 

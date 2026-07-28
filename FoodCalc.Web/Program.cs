@@ -103,9 +103,8 @@ public class Program
         builder.Services.AddAuthentication("JwtBearer")
             .AddJwtBearer("JwtBearer", options =>
             {
-                var jwtSettings = builder.Configuration.GetSection("Jwt")
-                    .Get<JwtOptions>();
-                var key = jwtSettings?.Key;
+                var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtOptions>();
+                string key = jwtSettings?.Key;
 
                 if (string.IsNullOrWhiteSpace(key))
                     throw new InvalidOperationException("JWT key is not configured.");
