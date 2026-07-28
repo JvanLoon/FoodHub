@@ -8,10 +8,10 @@ namespace Microsoft.Extensions.Hosting;
 // To learn more about using this project, see https://aka.ms/dotnet/aspire/service-defaults
 public static class Extensions
 {
-	public static IServiceCollection AddApplicationMediatR(this IServiceCollection services)
-	{
-		services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetAllRecipesQueryHandler).Assembly));
+    public static IServiceCollection AddApplicationMediatR(this IServiceCollection services)
+    {
+        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetAllRecipesQueryHandler).Assembly));
 
-		return services;
-	}
+        return services;
+    }
 }

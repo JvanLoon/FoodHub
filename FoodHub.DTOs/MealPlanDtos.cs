@@ -3,17 +3,17 @@ namespace FoodHub.DTOs;
 /// <summary>A recipe planned for a given calendar day (belongs to the calling user).</summary>
 public class MealPlanEntryDto
 {
-	public Guid Id { get; set; }
-	public DateOnly Date { get; set; }
-	public Guid RecipeId { get; set; }
-	public string RecipeName { get; set; } = string.Empty;
+    public Guid Id { get; set; }
+    public DateOnly Date { get; set; }
+    public Guid RecipeId { get; set; }
+    public string RecipeName { get; set; } = string.Empty;
 }
 
 /// <summary>Add one recipe to one day on the calling user's calendar.</summary>
 public class AddMealPlanEntryDto
 {
-	public DateOnly Date { get; set; }
-	public Guid RecipeId { get; set; }
+    public DateOnly Date { get; set; }
+    public Guid RecipeId { get; set; }
 }
 
 /// <summary>
@@ -24,8 +24,8 @@ public class AddMealPlanEntryDto
 /// </summary>
 public class RandomizeMealPlanDto
 {
-	public List<DateOnly> Dates { get; set; } = [];
-	public List<string> Ingredients { get; set; } = [];
-	public int RecipesPerDay { get; set; } = 1;
-	public bool Overwrite { get; set; }
+    public List<DateOnly> Dates { get; set; } = [];
+    public List<string> Ingredients { get; set; } = [];
+    public int RecipesPerDay { get; set; } = 1;
+    public bool Overwrite { get; set; }
 }

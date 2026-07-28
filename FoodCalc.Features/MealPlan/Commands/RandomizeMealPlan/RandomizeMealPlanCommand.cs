@@ -1,7 +1,5 @@
 using ErrorOr;
-
 using FoodHub.DTOs;
-
 using MediatR;
 
 namespace FoodCalc.Features.MealPlan.Commands.RandomizeMealPlan;
@@ -14,8 +12,8 @@ namespace FoodCalc.Features.MealPlan.Commands.RandomizeMealPlan;
 /// respecting the per-day cap.
 /// </summary>
 public record RandomizeMealPlanCommand(
-	string UserId,
-	IReadOnlyList<DateOnly> Dates,
-	IReadOnlyList<string> Ingredients,
-	int RecipesPerDay,
-	bool Overwrite) : IRequest<ErrorOr<List<MealPlanEntryDto>>>;
+    string UserId,
+    IReadOnlyList<DateOnly> Dates,
+    IReadOnlyList<string> Ingredients,
+    int RecipesPerDay,
+    bool Overwrite) : IRequest<ErrorOr<List<MealPlanEntryDto>>>;

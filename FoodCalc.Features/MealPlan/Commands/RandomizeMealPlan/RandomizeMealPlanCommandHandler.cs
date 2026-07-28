@@ -39,7 +39,8 @@ public class RandomizeMealPlanCommandHandler(FoodHubDbContext context, ILogger<R
             if (wanted.Count > 0)
             {
                 var matched = allRecipes.Where(r => r.Ingredients != null &&
-                                                    r.Ingredients.Any(ri => wanted.Any(w => ri.Name.Contains(w, StringComparison.InvariantCultureIgnoreCase))))
+                                                    r.Ingredients.Any(ri => wanted.Any(w => ri.Name.Contains(w,
+                                                        StringComparison.InvariantCultureIgnoreCase))))
                     .ToList();
 
                 // Fall back to the whole library if nothing matches, so the button still acts.

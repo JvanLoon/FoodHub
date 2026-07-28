@@ -15,12 +15,12 @@ namespace FoodCalc.Api.Common;
 /// </summary>
 public abstract class PagedSearchRequest : IPagedSearchRequest
 {
-	[BindFrom("page")]
-	public int Page { get; set; } = 1;
+    [BindFrom("page")]
+    public int Page { get; set; } = 1;
 
-	[BindFrom("pageSize")]
-	public int PageSize { get; set; } = 25;
+    [BindFrom("pageSize")]
+    public int PageSize { get; set; } = 25;
 
-	[BindFrom("search")]
-	public string? Search { get; set; }
+    [BindFrom("search")]
+    public string? Search { get; set; }
 }

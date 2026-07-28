@@ -116,8 +116,8 @@
 		// OnFailure() raises the toasts; the returned result is what the panel below renders,
 		// so the two views of the same failure can be compared.
 		result = await AdminService.TriggerErrorTestAsync(form.Count, form.StatusCode)
-		                           .OnSuccess(ShowSuccess)
-		                           .OnFailure();
+			.OnSuccess(ShowSuccess)
+			.OnFailure();
 
 		running = false;
 	}

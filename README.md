@@ -53,8 +53,8 @@ Blazor-state-driven.
 ### Prerequisites
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) — the Aspire AppHost runs PostgreSQL and
-  pgAdmin as containers, so **no local PostgreSQL install is needed**
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) — the Aspire AppHost runs PostgreSQL and pgAdmin as
+  containers, so **no local PostgreSQL install is needed**
 
 ### Getting Started
 
@@ -74,13 +74,13 @@ Blazor-state-driven.
    dotnet run --project FoodHub.AppHost
    ```
    Aspire starts a **PostgreSQL** container (recreated on each run; data persists in the `foodhub-pgdata`
-   volume) and a **pgAdmin** container, then runs the API and Web projects pointed at that database. The API
-   applies EF Core migrations on boot, so the schema is created automatically — no manual migration step and no
-   connection string to edit.
+   volume) and a **pgAdmin** container, then runs the API and Web projects pointed at that database. The API applies EF
+   Core migrations on boot, so the schema is created automatically — no manual migration step and no connection string
+   to edit.
 
 4. **Access the application**
-	- Web Application, API, and **pgAdmin** links are all listed in the Aspire dashboard that opens on start
-	- API Documentation: Available at the API's `/swagger` endpoint in development
+    - Web Application, API, and **pgAdmin** links are all listed in the Aspire dashboard that opens on start
+    - API Documentation: Available at the API's `/swagger` endpoint in development
 
 > To run without Aspire (plain `dotnet run` on the API), point `ConnectionStrings:DefaultConnection` in
 > `FoodCalc.Api/appsettings.Development.json` at a reachable PostgreSQL instance — e.g. start just the database
@@ -105,26 +105,25 @@ docker compose up -d --build
 Startup order is handled automatically: `db` (waited on via healthcheck) → `api` →
 `web`. The API runs EF Core migrations on boot, which create the entire schema — no separate init script is required.
 
-To browse tables in pgAdmin, add a server pointing at host `db`, port `5432`, user `foodhub`. Its
-**restore/import** feature is the easiest way to reset the data.
+To browse tables in pgAdmin, add a server pointing at host `db`, port `5432`, user `foodhub`. Its **restore/import**
+feature is the easiest way to reset the data.
 
 ### Getting a first account
 
-**Nothing is seeded.** There are no default accounts, and the two that used to be
-committed here (`admin@foodhub.local` / `user@foodhub.local`) are deleted by the
+**Nothing is seeded.** There are no default accounts, and the two that used to be committed here
+(`admin@foodhub.local` / `user@foodhub.local`) are deleted by the
 `RemoveSeededIdentityData` migration. Assume their published passwords are burned.
 
-The `Admin`/`Moderator`/`User` roles are created at runtime on every boot. To get
-the first account, set these two variables **once** and start the API:
+The `Admin`/`Moderator`/`User` roles are created at runtime on every boot. To get the first account, set these two
+variables **once** and start the API:
 
 ```
 Bootstrap__AdminEmail=you@example.com
 Bootstrap__AdminPassword=<generated>
 ```
 
-The account is created only while the users table is completely empty, so it cannot
-overwrite anything or run twice. Sign in, change the password, then clear both
-variables. See [deployment.md](deployment.md) for the full story.
+The account is created only while the users table is completely empty, so it cannot overwrite anything or run twice.
+Sign in, change the password, then clear both variables. See [deployment.md](deployment.md) for the full story.
 
 ### Data persistence
 

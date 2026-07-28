@@ -26,7 +26,10 @@
 
 	private readonly List<ToastItem> _toasts = new();
 
-	protected override void OnInitialized() { MessageService.OnShowMessage += ShowToast; }
+	protected override void OnInitialized()
+	{
+		MessageService.OnShowMessage += ShowToast;
+	}
 
 	// MessageService fires synchronously; the display/dismiss lifecycle is ours to run in the background.
 	private void ShowToast(ToastMessage message) => _ = DisplayAsync(message);

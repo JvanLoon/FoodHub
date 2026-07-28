@@ -14,15 +14,15 @@ namespace FoodHub.DTOs;
 /// </summary>
 public class ToggleUserRequest
 {
-	public string Email { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
 
-	public bool Enable { get; set; } = true;
+    public bool Enable { get; set; } = true;
 }
 
 /// <summary>Body of POST api/admin/userroles — grant a role to a user.</summary>
 public class ModifyUserRoleRequest
 {
-	public string Email { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
 
-	public string Role { get; set; } = string.Empty;
+    public string Role { get; set; } = string.Empty;
 }

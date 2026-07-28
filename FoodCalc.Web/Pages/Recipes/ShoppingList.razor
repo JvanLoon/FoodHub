@@ -36,5 +36,9 @@
 		}
 	}
 
-	private async Task SaveItemsAsync(List<string> items) { await LocalStorage.SetItemAsync("shopping-list-items", items); }
+	private async Task SaveItemsAsync(List<string> items)
+	{
+		await LocalStorage.SetItemAsync("shopping-list-items", items);
+	}
+
 }

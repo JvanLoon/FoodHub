@@ -76,20 +76,20 @@
 }
 
 .card-title--link {
-	background: transparent;
-	border: none;
-	padding: 0;
-	font: inherit;
-	color: inherit;
-	text-align: left;
-	cursor: pointer;
-	max-width: 100%;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
+    background: transparent;
+    border: none;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .card-title--link:hover {
-	color: var(--fh-accent);
-	text-decoration: underline;
+    color: var(--fh-accent);
+    text-decoration: underline;
 }

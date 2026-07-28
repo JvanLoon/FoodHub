@@ -45,7 +45,10 @@
 	private const string ExportFormat = "json";
 	private IBrowserFile? _selectedFile;
 
-	private void HandleFileSelected(InputFileChangeEventArgs e) { _selectedFile = e.File; }
+	private void HandleFileSelected(InputFileChangeEventArgs e)
+	{
+		_selectedFile = e.File;
+	}
 
 	private async Task ExportData()
 	{
@@ -89,8 +92,8 @@
 			}
 
 			var result = await import(bytes, _selectedFile.Name)
-			                   .OnSuccess(message: WebConstants.Messages.ImportExport.ImportSucceeded)
-			                   .OnFailure();
+				.OnSuccess(message: WebConstants.Messages.ImportExport.ImportSucceeded)
+				.OnFailure();
 		}
 		catch (Exception ex) { messageService.ShowMessage($"Import failed: {ex.Message}", true); }
 	}

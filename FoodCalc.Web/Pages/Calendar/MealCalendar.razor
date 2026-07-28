@@ -16,7 +16,8 @@
 				        role="tab" aria-selected="@(_viewMode == View.Week)" @onclick="() => _viewMode = View.Week">
 					<i class="bi bi-calendar-week" aria-hidden="true"></i> Week
 				</button>
-				<button type="button" class="cal-toggle__btn @(_viewMode == View.Month ? "cal-toggle__btn--active" : "")"
+				<button type="button"
+				        class="cal-toggle__btn @(_viewMode == View.Month ? "cal-toggle__btn--active" : "")"
 				        role="tab" aria-selected="@(_viewMode == View.Month)" @onclick="() => _viewMode = View.Month">
 					<i class="bi bi-calendar-month" aria-hidden="true"></i> Month
 				</button>
@@ -245,17 +246,17 @@
 	protected override async Task OnInitializedAsync()
 	{
 		var recipes = await RecipeService.GetAllRecipesAsync(withIngredients: false)
-		                                 .OrDefault(new List<RecipeDto>());
+			.OrDefault(new List<RecipeDto>());
 		_allRecipes = recipes.OrderBy(r => r.Name)
-		                    .ToList();
+			.ToList();
 
 		var ingredients = await IngredientService.GetAllIngredientsAsync()
-		                                         .OrDefault(new List<IngredientDto>());
+			.OrDefault(new List<IngredientDto>());
 		_allIngredientNames = ingredients.Select(i => i.Name)
-		                                .Where(n => !string.IsNullOrWhiteSpace(n))
-		                                .Distinct(StringComparer.OrdinalIgnoreCase)
-		                                .OrderBy(n => n)
-		                                .ToList();
+			.Where(n => !string.IsNullOrWhiteSpace(n))
+			.Distinct(StringComparer.OrdinalIgnoreCase)
+			.OrderBy(n => n)
+			.ToList();
 
 		await ReloadAsync();
 		_loading = false;
@@ -265,9 +266,8 @@
 
 	private DateOnly WeekStart => StartOfWeek(_weekAnchor);
 
-	private IEnumerable<DateOnly> WeekDays =>
-		Enumerable.Range(0, 7)
-		          .Select(i => WeekStart.AddDays(i));
+	private IEnumerable<DateOnly> WeekDays => Enumerable.Range(0, 7)
+		.Select(i => WeekStart.AddDays(i));
 
 	private DateOnly MonthGridStart => StartOfWeek(_monthAnchor);
 
@@ -276,7 +276,7 @@
 		get
 		{
 			var lastOfMonth = _monthAnchor.AddMonths(1)
-			                             .AddDays(-1);
+				.AddDays(-1);
 			return StartOfWeek(lastOfMonth)
 				.AddDays(6);
 		}
@@ -315,9 +315,9 @@
 		var to = toWeek > MonthGridEnd ? toWeek : MonthGridEnd;
 
 		var result = await MealPlanService.GetRangeAsync(from, to)
-		                                  .OrDefault([]);
+			.OrDefault([]);
 		_entriesByDay = result.GroupBy(e => e.Date)
-		                     .ToDictionary(g => g.Key, g => g.ToList());
+			.ToDictionary(g => g.Key, g => g.ToList());
 	}
 
 	// ---------- Navigation ----------
@@ -368,10 +368,8 @@
 	private void OnRecipeSearchChanged(string value)
 	{
 		_recipeSearch = value;
-		
-		FilteredRecipes = string.IsNullOrWhiteSpace(_recipeSearch) ? 
-			_allRecipes : 
-			_allRecipes.Where(r => r.Name.Contains(_recipeSearch, StringComparison.OrdinalIgnoreCase));
+
+		FilteredRecipes = string.IsNullOrWhiteSpace(_recipeSearch) ? _allRecipes : _allRecipes.Where(r => r.Name.Contains(_recipeSearch, StringComparison.OrdinalIgnoreCase));
 		StateHasChanged();
 	}
 
@@ -421,9 +419,8 @@
 	private void CloseRandomize() => _randomizeModalVisible = false;
 
 	// Ingredient names available to pick: everything not already chosen, filtered by what's typed.
-	private IEnumerable<string> IngredientOptions =>
-		_allIngredientNames.Where(n => !_wantedIngredients.Contains(n, StringComparer.OrdinalIgnoreCase))
-		                  .Where(n => string.IsNullOrWhiteSpace(_ingredientDraft) || n.Contains(_ingredientDraft.Trim(), StringComparison.OrdinalIgnoreCase));
+	private IEnumerable<string> IngredientOptions => _allIngredientNames.Where(n => !_wantedIngredients.Contains(n, StringComparer.OrdinalIgnoreCase))
+		.Where(n => string.IsNullOrWhiteSpace(_ingredientDraft) || n.Contains(_ingredientDraft.Trim(), StringComparison.OrdinalIgnoreCase));
 
 	private void ToggleIngredientMenu() => _ingredientMenuOpen = !_ingredientMenuOpen;
 
@@ -450,7 +447,9 @@
 
 	private void AddIngredientDraft()
 	{
-		var value = _ingredientDraft.Trim().TrimEnd(',').Trim();
+		var value = _ingredientDraft.Trim()
+			.TrimEnd(',')
+			.Trim();
 		if (!string.IsNullOrEmpty(value) && !_wantedIngredients.Contains(value, StringComparer.OrdinalIgnoreCase)) { _wantedIngredients.Add(value); }
 
 		_ingredientDraft = string.Empty;

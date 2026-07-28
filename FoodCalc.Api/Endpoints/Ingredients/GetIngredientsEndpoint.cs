@@ -10,17 +10,21 @@ public class GetIngredientsRequest : PagedSearchRequest;
 /// <summary>GET api/ingredient — any authenticated user.</summary>
 public class GetIngredientsEndpoint(IMediator mediator) : Endpoint<GetIngredientsRequest, PagedResultDto<IngredientDto>>
 {
-	public override void Configure()
-	{
-		Get(ApiRoutes.Ingredient.GetAll);
-		// [Authorize] on the original action: authenticated user, any role.
-	}
+    public override void Configure()
+    {
+        Get(ApiRoutes.Ingredient.GetAll);
+        // [Authorize] on the original action: authenticated user, any role.
+    }
 
-	public override async Task HandleAsync(GetIngredientsRequest req, CancellationToken ct)
-	{
-		var result = await mediator.Send(
-			new GetAllIngredientsQuery {Page = req.Page, PageSize = req.PageSize, Search = req.Search}, ct);
+    public override async Task HandleAsync(GetIngredientsRequest req, CancellationToken ct)
+    {
+        var result = await mediator.Send(new GetAllIngredientsQuery
+        {
+            Page = req.Page,
+            PageSize = req.PageSize,
+            Search = req.Search
+        }, ct);
 
-		await result.Match(value => Send.OkAsync(value, ct), errors => this.SendErrorsAsync(errors, ct: ct));
-	}
+        await result.Match(value => Send.OkAsync(value, ct), errors => this.SendErrorsAsync(errors, ct: ct));
+    }
 }

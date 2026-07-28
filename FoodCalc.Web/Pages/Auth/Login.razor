@@ -33,18 +33,18 @@
 	private async Task HandleLogin()
 	{
 		await LoginService.LoginAsync(loginModel)
-		                  .OnSuccess(async void (data) =>
-		                  {
-			                  if (data?.Token == null)
-			                  {
-				                  MessageService.ShowMessage(WebConstants.Messages.Auth.LoginInvalidResponse, true);
-				                  return;
-			                  }
+			.OnSuccess(async void (data) =>
+			{
+				if (data?.Token == null)
+				{
+					MessageService.ShowMessage(WebConstants.Messages.Auth.LoginInvalidResponse, true);
+					return;
+				}
 
-			                  await AuthStateService.SignInAsync(data.Token);
-			                  Navigation.NavigateTo("/");
-		                  })
-		                  .OnFailure();
+				await AuthStateService.SignInAsync(data.Token);
+				Navigation.NavigateTo("/");
+			})
+			.OnFailure();
 	}
 
 }

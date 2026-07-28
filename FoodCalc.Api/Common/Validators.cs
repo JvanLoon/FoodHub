@@ -21,40 +21,40 @@ public class GetRecipesRequestValidator : PagedSearchRequestValidator<GetRecipes
 /// </summary>
 public class CreateRecipeValidator : Validator<CreateRecipeDto>
 {
-	public CreateRecipeValidator()
-	{
-		RuleFor(x => x.Name)
-			.NotEmpty()
-			.WithMessage(ValidationMessages.Common.NameRequired);
-	}
+    public CreateRecipeValidator()
+    {
+        RuleFor(x => x.Name)
+            .NotEmpty()
+            .WithMessage(ValidationMessages.Common.NameRequired);
+    }
 }
 
 public class UpdateRecipeValidator : Validator<UpdateRecipeDto>
 {
-	public UpdateRecipeValidator()
-	{
-		RuleFor(x => x.Id)
-			.NotEmpty()
-			.WithMessage(ValidationMessages.Common.EntityIdRequired(Entity.Recipe));
+    public UpdateRecipeValidator()
+    {
+        RuleFor(x => x.Id)
+            .NotEmpty()
+            .WithMessage(ValidationMessages.Common.EntityIdRequired(Entity.Recipe));
 
-		RuleFor(x => x.Name)
-			.NotEmpty()
-			.WithMessage(ValidationMessages.Common.NameRequired);
-	}
+        RuleFor(x => x.Name)
+            .NotEmpty()
+            .WithMessage(ValidationMessages.Common.NameRequired);
+    }
 }
 
 public class RecipeNameUpdateValidator : Validator<RecipeNameUpdateDto>
 {
-	public RecipeNameUpdateValidator()
-	{
-		RuleFor(x => x.Id)
-			.NotEmpty()
-			.WithMessage(ValidationMessages.Common.EntityIdRequired(Entity.Recipe));
+    public RecipeNameUpdateValidator()
+    {
+        RuleFor(x => x.Id)
+            .NotEmpty()
+            .WithMessage(ValidationMessages.Common.EntityIdRequired(Entity.Recipe));
 
-		RuleFor(x => x.Name)
-			.NotEmpty()
-			.WithMessage(ValidationMessages.Common.NameRequired);
-	}
+        RuleFor(x => x.Name)
+            .NotEmpty()
+            .WithMessage(ValidationMessages.Common.NameRequired);
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -67,26 +67,26 @@ public class GetIngredientsRequestValidator : PagedSearchRequestValidator<GetIng
 /// <summary>Replaces the old inline ModelState check in the AddIngredient action.</summary>
 public class CreateIngredientValidator : Validator<CreateIngredientDto>
 {
-	public CreateIngredientValidator()
-	{
-		RuleFor(x => x.Name)
-			.NotEmpty()
-			.WithMessage(ValidationMessages.Common.NameRequired);
-	}
+    public CreateIngredientValidator()
+    {
+        RuleFor(x => x.Name)
+            .NotEmpty()
+            .WithMessage(ValidationMessages.Common.NameRequired);
+    }
 }
 
 public class UpdateIngredientValidator : Validator<UpdateIngredientDto>
 {
-	public UpdateIngredientValidator()
-	{
-		RuleFor(x => x.Id)
-			.NotEmpty()
-			.WithMessage(ValidationMessages.Common.EntityIdRequired(Entity.Ingredient));
+    public UpdateIngredientValidator()
+    {
+        RuleFor(x => x.Id)
+            .NotEmpty()
+            .WithMessage(ValidationMessages.Common.EntityIdRequired(Entity.Ingredient));
 
-		RuleFor(x => x.Name)
-			.NotEmpty()
-			.WithMessage(ValidationMessages.Common.NameRequired);
-	}
+        RuleFor(x => x.Name)
+            .NotEmpty()
+            .WithMessage(ValidationMessages.Common.NameRequired);
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -103,22 +103,22 @@ public class GetUsersRequestValidator : PagedSearchRequestValidator<GetUsersRequ
 
 public class GetUserRolesRequestValidator : Validator<GetUserRolesRequest>
 {
-	public GetUserRolesRequestValidator()
-	{
-		RuleFor(x => x.Email)
-			.NotEmpty();
-	}
+    public GetUserRolesRequestValidator()
+    {
+        RuleFor(x => x.Email)
+            .NotEmpty();
+    }
 }
 
 public class ModifyUserRoleRequestValidator : Validator<ModifyUserRoleRequest>
 {
-	public ModifyUserRoleRequestValidator()
-	{
-		RuleFor(x => x.Email)
-			.NotEmpty();
-		RuleFor(x => x.Role)
-			.NotEmpty();
-	}
+    public ModifyUserRoleRequestValidator()
+    {
+        RuleFor(x => x.Email)
+            .NotEmpty();
+        RuleFor(x => x.Role)
+            .NotEmpty();
+    }
 }
 
 /// <summary>
@@ -127,13 +127,13 @@ public class ModifyUserRoleRequestValidator : Validator<ModifyUserRoleRequest>
 /// </summary>
 public class RemoveUserRoleRequestValidator : Validator<RemoveUserRoleRequest>
 {
-	public RemoveUserRoleRequestValidator()
-	{
-		RuleFor(x => x.Email)
-			.NotEmpty();
-		RuleFor(x => x.Role)
-			.NotEmpty();
-	}
+    public RemoveUserRoleRequestValidator()
+    {
+        RuleFor(x => x.Email)
+            .NotEmpty();
+        RuleFor(x => x.Role)
+            .NotEmpty();
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -156,51 +156,51 @@ public class GetRolesRequestValidator : PagedSearchRequestValidator<GetRolesRequ
 /// </summary>
 public class RegisterValidator : Validator<RegisterDto>
 {
-	public RegisterValidator()
-	{
-		RuleFor(x => x.Email)
-			.NotEmpty()
-			.EmailAddress();
-		RuleFor(x => x.Password)
-			.NotEmpty()
-			.Length(6, 100);
-	}
+    public RegisterValidator()
+    {
+        RuleFor(x => x.Email)
+            .NotEmpty()
+            .EmailAddress();
+        RuleFor(x => x.Password)
+            .NotEmpty()
+            .Length(6, 100);
+    }
 }
 
 /// <summary>Mirrors the DataAnnotations on ResetPasswordDto (see RegisterValidator).</summary>
 public class ResetPasswordValidator : Validator<ResetPasswordDto>
 {
-	public ResetPasswordValidator()
-	{
-		RuleFor(x => x.Email)
-			.NotEmpty()
-			.EmailAddress();
-		RuleFor(x => x.Password)
-			.NotEmpty()
-			.Length(6, 100);
-	}
+    public ResetPasswordValidator()
+    {
+        RuleFor(x => x.Email)
+            .NotEmpty()
+            .EmailAddress();
+        RuleFor(x => x.Password)
+            .NotEmpty()
+            .Length(6, 100);
+    }
 }
 
 /// <summary>Hardening: reject blank credentials before hitting the user store.</summary>
 public class LoginValidator : Validator<LoginDto>
 {
-	public LoginValidator()
-	{
-		RuleFor(x => x.Email)
-			.NotEmpty();
-		RuleFor(x => x.Password)
-			.NotEmpty();
-	}
+    public LoginValidator()
+    {
+        RuleFor(x => x.Email)
+            .NotEmpty();
+        RuleFor(x => x.Password)
+            .NotEmpty();
+    }
 }
 
 /// <summary>Hardening: require an email for the toggle-user query.</summary>
 public class ToggleUserRequestValidator : Validator<ToggleUserRequest>
 {
-	public ToggleUserRequestValidator()
-	{
-		RuleFor(x => x.Email)
-			.NotEmpty();
-	}
+    public ToggleUserRequestValidator()
+    {
+        RuleFor(x => x.Email)
+            .NotEmpty();
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -210,9 +210,9 @@ public class ToggleUserRequestValidator : Validator<ToggleUserRequest>
 /// <summary>Hardening: require an export format.</summary>
 public class ExportRequestValidator : Validator<ExportRequest>
 {
-	public ExportRequestValidator()
-	{
-		RuleFor(x => x.Format)
-			.NotEmpty();
-	}
+    public ExportRequestValidator()
+    {
+        RuleFor(x => x.Format)
+            .NotEmpty();
+    }
 }

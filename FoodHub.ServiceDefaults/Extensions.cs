@@ -11,122 +11,125 @@ namespace Microsoft.Extensions.Hosting;
 // To learn more about using this project, see https://aka.ms/dotnet/aspire/service-defaults
 public static class Extensions
 {
-	public static TBuilder AddServiceDefaults<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
-	{
-		//builder.ConfigureOpenTelemetry();
+    public static TBuilder AddServiceDefaults<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
+    {
+        //builder.ConfigureOpenTelemetry();
 
-		builder.AddDefaultHealthChecks();
-
-
-		builder.Services.Configure<ServiceDiscoveryOptions>(options =>
-		{
-			// This stack talks to the API over plain HTTP on the internal Docker
-			// network (http://api:8080), so http must be an allowed scheme.
-			options.AllowedSchemes = ["https", "http"];
-		});
-
-		builder.Services.AddServiceDiscovery();
+        builder.AddDefaultHealthChecks();
 
 
-		builder.Services.ConfigureHttpClientDefaults(http =>
-		{
-			// Turn on resilience by default
-			http.AddStandardResilienceHandler();
+        builder.Services.Configure<ServiceDiscoveryOptions>(options =>
+        {
+            // This stack talks to the API over plain HTTP on the internal Docker
+            // network (http://api:8080), so http must be an allowed scheme.
+            options.AllowedSchemes = ["https", "http"];
+        });
 
-			// Turn on service discovery by default
-			http.AddServiceDiscovery();
-		});
+        builder.Services.AddServiceDiscovery();
 
-		// Uncomment the following to restrict the allowed schemes for service discovery.
-		// builder.Services.Configure<ServiceDiscoveryOptions>(options =>
-		// {
-		//     options.AllowedSchemes = ["https"];
-		// });
 
-		return builder;
-	}
+        builder.Services.ConfigureHttpClientDefaults(http =>
+        {
+            // Turn on resilience by default
+            http.AddStandardResilienceHandler();
 
-	//public static TBuilder ConfigureOpenTelemetry<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
-	//{
-	//	builder.Logging.AddOpenTelemetry(logging =>
-	//	{
-	//		logging.IncludeFormattedMessage = true;
-	//		logging.IncludeScopes = true;
-	//	});
+            // Turn on service discovery by default
+            http.AddServiceDiscovery();
+        });
 
-	//	builder.Services.AddOpenTelemetry()
-	//		.WithMetrics(metrics =>
-	//		{
-	//			metrics.AddAspNetCoreInstrumentation()
-	//				.AddHttpClientInstrumentation()
-	//				.AddRuntimeInstrumentation();
-	//		})
-	//		.WithTracing(tracing =>
-	//		{
-	//			tracing.AddSource(builder.Environment.ApplicationName)
-	//				.AddAspNetCoreInstrumentation()
-	//				// Uncomment the following line to enable gRPC instrumentation (requires the OpenTelemetry.Instrumentation.GrpcNetClient package)
-	//				//.AddGrpcClientInstrumentation()
-	//				.AddHttpClientInstrumentation();
-	//		});
+        // Uncomment the following to restrict the allowed schemes for service discovery.
+        // builder.Services.Configure<ServiceDiscoveryOptions>(options =>
+        // {
+        //     options.AllowedSchemes = ["https"];
+        // });
 
-	//	builder.AddOpenTelemetryExporters();
+        return builder;
+    }
 
-	//	return builder;
-	//}
+    //public static TBuilder ConfigureOpenTelemetry<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
+    //{
+    //	builder.Logging.AddOpenTelemetry(logging =>
+    //	{
+    //		logging.IncludeFormattedMessage = true;
+    //		logging.IncludeScopes = true;
+    //	});
 
-	//private static TBuilder AddOpenTelemetryExporters<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
-	//{
-	//	var useOtlpExporter = !string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]);
+    //	builder.Services.AddOpenTelemetry()
+    //		.WithMetrics(metrics =>
+    //		{
+    //			metrics.AddAspNetCoreInstrumentation()
+    //				.AddHttpClientInstrumentation()
+    //				.AddRuntimeInstrumentation();
+    //		})
+    //		.WithTracing(tracing =>
+    //		{
+    //			tracing.AddSource(builder.Environment.ApplicationName)
+    //				.AddAspNetCoreInstrumentation()
+    //				// Uncomment the following line to enable gRPC instrumentation (requires the OpenTelemetry.Instrumentation.GrpcNetClient package)
+    //				//.AddGrpcClientInstrumentation()
+    //				.AddHttpClientInstrumentation();
+    //		});
 
-	//	if (useOtlpExporter)
-	//	{
-	//		builder.Services.AddOpenTelemetry().UseOtlpExporter();
-	//	}
+    //	builder.AddOpenTelemetryExporters();
 
-	//	return builder;
-	//}
+    //	return builder;
+    //}
 
-	public static TBuilder AddDefaultHealthChecks<TBuilder>(this TBuilder builder)
-		where TBuilder : IHostApplicationBuilder
-	{
-		builder.Services.AddHealthChecks()
-			   // Add a default liveness check to ensure app is responsive
-			   .AddCheck("self", () => HealthCheckResult.Healthy(), ["live"]);
+    //private static TBuilder AddOpenTelemetryExporters<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
+    //{
+    //	var useOtlpExporter = !string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]);
 
-		return builder;
-	}
+    //	if (useOtlpExporter)
+    //	{
+    //		builder.Services.AddOpenTelemetry().UseOtlpExporter();
+    //	}
 
-	public static WebApplication MapDefaultEndpoints(this WebApplication app)
-	{
-		// Adding health checks endpoints to applications in non-development environments has security implications.
-		// See https://aka.ms/dotnet/aspire/healthchecks for details before enabling these endpoints in non-development environments.
-		if (app.Environment.IsDevelopment())
-		{
-			// All health checks must pass for app to be considered ready to accept traffic after starting
-			app.MapHealthChecks("/health");
+    //	return builder;
+    //}
 
-			// Only health checks tagged with the "live" tag must pass for app to be considered alive
-			app.MapHealthChecks("/alive", new HealthCheckOptions {Predicate = r => r.Tags.Contains("live")});
-		}
+    public static TBuilder AddDefaultHealthChecks<TBuilder>(this TBuilder builder)
+        where TBuilder : IHostApplicationBuilder
+    {
+        builder.Services.AddHealthChecks()
+            // Add a default liveness check to ensure app is responsive
+            .AddCheck("self", () => HealthCheckResult.Healthy(), ["live"]);
 
-		return app;
-	}
+        return builder;
+    }
 
-	//  public static IServiceCollection AddApplicationMediatR(this IServiceCollection services)
-	//  {
-	//      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetAllRecipesQueryHandler).Assembly));
-	//      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetRecipeByIdQueryHandler).Assembly));
-	//      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(AddRecipeCommandHandler).Assembly));
-	//      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(UpdateRecipeNameCommandHandler).Assembly));
-	//      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DeleteIngredientFromRecipeCommandHandler).Assembly));
-	//      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetAllIngredientsQueryHandler).Assembly));
-	//      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(AddIngredientCommandHandler).Assembly));
+    public static WebApplication MapDefaultEndpoints(this WebApplication app)
+    {
+        // Adding health checks endpoints to applications in non-development environments has security implications.
+        // See https://aka.ms/dotnet/aspire/healthchecks for details before enabling these endpoints in non-development environments.
+        if (app.Environment.IsDevelopment())
+        {
+            // All health checks must pass for app to be considered ready to accept traffic after starting
+            app.MapHealthChecks("/health");
 
-	//      //services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof().Assembly));
+            // Only health checks tagged with the "live" tag must pass for app to be considered alive
+            app.MapHealthChecks("/alive", new HealthCheckOptions
+            {
+                Predicate = r => r.Tags.Contains("live")
+            });
+        }
 
-	//      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(AddIngredientToRecipeCommandHandler).Assembly));
+        return app;
+    }
 
-	//return services;
-	//  }
+    //  public static IServiceCollection AddApplicationMediatR(this IServiceCollection services)
+    //  {
+    //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetAllRecipesQueryHandler).Assembly));
+    //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetRecipeByIdQueryHandler).Assembly));
+    //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(AddRecipeCommandHandler).Assembly));
+    //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(UpdateRecipeNameCommandHandler).Assembly));
+    //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DeleteIngredientFromRecipeCommandHandler).Assembly));
+    //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetAllIngredientsQueryHandler).Assembly));
+    //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(AddIngredientCommandHandler).Assembly));
+
+    //      //services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof().Assembly));
+
+    //      services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(AddIngredientToRecipeCommandHandler).Assembly));
+
+    //return services;
+    //  }
 }

@@ -14,11 +14,11 @@ namespace FoodCalc.Api.Common;
 /// </summary>
 public class PagedSearchRequestValidator<TRequest> : Validator<TRequest> where TRequest : class, IPagedSearchRequest
 {
-	public PagedSearchRequestValidator()
-	{
-		RuleFor(x => x.Page)
-			.GreaterThanOrEqualTo(1);
-		RuleFor(x => x.PageSize)
-			.GreaterThanOrEqualTo(1);
-	}
+    public PagedSearchRequestValidator()
+    {
+        RuleFor(x => x.Page)
+            .GreaterThanOrEqualTo(1);
+        RuleFor(x => x.PageSize)
+            .GreaterThanOrEqualTo(1);
+    }
 }

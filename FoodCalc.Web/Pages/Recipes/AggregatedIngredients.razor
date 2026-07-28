@@ -60,8 +60,8 @@ else
 		{
 			_initialized = true;
 			_displayItems = Ingredients.Where(i => !string.IsNullOrWhiteSpace(i.Name))
-			                           .Select(i => $"{i.Name}: {i.Amount.ToFormattedString()} {i.IngredientAmount}")
-			                           .ToList();
+				.Select(i => $"{i.Name}: {i.Amount.ToFormattedString()} {i.IngredientAmount}")
+				.ToList();
 			await OnItemsChanged.InvokeAsync(_displayItems);
 		}
 		else if (InitialItems.Count > 0)

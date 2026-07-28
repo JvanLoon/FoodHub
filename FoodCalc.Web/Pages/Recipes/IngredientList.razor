@@ -96,7 +96,7 @@
 	private async Task LoadIngredientsAsync()
 	{
 		pagedResult = await IngredientService.GetPagedIngredientsAsync(currentPage, pageSize, searchTerm)
-		                                     .OrDefault<PagedResultDto<IngredientDto>>(new());
+			.OrDefault<PagedResultDto<IngredientDto>>(new());
 	}
 
 	private async Task OnPageChanged(int page)
@@ -123,10 +123,15 @@
 	{
 		ingredient.ShouldBeAddedToShoppingCart = (bool) e.Value!;
 
-		var updateDto = new UpdateIngredientDto {Id = ingredient.Id, Name = ingredient.Name, ShouldBeAddedToShoppingCart = ingredient.ShouldBeAddedToShoppingCart};
+		var updateDto = new UpdateIngredientDto
+		{
+			Id = ingredient.Id,
+			Name = ingredient.Name,
+			ShouldBeAddedToShoppingCart = ingredient.ShouldBeAddedToShoppingCart
+		};
 		await IngredientService.UpdateIngredient(updateDto)
-		                       .OnSuccess()
-		                       .OnFailure();
+			.OnSuccess()
+			.OnFailure();
 	}
 
 	private void StartEdit(IngredientDto ingredient)
@@ -140,10 +145,15 @@
 		if (!string.IsNullOrWhiteSpace(editingName) && editingName != ingredient.Name)
 		{
 			ingredient.Name = editingName;
-			var updateDto = new UpdateIngredientDto {Id = ingredient.Id, Name = ingredient.Name, ShouldBeAddedToShoppingCart = ingredient.ShouldBeAddedToShoppingCart};
+			var updateDto = new UpdateIngredientDto
+			{
+				Id = ingredient.Id,
+				Name = ingredient.Name,
+				ShouldBeAddedToShoppingCart = ingredient.ShouldBeAddedToShoppingCart
+			};
 			await IngredientService.UpdateIngredient(updateDto)
-			                       .OnSuccess(message: WebConstants.Messages.Ingredient.NameUpdated)
-			                       .OnFailure();
+				.OnSuccess(message: WebConstants.Messages.Ingredient.NameUpdated)
+				.OnFailure();
 		}
 
 		editingIngredientId = null;
@@ -159,8 +169,8 @@
 	{
 		//todo: checken of ook echt stopt als het foutgaat
 		await IngredientService.DeleteIngredient(id)
-		                       .OnSuccess(async () => await LoadIngredientsAsync(), WebConstants.Messages.Ingredient.DeletedWithReload)
-		                       .OnFailure();
+			.OnSuccess(async () => await LoadIngredientsAsync(), WebConstants.Messages.Ingredient.DeletedWithReload)
+			.OnFailure();
 	}
 
 }

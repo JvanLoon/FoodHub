@@ -6,13 +6,13 @@ namespace FoodCalc.Api.Endpoints.Dev;
 
 public class ErrorTestRequest
 {
-	/// <summary>How many errors to return. 0 (or less) returns a success response instead.</summary>
-	[BindFrom("count")]
-	public int Count { get; set; } = 1;
+    /// <summary>How many errors to return. 0 (or less) returns a success response instead.</summary>
+    [BindFrom("count")]
+    public int Count { get; set; } = 1;
 
-	/// <summary>Status code to fail with, so the client's status fallbacks can be exercised too.</summary>
-	[BindFrom("statusCode")]
-	public int StatusCode { get; set; } = 400;
+    /// <summary>Status code to fail with, so the client's status fallbacks can be exercised too.</summary>
+    [BindFrom("statusCode")]
+    public int StatusCode { get; set; } = 400;
 }
 
 /// <summary>
@@ -33,61 +33,60 @@ public class ErrorTestRequest
 /// </summary>
 public class ErrorTestEndpoint(IWebHostEnvironment env) : Endpoint<ErrorTestRequest>
 {
-	/// <summary>Upper bound so a stray query string can't ask for a million toasts.</summary>
-	private const int _maxCount = 20;
+    /// <summary>Upper bound so a stray query string can't ask for a million toasts.</summary>
+    private const int _maxCount = 20;
 
-	public override void Configure()
-	{
-		Get(ApiRoutes.Dev.ErrorTest);
-		Roles("Admin");
-	}
+    public override void Configure()
+    {
+        Get(ApiRoutes.Dev.ErrorTest);
+        Roles("Admin");
+    }
 
-	public override async Task HandleAsync(ErrorTestRequest req, CancellationToken ct)
-	{
-		// Inert outside development — the endpoint is registered either way, but only ever
-		// does anything on a dev machine.
-		if (env.IsProduction())
-		{
-			await Send.NotFoundAsync(ct);
-			return;
-		}
+    public override async Task HandleAsync(ErrorTestRequest req, CancellationToken ct)
+    {
+        // Inert outside development — the endpoint is registered either way, but only ever
+        // does anything on a dev machine.
+        if (env.IsProduction())
+        {
+            await Send.NotFoundAsync(ct);
+            return;
+        }
 
-		// A 2xx is always success, whatever the count — errors attached to one would silently
-		// vanish, so we never send them here. The body names the status (e.g. "200 => OK") so the
-		// client can toast a concrete confirmation instead of a generic one. 204 is the exception:
-		// the spec forbids a body on No Content, so it goes out bare and the client falls back to
-		// its own "No Content" wording.
-		if (req.StatusCode is >= 200 and < 300)
-		{
-			if (req.StatusCode == StatusCodes.Status204NoContent)
-			{
-				await Send.ResultAsync(Results.StatusCode(req.StatusCode));
-				return;
-			}
+        // A 2xx is always success, whatever the count — errors attached to one would silently
+        // vanish, so we never send them here. The body names the status (e.g. "200 => OK") so the
+        // client can toast a concrete confirmation instead of a generic one. 204 is the exception:
+        // the spec forbids a body on No Content, so it goes out bare and the client falls back to
+        // its own "No Content" wording.
+        if (req.StatusCode is >= 200 and < 300)
+        {
+            if (req.StatusCode == StatusCodes.Status204NoContent)
+            {
+                await Send.ResultAsync(Results.StatusCode(req.StatusCode));
+                return;
+            }
 
-			var reason = ((HttpStatusCode) req.StatusCode).ToString();
-			await Send.ResultAsync(Results.Text($"{req.StatusCode} => {reason}", contentType: "text/plain",
-												statusCode: req.StatusCode));
-			return;
-		}
+            var reason = ((HttpStatusCode) req.StatusCode).ToString();
+            await Send.ResultAsync(Results.Text($"{req.StatusCode} => {reason}", contentType: "text/plain",
+                statusCode: req.StatusCode));
+            return;
+        }
 
-		// count <= 0 on a non-2xx is how you reach the client's StatusFallback — it only fires when
-		// the body yields no message, so an empty body is the point.
-		if (req.Count <= 0)
-		{
-			await Send.ResultAsync(Results.StatusCode(req.StatusCode));
-			return;
-		}
+        // count <= 0 on a non-2xx is how you reach the client's StatusFallback — it only fires when
+        // the body yields no message, so an empty body is the point.
+        if (req.Count <= 0)
+        {
+            await Send.ResultAsync(Results.StatusCode(req.StatusCode));
+            return;
+        }
 
-		var count = Math.Min(req.Count, _maxCount);
+        var count = Math.Min(req.Count, _maxCount);
 
-		// Deliberately all Error.Failure with the default code, matching what the real handlers
-		// produce — that is the case AllowDuplicateErrors has to survive.
-		var errors = Enumerable.Range(1, count)
-							   .Select(i => Error.Failure(
-										   description: $"{req.StatusCode} => Test error {i} of {count}."))
-							   .ToList();
+        // Deliberately all Error.Failure with the default code, matching what the real handlers
+        // produce — that is the case AllowDuplicateErrors has to survive.
+        var errors = Enumerable.Range(1, count)
+            .Select(i => Error.Failure(description: $"{req.StatusCode} => Test error {i} of {count}."))
+            .ToList();
 
-		await this.SendErrorsAsync(errors, req.StatusCode, ct);
-	}
+        await this.SendErrorsAsync(errors, req.StatusCode, ct);
+    }
 }

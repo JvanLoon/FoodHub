@@ -63,12 +63,15 @@
 	private int pageSize = 50;
 	private string searchTerm = string.Empty;
 
-	protected override async Task OnInitializedAsync() { await LoadUsersAsync(); }
+	protected override async Task OnInitializedAsync()
+	{
+		await LoadUsersAsync();
+	}
 
 	private async Task LoadUsersAsync()
 	{
 		pagedResult = await AdminService.GetPagedUsersAsync(currentPage, pageSize, searchTerm)
-		                                .OrDefault(new PagedResultDto<UserDto>());
+			.OrDefault(new PagedResultDto<UserDto>());
 	}
 
 	private async Task OnPageChanged(int page)
@@ -94,13 +97,13 @@
 	public async Task ToggleUserAsync(string email, bool enabled)
 	{
 		await AdminService.ToggleUserAsync(email, enabled)
-		                  .OnSuccess(() =>
-		                  {
-			                  var user = pagedResult?.Items.FirstOrDefault(u => u.Email == email);
-			                  if (user != null)
-				                  user.Enabled = enabled;
-		                  })
-		                  .OnFailure();
+			.OnSuccess(() =>
+			{
+				var user = pagedResult?.Items.FirstOrDefault(u => u.Email == email);
+				if (user != null)
+					user.Enabled = enabled;
+			})
+			.OnFailure();
 	}
 
 }

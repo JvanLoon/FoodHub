@@ -103,7 +103,7 @@
 	private async Task LoadRecipesAsync()
 	{
 		pagedResult = await recipeService.GetPagedRecipesAsync(currentPage, pageSize, searchTerm)
-		                                 .OrDefault(new PagedResultDto<RecipeDto>());
+			.OrDefault(new PagedResultDto<RecipeDto>());
 	}
 
 	private async Task OnPageChanged(int page)
@@ -159,19 +159,31 @@
 					else
 					{
 						// Clone to avoid mutating original
-						ingredientDict[key] = new RecipeItemDto {Name = ri.Name, IngredientAmount = ri.IngredientAmount, Amount = ri.Amount, ShouldBeAddedToShoppingCart = ri.ShouldBeAddedToShoppingCart};
+						ingredientDict[key] = new RecipeItemDto
+						{
+							Name = ri.Name,
+							IngredientAmount = ri.IngredientAmount,
+							Amount = ri.Amount,
+							ShouldBeAddedToShoppingCart = ri.ShouldBeAddedToShoppingCart
+						};
 					}
 				}
 			}
 		}
 
 		AggregatedIngredients = ingredientDict.Values.OrderBy(i => i.Name)
-		                                      .ToList();
+			.ToList();
 	}
 
-	private void EditRecipe(Guid recipeId) { NavigationManager.NavigateTo($"/recipes/edit/{recipeId}"); }
+	private void EditRecipe(Guid recipeId)
+	{
+		NavigationManager.NavigateTo($"/recipes/edit/{recipeId}");
+	}
 
-	private void OpenRecipe(Guid recipeId) { NavigationManager.NavigateTo($"/recipe/{recipeId}"); }
+	private void OpenRecipe(Guid recipeId)
+	{
+		NavigationManager.NavigateTo($"/recipe/{recipeId}");
+	}
 
 	private async Task DeleteRecipe(Guid recipeId)
 	{
@@ -180,12 +192,12 @@
 			return;
 
 		await recipeService.DeleteRecipe(recipeId)
-		                   .OnSuccess(async () =>
-		                   {
-			                   await LoadRecipesAsync();
-			                   StateHasChanged();
-		                   }, WebConstants.Messages.Recipe.Deleted)
-		                   .OnFailure();
+			.OnSuccess(async () =>
+			{
+				await LoadRecipesAsync();
+				StateHasChanged();
+			}, WebConstants.Messages.Recipe.Deleted)
+			.OnFailure();
 	}
 
 }

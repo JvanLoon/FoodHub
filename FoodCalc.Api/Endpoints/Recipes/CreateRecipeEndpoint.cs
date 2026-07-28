@@ -7,18 +7,16 @@ namespace FoodCalc.Api.Endpoints.Recipes;
 /// <summary>POST api/recipe — Admin only. Body validated by CreateRecipeValidator.</summary>
 public class CreateRecipeEndpoint(IMediator mediator) : Endpoint<CreateRecipeDto, RecipeDto>
 {
-	public override void Configure()
-	{
-		Post(ApiRoutes.Recipe.Create);
-		Roles("Admin");
-	}
+    public override void Configure()
+    {
+        Post(ApiRoutes.Recipe.Create);
+        Roles("Admin");
+    }
 
-	public override async Task HandleAsync(CreateRecipeDto req, CancellationToken ct)
-	{
-		var result = await mediator.Send(new AddRecipeCommand(req, User.GetUserId()), ct);
+    public override async Task HandleAsync(CreateRecipeDto req, CancellationToken ct)
+    {
+        var result = await mediator.Send(new AddRecipeCommand(req, User.GetUserId()), ct);
 
-		await result.Match(
-			value => Send.OkAsync(value, ct), 
-			errors => this.SendErrorsAsync(errors, ct: ct));
-	}
+        await result.Match(value => Send.OkAsync(value, ct), errors => this.SendErrorsAsync(errors, ct: ct));
+    }
 }

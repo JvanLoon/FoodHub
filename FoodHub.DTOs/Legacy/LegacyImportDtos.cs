@@ -9,18 +9,18 @@ namespace FoodHub.DTOs.Legacy;
 /// </summary>
 public class LegacyImportExportAllDataDto
 {
-	public List<RecipeDto> Recipes { get; set; } = [];
-	public List<IngredientDto> Ingredients { get; set; } = [];
-	public List<LegacyRecipeIngredientDto> RecipeIngredients { get; set; } = [];
-	public List<UserWithRolesDto>? Users { get; set; }
+    public List<RecipeDto> Recipes { get; set; } = [];
+    public List<IngredientDto> Ingredients { get; set; } = [];
+    public List<LegacyRecipeIngredientDto> RecipeIngredients { get; set; } = [];
+    public List<UserWithRolesDto>? Users { get; set; }
 }
 
 public class LegacyRecipeIngredientDto
 {
-	public Guid Id { get; set; }
-	public Guid RecipeId { get; set; }
-	public Guid IngredientId { get; set; }
-	public IngredientDto? Ingredient { get; set; }
-	public decimal Amount { get; set; }
-	public IngredientAmountTypeDto IngredientAmount { get; set; }
+    public Guid Id { get; set; }
+    public Guid RecipeId { get; set; }
+    public Guid IngredientId { get; set; }
+    public IngredientDto? Ingredient { get; set; }
+    public decimal Amount { get; set; }
+    public IngredientAmountTypeDto IngredientAmount { get; set; }
 }

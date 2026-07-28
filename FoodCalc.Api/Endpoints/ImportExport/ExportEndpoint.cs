@@ -7,8 +7,8 @@ namespace FoodCalc.Api.Endpoints.ImportExport;
 
 public class ExportRequest
 {
-	[BindFrom("format")]
-	public string Format { get; set; } = string.Empty;
+    [BindFrom("format")]
+    public string Format { get; set; } = string.Empty;
 }
 
 /// <summary>
@@ -18,34 +18,32 @@ public class ExportRequest
 /// </summary>
 public class ExportFileResponse
 {
-	public byte[] FileContents { get; set; } = [];
-	public string ContentType { get; set; } = "application/octet-stream";
-	public string? FileDownloadName { get; set; }
+    public byte[] FileContents { get; set; } = [];
+    public string ContentType { get; set; } = "application/octet-stream";
+    public string? FileDownloadName { get; set; }
 }
 
 /// <summary>GET api/importexport/export?format= — Admin.</summary>
 public class ExportEndpoint(IMediator mediator) : Endpoint<ExportRequest, ExportFileResponse>
 {
-	// Matches the old controller's hardcoded field.
-	private const bool IncludeUsers = false;
+    // Matches the old controller's hardcoded field.
+    private const bool IncludeUsers = false;
 
-	public override void Configure()
-	{
-		Get(ApiRoutes.ImportExport.Export);
-		Policies("Admin");
-	}
+    public override void Configure()
+    {
+        Get(ApiRoutes.ImportExport.Export);
+        Policies("Admin");
+    }
 
-	public override async Task HandleAsync(ExportRequest req, CancellationToken ct)
-	{
-		var result = await mediator.Send(new ExportAllCommand(req.Format, IncludeUsers), ct);
+    public override async Task HandleAsync(ExportRequest req, CancellationToken ct)
+    {
+        var result = await mediator.Send(new ExportAllCommand(req.Format, IncludeUsers), ct);
 
-		await result.Match(
-			json => Send.OkAsync(
-				new ExportFileResponse
-				{
-					FileContents = Encoding.UTF8.GetBytes(json),
-					ContentType = "application/json",
-					FileDownloadName = "users.json"
-				}, ct), errors => this.SendErrorsAsync(errors, ct: ct));
-	}
+        await result.Match(json => Send.OkAsync(new ExportFileResponse
+        {
+            FileContents = Encoding.UTF8.GetBytes(json),
+            ContentType = "application/json",
+            FileDownloadName = "users.json"
+        }, ct), errors => this.SendErrorsAsync(errors, ct: ct));
+    }
 }

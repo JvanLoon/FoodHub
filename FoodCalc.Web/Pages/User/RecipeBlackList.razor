@@ -49,7 +49,7 @@
 	protected override async Task OnInitializedAsync()
 	{
 		AllRecipes = await RecipeService.GetAllRecipesAsync(false)
-		                                .OrDefault<List<RecipeDto>>(new());
+			.OrDefault<List<RecipeDto>>(new());
 	}
 
 	private async Task AddSelectedRecipe()

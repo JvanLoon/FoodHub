@@ -11,16 +11,16 @@ namespace FoodCalc.Api.Endpoints.Admin;
 /// </summary>
 public class GetAllRolesEndpoint(IMediator mediator) : Endpoint<GetRolesRequest, PagedResultDto<string>>
 {
-	public override void Configure()
-	{
-		Get(ApiRoutes.Admin.AllRoles);
-		Policies("Admin,Moderator");
-	}
+    public override void Configure()
+    {
+        Get(ApiRoutes.Admin.AllRoles);
+        Policies("Admin,Moderator");
+    }
 
-	public override async Task HandleAsync(GetRolesRequest req, CancellationToken ct)
-	{
-		var result = await mediator.Send(new GetAllRolesQuery(req.Page, req.PageSize, req.Search), ct);
+    public override async Task HandleAsync(GetRolesRequest req, CancellationToken ct)
+    {
+        var result = await mediator.Send(new GetAllRolesQuery(req.Page, req.PageSize, req.Search), ct);
 
-		await result.Match(value => Send.OkAsync(value, ct), errors => this.SendErrorsAsync(errors, ct: ct));
-	}
+        await result.Match(value => Send.OkAsync(value, ct), errors => this.SendErrorsAsync(errors, ct: ct));
+    }
 }

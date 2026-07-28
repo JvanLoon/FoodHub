@@ -6,7 +6,7 @@ namespace FoodCalc.Api.Endpoints.Ingredients;
 
 public class DeleteIngredientRequest
 {
-	public Guid Id { get; set; }
+    public Guid Id { get; set; }
 }
 
 /// <summary>
@@ -16,16 +16,16 @@ public class DeleteIngredientRequest
 /// </summary>
 public class DeleteIngredientEndpoint(IMediator mediator) : Endpoint<DeleteIngredientRequest, bool>
 {
-	public override void Configure()
-	{
-		Delete(ApiRoutes.Ingredient.DeleteTemplate);
-		Roles("Admin");
-	}
+    public override void Configure()
+    {
+        Delete(ApiRoutes.Ingredient.DeleteTemplate);
+        Roles("Admin");
+    }
 
-	public override async Task HandleAsync(DeleteIngredientRequest req, CancellationToken ct)
-	{
-		var result = await mediator.Send(new DeleteIngredientCommand(req.Id), ct);
+    public override async Task HandleAsync(DeleteIngredientRequest req, CancellationToken ct)
+    {
+        var result = await mediator.Send(new DeleteIngredientCommand(req.Id), ct);
 
-		await result.Match(value => Send.OkAsync(value, ct), errors => this.SendErrorsAsync(errors, ct: ct));
-	}
+        await result.Match(value => Send.OkAsync(value, ct), errors => this.SendErrorsAsync(errors, ct: ct));
+    }
 }

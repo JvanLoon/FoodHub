@@ -16,42 +16,38 @@ namespace FoodCalc.Api.Common;
 /// </summary>
 public static class ErrorResultExtensions
 {
-	/// <summary>Field name used for errors that aren't tied to a specific request property.</summary>
-	private const string _generalErrorsField = "generalErrors";
+    /// <summary>Field name used for errors that aren't tied to a specific request property.</summary>
+    private const string _generalErrorsField = "generalErrors";
 
-	/// <summary>ErrorOr's placeholder code, used when a handler only supplies a description.</summary>
-	private const string _defaultErrorOrCode = "General.Failure";
+    /// <summary>ErrorOr's placeholder code, used when a handler only supplies a description.</summary>
+    private const string _defaultErrorOrCode = "General.Failure";
 
-	/// <summary>
-	/// Sends every <see cref="Error"/> from a failed <c>ErrorOr</c> result. A meaningful
-	/// <see cref="Error.Code"/> becomes the field name, so a future <c>Error.Validation("Name", ...)</c>
-	/// lands on the right property without any change here; ErrorOr's placeholder code is mapped to
-	/// the general bucket rather than leaked into the response.
-	/// </summary>
-	public static Task SendErrorsAsync(this BaseEndpoint ep,
-									   List<Error> errors,
-									   int statusCode = 400,
-									   CancellationToken ct = default
-	) =>
-		ep.SendFailuresAsync(errors.Select(e => new ValidationFailure(FieldNameFor(e), e.Description)), statusCode, ct);
+    /// <summary>
+    /// Sends every <see cref="Error"/> from a failed <c>ErrorOr</c> result. A meaningful
+    /// <see cref="Error.Code"/> becomes the field name, so a future <c>Error.Validation("Name", ...)</c>
+    /// lands on the right property without any change here; ErrorOr's placeholder code is mapped to
+    /// the general bucket rather than leaked into the response.
+    /// </summary>
+    public static Task SendErrorsAsync(this BaseEndpoint ep,
+        List<Error> errors,
+        int statusCode = 400,
+        CancellationToken ct = default) =>
+        ep.SendFailuresAsync(errors.Select(e => new ValidationFailure(FieldNameFor(e), e.Description)), statusCode, ct);
 
-	private static string FieldNameFor(Error error) =>
-		string.IsNullOrWhiteSpace(error.Code) || error.Code == _defaultErrorOrCode ? _generalErrorsField : error.Code;
+    private static string FieldNameFor(Error error) =>
+        string.IsNullOrWhiteSpace(error.Code) || error.Code == _defaultErrorOrCode ? _generalErrorsField : error.Code;
 
-	/// <summary>
-	/// Sends a set of plain messages (e.g. <c>IdentityResult.Errors</c>) as general errors.
-	/// </summary>
-	public static Task SendErrorsAsync(this BaseEndpoint ep,
-									   IEnumerable<string> messages,
-									   int statusCode = 400,
-									   CancellationToken ct = default
-	) =>
-		ep.SendFailuresAsync(messages.Select(m => new ValidationFailure(_generalErrorsField, m)), statusCode, ct);
+    /// <summary>
+    /// Sends a set of plain messages (e.g. <c>IdentityResult.Errors</c>) as general errors.
+    /// </summary>
+    public static Task SendErrorsAsync(this BaseEndpoint ep,
+        IEnumerable<string> messages,
+        int statusCode = 400,
+        CancellationToken ct = default) =>
+        ep.SendFailuresAsync(messages.Select(m => new ValidationFailure(_generalErrorsField, m)), statusCode, ct);
 
-	private static Task SendFailuresAsync(this BaseEndpoint ep,
-										  IEnumerable<ValidationFailure> failures,
-										  int statusCode,
-										  CancellationToken ct
-	) =>
-		ep.HttpContext.Response.SendErrorsAsync([..failures], statusCode, cancellation: ct);
+    private static Task SendFailuresAsync(this BaseEndpoint ep,
+        IEnumerable<ValidationFailure> failures,
+        int statusCode,
+        CancellationToken ct) => ep.HttpContext.Response.SendErrorsAsync([..failures], statusCode, cancellation: ct);
 }

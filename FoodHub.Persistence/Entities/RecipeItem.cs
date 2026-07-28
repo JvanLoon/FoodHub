@@ -9,10 +9,10 @@ namespace FoodHub.Persistence.Entities;
 /// </summary>
 public class RecipeItem : BaseEntity
 {
-	public Guid Id { get; set; } = Guid.NewGuid();
-	public Guid RecipeId { get; set; }
-	public required string Name { get; set; }
-	public decimal Amount { get; set; }
-	public IngredientAmountType IngredientAmount { get; set; }
-	public bool ShouldBeAddedToShoppingCart { get; set; } = true;
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid RecipeId { get; set; }
+    public required string Name { get; set; }
+    public decimal Amount { get; set; }
+    public IngredientAmountType IngredientAmount { get; set; }
+    public bool ShouldBeAddedToShoppingCart { get; set; } = true;
 }

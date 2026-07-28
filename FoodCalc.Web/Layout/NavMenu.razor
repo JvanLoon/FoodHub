@@ -60,5 +60,9 @@
 		catch (Exception ex) { MessageService.ShowMessage(ex.Message, true, 0); }
 	}
 
-	public void Dispose() { AuthStateService.OnAuthStateChanged -= HandleAuthStateChangedAsync; }
+	public void Dispose()
+	{
+		AuthStateService.OnAuthStateChanged -= HandleAuthStateChangedAsync;
+	}
+
 }

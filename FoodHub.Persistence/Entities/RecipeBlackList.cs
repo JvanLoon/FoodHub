@@ -2,6 +2,6 @@
 
 public class RecipeBlackList
 {
-	public Guid RecipeId { get; set; }
-	public Guid UserId { get; set; }
+    public Guid RecipeId { get; set; }
+    public Guid UserId { get; set; }
 }

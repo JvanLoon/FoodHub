@@ -47,29 +47,27 @@
 	[Parameter]
 	public RenderFragment? ChildContent { get; set; }
 
-	private string VariantClass =>
-		Variant switch
-		{
-			ButtonVariant.Primary => "btn-primary",
-			ButtonVariant.Secondary => "btn-secondary",
-			ButtonVariant.Success => "btn-success",
-			ButtonVariant.Danger => "btn-danger",
-			ButtonVariant.OutlinePrimary => "btn-outline-primary",
-			ButtonVariant.OutlineSecondary => "btn-outline-secondary",
-			ButtonVariant.OutlineSuccess => "btn-outline-success",
-			ButtonVariant.OutlineDanger => "btn-outline-danger",
-			ButtonVariant.Ghost => "fh-btn-ghost",
-			ButtonVariant.Link => "btn-link",
-			_ => "btn-primary"
-		};
+	private string VariantClass => Variant switch
+	{
+		ButtonVariant.Primary => "btn-primary",
+		ButtonVariant.Secondary => "btn-secondary",
+		ButtonVariant.Success => "btn-success",
+		ButtonVariant.Danger => "btn-danger",
+		ButtonVariant.OutlinePrimary => "btn-outline-primary",
+		ButtonVariant.OutlineSecondary => "btn-outline-secondary",
+		ButtonVariant.OutlineSuccess => "btn-outline-success",
+		ButtonVariant.OutlineDanger => "btn-outline-danger",
+		ButtonVariant.Ghost => "fh-btn-ghost",
+		ButtonVariant.Link => "btn-link",
+		_ => "btn-primary"
+	};
 
-	private string? SizeClass =>
-		Size switch
-		{
-			ButtonSize.Small => "btn-sm",
-			ButtonSize.Large => "btn-lg",
-			_ => null
-		};
+	private string? SizeClass => Size switch
+	{
+		ButtonSize.Small => "btn-sm",
+		ButtonSize.Large => "btn-lg",
+		_ => null
+	};
 
 	private async Task HandleClick()
 	{

@@ -73,7 +73,10 @@
 		await InvokeAsync(StateHasChanged);
 	}
 
-	public void Dispose() { AuthStateService.OnAuthStateChanged -= HandleAuthStateChangedAsync; }
+	public void Dispose()
+	{
+		AuthStateService.OnAuthStateChanged -= HandleAuthStateChangedAsync;
+	}
 
 	private async Task Logout()
 	{

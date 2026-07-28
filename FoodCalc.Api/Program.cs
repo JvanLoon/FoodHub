@@ -19,7 +19,7 @@ public static class Program
         // this is a no-op.
         if (File.Exists(".env"))
             DotNetEnv.Env.NoClobber()
-                     .Load();
+                .Load();
 
         var builder = WebApplication.CreateBuilder(args);
 
@@ -82,7 +82,8 @@ public static class Program
         });
 
         // Configure JWT authentication
-        var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtOptions>();
+        var jwtSettings = builder.Configuration.GetSection("Jwt")
+            .Get<JwtOptions>();
         var key = jwtSettings?.Key;
 
         if (string.IsNullOrEmpty(key))
@@ -111,7 +112,9 @@ public static class Program
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = jwtSettings?.Issuer,
-                    IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(key)),
+                    IssuerSigningKey =
+                        new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
+                            System.Text.Encoding.UTF8.GetBytes(key)),
                     ClockSkew = TimeSpan.Zero
                 };
 

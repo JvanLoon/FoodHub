@@ -166,9 +166,9 @@
 		}
 
 		var recipes = await RecipeService.GetAllRecipesAsync(withIngredients: true)
-		                                 .OrDefault(new List<RecipeDto>());
+			.OrDefault(new List<RecipeDto>());
 		var ingredientsPage = await IngredientService.GetPagedIngredientsAsync(1, 1)
-		                                             .OrDefault(new PagedResultDto<IngredientDto>());
+			.OrDefault(new PagedResultDto<IngredientDto>());
 
 		recipeCount = recipes.Count;
 		ingredientCount = ingredientsPage.TotalCount;
@@ -176,7 +176,7 @@
 		if (isAdmin)
 		{
 			var usersResult = await AdminService.GetPagedUsersAsync(1, 1)
-			                                    .OrDefault(new PagedResultDto<UserDto>());
+				.OrDefault(new PagedResultDto<UserDto>());
 			userCount = usersResult.TotalCount;
 		}
 
@@ -206,9 +206,13 @@
 				{
 					if (!usage.TryGetValue(ri.Name, out var u))
 					{
-						u = new IngredientUsage {Name = ri.Name};
-						usage[ri.Name] = u;}
-					
+						u = new IngredientUsage
+						{
+							Name = ri.Name
+						};
+						usage[ri.Name] = u;
+					}
+
 
 					u.UsageCount++;
 				}
@@ -218,9 +222,9 @@
 		shoppingCartIngredientCount = seenShoppingIngredients.Count;
 
 		topIngredients = usage.Values.OrderByDescending(u => u.UsageCount)
-		                      .ThenBy(u => u.Name)
-		                      .Take(5)
-		                      .ToList();
+			.ThenBy(u => u.Name)
+			.Take(5)
+			.ToList();
 
 		maxTopUsage = topIngredients.Count == 0 ? 0 : topIngredients.Max(t => t.UsageCount);
 	}

@@ -103,7 +103,8 @@ public class Program
         builder.Services.AddAuthentication("JwtBearer")
             .AddJwtBearer("JwtBearer", options =>
             {
-                var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtOptions>();
+                var jwtSettings = builder.Configuration.GetSection("Jwt")
+                    .Get<JwtOptions>();
                 var key = jwtSettings?.Key;
 
                 if (string.IsNullOrWhiteSpace(key))

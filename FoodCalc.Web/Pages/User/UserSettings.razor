@@ -31,5 +31,9 @@
 @code {
 	private string? email;
 
-	protected override async Task OnInitializedAsync() { email = await AuthTokenService.GetEmailAsync(); }
+	protected override async Task OnInitializedAsync()
+	{
+		email = await AuthTokenService.GetEmailAsync();
+	}
+
 }

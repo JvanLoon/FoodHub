@@ -8,18 +8,18 @@ namespace FoodCalc.Api.Endpoints.Users;
 /// <summary>GET api/user/users — Admin, Moderator or User.</summary>
 public class GetUsersEndpoint(IMediator mediator) : Endpoint<GetUsersRequest, PagedResultDto<UserDto>>
 {
-	public override void Configure()
-	{
-		Get(ApiRoutes.User.Users);
-		Policies("Admin,Moderator,User");
-	}
+    public override void Configure()
+    {
+        Get(ApiRoutes.User.Users);
+        Policies("Admin,Moderator,User");
+    }
 
-	public override async Task HandleAsync(GetUsersRequest req, CancellationToken ct)
-	{
-		var result = await mediator.Send(new GetAllUsersQuery(req.Page, req.PageSize, req.Search), ct);
+    public override async Task HandleAsync(GetUsersRequest req, CancellationToken ct)
+    {
+        var result = await mediator.Send(new GetAllUsersQuery(req.Page, req.PageSize, req.Search), ct);
 
-		await result.Match(value => Send.OkAsync(value, ct), errors => this.SendErrorsAsync(errors, ct: ct));
-	}
+        await result.Match(value => Send.OkAsync(value, ct), errors => this.SendErrorsAsync(errors, ct: ct));
+    }
 }
 
 /// <summary>
@@ -28,16 +28,16 @@ public class GetUsersEndpoint(IMediator mediator) : Endpoint<GetUsersRequest, Pa
 /// </summary>
 public class GetAllRolesEndpoint(IMediator mediator) : Endpoint<GetRolesRequest, PagedResultDto<string>>
 {
-	public override void Configure()
-	{
-		Get(ApiRoutes.User.AllRoles);
-		Policies("Admin,Moderator,User");
-	}
+    public override void Configure()
+    {
+        Get(ApiRoutes.User.AllRoles);
+        Policies("Admin,Moderator,User");
+    }
 
-	public override async Task HandleAsync(GetRolesRequest req, CancellationToken ct)
-	{
-		var result = await mediator.Send(new GetAllRolesQuery(req.Page, req.PageSize, req.Search), ct);
+    public override async Task HandleAsync(GetRolesRequest req, CancellationToken ct)
+    {
+        var result = await mediator.Send(new GetAllRolesQuery(req.Page, req.PageSize, req.Search), ct);
 
-		await result.Match(value => Send.OkAsync(value, ct), errors => this.SendErrorsAsync(errors, ct: ct));
-	}
+        await result.Match(value => Send.OkAsync(value, ct), errors => this.SendErrorsAsync(errors, ct: ct));
+    }
 }

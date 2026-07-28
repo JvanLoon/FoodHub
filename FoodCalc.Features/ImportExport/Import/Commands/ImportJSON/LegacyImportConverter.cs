@@ -12,36 +12,39 @@ namespace FoodCalc.Features.ImportExport.Import.Commands.ImportJSON;
 /// </summary>
 public static class LegacyImportConverter
 {
-	public static ImportExportAllDataDto ToCurrent(LegacyImportExportAllDataDto legacy)
-	{
-		var catalogById = legacy.Ingredients.GroupBy(i => i.Id)
-								.ToDictionary(g => g.Key, g => g.First());
+    public static ImportExportAllDataDto ToCurrent(LegacyImportExportAllDataDto legacy)
+    {
+        var catalogById = legacy.Ingredients.GroupBy(i => i.Id)
+            .ToDictionary(g => g.Key, g => g.First());
 
-		var items = new List<RecipeItemDto>();
-		foreach (var ri in legacy.RecipeIngredients)
-		{
-			catalogById.TryGetValue(ri.IngredientId, out var catalog);
+        var items = new List<RecipeItemDto>();
+        foreach (var ri in legacy.RecipeIngredients)
+        {
+            catalogById.TryGetValue(ri.IngredientId, out var catalog);
 
-			var name = ri.Ingredient?.Name ?? catalog?.Name;
-			if (string.IsNullOrWhiteSpace(name)) { continue; }
+            var name = ri.Ingredient?.Name ?? catalog?.Name;
+            if (string.IsNullOrWhiteSpace(name)) { continue; }
 
-			var shouldBeAddedToShoppingCart = ri.Ingredient?.ShouldBeAddedToShoppingCart
-											  ?? catalog?.ShouldBeAddedToShoppingCart ?? true;
+            var shouldBeAddedToShoppingCart = ri.Ingredient?.ShouldBeAddedToShoppingCart ??
+                                              catalog?.ShouldBeAddedToShoppingCart ?? true;
 
-			items.Add(new RecipeItemDto
-			{
-				Id = ri.Id,
-				RecipeId = ri.RecipeId,
-				Name = name,
-				Amount = ri.Amount,
-				IngredientAmount = ri.IngredientAmount,
-				ShouldBeAddedToShoppingCart = shouldBeAddedToShoppingCart
-			});
-		}
+            items.Add(new RecipeItemDto
+            {
+                Id = ri.Id,
+                RecipeId = ri.RecipeId,
+                Name = name,
+                Amount = ri.Amount,
+                IngredientAmount = ri.IngredientAmount,
+                ShouldBeAddedToShoppingCart = shouldBeAddedToShoppingCart
+            });
+        }
 
-		return new ImportExportAllDataDto
-		{
-			Recipes = legacy.Recipes, Ingredients = legacy.Ingredients, RecipeItems = items, Users = legacy.Users
-		};
-	}
+        return new ImportExportAllDataDto
+        {
+            Recipes = legacy.Recipes,
+            Ingredients = legacy.Ingredients,
+            RecipeItems = items,
+            Users = legacy.Users
+        };
+    }
 }

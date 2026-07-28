@@ -2,6 +2,6 @@
 
 public class BlackListDto
 {
-	public Guid UserId { get; set; }
-	public Guid RecipeId { get; set; }
+    public Guid UserId { get; set; }
+    public Guid RecipeId { get; set; }
 }

@@ -7,7 +7,7 @@ namespace FoodCalc.Api.Common;
 /// </summary>
 public interface IPagedSearchRequest
 {
-	int Page { get; set; }
-	int PageSize { get; set; }
-	string? Search { get; set; }
+    int Page { get; set; }
+    int PageSize { get; set; }
+    string? Search { get; set; }
 }
