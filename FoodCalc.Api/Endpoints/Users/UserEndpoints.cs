@@ -5,18 +5,6 @@ using MediatR;
 
 namespace FoodCalc.Api.Endpoints.Users;
 
-public class GetUsersRequest : IPagedSearchRequest
-{
-	[BindFrom("page")]
-	public int Page { get; set; } = 1;
-
-	[BindFrom("pageSize")]
-	public int PageSize { get; set; } = 25;
-
-	[BindFrom("search")]
-	public string? Search { get; set; }
-}
-
 /// <summary>GET api/user/users — Admin, Moderator or User.</summary>
 public class GetUsersEndpoint(IMediator mediator) : Endpoint<GetUsersRequest, PagedResultDto<UserDto>>
 {

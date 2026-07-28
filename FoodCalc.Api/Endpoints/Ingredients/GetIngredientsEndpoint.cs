@@ -5,17 +5,7 @@ using MediatR;
 namespace FoodCalc.Api.Endpoints.Ingredients;
 
 /// <summary>Query parameters for GET api/ingredient.</summary>
-public class GetIngredientsRequest : IPagedSearchRequest
-{
-	[BindFrom("page")]
-	public int Page { get; set; } = 1;
-
-	[BindFrom("pageSize")]
-	public int PageSize { get; set; } = 25;
-
-	[BindFrom("search")]
-	public string? Search { get; set; }
-}
+public class GetIngredientsRequest : PagedSearchRequest;
 
 /// <summary>GET api/ingredient — any authenticated user.</summary>
 public class GetIngredientsEndpoint(IMediator mediator) : Endpoint<GetIngredientsRequest, PagedResultDto<IngredientDto>>

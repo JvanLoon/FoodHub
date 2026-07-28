@@ -93,11 +93,13 @@ public class UpdateIngredientValidator : Validator<UpdateIngredientDto>
 // Users
 // ---------------------------------------------------------------------------
 
-/// <summary>Paging guard for GET api/admin/users (see <see cref="PagedSearchRequestValidator{T}"/>).</summary>
-public class AdminGetUsersRequestValidator : PagedSearchRequestValidator<FoodCalc.Api.Endpoints.Admin.GetUsersRequest>;
-
-/// <summary>Paging guard for GET api/user/users (see <see cref="PagedSearchRequestValidator{T}"/>).</summary>
-public class UserGetUsersRequestValidator : PagedSearchRequestValidator<FoodCalc.Api.Endpoints.Users.GetUsersRequest>;
+/// <summary>
+/// Paging guard for GET api/admin/users and GET api/user/users (see
+/// <see cref="PagedSearchRequestValidator{T}"/>). One validator, because both endpoints now
+/// bind the same <see cref="GetUsersRequest"/> — FastEndpoints resolves validators by request
+/// type, so a second one for the same type would be ambiguous.
+/// </summary>
+public class GetUsersRequestValidator : PagedSearchRequestValidator<GetUsersRequest>;
 
 public class GetUserRolesRequestValidator : Validator<GetUserRolesRequest>
 {
@@ -111,6 +113,21 @@ public class GetUserRolesRequestValidator : Validator<GetUserRolesRequest>
 public class ModifyUserRoleRequestValidator : Validator<ModifyUserRoleRequest>
 {
 	public ModifyUserRoleRequestValidator()
+	{
+		RuleFor(x => x.Email)
+			.NotEmpty();
+		RuleFor(x => x.Role)
+			.NotEmpty();
+	}
+}
+
+/// <summary>
+/// The DELETE binds its own query-bound type, so it needs its own validator — before that
+/// type existed it shared <see cref="ModifyUserRoleRequest"/> and inherited these rules.
+/// </summary>
+public class RemoveUserRoleRequestValidator : Validator<RemoveUserRoleRequest>
+{
+	public RemoveUserRoleRequestValidator()
 	{
 		RuleFor(x => x.Email)
 			.NotEmpty();
