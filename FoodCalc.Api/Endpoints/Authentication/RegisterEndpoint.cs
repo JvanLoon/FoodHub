@@ -25,6 +25,6 @@ public class RegisterEndpoint(UserManager<IdentityUser> userManager) : Endpoint<
 			return;
 		}
 
-		await Send.OkAsync(ct);
+		await Send.OkAsync(cancellation: ct);
 	}
 }

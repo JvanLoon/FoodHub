@@ -70,7 +70,7 @@ public class AddUserRoleEndpoint(UserManager<IdentityUser> userManager) : Endpoi
 			return;
 		}
 
-		await Send.OkAsync(ct);
+		await Send.OkAsync(cancellation: ct);
 	}
 }
 
@@ -99,6 +99,6 @@ public class RemoveUserRoleEndpoint(UserManager<IdentityUser> userManager) : End
 			return;
 		}
 
-		await Send.OkAsync(ct);
+		await Send.OkAsync(cancellation: ct);
 	}
 }

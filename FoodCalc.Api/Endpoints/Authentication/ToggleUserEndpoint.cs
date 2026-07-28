@@ -48,6 +48,6 @@ public class ToggleUserEndpoint(UserManager<IdentityUser> userManager) : Endpoin
 			return;
 		}
 
-		await Send.OkAsync(ct);
+		await Send.OkAsync(cancellation: ct);
 	}
 }
