@@ -1,0 +1,54 @@
+# Standalone stack for running WITHOUT a domain — one file, one flag:
+#
+#   docker compose -f docker-compose.prod.quicktunnel.yml up -d --build
+#   docker compose -f docker-compose.prod.quicktunnel.yml logs cloudflared | grep trycloudflare
+#
+# Identical to docker-compose.prod.yml except for the tunnel. A named tunnel needs a
+# Cloudflare zone, which needs a domain you own; a quick tunnel is anonymous — Cloudflare
+# hands out a random https://<words>.trycloudflare.com URL, no account, no token.
+#
+# That URL is NEW every time the cloudflared container restarts, and PUBLIC_HOSTNAME must
+# match it or the API rejects the browser's calls as a CORS violation. Which is the whole
+# reason this is a test rig: get a domain and use docker-compose.prod.yml for anything real.
+#
+# db/api/web are pulled in from docker-compose.prod.yml with `extends` rather than copied,
+# so there is exactly one definition of the application to keep correct. `extends` does not
+# carry depends_on or named volumes, which is why those are repeated below.
+
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    # http://web:8080, not localhost — inside this container localhost is cloudflared
+    # itself, which is the usual cause of a 502 from the tunnel.
+    command: tunnel --no-autoupdate --url http://web:8080
+    depends_on:
+      - web
+
+  db:
+    extends:
+      file: docker-compose.prod.yml
+      service: db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  api:
+    extends:
+      file: docker-compose.prod.yml
+      service: api
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    extends:
+      file: docker-compose.prod.yml
+      service: web
+    volumes:
+      - dataprotection-keys:/root/.local/share/FoodHub/dataprotection-keys
+    depends_on:
+      - api
+
+volumes:
+  pgdata:
+  dataprotection-keys:
