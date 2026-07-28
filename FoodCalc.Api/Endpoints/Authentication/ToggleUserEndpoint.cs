@@ -3,16 +3,10 @@ using Microsoft.AspNetCore.Identity;
 
 namespace FoodCalc.Api.Endpoints.Authentication;
 
-public class ToggleUserRequest
-{
-	[BindFrom("email")]
-	public string Email { get; set; } = string.Empty;
-
-	[BindFrom("enable")]
-	public bool Enable { get; set; } = true;
-}
-
-/// <summary>POST api/authentication/toggleUser?email=&amp;enable= — Admin.</summary>
+/// <summary>
+/// POST api/authentication/toggleUser — Admin. Takes <see cref="ToggleUserRequest"/> as a
+/// JSON body; the type lives in FoodHub.DTOs so the Web client posts the same shape.
+/// </summary>
 public class ToggleUserEndpoint(UserManager<IdentityUser> userManager) : Endpoint<ToggleUserRequest>
 {
 	public override void Configure()

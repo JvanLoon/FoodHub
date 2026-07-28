@@ -23,8 +23,11 @@ public class AdminService(AuthenticatedHttpClientService httpClient)
 		return ApiResult<List<UserDto>>.Ok([..paged.Data!.Items], paged.StatusCode);
 	}
 
+	// Posted as a body rather than a query string, so the shape is checked by the compiler
+	// against the API's request type — and so an address containing '+' survives the trip.
 	public Task<ApiResult> ToggleUserAsync(string email, bool enable = true) =>
-		httpClient.PostContentAsync($"{ApiRoutes.Authentication.ToggleUser}?email={email}&enable={enable}");
+		httpClient.PostAsync(ApiRoutes.Authentication.ToggleUser,
+			new ToggleUserRequest { Email = email, Enable = enable });
 
 	/// <summary>
 	/// Development diagnostics: asks the API to fail with <paramref name="count"/> errors so the
@@ -45,12 +48,17 @@ public class AdminService(AuthenticatedHttpClientService httpClient)
 		return ApiResult<List<string>>.Ok([..paged.Data!.Items], paged.StatusCode);
 	}
 
+	// GET and DELETE have no body, so these stay query strings — but the values still have to
+	// be escaped, or a '+' in an address arrives as a space and the lookup returns 404.
 	public Task<ApiResult<List<string>>> GetUserRolesAsync(string email) =>
-		httpClient.GetAsync<List<string>>($"{ApiRoutes.Admin.UserRoles}?email={email}");
+		httpClient.GetAsync<List<string>>(
+			$"{ApiRoutes.Admin.UserRoles}?email={Uri.EscapeDataString(email)}");
 
 	public Task<ApiResult> UpdateUserRolesAsync(string email, string newRole) =>
-		httpClient.PostContentAsync($"{ApiRoutes.Admin.UserRoles}?email={email}&role={newRole}");
+		httpClient.PostAsync(ApiRoutes.Admin.UserRoles,
+			new ModifyUserRoleRequest { Email = email, Role = newRole });
 
 	public Task<ApiResult> RemoveUserRoleAsync(string email, string role) =>
-		httpClient.DeleteAsync($"{ApiRoutes.Admin.UserRoles}?email={email}&role={role}");
+		httpClient.DeleteAsync(
+			$"{ApiRoutes.Admin.UserRoles}?email={Uri.EscapeDataString(email)}&role={Uri.EscapeDataString(role)}");
 }

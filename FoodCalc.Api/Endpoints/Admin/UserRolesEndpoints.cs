@@ -9,7 +9,12 @@ public class GetUserRolesRequest
 	public string Email { get; set; } = string.Empty;
 }
 
-public class ModifyUserRoleRequest
+/// <summary>
+/// Query-bound twin of <see cref="ModifyUserRoleRequest"/>, for the DELETE. A DELETE has no
+/// body, so this one cannot move to FoodHub.DTOs without taking a FastEndpoints reference
+/// with it — the attributes below are what bind it.
+/// </summary>
+public class RemoveUserRoleRequest
 {
 	[BindFrom("email")]
 	public string Email { get; set; } = string.Empty;
@@ -40,7 +45,7 @@ public class GetUserRolesEndpoint(UserManager<IdentityUser> userManager) : Endpo
 	}
 }
 
-/// <summary>POST api/admin/userroles?email=&amp;role= — Admin or Moderator.</summary>
+/// <summary>POST api/admin/userroles — Admin or Moderator. Takes a JSON body.</summary>
 public class AddUserRoleEndpoint(UserManager<IdentityUser> userManager) : Endpoint<ModifyUserRoleRequest>
 {
 	public override void Configure()
@@ -70,7 +75,7 @@ public class AddUserRoleEndpoint(UserManager<IdentityUser> userManager) : Endpoi
 }
 
 /// <summary>DELETE api/admin/userroles?email=&amp;role= — Admin or Moderator.</summary>
-public class RemoveUserRoleEndpoint(UserManager<IdentityUser> userManager) : Endpoint<ModifyUserRoleRequest>
+public class RemoveUserRoleEndpoint(UserManager<IdentityUser> userManager) : Endpoint<RemoveUserRoleRequest>
 {
 	public override void Configure()
 	{
@@ -78,7 +83,7 @@ public class RemoveUserRoleEndpoint(UserManager<IdentityUser> userManager) : End
 		Policies("Admin,Moderator");
 	}
 
-	public override async Task HandleAsync(ModifyUserRoleRequest req, CancellationToken ct)
+	public override async Task HandleAsync(RemoveUserRoleRequest req, CancellationToken ct)
 	{
 		var user = await userManager.FindByEmailAsync(req.Email);
 		if (user == null)
