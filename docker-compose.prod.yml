@@ -1,11 +1,14 @@
-# Production stack: Caddy (TLS) -> web -> api -> db.
+# Production stack: Cloudflare Tunnel -> web -> api -> db.
 #
 #   docker compose -f docker-compose.prod.yml up -d --build
 #
 # Differences from the development docker-compose.yml:
-#   • Caddy is the ONLY container with published ports. db/api/web are reachable
-#     only on the internal network, which is what makes clearing KnownIPNetworks
-#     in the ForwardedHeaders config safe.
+#   • NOTHING is published on the host. cloudflared makes an outbound connection
+#     to Cloudflare and traffic arrives back down it, so there is no inbound port,
+#     no router forwarding and no firewall hole. This is also what makes clearing
+#     KnownIPNetworks in the ForwardedHeaders config safe.
+#   • TLS is terminated at Cloudflare's edge, so there is no reverse proxy here
+#     and no certificate to renew.
 #   • No pgAdmin. Reach the database over an SSH tunnel instead of exposing it.
 #   • Postgres has no host port mapping.
 #   • restart: unless-stopped everywhere, so the stack survives a reboot.
@@ -13,21 +16,17 @@
 # Every value comes from .env — see .env.example.
 
 services:
-  caddy:
-    image: caddy:2-alpine
+  # The only route in. Because it shares this compose network it can resolve
+  # `web` by name — the tunnel's public hostname must point at http://web:8080,
+  # NOT localhost, which inside this container means cloudflared itself.
+  cloudflared:
+    image: cloudflare/cloudflared:latest
     restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
+    command: tunnel --no-autoupdate run
     environment:
-      PUBLIC_HOSTNAME: ${PUBLIC_HOSTNAME:?set PUBLIC_HOSTNAME in .env}
-      ACME_EMAIL: ${ACME_EMAIL:?set ACME_EMAIL in .env}
-    volumes:
-      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
-      # Certificates and ACME account keys. Losing this volume means re-issuing
-      # certs, and Let's Encrypt rate-limits that — keep it.
-      - caddy-data:/data
-      - caddy-config:/config
+      # Named-tunnel token from the Zero Trust dashboard. It embeds the tunnel's
+      # credentials — treat it exactly like a password.
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:?set CLOUDFLARE_TUNNEL_TOKEN in .env}
     depends_on:
       - web
 
@@ -93,5 +92,3 @@ services:
 volumes:
   pgdata:
   dataprotection-keys:
-  caddy-data:
-  caddy-config:
