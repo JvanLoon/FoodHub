@@ -83,7 +83,7 @@ public static class Program
 
         // Configure JWT authentication
         var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtOptions>();
-        string key = jwtSettings?.Key;
+        string? key = jwtSettings?.Key;
 
         if (string.IsNullOrEmpty(key))
             throw new InvalidOperationException("JWT key is not configured. Set Jwt__Key in the environment (see deployment.md).");
