@@ -192,4 +192,4 @@ await LoginService.RegisterAsync(registerModel)
 
 - [error-handling.md](error-handling.md) — how `AuthenticatedHttpClientService`
   turns a failed response into the clean `Errors` list these helpers consume.
-- [../../../README.md](../../../README.md) — project overview and setup.
+- [README.md](../../../README.md) — project overview and setup.
