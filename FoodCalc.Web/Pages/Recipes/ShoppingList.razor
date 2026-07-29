@@ -18,19 +18,16 @@
 	{
 		if (firstRender)
 		{
-			if (!await AuthStateService.IsInAnyRoleAsync("Admin", "Moderator"))
-			{
-				Navigation.NavigateTo("/");
-				return;
-			}
-
 			var newList = await LocalStorage.GetItemAsync<List<RecipeItemDto>>(WebConstants.Storage.AggregatedIngredients);
 			if (newList?.Count > 0)
 			{
 				_ingredients = newList;
 				_ = LocalStorage.RemoveItemAsync(WebConstants.Storage.AggregatedIngredients);
 			}
-			else { _initialItems = await LocalStorage.GetItemAsync<List<string>>(WebConstants.Storage.ShoppingListItems) ?? new(); }
+			else
+			{
+				_initialItems = await LocalStorage.GetItemAsync<List<string>>(WebConstants.Storage.ShoppingListItems) ?? new();
+			}
 
 			StateHasChanged();
 		}
@@ -40,5 +37,4 @@
 	{
 		await LocalStorage.SetItemAsync("shopping-list-items", items);
 	}
-
 }

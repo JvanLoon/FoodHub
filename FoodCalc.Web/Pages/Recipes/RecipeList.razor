@@ -15,14 +15,11 @@
 	<div class="recipes-header">
 		<PageHeader Title="Recipes" Subtitle="Select recipes to build a shopping list">
 			<SearchBox Placeholder="Search recipes..." Value="@searchTerm" ValueChanged="OnSearchChanged"/>
-			@if (isAdmin)
-			{
 				<AppButton Variant="ButtonVariant.Primary" Icon="cart3"
 				           Disabled="@(!SelectedRecipeIds.Any())"
 				           OnClick="OpenAggregatedIngredientsPage">
 					Generate shopping list
 				</AppButton>
-			}
 		</PageHeader>
 	</div>
 

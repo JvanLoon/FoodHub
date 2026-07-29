@@ -130,4 +130,5 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(23rem, 1fr));
     gap: var(--fh-space-5);
+    padding: 8px;
 }

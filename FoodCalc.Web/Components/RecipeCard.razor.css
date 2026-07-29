@@ -10,7 +10,6 @@
     transition: border-color var(--fh-transition), box-shadow var(--fh-transition), transform var(--fh-transition);
 
     &:hover {
-        box-shadow: var(--fh-shadow-md);
         transform: translateY(-2px);
     }
 }
