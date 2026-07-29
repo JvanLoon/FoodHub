@@ -15,8 +15,10 @@ public static class ClaimsPrincipalExtensions
 
     /// <summary>
     /// The caller as a content-ownership subject, for commands that mutate recipes or catalog
-    /// ingredients. Endpoints pass this straight through; the handler does the deciding.
+    /// ingredients. Endpoints pass this straight through; the handler does the deciding. Admin
+    /// and Moderator are both "can edit anything" — the review side of moderation lets them fix
+    /// submissions, not just approve them.
     /// </summary>
     public static ActingUser ToActingUser(this ClaimsPrincipal user) =>
-        new(user.GetUserId(), user.IsInRole("Admin"));
+        new(user.GetUserId(), user.IsInRole("Admin") || user.IsInRole("Moderator"));
 }

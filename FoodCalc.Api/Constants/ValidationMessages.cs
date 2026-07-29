@@ -18,12 +18,6 @@ public static class ValidationMessages
         public static string EntityIdRequired(Entity entityName) =>
             string.Format(EntityIdRequiredTemplate, entityName.ToString());
     }
-
-    /// <summary>Moderation queue.</summary>
-    public static class Review
-    {
-        public const string ReasonRequired = "Enter a reason for rejecting this.";
-    }
 }
 
 public enum Entity

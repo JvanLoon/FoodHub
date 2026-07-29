@@ -84,7 +84,9 @@
 
 	protected override async Task OnInitializedAsync()
 	{
-		if (!await AuthStateService.IsInAnyRoleAsync("Admin"))
+		// Staff (Admin or Moderator) manage the catalog; moderators can now edit ingredients
+		// and their shopping-cart flag, not only approve them.
+		if (!await AuthStateService.IsInAnyRoleAsync("Admin", "Moderator"))
 		{
 			Navigation.NavigateTo("/");
 			return;

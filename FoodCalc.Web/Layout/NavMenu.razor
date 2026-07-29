@@ -26,12 +26,13 @@
 			   approves it. *@
 			<NavItem Href="/recipes/create" Icon="plus-circle" Label="Add recipe"/>
 
-			@if (isAdmin)
+			@* Staff manage the ingredient catalog — moderators edit it now, not only admins. *@
+			@if (isAdmin || isModerator)
 			{
 				<NavItem Href="/ingredients" Icon="egg" Label="Edit Ingredients"/>
 			}
 
-			@* Moderators land on the same page, but it only offers them the review tab. *@
+			@* Same admin page for both; a moderator only gets the review tab within it. *@
 			@if (isAdmin || isModerator)
 			{
 				<NavItem Href="/admin" Icon="gear" Label="@(isAdmin ? "Admin" : "Review")"/>

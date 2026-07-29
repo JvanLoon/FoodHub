@@ -12,13 +12,19 @@ public class AuthStateService(AuthTokenService authTokenService)
     public async Task<string?> GetUserIdAsync() => await authTokenService.GetUserIdAsync();
 
     /// <summary>
+    /// True for staff (Admin or Moderator), who may edit any recipe or ingredient. Mirrors the
+    /// server's ActingUser rule; the API re-checks on every write, so this only gates the UI.
+    /// </summary>
+    public async Task<bool> CanEditAnyContentAsync() => await IsInAnyRoleAsync("Admin", "Moderator");
+
+    /// <summary>
     /// True if the UI should offer edit controls for content authored by
-    /// <paramref name="ownerUserId"/>. Mirrors the server's rule (author or Admin); the API
+    /// <paramref name="ownerUserId"/>: staff for anything, or the author for their own. The API
     /// re-checks on every write, so this only decides what is worth rendering.
     /// </summary>
     public async Task<bool> CanEditContentAsync(string ownerUserId)
     {
-        if (await IsAdminAsync())
+        if (await CanEditAnyContentAsync())
             return true;
 
         var userId = await GetUserIdAsync();

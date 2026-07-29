@@ -197,54 +197,6 @@ namespace FoodHub.Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("FoodHub.Persistence.Entities.ReviewRejection", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Reason")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
-
-                    b.Property<string>("RejectedByUserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<bool>("TargetDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<Guid>("TargetId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("TargetName")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("character varying(450)");
-
-                    b.Property<string>("TargetOwnerUserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("TargetType")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TargetOwnerUserId");
-
-                    b.HasIndex("TargetType", "TargetId");
-
-                    b.ToTable("ReviewRejections");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")

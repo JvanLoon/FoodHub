@@ -97,19 +97,19 @@
 	private HashSet<Guid> SelectedRecipeIds = new();
 	private List<RecipeItemDto> AggregatedIngredients = new();
 	private ConfirmDialog? confirmDialog;
-	private bool isAdmin;
+	private bool canEditAny;
 	private string? currentUserId;
 
 	protected override async Task OnInitializedAsync()
 	{
 		try
 		{
-			isAdmin = await AuthStateService.IsAdminAsync();
+			canEditAny = await AuthStateService.CanEditAnyContentAsync();
 			currentUserId = await AuthStateService.GetUserIdAsync();
 		}
 		catch
 		{
-			isAdmin = false;
+			canEditAny = false;
 			currentUserId = null;
 		}
 
@@ -117,11 +117,12 @@
 	}
 
 	/// <summary>
-	/// Whether to offer Edit/Delete on a card: the recipe's author, or an Admin. Mirrors the
-	/// server's rule — which re-checks on every write, so this only decides what to render.
+	/// Whether to offer Edit/Delete on a card: staff (Admin or Moderator) for anything, or the
+	/// recipe's author for their own. Mirrors the server's rule — which re-checks on every
+	/// write, so this only decides what to render.
 	/// </summary>
 	private bool CanEdit(RecipeDto recipe) =>
-		isAdmin || (!string.IsNullOrEmpty(currentUserId) && recipe.CreatedByUserId == currentUserId);
+		canEditAny || (!string.IsNullOrEmpty(currentUserId) && recipe.CreatedByUserId == currentUserId);
 
 	private async Task LoadRecipesAsync()
 	{

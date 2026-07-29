@@ -1,5 +1,4 @@
 using ErrorOr;
-using FoodHub.Persistence.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -17,6 +16,7 @@ public class ApproveContentCommandHandler(FoodHubDbContext context, ILogger<Appr
             {
                 ReviewTargetType.Recipe => await ApproveRecipeAsync(request.TargetId, cancellationToken),
                 ReviewTargetType.Ingredient => await ApproveIngredientAsync(request.TargetId, cancellationToken),
+                ReviewTargetType.RecipeItem => await ApproveRecipeItemAsync(request.TargetId, cancellationToken),
                 _ => Error.Validation(description: $"Unknown review target type: {request.TargetType}.")
             };
         }
@@ -55,6 +55,24 @@ public class ApproveContentCommandHandler(FoodHubDbContext context, ILogger<Appr
 
         ingredient.IsReviewed = true;
         ingredient.FirstApprovedDate ??= DateTime.UtcNow;
+
+        await context.SaveChangesAsync(cancellationToken);
+        return true;
+    }
+
+    /// <summary>
+    /// Clears the "changed" flag on one line. The parent recipe stays pending — approving a
+    /// line just resolves it, so the recipe's own Approve button unlocks once every line is
+    /// resolved. Whole-recipe approval (above) is what finally publishes it.
+    /// </summary>
+    private async Task<ErrorOr<bool>> ApproveRecipeItemAsync(Guid id, CancellationToken cancellationToken)
+    {
+        var item = await context.RecipeItems.SingleOrDefaultAsync(ri => ri.Id == id, cancellationToken);
+
+        if (item is null)
+            return Error.NotFound(description: ErrorMessages.Common.NotFound("Recipe line"));
+
+        item.IsReviewed = true;
 
         await context.SaveChangesAsync(cancellationToken);
         return true;

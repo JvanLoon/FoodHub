@@ -1,5 +1,7 @@
 @* Moderation queue: approve or reject user-submitted recipes and catalog ingredients.
-   Rendered inside the Admin page's tab set, and the only tab a Moderator can reach. *@
+   Rendered inside the Admin page's tab set, and the only tab a Moderator can reach.
+   Approve publishes; reject deletes. A recipe cannot be approved until every changed line
+   has been individually approved or rejected. *@
 
 @using FoodCalc.Web.Services
 @inject ReviewService ReviewService
@@ -47,33 +49,36 @@
 							· submitted @recipe.ModifiedDate.ToLocalTime().ToString("g")
 						</p>
 
-						@if (recipe.LastRejection is { } rejection)
-						{
-							<p class="review-item__rejection">
-								<i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
-								Previously rejected by @rejection.RejectedByEmail
-								on @rejection.RejectedDate.ToLocalTime().ToString("d"):
-								<em>@rejection.Reason</em>
-							</p>
-						}
-
 						@if (recipe.Ingredients.Any())
 						{
-							<ul class="review-ingredients">
-								@foreach (var item in recipe.Ingredients)
+							<ul class="review-lines">
+								@foreach (var line in recipe.Ingredients)
 								{
-									<li class="@(item.IsChanged ? "review-ingredients__changed" : null)">
-										@if (item.IsChanged)
-										{
-											<i class="bi bi-dot" aria-hidden="true" title="Changed"></i>
-										}
-										<span>@item.Name</span>
-										<span class="fh-muted">
-											@item.Amount.ToFormattedString() @item.IngredientAmount
+									<li class="review-line @(line.IsChanged ? "review-line--changed" : null)">
+										<span class="review-line__name">@line.Name</span>
+										<span class="review-line__amount fh-muted">
+											@line.Amount.ToFormattedString() @line.IngredientAmount
 										</span>
-										@if (item.IsChanged)
+
+										@if (line.IsChanged)
 										{
-											<Badge Variant="Badge.BadgeVariant.Warning">changed</Badge>
+											<span class="review-line__actions">
+												<Badge Variant="Badge.BadgeVariant.Warning">changed</Badge>
+												<IconButton Icon="check-lg" Title="Approve this line"
+												            Size="ButtonSize.Small" Variant="ButtonVariant.Success"
+												            Disabled="@busy"
+												            OnClick="() => ApproveLineAsync(line)"/>
+												<IconButton Icon="x-lg" Title="Reject and remove this line"
+												            Size="ButtonSize.Small" Variant="ButtonVariant.Danger"
+												            Disabled="@busy"
+												            OnClick="() => RejectLineAsync(recipe, line)"/>
+											</span>
+										}
+										else
+										{
+											<span class="review-line__ok fh-muted" title="Approved">
+												<i class="bi bi-check2" aria-hidden="true"></i>
+											</span>
 										}
 									</li>
 								}
@@ -85,17 +90,25 @@
 						}
 						</Body>
 						<Footer>
-							<div class="fh-cluster">
-								<AppButton Variant="ButtonVariant.Success" Icon="check-lg"
-								           Disabled="@busy"
-								           OnClick="() => ApproveRecipeAsync(recipe)">
-									Approve
-								</AppButton>
-								<AppButton Variant="ButtonVariant.OutlineDanger" Icon="x-lg"
-								           Disabled="@busy"
-								           OnClick="() => StartReject(ReviewKind.Recipe, recipe.Id, recipe.Name)">
-									Reject
-								</AppButton>
+							<div class="review-item__footer">
+								<div class="fh-cluster">
+									<AppButton Variant="ButtonVariant.Success" Icon="check-lg"
+									           Disabled="@(busy || HasPendingLines(recipe))"
+									           OnClick="() => ApproveRecipeAsync(recipe)">
+										Approve recipe
+									</AppButton>
+									<AppButton Variant="ButtonVariant.OutlineDanger" Icon="trash"
+									           Disabled="@busy"
+									           OnClick="() => RejectRecipeAsync(recipe)">
+										Reject
+									</AppButton>
+								</div>
+								@if (HasPendingLines(recipe))
+								{
+									<span class="review-item__hint fh-muted">
+										Approve or reject every changed line to enable approval.
+									</span>
+								}
 							</div>
 						</Footer>
 					</AppCard>
@@ -121,12 +134,16 @@
 									by @ingredient.CreatedByEmail
 									· @ingredient.CreatedDate.ToLocalTime().ToString("g")
 								</span>
-								@if (ingredient.LastRejection is { } rejection)
-								{
-									<span class="review-item__rejection">
-										Previously rejected: <em>@rejection.Reason</em>
-									</span>
-								}
+								<span class="fh-muted review-ingredient-list__cart">
+									@if (ingredient.ShouldBeAddedToShoppingCart)
+									{
+										<i class="bi bi-cart-check" aria-hidden="true"></i> <text>on shopping list</text>
+									}
+									else
+									{
+										<i class="bi bi-cart-x" aria-hidden="true"></i> <text>not on shopping list</text>
+									}
+								</span>
 							</div>
 							<div class="fh-cluster">
 								<AppButton Variant="ButtonVariant.Success" Icon="check-lg" Size="ButtonSize.Small"
@@ -134,9 +151,9 @@
 								           OnClick="() => ApproveIngredientAsync(ingredient)">
 									Approve
 								</AppButton>
-								<AppButton Variant="ButtonVariant.OutlineDanger" Icon="x-lg" Size="ButtonSize.Small"
+								<AppButton Variant="ButtonVariant.OutlineDanger" Icon="trash" Size="ButtonSize.Small"
 								           Disabled="@busy"
-								           OnClick="() => StartReject(ReviewKind.Ingredient, ingredient.Id, ingredient.Name)">
+								           OnClick="() => RejectIngredientAsync(ingredient)">
 									Reject
 								</AppButton>
 							</div>
@@ -148,54 +165,12 @@
 	}
 </div>
 
-<Modal Title="@($"Reject \"{rejectTargetName}\"")" @bind-Visible="rejectDialogOpen">
-	<EditForm Model="rejectModel" OnValidSubmit="ConfirmRejectAsync" FormName="reject-review-form">
-		<TextField Label="Reason" Placeholder="Tell the author what is wrong with it"
-		           @bind-Value="rejectReason"/>
-
-		<div class="form-check review-reject__delete">
-			<input class="form-check-input" type="checkbox" id="reject-delete"
-			       checked="@rejectDelete"
-			       @onchange="e => rejectDelete = (bool?) e.Value ?? false"/>
-			<label class="form-check-label" for="reject-delete">
-				Delete it as well
-			</label>
-		</div>
-		<p class="fh-muted review-reject__hint">
-			@(rejectDelete
-				? "The item is removed. The reason is kept so the author can be told."
-				: "The item stays with its author, unpublished, so they can fix and resubmit it.")
-		</p>
-
-		<div class="fh-cluster">
-			<AppButton Type="submit" Variant="ButtonVariant.Danger" Icon="x-lg" Disabled="@busy">
-				Reject
-			</AppButton>
-			<AppButton Variant="ButtonVariant.OutlineSecondary" OnClick="CancelReject">Cancel</AppButton>
-		</div>
-	</EditForm>
-</Modal>
+<ConfirmDialog @ref="confirmDialog"/>
 
 @code {
 	private ReviewQueueDto? queue;
 	private bool busy;
-
-	// --- reject dialog state ---
-	private enum ReviewKind
-	{
-		Recipe,
-		Ingredient
-	}
-
-	private bool rejectDialogOpen;
-	private ReviewKind rejectKind;
-	private Guid rejectTargetId;
-	private string rejectTargetName = string.Empty;
-	private string rejectReason = string.Empty;
-	private bool rejectDelete;
-
-	// EditForm needs a model instance; the fields live above, so this is just a handle.
-	private readonly object rejectModel = new();
+	private ConfirmDialog? confirmDialog;
 
 	protected override async Task OnInitializedAsync() => await LoadAsync();
 
@@ -206,60 +181,63 @@
 			.OnFailure();
 	}
 
-	private async Task ApproveRecipeAsync(PendingRecipeDto recipe)
+	/// <summary>True while any of the recipe's lines still needs approving or rejecting.</summary>
+	private static bool HasPendingLines(PendingRecipeDto recipe) => recipe.Ingredients.Any(i => i.IsChanged);
+
+	// One place that runs an action, toasts the outcome and — crucially — awaits the reload
+	// before returning so Blazor re-renders with the updated queue. (The earlier fire-and-forget
+	// reload ran outside the render cycle, which is why the list did not refresh.)
+	private async Task RunAsync(Func<Task<ApiResult>> call, string successMessage)
 	{
 		busy = true;
-		await ReviewService.ApproveRecipeAsync(recipe.Id)
-			.OnSuccess(async () => await LoadAsync(), $"Approved \"{recipe.Name}\".")
+
+		var result = await call()
+			.OnSuccess(message: successMessage)
 			.OnFailure();
+
+		if (result.Success)
+			await LoadAsync();
+
 		busy = false;
 	}
 
-	private async Task ApproveIngredientAsync(PendingIngredientDto ingredient)
-	{
-		busy = true;
-		await ReviewService.ApproveIngredientAsync(ingredient.Id)
-			.OnSuccess(async () => await LoadAsync(), $"Approved \"{ingredient.Name}\".")
-			.OnFailure();
-		busy = false;
-	}
+	private Task ApproveRecipeAsync(PendingRecipeDto recipe) =>
+		RunAsync(() => ReviewService.ApproveRecipeAsync(recipe.Id), WebConstants.Messages.Review.Approved);
 
-	private void StartReject(ReviewKind kind, Guid id, string name)
-	{
-		rejectKind = kind;
-		rejectTargetId = id;
-		rejectTargetName = name;
-		rejectReason = string.Empty;
-		rejectDelete = false;
-		rejectDialogOpen = true;
-	}
+	private Task ApproveLineAsync(PendingRecipeItemDto line) =>
+		RunAsync(() => ReviewService.ApproveRecipeItemAsync(line.Id), WebConstants.Messages.Review.Approved);
 
-	private void CancelReject() => rejectDialogOpen = false;
+	private Task ApproveIngredientAsync(PendingIngredientDto ingredient) =>
+		RunAsync(() => ReviewService.ApproveIngredientAsync(ingredient.Id), WebConstants.Messages.Review.Approved);
 
-	private async Task ConfirmRejectAsync()
+	// Removing a single line during review is expected work, so it happens without a prompt.
+	private Task RejectLineAsync(PendingRecipeDto recipe, PendingRecipeItemDto line) =>
+		RunAsync(() => ReviewService.RejectRecipeItemAsync(line.Id), $"Removed \"{line.Name}\" from {recipe.Name}.");
+
+	// Rejecting a whole submission deletes it outright, so confirm first.
+	private async Task RejectRecipeAsync(PendingRecipeDto recipe)
 	{
-		// The server rejects a blank reason too; this keeps the dialog open instead of
-		// bouncing the user out on a validation error they can fix in place.
-		if (string.IsNullOrWhiteSpace(rejectReason))
-		{
-			MessageService.ShowMessage(WebConstants.Messages.Review.ReasonRequired, isError: true);
+		if (confirmDialog is null)
 			return;
-		}
 
-		busy = true;
+		var confirmed = await confirmDialog.ShowAsync("Reject recipe",
+			$"Reject and delete \"{recipe.Name}\"? This cannot be undone.", "Reject", danger: true);
 
-		var call = rejectKind == ReviewKind.Recipe
-			? ReviewService.RejectRecipeAsync(rejectTargetId, rejectReason, rejectDelete)
-			: ReviewService.RejectIngredientAsync(rejectTargetId, rejectReason, rejectDelete);
+		if (confirmed)
+			await RunAsync(() => ReviewService.RejectRecipeAsync(recipe.Id), WebConstants.Messages.Review.Rejected);
+	}
 
-		await call.OnSuccess(async () =>
-			{
-				rejectDialogOpen = false;
-				await LoadAsync();
-			}, rejectDelete ? WebConstants.Messages.Review.RejectedAndDeleted : WebConstants.Messages.Review.Rejected)
-			.OnFailure();
+	private async Task RejectIngredientAsync(PendingIngredientDto ingredient)
+	{
+		if (confirmDialog is null)
+			return;
 
-		busy = false;
+		var confirmed = await confirmDialog.ShowAsync("Reject ingredient",
+			$"Reject and delete \"{ingredient.Name}\"? This cannot be undone.", "Reject", danger: true);
+
+		if (confirmed)
+			await RunAsync(() => ReviewService.RejectIngredientAsync(ingredient.Id),
+				WebConstants.Messages.Review.Rejected);
 	}
 
 }

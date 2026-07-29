@@ -55,9 +55,7 @@ public static class ErrorMessages
 
         public static string NotOwned(string entityName) => string.Format(_notOwnedTemplate, entityName);
 
-        public const string ReasonRequired = "A rejection needs a reason.";
         public const string NoUser = "A recipe cannot be created without a logged-in user.";
-        public const string AlreadyReviewed = "That item has already been approved.";
     }
 
     /// <summary>User-specific wording.</summary>

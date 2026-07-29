@@ -30,10 +30,11 @@ public static class ReviewVisibilityExtensions
 
     /// <summary>
     /// True if <paramref name="userId"/> may modify content authored by
-    /// <paramref name="ownerUserId"/>. Authors edit their own work; admins edit anything.
-    /// Moderators are intentionally absent: their remit is approving submissions, not
-    /// rewriting them.
+    /// <paramref name="ownerUserId"/>. Authors edit their own work; staff edit anything.
+    /// <paramref name="canEditAnyContent"/> is the staff flag — true for Admin and Moderator,
+    /// both of whom may edit any recipe or ingredient (a moderator curating the library needs
+    /// to fix as well as approve).
     /// </summary>
-    public static bool CanEditContentOwnedBy(string? userId, string ownerUserId, bool isAdmin) =>
-        isAdmin || (!string.IsNullOrEmpty(userId) && userId == ownerUserId);
+    public static bool CanEditContentOwnedBy(string? userId, string ownerUserId, bool canEditAnyContent) =>
+        canEditAnyContent || (!string.IsNullOrEmpty(userId) && userId == ownerUserId);
 }

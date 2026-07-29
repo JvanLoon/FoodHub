@@ -31,12 +31,10 @@ public class PendingRecipeDto
     /// <summary>
     /// Every line of the recipe, not just the changed ones — a moderator judging "chicken:
     /// 4000 g" needs to see the rest of the dish. <see cref="PendingRecipeItemDto.IsChanged"/>
-    /// marks which ones actually need attention.
+    /// marks which ones still need approving or rejecting; the recipe cannot be approved while
+    /// any line is still changed.
     /// </summary>
     public List<PendingRecipeItemDto> Ingredients { get; set; } = [];
-
-    /// <summary>The most recent rejection of this recipe, if it has been rejected and kept before.</summary>
-    public ReviewRejectionDto? LastRejection { get; set; }
 }
 
 public class PendingRecipeItemDto
@@ -59,30 +57,14 @@ public class PendingIngredientDto
     public string CreatedByUserId { get; set; } = string.Empty;
     public string CreatedByEmail { get; set; } = string.Empty;
     public DateTime CreatedDate { get; set; }
-    public ReviewRejectionDto? LastRejection { get; set; }
 }
 
-/// <summary>A past rejection, shown so a moderator can tell a resubmission from a fresh one.</summary>
-public class ReviewRejectionDto
-{
-    public string Reason { get; set; } = string.Empty;
-    public string RejectedByEmail { get; set; } = string.Empty;
-    public DateTime RejectedDate { get; set; }
-    public bool TargetDeleted { get; set; }
-}
-
-/// <summary>Body of an approve call.</summary>
-public class ApproveReviewDto
+/// <summary>
+/// Body of any approve or reject call — a recipe, a catalog ingredient, or a single recipe
+/// line. Approve publishes the target; reject deletes it. Nothing else is carried: rejection no
+/// longer records a reason or who did it.
+/// </summary>
+public class ReviewTargetDto
 {
     public Guid Id { get; set; }
-}
-
-/// <summary>Body of a reject call. <see cref="Reason"/> is required.</summary>
-public class RejectReviewDto
-{
-    public Guid Id { get; set; }
-    public string Reason { get; set; } = string.Empty;
-
-    /// <summary>True to delete the rejected item outright; false to leave it with its author.</summary>
-    public bool Delete { get; set; }
 }

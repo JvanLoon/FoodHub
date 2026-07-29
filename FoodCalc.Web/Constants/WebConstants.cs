@@ -103,9 +103,8 @@ public static class WebConstants
         /// <summary>Moderation queue.</summary>
         public static class Review
         {
-            public const string ReasonRequired = "Enter a reason for rejecting this.";
-            public const string Rejected = "Rejected. The author keeps it and can resubmit.";
-            public const string RejectedAndDeleted = "Rejected and deleted.";
+            public const string Approved = "Approved.";
+            public const string Rejected = "Rejected and deleted.";
 
             public const string PendingApproval =
                 "Submitted for approval — only you can see it until a moderator approves it.";

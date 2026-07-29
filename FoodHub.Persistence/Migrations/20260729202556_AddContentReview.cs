@@ -20,17 +20,13 @@ namespace FoodHub.Persistence.Migrations
     /// "changed" by the review screen, so leaving the existing lines at false would make every
     /// pre-existing recipe look wholly rewritten the first time it is edited.
     ///
-    /// FirstApprovedDate is backfilled to each row's own CreatedDate. There is no record of a
-    /// real approval — these rows predate review entirely — and CreatedDate is both the
-    /// truthful "has existed and been public since" and enough to keep them out of the queue's
-    /// first-submission bucket. Any non-null value would do; an invented recent timestamp
-    /// would read as a moderation that never happened.
-    ///
-    /// Ingredients.CreatedByUserId is deliberately left empty on existing rows rather than
-    /// backfilled to an admin. Those rows are approved, so nothing reads their author — and
-    /// inventing one would misattribute the whole catalog.
+    /// FirstApprovedDate is backfilled to each row's own CreatedDate — the truthful "has been
+    /// public since" for rows that predate review, and enough to keep them out of the queue's
+    /// first-submission bucket. Ingredients.CreatedByUserId is deliberately left empty on
+    /// existing rows: they are approved, so nothing reads their author, and inventing one would
+    /// misattribute the catalog.
     /// </summary>
-    public partial class AddRecipeAndIngredientReview : Migration
+    public partial class AddContentReview : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -83,26 +79,6 @@ namespace FoodHub.Persistence.Migrations
             migrationBuilder.Sql(
                 "UPDATE \"Ingredients\" SET \"IsReviewed\" = true, \"FirstApprovedDate\" = \"CreatedDate\";");
 
-            migrationBuilder.CreateTable(
-                name: "ReviewRejections",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    TargetType = table.Column<int>(type: "integer", nullable: false),
-                    TargetId = table.Column<Guid>(type: "uuid", nullable: false),
-                    TargetName = table.Column<string>(type: "character varying(450)", maxLength: 450, nullable: false),
-                    TargetOwnerUserId = table.Column<string>(type: "text", nullable: false),
-                    RejectedByUserId = table.Column<string>(type: "text", nullable: false),
-                    Reason = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
-                    TargetDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ReviewRejections", x => x.Id);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_Recipes_IsReviewed_Pending",
                 table: "Recipes",
@@ -119,24 +95,11 @@ namespace FoodHub.Persistence.Migrations
                 table: "Ingredients",
                 column: "IsReviewed",
                 filter: "\"IsReviewed\" = false");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ReviewRejections_TargetOwnerUserId",
-                table: "ReviewRejections",
-                column: "TargetOwnerUserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ReviewRejections_TargetType_TargetId",
-                table: "ReviewRejections",
-                columns: new[] { "TargetType", "TargetId" });
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "ReviewRejections");
-
             migrationBuilder.DropIndex(
                 name: "IX_Recipes_IsReviewed_Pending",
                 table: "Recipes");

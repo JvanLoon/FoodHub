@@ -94,28 +94,12 @@ public class UpdateIngredientValidator : Validator<UpdateIngredientDto>
 // ---------------------------------------------------------------------------
 
 /// <summary>
-/// A rejection must say why. The reason is the only thing the author will ever be shown about
-/// the decision, so an empty one is rejected here rather than stored as a useless blank.
-/// Shared by the recipe and ingredient reject endpoints, which bind the same DTO.
+/// Guards every approve/reject endpoint — all bind the same id-only body. FastEndpoints
+/// resolves validators by request type, so one validator covers them all.
 /// </summary>
-public class RejectReviewValidator : Validator<RejectReviewDto>
+public class ReviewTargetValidator : Validator<ReviewTargetDto>
 {
-    public RejectReviewValidator()
-    {
-        RuleFor(x => x.Id)
-            .NotEmpty();
-
-        RuleFor(x => x.Reason)
-            .NotEmpty()
-            .WithMessage(ValidationMessages.Review.ReasonRequired)
-            .MaximumLength(1000);
-    }
-}
-
-/// <summary>Guards the approve endpoints, which are keyed only by id.</summary>
-public class ApproveReviewValidator : Validator<ApproveReviewDto>
-{
-    public ApproveReviewValidator()
+    public ReviewTargetValidator()
     {
         RuleFor(x => x.Id)
             .NotEmpty();

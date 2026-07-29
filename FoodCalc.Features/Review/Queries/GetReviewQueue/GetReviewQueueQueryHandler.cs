@@ -1,7 +1,6 @@
 using ErrorOr;
 using FoodCalc.Features.Mapping;
 using FoodHub.DTOs;
-using FoodHub.Persistence.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -34,39 +33,17 @@ public class GetReviewQueueQueryHandler(
             var emails = await ResolveEmailsAsync(recipes.Select(r => r.CreatedByUserId)
                 .Concat(ingredients.Select(i => i.CreatedByUserId)));
 
-            var rejections = await LoadLatestRejectionsAsync(recipes, ingredients, emails, cancellationToken);
-
-            var queue = new ReviewQueueDto
+            return new ReviewQueueDto
             {
-                Recipes = [..recipes.Select(r => BuildRecipe(r, emails, rejections))],
-                Ingredients = [..ingredients.Select(i => BuildIngredient(i, emails, rejections))]
+                Recipes = [..recipes.Select(r => r.ToPendingDto(DisplayName(r.CreatedByUserId, emails)))],
+                Ingredients = [..ingredients.Select(i => i.ToPendingDto(DisplayName(i.CreatedByUserId, emails)))]
             };
-
-            return queue;
         }
         catch (Exception ex)
         {
             logger.LogError(ex, ErrorMessages.Common.GetAllFailed("the review queue"));
             return Error.Failure(description: ErrorMessages.Common.GetAllFailed("the review queue"));
         }
-    }
-
-    private PendingRecipeDto BuildRecipe(Recipe recipe,
-        IReadOnlyDictionary<string, string> emails,
-        IReadOnlyDictionary<(ReviewTargetType, Guid), ReviewRejectionDto> rejections)
-    {
-        var dto = recipe.ToPendingDto(DisplayName(recipe.CreatedByUserId, emails));
-        dto.LastRejection = rejections.GetValueOrDefault((ReviewTargetType.Recipe, recipe.Id));
-        return dto;
-    }
-
-    private PendingIngredientDto BuildIngredient(Ingredient ingredient,
-        IReadOnlyDictionary<string, string> emails,
-        IReadOnlyDictionary<(ReviewTargetType, Guid), ReviewRejectionDto> rejections)
-    {
-        var dto = ingredient.ToPendingDto(DisplayName(ingredient.CreatedByUserId, emails));
-        dto.LastRejection = rejections.GetValueOrDefault((ReviewTargetType.Ingredient, ingredient.Id));
-        return dto;
     }
 
     /// <summary>
@@ -92,40 +69,4 @@ public class GetReviewQueueQueryHandler(
     /// </summary>
     private static string DisplayName(string userId, IReadOnlyDictionary<string, string> emails) =>
         string.IsNullOrEmpty(userId) ? "(unknown)" : emails.GetValueOrDefault(userId, userId);
-
-    /// <summary>
-    /// The most recent rejection per pending item, so the queue can distinguish a resubmission
-    /// from a first submission — otherwise a rejected-but-kept item is indistinguishable from a
-    /// new one and gets re-judged from scratch every time.
-    /// </summary>
-    private async Task<Dictionary<(ReviewTargetType, Guid), ReviewRejectionDto>> LoadLatestRejectionsAsync(
-        List<Recipe> recipes,
-        List<Ingredient> ingredients,
-        Dictionary<string, string> emails,
-        CancellationToken cancellationToken)
-    {
-        var recipeIds = recipes.Select(r => r.Id)
-            .ToList();
-        var ingredientIds = ingredients.Select(i => i.Id)
-            .ToList();
-
-        var rows = await context.ReviewRejections
-            .Where(r => (r.TargetType == ReviewTargetType.Recipe && recipeIds.Contains(r.TargetId)) ||
-                        (r.TargetType == ReviewTargetType.Ingredient && ingredientIds.Contains(r.TargetId)))
-            .ToListAsync(cancellationToken);
-
-        if (rows.Count == 0)
-            return [];
-
-        // Rejecting moderators are usually a handful of accounts the caller's own map does not
-        // cover, so resolve them too before projecting.
-        foreach (var (id, email) in await ResolveEmailsAsync(rows.Select(r => r.RejectedByUserId)))
-        {
-            emails[id] = email;
-        }
-
-        return rows.GroupBy(r => (r.TargetType, r.TargetId))
-            .Select(g => (g.Key, Latest: g.MaxBy(r => r.CreatedDate)!))
-            .ToDictionary(x => x.Key, x => x.Latest.ToDto(DisplayName(x.Latest.RejectedByUserId, emails)));
-    }
 }
