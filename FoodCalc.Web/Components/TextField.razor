@@ -7,14 +7,28 @@
 	{
 		<label class="form-label" for="@Id">@Label</label>
 	}
-	<InputText id="@Id"
-	           class="form-control"
-	           type="@Type"
-	           placeholder="@Placeholder"
-	           autocomplete="@Autocomplete"
-	           Value="@Value"
-	           ValueChanged="ValueChanged"
-	           ValueExpression="ValueExpression"/>
+	<div class="fh-field__control @(ShowRevealToggle ? "fh-field__control--with-toggle" : null)">
+		<InputText id="@Id"
+		           class="form-control"
+		           type="@EffectiveType"
+		           placeholder="@Placeholder"
+		           autocomplete="@Autocomplete"
+		           Value="@Value"
+		           ValueChanged="ValueChanged"
+		           ValueExpression="ValueExpression"/>
+		@if (ShowRevealToggle)
+		{
+			<button type="button"
+			        class="fh-field__reveal"
+			        title="@RevealLabel"
+			        aria-label="@RevealLabel"
+			        aria-controls="@Id"
+			        aria-pressed="@(_revealed ? "true" : "false")"
+			        @onclick="() => _revealed = !_revealed">
+				<i class="bi bi-@(_revealed ? "eye-slash" : "eye")" aria-hidden="true"></i>
+			</button>
+		}
+	</div>
 	@if (ValueExpression is not null)
 	{
 		<ValidationMessage For="ValueExpression"/>
@@ -31,6 +45,10 @@
 
 	[Parameter]
 	public string Type { get; set; } = "text";
+
+	/// <summary>Shows an eye button that toggles the value between hidden and plain text. Only meaningful for Type="password".</summary>
+	[Parameter]
+	public bool ShowRevealToggle { get; set; }
 
 	[Parameter]
 	public string? Placeholder { get; set; }
@@ -49,5 +67,11 @@
 
 	[Parameter]
 	public Expression<Func<string?>>? ValueExpression { get; set; }
+
+	private bool _revealed;
+
+	private string EffectiveType => ShowRevealToggle && _revealed ? "text" : Type;
+
+	private string RevealLabel => _revealed ? "Hide password" : "Show password";
 
 }

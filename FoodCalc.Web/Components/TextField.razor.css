@@ -12,6 +12,43 @@
     color: var(--fh-text-muted);
 }
 
+.fh-field__control {
+    position: relative;
+    display: flex;
+}
+
+/* Keep the value clear of the eye button. */
+.fh-field__control--with-toggle ::deep .form-control {
+    padding-right: 2.75rem;
+}
+
+.fh-field__reveal {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--fh-text-muted);
+    cursor: pointer;
+}
+
+.fh-field__reveal:hover {
+    color: var(--fh-text);
+}
+
+.fh-field__reveal:focus-visible {
+    outline: none;
+    border-radius: var(--fh-radius-sm);
+    box-shadow: var(--fh-focus-ring);
+    color: var(--fh-text);
+}
+
 .fh-field ::deep .validation-message {
     font-size: var(--fh-text-sm);
     color: var(--fh-danger);
