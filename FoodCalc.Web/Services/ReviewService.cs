@@ -6,7 +6,8 @@ namespace FoodCalc.Web.Services;
 /// <summary>
 /// Client for the moderation queue. Every call here is Admin/Moderator-only on the server; the
 /// UI hides the tab from everyone else, but the API is what actually enforces it. Approve
-/// publishes the target; reject deletes it — no reason, nothing recorded.
+/// publishes the target; reject deletes it — no reason, nothing recorded. The recipe is the
+/// gate: approving a recipe approves its ingredients too, so there is no ingredient call here.
 /// </summary>
 public class ReviewService(AuthenticatedHttpClientService httpClient)
 {
@@ -22,12 +23,6 @@ public class ReviewService(AuthenticatedHttpClientService httpClient)
 
     public Task<ApiResult> RejectRecipeItemAsync(Guid recipeItemId) =>
         Post(ApiRoutes.Review.RejectRecipeItem, recipeItemId);
-
-    public Task<ApiResult> ApproveIngredientAsync(Guid ingredientId) =>
-        Post(ApiRoutes.Review.ApproveIngredient, ingredientId);
-
-    public Task<ApiResult> RejectIngredientAsync(Guid ingredientId) =>
-        Post(ApiRoutes.Review.RejectIngredient, ingredientId);
 
     private Task<ApiResult> Post(string route, Guid id) => httpClient.PostAsync(route, new ReviewTargetDto { Id = id });
 }

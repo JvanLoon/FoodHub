@@ -55,6 +55,15 @@ public static class EntityMappingExtensions
         ShouldBeAddedToShoppingCart = e.ShouldBeAddedToShoppingCart
     };
 
+    public static PendingRecipeItemDto ToPendingDto(this RecipeItem e) => new()
+    {
+        Id = e.Id,
+        Name = e.Name,
+        Amount = e.Amount,
+        IngredientAmount = (IngredientAmountTypeDto) e.IngredientAmount,
+        IsChanged = !e.IsReviewed
+    };
+
     public static List<RecipeItemDto> ToDtoList(this IEnumerable<RecipeItem> items) => items.Select(ri => ri.ToDto())
         .ToList();
 
@@ -112,27 +121,9 @@ public static class EntityMappingExtensions
         CreatedDate = e.CreatedDate,
         ModifiedDate = e.ModifiedDate,
         IsFirstSubmission = e.FirstApprovedDate is null,
-        Ingredients = e.Ingredients is null ? [] : 
-            e.Ingredients.OrderBy(ri => ri.Name)
-            .Select(ri => new PendingRecipeItemDto
-            {
-                Id = ri.Id,
-                Name = ri.Name,
-                Amount = ri.Amount,
-                IngredientAmount = (IngredientAmountTypeDto) ri.IngredientAmount,
-                IsChanged = !ri.IsReviewed
-            }).ToList()
-    };
-
-    /// <inheritdoc cref="ToPendingDto(Recipe,string)"/>
-    public static PendingIngredientDto ToPendingDto(this Ingredient e, string createdByEmail) => new()
-    {
-        Id = e.Id,
-        Name = e.Name,
-        ShouldBeAddedToShoppingCart = e.ShouldBeAddedToShoppingCart,
-        CreatedByUserId = e.CreatedByUserId,
-        CreatedByEmail = createdByEmail,
-        CreatedDate = e.CreatedDate
+        Ingredients = e.Ingredients is null ? 
+            [] : 
+            e.Ingredients.OrderBy(ri => ri.Name).Select(ri => ri.ToPendingDto()).ToList()
     };
 
     public static List<RecipeDto> ToDtoList(this IEnumerable<Recipe> items) => items.Select(r => r.ToDto())

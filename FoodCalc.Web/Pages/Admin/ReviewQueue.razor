@@ -1,7 +1,8 @@
-@* Moderation queue: approve or reject user-submitted recipes and catalog ingredients.
+@* Moderation queue: approve or reject user-submitted recipes.
    Rendered inside the Admin page's tab set, and the only tab a Moderator can reach.
-   Approve publishes; reject deletes. A recipe cannot be approved until every changed line
-   has been individually approved or rejected. *@
+   The recipe is the only gate: a recipe cannot be approved until every changed line has been
+   approved or rejected, and approving the recipe approves its ingredients too. Approve
+   publishes; reject deletes. *@
 
 @using FoodCalc.Web.Services
 @inject ReviewService ReviewService
@@ -15,153 +16,103 @@
 	else if (queue.TotalCount == 0)
 	{
 		<EmptyState Icon="check2-circle" Title="Nothing to review."
-		            Message="New recipes and ingredients appear here as soon as they are submitted."/>
+		            Message="New recipes appear here as soon as they are submitted."/>
 	}
 	else
 	{
-		@if (queue.Recipes.Any())
-		{
-			<section class="fh-stack">
-				<div class="fh-panel-header">
-					<h2 class="fh-subheading">Recipes</h2>
-					<span class="fh-muted">@queue.Recipes.Count waiting</span>
-				</div>
+		<section class="fh-stack">
+			<div class="fh-panel-header">
+				<h2 class="fh-subheading">Recipes</h2>
+				<span class="fh-muted">@queue.Recipes.Count waiting</span>
+			</div>
 
-				@foreach (var recipe in queue.Recipes)
-				{
-					<AppCard CssClass="review-item">
-						<Header>
-							<div class="review-item__head">
-								<span class="review-item__title">@recipe.Name</span>
-								@if (recipe.IsFirstSubmission)
-								{
-									<Badge Variant="Badge.BadgeVariant.Accent" Icon="stars">New</Badge>
-								}
-								else
-								{
-									<Badge Variant="Badge.BadgeVariant.Info" Icon="pencil">Edited</Badge>
-								}
-							</div>
-						</Header>
-						<Body>
-						<p class="review-item__meta fh-muted">
-							by <strong>@recipe.CreatedByEmail</strong>
-							· submitted @recipe.ModifiedDate.ToLocalTime().ToString("g")
-						</p>
+			@foreach (var recipe in queue.Recipes)
+			{
+				<AppCard CssClass="review-item">
+					<Header>
+						<div class="review-item__head">
+							<span class="review-item__title">@recipe.Name</span>
+							@if (recipe.IsFirstSubmission)
+							{
+								<Badge Variant="Badge.BadgeVariant.Accent" Icon="stars">New</Badge>
+							}
+							else
+							{
+								<Badge Variant="Badge.BadgeVariant.Info" Icon="pencil">Edited</Badge>
+							}
+						</div>
+					</Header>
+					<Body>
+					<p class="review-item__meta fh-muted">
+						by <strong>@recipe.CreatedByEmail</strong>
+						· submitted @recipe.ModifiedDate.ToLocalTime().ToString("g")
+					</p>
 
-						@if (recipe.Ingredients.Any())
-						{
-							<ul class="review-lines">
-								@foreach (var line in recipe.Ingredients)
-								{
-									<li class="review-line @(line.IsChanged ? "review-line--changed" : null)">
-										<span class="review-line__name">@line.Name</span>
-										<span class="review-line__amount fh-muted">
-											@line.Amount.ToFormattedString() @line.IngredientAmount
-										</span>
-
-										@if (line.IsChanged)
-										{
-											<span class="review-line__actions">
-												<Badge Variant="Badge.BadgeVariant.Warning">changed</Badge>
-												<IconButton Icon="check-lg" Title="Approve this line"
-												            Size="ButtonSize.Small" Variant="ButtonVariant.Success"
-												            Disabled="@busy"
-												            OnClick="() => ApproveLineAsync(line)"/>
-												<IconButton Icon="x-lg" Title="Reject and remove this line"
-												            Size="ButtonSize.Small" Variant="ButtonVariant.Danger"
-												            Disabled="@busy"
-												            OnClick="() => RejectLineAsync(recipe, line)"/>
-											</span>
-										}
-										else
-										{
-											<span class="review-line__ok fh-muted" title="Approved">
-												<i class="bi bi-check2" aria-hidden="true"></i>
-											</span>
-										}
-									</li>
-								}
-							</ul>
-						}
-						else
-						{
-							<p class="fh-muted">This recipe has no ingredients yet.</p>
-						}
-						</Body>
-						<Footer>
-							<div class="review-item__footer">
-								<div class="fh-cluster">
-									<AppButton Variant="ButtonVariant.Success" Icon="check-lg"
-									           Disabled="@(busy || HasPendingLines(recipe))"
-									           OnClick="() => ApproveRecipeAsync(recipe)">
-										Approve recipe
-									</AppButton>
-									<AppButton Variant="ButtonVariant.OutlineDanger" Icon="trash"
-									           Disabled="@busy"
-									           OnClick="() => RejectRecipeAsync(recipe)">
-										Reject
-									</AppButton>
-								</div>
-								@if (HasPendingLines(recipe))
-								{
-									<span class="review-item__hint fh-muted">
-										Approve or reject every changed line to enable approval.
-									</span>
-								}
-							</div>
-						</Footer>
-					</AppCard>
-				}
-			</section>
-		}
-
-		@if (queue.Ingredients.Any())
-		{
-			<section class="fh-stack">
-				<div class="fh-panel-header">
-					<h2 class="fh-subheading">Ingredients</h2>
-					<span class="fh-muted">@queue.Ingredients.Count waiting</span>
-				</div>
-
-				<ul class="review-ingredient-list">
-					@foreach (var ingredient in queue.Ingredients)
+					@if (recipe.Ingredients.Any())
 					{
-						<li>
-							<div class="review-ingredient-list__info">
-								<span class="review-item__title">@ingredient.Name</span>
-								<span class="fh-muted">
-									by @ingredient.CreatedByEmail
-									· @ingredient.CreatedDate.ToLocalTime().ToString("g")
-								</span>
-								<span class="fh-muted review-ingredient-list__cart">
-									@if (ingredient.ShouldBeAddedToShoppingCart)
+						<ul class="review-lines">
+							@foreach (var line in recipe.Ingredients)
+							{
+								<li class="review-line @(line.IsChanged ? "review-line--changed" : null)">
+									<span class="review-line__name">@line.Name</span>
+									<span class="review-line__amount fh-muted">
+										@line.Amount.ToFormattedString() @line.IngredientAmount
+									</span>
+
+									@if (line.IsChanged)
 									{
-										<i class="bi bi-cart-check" aria-hidden="true"></i> <text>on shopping list</text>
+										<span class="review-line__actions">
+											<Badge Variant="Badge.BadgeVariant.Warning">changed</Badge>
+											<IconButton Icon="check-lg" Title="Approve this ingredient"
+											            Size="ButtonSize.Small" Variant="ButtonVariant.Success"
+											            Disabled="@busy"
+											            OnClick="() => ApproveLineAsync(line)"/>
+											<IconButton Icon="x-lg" Title="Reject and remove this ingredient"
+											            Size="ButtonSize.Small" Variant="ButtonVariant.Danger"
+											            Disabled="@busy"
+											            OnClick="() => RejectLineAsync(recipe, line)"/>
+										</span>
 									}
 									else
 									{
-										<i class="bi bi-cart-x" aria-hidden="true"></i> <text>not on shopping list</text>
+										<span class="review-line__ok fh-muted" title="Approved">
+											<i class="bi bi-check2" aria-hidden="true"></i>
+										</span>
 									}
-								</span>
-							</div>
+								</li>
+							}
+						</ul>
+					}
+					else
+					{
+						<p class="fh-muted">This recipe has no ingredients yet.</p>
+					}
+					</Body>
+					<Footer>
+						<div class="review-item__footer">
 							<div class="fh-cluster">
-								<AppButton Variant="ButtonVariant.Success" Icon="check-lg" Size="ButtonSize.Small"
-								           Disabled="@busy"
-								           OnClick="() => ApproveIngredientAsync(ingredient)">
-									Approve
+								<AppButton Variant="ButtonVariant.Success" Icon="check-lg"
+								           Disabled="@(busy || HasPendingLines(recipe))"
+								           OnClick="() => ApproveRecipeAsync(recipe)">
+									Approve recipe
 								</AppButton>
-								<AppButton Variant="ButtonVariant.OutlineDanger" Icon="trash" Size="ButtonSize.Small"
+								<AppButton Variant="ButtonVariant.OutlineDanger" Icon="trash"
 								           Disabled="@busy"
-								           OnClick="() => RejectIngredientAsync(ingredient)">
+								           OnClick="() => RejectRecipeAsync(recipe)">
 									Reject
 								</AppButton>
 							</div>
-						</li>
-					}
-				</ul>
-			</section>
-		}
+							@if (HasPendingLines(recipe))
+							{
+								<span class="review-item__hint fh-muted">
+									Approve or reject every changed ingredient to enable approval.
+								</span>
+							}
+						</div>
+					</Footer>
+				</AppCard>
+			}
+		</section>
 	}
 </div>
 
@@ -181,7 +132,7 @@
 			.OnFailure();
 	}
 
-	/// <summary>True while any of the recipe's lines still needs approving or rejecting.</summary>
+	/// <summary>True while any of the recipe's ingredients still needs approving or rejecting.</summary>
 	private static bool HasPendingLines(PendingRecipeDto recipe) => recipe.Ingredients.Any(i => i.IsChanged);
 
 	// One place that runs an action, toasts the outcome and — crucially — awaits the reload
@@ -201,20 +152,18 @@
 		busy = false;
 	}
 
+	// Approving a recipe also approves its ingredients server-side — the recipe is the gate.
 	private Task ApproveRecipeAsync(PendingRecipeDto recipe) =>
 		RunAsync(() => ReviewService.ApproveRecipeAsync(recipe.Id), WebConstants.Messages.Review.Approved);
 
 	private Task ApproveLineAsync(PendingRecipeItemDto line) =>
 		RunAsync(() => ReviewService.ApproveRecipeItemAsync(line.Id), WebConstants.Messages.Review.Approved);
 
-	private Task ApproveIngredientAsync(PendingIngredientDto ingredient) =>
-		RunAsync(() => ReviewService.ApproveIngredientAsync(ingredient.Id), WebConstants.Messages.Review.Approved);
-
-	// Removing a single line during review is expected work, so it happens without a prompt.
+	// Removing a single ingredient during review is expected work, so it happens without a prompt.
 	private Task RejectLineAsync(PendingRecipeDto recipe, PendingRecipeItemDto line) =>
 		RunAsync(() => ReviewService.RejectRecipeItemAsync(line.Id), $"Removed \"{line.Name}\" from {recipe.Name}.");
 
-	// Rejecting a whole submission deletes it outright, so confirm first.
+	// Rejecting a whole recipe deletes it outright, so confirm first.
 	private async Task RejectRecipeAsync(PendingRecipeDto recipe)
 	{
 		if (confirmDialog is null)
@@ -225,19 +174,6 @@
 
 		if (confirmed)
 			await RunAsync(() => ReviewService.RejectRecipeAsync(recipe.Id), WebConstants.Messages.Review.Rejected);
-	}
-
-	private async Task RejectIngredientAsync(PendingIngredientDto ingredient)
-	{
-		if (confirmDialog is null)
-			return;
-
-		var confirmed = await confirmDialog.ShowAsync("Reject ingredient",
-			$"Reject and delete \"{ingredient.Name}\"? This cannot be undone.", "Reject", danger: true);
-
-		if (confirmed)
-			await RunAsync(() => ReviewService.RejectIngredientAsync(ingredient.Id),
-				WebConstants.Messages.Review.Rejected);
 	}
 
 }

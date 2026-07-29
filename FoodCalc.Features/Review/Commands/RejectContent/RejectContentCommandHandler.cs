@@ -6,9 +6,10 @@ using Microsoft.Extensions.Logging;
 namespace FoodCalc.Features.Review.Commands.RejectContent;
 
 /// <summary>
-/// Rejecting means deleting. A rejected recipe or catalog ingredient is removed outright; a
-/// rejected recipe line is removed from its recipe, which stays pending until the moderator
-/// resolves its remaining lines and approves it. Nothing about the rejection is kept.
+/// Rejecting means deleting. A rejected recipe is removed outright; a rejected recipe line is
+/// removed from its recipe, which stays pending until the moderator resolves its remaining
+/// lines and approves it. Nothing about the rejection is kept. Ingredients have no independent
+/// review, so there is no ingredient reject — the recipe is the only gate.
 /// </summary>
 public class RejectContentCommandHandler(FoodHubDbContext context, ILogger<RejectContentCommandHandler> logger)
     : IRequestHandler<RejectContentCommand, ErrorOr<bool>>
@@ -28,16 +29,6 @@ public class RejectContentCommandHandler(FoodHubDbContext context, ILogger<Rejec
 
                     // Its lines cascade with it (see RecipeConfiguration).
                     context.Recipes.Remove(recipe);
-                    break;
-                }
-                case ReviewTargetType.Ingredient:
-                {
-                    var ingredient = await context.Ingredients.SingleOrDefaultAsync(i => i.Id == request.TargetId,
-                        cancellationToken);
-                    if (ingredient is null)
-                        return Error.NotFound(description: ErrorMessages.Common.NotFound("Ingredient"));
-
-                    context.Ingredients.Remove(ingredient);
                     break;
                 }
                 case ReviewTargetType.RecipeItem:

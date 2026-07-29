@@ -25,16 +25,12 @@ public class UpdateIngredientCommandHandler(FoodHubDbContext context, ILogger<Up
             if (!request.Acting.CanEdit(ingredient.CreatedByUserId))
                 return Error.Forbidden(description: ErrorMessages.Review.NotOwned("ingredient"));
 
-            var changed = ingredient.Name != request.Ingredient.Name ||
-                          ingredient.ShouldBeAddedToShoppingCart != request.Ingredient.ShouldBeAddedToShoppingCart;
-
             ingredient.Name = request.Ingredient.Name;
             ingredient.ShouldBeAddedToShoppingCart = request.Ingredient.ShouldBeAddedToShoppingCart;
 
-            // Edited entries go back through approval, but only on a real change — see the
-            // matching note in UpdateRecipeNameCommandHandler.
-            if (changed)
-                ingredient.IsReviewed = false;
+            // Ingredient edits do NOT reset approval. Ingredients have no review queue of their
+            // own (the recipe is the gate), so un-approving one here would strand it — invisible
+            // to everyone with no way back. The /ingredients page is staff-only anyway.
 
             await context.SaveChangesAsync(cancellationToken);
 

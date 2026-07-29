@@ -66,8 +66,6 @@ public static class ApiRoutes
         public const string RejectRecipe = Base + "/recipe/reject";           // POST
         public const string ApproveRecipeItem = Base + "/recipe/line/approve"; // POST
         public const string RejectRecipeItem = Base + "/recipe/line/reject";   // POST
-        public const string ApproveIngredient = Base + "/ingredient/approve"; // POST
-        public const string RejectIngredient = Base + "/ingredient/reject";   // POST
     }
 
     public static class Admin

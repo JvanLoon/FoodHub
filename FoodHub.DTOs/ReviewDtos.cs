@@ -1,12 +1,14 @@
 namespace FoodHub.DTOs;
 
-/// <summary>Everything currently awaiting moderator approval, in one round trip.</summary>
+/// <summary>
+/// Everything currently awaiting moderator approval. Only recipes: the recipe is the review
+/// gate, and its ingredients are approved along with it.
+/// </summary>
 public class ReviewQueueDto
 {
     public List<PendingRecipeDto> Recipes { get; set; } = [];
-    public List<PendingIngredientDto> Ingredients { get; set; } = [];
 
-    public int TotalCount => Recipes.Count + Ingredients.Count;
+    public int TotalCount => Recipes.Count;
 }
 
 /// <summary>A recipe waiting on approval, with enough context to judge it without opening it.</summary>
@@ -48,21 +50,9 @@ public class PendingRecipeItemDto
     public bool IsChanged { get; set; }
 }
 
-/// <summary>A catalog ingredient waiting on approval.</summary>
-public class PendingIngredientDto
-{
-    public Guid Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public bool ShouldBeAddedToShoppingCart { get; set; }
-    public string CreatedByUserId { get; set; } = string.Empty;
-    public string CreatedByEmail { get; set; } = string.Empty;
-    public DateTime CreatedDate { get; set; }
-}
-
 /// <summary>
-/// Body of any approve or reject call — a recipe, a catalog ingredient, or a single recipe
-/// line. Approve publishes the target; reject deletes it. Nothing else is carried: rejection no
-/// longer records a reason or who did it.
+/// Body of any approve or reject call — a recipe or a single recipe line. Approve publishes the
+/// target; reject deletes it. Nothing else is carried: rejection records no reason or who.
 /// </summary>
 public class ReviewTargetDto
 {

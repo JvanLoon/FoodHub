@@ -95,36 +95,3 @@ public class RejectRecipeItemEndpoint(IMediator mediator) : Endpoint<ReviewTarge
     }
 }
 
-/// <summary>POST api/review/ingredient/approve — Admin and Moderator. Publishes the ingredient.</summary>
-public class ApproveIngredientEndpoint(IMediator mediator) : Endpoint<ReviewTargetDto, bool>
-{
-    public override void Configure()
-    {
-        Post(ApiRoutes.Review.ApproveIngredient);
-        Policies("Admin,Moderator");
-    }
-
-    public override async Task HandleAsync(ReviewTargetDto req, CancellationToken ct)
-    {
-        var result = await mediator.Send(new ApproveContentCommand(ReviewTargetType.Ingredient, req.Id), ct);
-
-        await result.Match(value => Send.OkAsync(value, ct), errors => this.SendErrorsAsync(errors, ct: ct));
-    }
-}
-
-/// <summary>POST api/review/ingredient/reject — Admin and Moderator. Deletes the ingredient.</summary>
-public class RejectIngredientEndpoint(IMediator mediator) : Endpoint<ReviewTargetDto, bool>
-{
-    public override void Configure()
-    {
-        Post(ApiRoutes.Review.RejectIngredient);
-        Policies("Admin,Moderator");
-    }
-
-    public override async Task HandleAsync(ReviewTargetDto req, CancellationToken ct)
-    {
-        var result = await mediator.Send(new RejectContentCommand(ReviewTargetType.Ingredient, req.Id), ct);
-
-        await result.Match(value => Send.OkAsync(value, ct), errors => this.SendErrorsAsync(errors, ct: ct));
-    }
-}

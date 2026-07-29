@@ -15,7 +15,6 @@ public class ApproveContentCommandHandler(FoodHubDbContext context, ILogger<Appr
             return request.TargetType switch
             {
                 ReviewTargetType.Recipe => await ApproveRecipeAsync(request.TargetId, cancellationToken),
-                ReviewTargetType.Ingredient => await ApproveIngredientAsync(request.TargetId, cancellationToken),
                 ReviewTargetType.RecipeItem => await ApproveRecipeItemAsync(request.TargetId, cancellationToken),
                 _ => Error.Validation(description: $"Unknown review target type: {request.TargetType}.")
             };
@@ -34,27 +33,37 @@ public class ApproveContentCommandHandler(FoodHubDbContext context, ILogger<Appr
         if (recipe is null)
             return Error.NotFound(description: ErrorMessages.Common.NotFound("Recipe"));
 
+        var now = DateTime.UtcNow;
+
         recipe.IsReviewed = true;
-        recipe.FirstApprovedDate ??= DateTime.UtcNow;
+        recipe.FirstApprovedDate ??= now;
 
         // Approving the recipe approves the lines it was approved with. Leaving them flagged
         // would make the next review of this recipe re-highlight edits a moderator already
         // signed off on.
-        foreach (var item in recipe.Ingredients ?? []) { item.IsReviewed = true; }
+        var lineNames = new List<string>();
+        foreach (var item in recipe.Ingredients ?? [])
+        {
+            item.IsReviewed = true;
+            lineNames.Add(item.Name);
+        }
 
-        await context.SaveChangesAsync(cancellationToken);
-        return true;
-    }
+        // The recipe is the only review gate: approving it also approves the ingredient records
+        // for its lines, so those ingredient names become allowed everywhere (visible in every
+        // user's ingredient search) rather than only inside this recipe. Matched by name, since
+        // that is how a recipe line and its ingredient record are tied together.
+        if (lineNames.Count > 0)
+        {
+            var pending = await context.Ingredients
+                .Where(ing => !ing.IsReviewed && lineNames.Contains(ing.Name))
+                .ToListAsync(cancellationToken);
 
-    private async Task<ErrorOr<bool>> ApproveIngredientAsync(Guid id, CancellationToken cancellationToken)
-    {
-        var ingredient = await context.Ingredients.SingleOrDefaultAsync(i => i.Id == id, cancellationToken);
-
-        if (ingredient is null)
-            return Error.NotFound(description: ErrorMessages.Common.NotFound("Ingredient"));
-
-        ingredient.IsReviewed = true;
-        ingredient.FirstApprovedDate ??= DateTime.UtcNow;
+            foreach (var ing in pending)
+            {
+                ing.IsReviewed = true;
+                ing.FirstApprovedDate ??= now;
+            }
+        }
 
         await context.SaveChangesAsync(cancellationToken);
         return true;

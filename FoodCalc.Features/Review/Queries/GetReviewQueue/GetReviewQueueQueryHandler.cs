@@ -18,25 +18,20 @@ public class GetReviewQueueQueryHandler(
         try
         {
             // Recipe.Ingredients is auto-included, so every pending recipe arrives with all of
-            // its lines — which is what the review screen shows, changed ones marked.
+            // its lines — which is what the review screen shows, changed ones marked. The recipe
+            // is the only review gate; ingredients are approved with the recipe that uses them.
             var recipes = await context.Recipes.Where(r => !r.IsReviewed)
                 .OrderBy(r => r.ModifiedDate)
                 .ToListAsync(cancellationToken);
 
-            var ingredients = await context.Ingredients.Where(i => !i.IsReviewed)
-                .OrderBy(i => i.CreatedDate)
-                .ToListAsync(cancellationToken);
-
-            if (recipes.Count == 0 && ingredients.Count == 0)
+            if (recipes.Count == 0)
                 return new ReviewQueueDto();
 
-            var emails = await ResolveEmailsAsync(recipes.Select(r => r.CreatedByUserId)
-                .Concat(ingredients.Select(i => i.CreatedByUserId)));
+            var emails = await ResolveEmailsAsync(recipes.Select(r => r.CreatedByUserId));
 
             return new ReviewQueueDto
             {
-                Recipes = [..recipes.Select(r => r.ToPendingDto(DisplayName(r.CreatedByUserId, emails)))],
-                Ingredients = [..ingredients.Select(i => i.ToPendingDto(DisplayName(i.CreatedByUserId, emails)))]
+                Recipes = [..recipes.Select(r => r.ToPendingDto(DisplayName(r.CreatedByUserId, emails)))]
             };
         }
         catch (Exception ex)
