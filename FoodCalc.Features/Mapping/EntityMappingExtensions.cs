@@ -18,7 +18,9 @@ public static class EntityMappingExtensions
     {
         Id = e.Id,
         Name = e.Name,
-        ShouldBeAddedToShoppingCart = e.ShouldBeAddedToShoppingCart
+        ShouldBeAddedToShoppingCart = e.ShouldBeAddedToShoppingCart,
+        CreatedByUserId = e.CreatedByUserId,
+        IsReviewed = e.IsReviewed
     };
 
     public static List<IngredientDto> ToDtoList(this IEnumerable<Ingredient> items) => items.Select(i => i.ToDto())
@@ -28,10 +30,14 @@ public static class EntityMappingExtensions
     {
         Id = d.Id,
         Name = d.Name,
-        ShouldBeAddedToShoppingCart = d.ShouldBeAddedToShoppingCart
+        ShouldBeAddedToShoppingCart = d.ShouldBeAddedToShoppingCart,
+        CreatedByUserId = d.CreatedByUserId
+        // IsReviewed is not mapped from the client: approval is granted by the review
+        // endpoints alone, never by echoing a flag back in a request body.
     };
 
-    // CreateIngredientDto leaves Id/CreatedDate/ModifiedDate at their entity defaults.
+    // CreateIngredientDto leaves Id/CreatedDate/ModifiedDate at their entity defaults, and
+    // IsReviewed at false — a new entry is always unapproved. The caller sets CreatedByUserId.
     public static Ingredient ToEntity(this CreateIngredientDto d) => new()
     {
         Name = d.Name,
@@ -64,12 +70,26 @@ public static class EntityMappingExtensions
 
     // Copies the editable fields onto an existing tracked entity, leaving its
     // identity (Id/RecipeId) untouched. Used when reconciling a recipe's items.
+    //
+    // Compares before assigning so that a line submitted unchanged stays Unmodified in the
+    // change tracker. Two things depend on that: the line keeps its approved status instead of
+    // being flagged as edited on the review screen, and UpdateRecipeCommandHandler can ask the
+    // tracker whether anything actually changed rather than assuming it did.
     public static void ApplyTo(this RecipeItemDto d, RecipeItem e)
     {
+        var amountType = (IngredientAmountType) d.IngredientAmount;
+
+        var changed = e.Name != d.Name || e.Amount != d.Amount || e.IngredientAmount != amountType ||
+                      e.ShouldBeAddedToShoppingCart != d.ShouldBeAddedToShoppingCart;
+
+        if (!changed)
+            return;
+
         e.Name = d.Name;
         e.Amount = d.Amount;
-        e.IngredientAmount = (IngredientAmountType) d.IngredientAmount;
+        e.IngredientAmount = amountType;
         e.ShouldBeAddedToShoppingCart = d.ShouldBeAddedToShoppingCart;
+        e.IsReviewed = false;
     }
 
     // ---------- Recipe ----------
@@ -78,7 +98,53 @@ public static class EntityMappingExtensions
         Id = e.Id,
         Name = e.Name,
         CreatedByUserId = e.CreatedByUserId,
+        IsReviewed = e.IsReviewed,
         Ingredients = e.Ingredients is null ? [] : [..e.Ingredients.Select(ri => ri.ToDto())]
+    };
+
+    /// <summary>Projection for the review queue: every line, with the changed ones flagged.</summary>
+    public static PendingRecipeDto ToPendingDto(this Recipe e, string createdByEmail) => new()
+    {
+        Id = e.Id,
+        Name = e.Name,
+        CreatedByUserId = e.CreatedByUserId,
+        CreatedByEmail = createdByEmail,
+        CreatedDate = e.CreatedDate,
+        ModifiedDate = e.ModifiedDate,
+        IsFirstSubmission = e.FirstApprovedDate is null,
+        Ingredients = e.Ingredients is null
+            ? []
+            :
+            [
+                ..e.Ingredients.OrderBy(ri => ri.Name)
+                    .Select(ri => new PendingRecipeItemDto
+                    {
+                        Id = ri.Id,
+                        Name = ri.Name,
+                        Amount = ri.Amount,
+                        IngredientAmount = (IngredientAmountTypeDto) ri.IngredientAmount,
+                        IsChanged = !ri.IsReviewed
+                    })
+            ]
+    };
+
+    /// <inheritdoc cref="ToPendingDto(Recipe,string)"/>
+    public static PendingIngredientDto ToPendingDto(this Ingredient e, string createdByEmail) => new()
+    {
+        Id = e.Id,
+        Name = e.Name,
+        ShouldBeAddedToShoppingCart = e.ShouldBeAddedToShoppingCart,
+        CreatedByUserId = e.CreatedByUserId,
+        CreatedByEmail = createdByEmail,
+        CreatedDate = e.CreatedDate
+    };
+
+    public static ReviewRejectionDto ToDto(this ReviewRejection e, string rejectedByEmail) => new()
+    {
+        Reason = e.Reason,
+        RejectedByEmail = rejectedByEmail,
+        RejectedDate = e.CreatedDate,
+        TargetDeleted = e.TargetDeleted
     };
 
     public static List<RecipeDto> ToDtoList(this IEnumerable<Recipe> items) => items.Select(r => r.ToDto())

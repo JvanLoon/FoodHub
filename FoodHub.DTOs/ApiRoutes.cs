@@ -57,6 +57,17 @@ public static class ApiRoutes
         public static string Delete(Guid id) => DeleteTemplate.Replace("{id}", id.ToString());
     }
 
+    /// <summary>Moderation queue. Admin and Moderator only — these read other users' unapproved content.</summary>
+    public static class Review
+    {
+        private const string Base = "api/review";
+        public const string Queue = Base + "/queue";              // GET
+        public const string ApproveRecipe = Base + "/recipe/approve";      // POST
+        public const string RejectRecipe = Base + "/recipe/reject";        // POST
+        public const string ApproveIngredient = Base + "/ingredient/approve"; // POST
+        public const string RejectIngredient = Base + "/ingredient/reject";   // POST
+    }
+
     public static class Admin
     {
         private const string Base = "api/admin";

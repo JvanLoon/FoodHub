@@ -15,11 +15,24 @@ public class UpdateRecipeNameCommandHandler(FoodHubDbContext context, ILogger<Up
     {
         try
         {
-            Recipe recipe =
-                await context.Recipes.SingleOrDefaultAsync(r => r.Id == request.RecipeId, cancellationToken) ??
-                throw new Exception($"recipe by id:{request.RecipeId} not found.");
+            Recipe? recipe =
+                await context.Recipes.SingleOrDefaultAsync(r => r.Id == request.RecipeId, cancellationToken);
 
-            if (!string.IsNullOrWhiteSpace(request.newRecipeName)) { recipe.Name = request.newRecipeName; }
+            if (recipe is null)
+                return Error.NotFound(description: ErrorMessages.Common.NotFound("Recipe"));
+
+            if (!request.Acting.CanEdit(recipe.CreatedByUserId))
+                return Error.Forbidden(description: ErrorMessages.Review.NotOwned("recipe"));
+
+            // Compare before assigning: saving the form without touching the name must not
+            // pull an approved recipe back into the review queue for no reason.
+            if (!string.IsNullOrWhiteSpace(request.newRecipeName) && request.newRecipeName != recipe.Name)
+            {
+                recipe.Name = request.newRecipeName;
+
+                // A rename republishes the recipe under a new title, so it needs approval again.
+                recipe.IsReviewed = false;
+            }
 
             await context.SaveChangesAsync(cancellationToken);
 

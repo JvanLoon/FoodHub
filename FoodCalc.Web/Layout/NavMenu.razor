@@ -22,11 +22,19 @@
 			<NavItem Href="/recipes" Icon="journal-text" Label="Recipes"/>
 			<NavItem Href="/recipes/find" Icon="search-heart" Label="Find recipes"/>
 
+			@* Anyone may submit a recipe; it stays private to them until a moderator
+			   approves it. *@
+			<NavItem Href="/recipes/create" Icon="plus-circle" Label="Add recipe"/>
+
 			@if (isAdmin)
 			{
-				<NavItem Href="/recipes/create" Icon="plus-circle" Label="Add recipe"/>
 				<NavItem Href="/ingredients" Icon="egg" Label="Edit Ingredients"/>
-				<NavItem Href="/admin" Icon="gear" Label="Admin"/>
+			}
+
+			@* Moderators land on the same page, but it only offers them the review tab. *@
+			@if (isAdmin || isModerator)
+			{
+				<NavItem Href="/admin" Icon="gear" Label="@(isAdmin ? "Admin" : "Review")"/>
 			}
 
 			<NavItem Href="/usersettings" Icon="person" Label="User Settings"/>
@@ -36,6 +44,7 @@
 
 @code {
 	private bool isAdmin;
+	private bool isModerator;
 	private bool isLoggedIn;
 
 	protected override async Task OnInitializedAsync()
@@ -56,6 +65,7 @@
 		{
 			isLoggedIn = await AuthStateService.IsLoggedInAsync();
 			isAdmin = isLoggedIn && await AuthStateService.IsAdminAsync();
+			isModerator = isLoggedIn && await AuthStateService.IsInAnyRoleAsync("Moderator");
 		}
 		catch (Exception ex) { MessageService.ShowMessage(ex.Message, true, 0); }
 	}

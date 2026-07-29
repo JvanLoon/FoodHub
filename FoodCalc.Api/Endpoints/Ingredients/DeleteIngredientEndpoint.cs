@@ -10,7 +10,7 @@ public class DeleteIngredientRequest
 }
 
 /// <summary>
-/// DELETE api/ingredient/deleteingredient/{id} — Admin only.
+/// DELETE api/ingredient/deleteingredient/{id} — the entry's author or an Admin.
 /// Deletes the ingredient itself (distinct from removing an ingredient from a
 /// recipe, which lives under Endpoints/Recipes).
 /// </summary>
@@ -19,12 +19,12 @@ public class DeleteIngredientEndpoint(IMediator mediator) : Endpoint<DeleteIngre
     public override void Configure()
     {
         Delete(ApiRoutes.Ingredient.DeleteTemplate);
-        Roles("Admin");
+        Policies("Admin,Moderator,User");
     }
 
     public override async Task HandleAsync(DeleteIngredientRequest req, CancellationToken ct)
     {
-        var result = await mediator.Send(new DeleteIngredientCommand(req.Id), ct);
+        var result = await mediator.Send(new DeleteIngredientCommand(req.Id, User.ToActingUser()), ct);
 
         await result.Match(value => Send.OkAsync(value, ct), errors => this.SendErrorsAsync(errors, ct: ct));
     }

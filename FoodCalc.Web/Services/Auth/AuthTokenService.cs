@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using Blazored.LocalStorage;
 using FoodCalc.Web.Constants;
 
@@ -34,6 +35,27 @@ public class AuthTokenService(ILocalStorageService localStorage)
         var emailClaim = jwt.Claims.FirstOrDefault(c => c.Type == "email");
 
         return emailClaim?.Value;
+    }
+
+    /// <summary>
+    /// The logged-in account's IdentityUser id, read from the token's "sub" claim (see
+    /// LoginEndpoint). Used to tell the user's own content from everyone else's — the server
+    /// enforces that independently, this is only so the UI can show the right controls.
+    /// </summary>
+    public async Task<string?> GetUserIdAsync()
+    {
+        var token = await GetTokenAsync();
+        if (string.IsNullOrEmpty(token))
+            return null;
+
+        var handler = new JwtSecurityTokenHandler();
+        var jwt = handler.ReadJwtToken(token);
+
+        // The raw claim is "sub"; the inbound-claim mapping that would rename it to
+        // nameidentifier runs on the API, not here, so check both.
+        return jwt.Claims.FirstOrDefault(c => c.Type == "sub")
+            ?.Value ?? jwt.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)
+            ?.Value;
     }
 
     public async Task<bool> IsTokenExpiredAsync()

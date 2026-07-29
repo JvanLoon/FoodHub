@@ -15,6 +15,9 @@ public class DeleteRecipeCommandHandler(FoodHubDbContext context, ILogger<Delete
             var recipe = await context.Recipes.SingleOrDefaultAsync(r => r.Id == request.Id, cancellationToken);
             if (recipe != null)
             {
+                if (!request.Acting.CanEdit(recipe.CreatedByUserId))
+                    return Error.Forbidden(description: ErrorMessages.Review.NotOwned("recipe"));
+
                 context.Recipes.Remove(recipe);
                 await context.SaveChangesAsync(cancellationToken);
             }

@@ -40,3 +40,9 @@
         padding: 0.15rem 0;
     }
 }
+
+/* Shown on your own recipes only — the list never contains anyone else's
+   unapproved work. */
+.recipe-pending {
+    margin-bottom: var(--fh-space-2);
+}

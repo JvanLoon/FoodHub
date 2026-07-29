@@ -13,9 +13,19 @@ namespace FoodCalc.Features.Ingredients.Commands.AddIngredient
         public async Task<ErrorOr<IngredientDto>> Handle(AddIngredientCommand request,
             CancellationToken cancellationToken)
         {
+            if (string.IsNullOrEmpty(request.CreatedByUserId))
+            {
+                return Error.Validation(description: ErrorMessages.Review.NoUser);
+            }
+
             try
             {
                 Ingredient ingredient = request.Ingredient.ToEntity();
+                ingredient.CreatedByUserId = request.CreatedByUserId;
+
+                // Unapproved on creation for everyone, admins included — same rule as recipes.
+                ingredient.IsReviewed = false;
+
                 context.Ingredients.Add(ingredient);
                 await context.SaveChangesAsync(cancellationToken);
 

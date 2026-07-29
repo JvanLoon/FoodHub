@@ -16,12 +16,25 @@ public class UpdateIngredientCommandHandler(FoodHubDbContext context, ILogger<Up
     {
         try
         {
-            Ingredient ingredient =
-                await context.Ingredients.SingleOrDefaultAsync(i => i.Id == request.Ingredient.Id, cancellationToken) ??
-                throw new Exception($"ingredient by id:{request.Ingredient.Id} not found.");
+            Ingredient? ingredient =
+                await context.Ingredients.SingleOrDefaultAsync(i => i.Id == request.Ingredient.Id, cancellationToken);
+
+            if (ingredient is null)
+                return Error.NotFound(description: ErrorMessages.Common.NotFound("Ingredient"));
+
+            if (!request.Acting.CanEdit(ingredient.CreatedByUserId))
+                return Error.Forbidden(description: ErrorMessages.Review.NotOwned("ingredient"));
+
+            var changed = ingredient.Name != request.Ingredient.Name ||
+                          ingredient.ShouldBeAddedToShoppingCart != request.Ingredient.ShouldBeAddedToShoppingCart;
 
             ingredient.Name = request.Ingredient.Name;
             ingredient.ShouldBeAddedToShoppingCart = request.Ingredient.ShouldBeAddedToShoppingCart;
+
+            // Edited entries go back through approval, but only on a real change — see the
+            // matching note in UpdateRecipeNameCommandHandler.
+            if (changed)
+                ingredient.IsReviewed = false;
 
             await context.SaveChangesAsync(cancellationToken);
 

@@ -16,16 +16,32 @@ public class UpdateRecipeCommandHandler(FoodHubDbContext context, ILogger<Update
     {
         try
         {
-            Recipe recipe =
-                await context.Recipes.SingleOrDefaultAsync(r => r.Id == request.Recipe.Id, cancellationToken) ??
-                throw new Exception($"recipe by id:{request.Recipe.Id} not found.");
+            Recipe? recipe =
+                await context.Recipes.SingleOrDefaultAsync(r => r.Id == request.Recipe.Id, cancellationToken);
 
+            if (recipe is null)
+                return Error.NotFound(description: ErrorMessages.Common.NotFound("Recipe"));
+
+            if (!request.Acting.CanEdit(recipe.CreatedByUserId))
+                return Error.Forbidden(description: ErrorMessages.Review.NotOwned("recipe"));
+
+            var nameChanged = recipe.Name != request.Recipe.Name;
             recipe.Name = request.Recipe.Name;
 
             // Reconcile the recipe's items with the set provided in the request:
             // update the ones still present, remove the missing, add the new.
             recipe.Ingredients?.Sync(request.Recipe.Ingredients, keyOfExisting: item => item.Id,
                 keyOfIncoming: dto => dto.Id, create: dto => dto.ToEntity(), update: (dto, item) => dto.ApplyTo(item));
+
+            // Ask the change tracker what Sync actually did rather than assuming a request
+            // means a change — a save that alters nothing must not cost the author their
+            // approval. ApplyTo leaves untouched lines Unmodified, which makes this exact.
+            var itemsChanged = context.ChangeTracker.Entries<RecipeItem>()
+                .Any(entry => entry.Entity.RecipeId == recipe.Id &&
+                              entry.State is EntityState.Added or EntityState.Modified or EntityState.Deleted);
+
+            if (nameChanged || itemsChanged)
+                recipe.IsReviewed = false;
 
             await context.SaveChangesAsync(cancellationToken);
 

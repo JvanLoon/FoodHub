@@ -15,4 +15,12 @@ public class RecipeItem : BaseEntity
     public decimal Amount { get; set; }
     public IngredientAmountType IngredientAmount { get; set; }
     public bool ShouldBeAddedToShoppingCart { get; set; } = true;
+
+    /// <summary>
+    /// False while this line is waiting on review. It does not hide the line — a line is only
+    /// ever seen through its <see cref="Recipe"/>, which carries its own gate. It exists so the
+    /// review screen can list every line of a recipe and mark the ones that actually changed,
+    /// rather than showing a whole recipe with no indication of what to look at.
+    /// </summary>
+    public bool IsReviewed { get; set; }
 }

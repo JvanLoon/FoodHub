@@ -18,6 +18,16 @@ public class DeleteIngredientFromRecipeCommandHandler(
             var recipeItem = await context.RecipeItems.SingleOrDefaultAsync(r => r.Id == request.Id, cancellationToken);
             if (recipeItem != null)
             {
+                var recipe =
+                    await context.Recipes.SingleOrDefaultAsync(r => r.Id == recipeItem.RecipeId, cancellationToken);
+
+                if (recipe is not null && !request.Acting.CanEdit(recipe.CreatedByUserId))
+                    return Error.Forbidden(description: ErrorMessages.Review.NotOwned("recipe"));
+
+                // Removing a line changes the recipe as much as editing one does.
+                if (recipe is not null)
+                    recipe.IsReviewed = false;
+
                 context.RecipeItems.Remove(recipeItem);
                 await context.SaveChangesAsync(cancellationToken);
             }

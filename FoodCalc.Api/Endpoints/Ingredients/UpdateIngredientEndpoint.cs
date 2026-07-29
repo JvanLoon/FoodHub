@@ -4,18 +4,18 @@ using MediatR;
 
 namespace FoodCalc.Api.Endpoints.Ingredients;
 
-/// <summary>PUT api/ingredient — Admin only.</summary>
+/// <summary>PUT api/ingredient — the entry's author or an Admin.</summary>
 public class UpdateIngredientEndpoint(IMediator mediator) : Endpoint<UpdateIngredientDto, IngredientDto>
 {
     public override void Configure()
     {
         Put(ApiRoutes.Ingredient.Update);
-        Roles("Admin");
+        Policies("Admin,Moderator,User");
     }
 
     public override async Task HandleAsync(UpdateIngredientDto req, CancellationToken ct)
     {
-        var result = await mediator.Send(new UpdateIngredientCommand(req), ct);
+        var result = await mediator.Send(new UpdateIngredientCommand(req, User.ToActingUser()), ct);
 
         await result.Match(value => Send.OkAsync(value, ct), errors => this.SendErrorsAsync(errors, ct: ct));
     }

@@ -1,5 +1,6 @@
 ﻿using ErrorOr;
 using FoodCalc.Features.Mapping;
+using FoodCalc.Features.Review;
 using FoodHub.DTOs;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -14,7 +15,7 @@ public class GetAllRecipesQueryHandler(FoodHubDbContext context, ILogger<GetAllR
     {
         try
         {
-            var query = context.Recipes.AsQueryable();
+            var query = context.Recipes.VisibleTo(request.RequestingUserId);
 
             if (!string.IsNullOrWhiteSpace(request.Search))
                 query = query.Where(r => r.Name != null && r.Name.Contains(request.Search));

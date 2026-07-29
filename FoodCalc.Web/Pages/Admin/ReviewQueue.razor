@@ -1,0 +1,265 @@
+@* Moderation queue: approve or reject user-submitted recipes and catalog ingredients.
+   Rendered inside the Admin page's tab set, and the only tab a Moderator can reach. *@
+
+@using FoodCalc.Web.Services
+@inject ReviewService ReviewService
+@inject MessageService MessageService
+
+<div class="fh-stack review-queue">
+	@if (queue == null)
+	{
+		<LoadingSpinner Label="Loading review queue..."/>
+	}
+	else if (queue.TotalCount == 0)
+	{
+		<EmptyState Icon="check2-circle" Title="Nothing to review."
+		            Message="New recipes and ingredients appear here as soon as they are submitted."/>
+	}
+	else
+	{
+		@if (queue.Recipes.Any())
+		{
+			<section class="fh-stack">
+				<div class="fh-panel-header">
+					<h2 class="fh-subheading">Recipes</h2>
+					<span class="fh-muted">@queue.Recipes.Count waiting</span>
+				</div>
+
+				@foreach (var recipe in queue.Recipes)
+				{
+					<AppCard CssClass="review-item">
+						<Header>
+							<div class="review-item__head">
+								<span class="review-item__title">@recipe.Name</span>
+								@if (recipe.IsFirstSubmission)
+								{
+									<Badge Variant="Badge.BadgeVariant.Accent" Icon="stars">New</Badge>
+								}
+								else
+								{
+									<Badge Variant="Badge.BadgeVariant.Info" Icon="pencil">Edited</Badge>
+								}
+							</div>
+						</Header>
+						<Body>
+						<p class="review-item__meta fh-muted">
+							by <strong>@recipe.CreatedByEmail</strong>
+							· submitted @recipe.ModifiedDate.ToLocalTime().ToString("g")
+						</p>
+
+						@if (recipe.LastRejection is { } rejection)
+						{
+							<p class="review-item__rejection">
+								<i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+								Previously rejected by @rejection.RejectedByEmail
+								on @rejection.RejectedDate.ToLocalTime().ToString("d"):
+								<em>@rejection.Reason</em>
+							</p>
+						}
+
+						@if (recipe.Ingredients.Any())
+						{
+							<ul class="review-ingredients">
+								@foreach (var item in recipe.Ingredients)
+								{
+									<li class="@(item.IsChanged ? "review-ingredients__changed" : null)">
+										@if (item.IsChanged)
+										{
+											<i class="bi bi-dot" aria-hidden="true" title="Changed"></i>
+										}
+										<span>@item.Name</span>
+										<span class="fh-muted">
+											@item.Amount.ToFormattedString() @item.IngredientAmount
+										</span>
+										@if (item.IsChanged)
+										{
+											<Badge Variant="Badge.BadgeVariant.Warning">changed</Badge>
+										}
+									</li>
+								}
+							</ul>
+						}
+						else
+						{
+							<p class="fh-muted">This recipe has no ingredients yet.</p>
+						}
+						</Body>
+						<Footer>
+							<div class="fh-cluster">
+								<AppButton Variant="ButtonVariant.Success" Icon="check-lg"
+								           Disabled="@busy"
+								           OnClick="() => ApproveRecipeAsync(recipe)">
+									Approve
+								</AppButton>
+								<AppButton Variant="ButtonVariant.OutlineDanger" Icon="x-lg"
+								           Disabled="@busy"
+								           OnClick="() => StartReject(ReviewKind.Recipe, recipe.Id, recipe.Name)">
+									Reject
+								</AppButton>
+							</div>
+						</Footer>
+					</AppCard>
+				}
+			</section>
+		}
+
+		@if (queue.Ingredients.Any())
+		{
+			<section class="fh-stack">
+				<div class="fh-panel-header">
+					<h2 class="fh-subheading">Ingredients</h2>
+					<span class="fh-muted">@queue.Ingredients.Count waiting</span>
+				</div>
+
+				<ul class="review-ingredient-list">
+					@foreach (var ingredient in queue.Ingredients)
+					{
+						<li>
+							<div class="review-ingredient-list__info">
+								<span class="review-item__title">@ingredient.Name</span>
+								<span class="fh-muted">
+									by @ingredient.CreatedByEmail
+									· @ingredient.CreatedDate.ToLocalTime().ToString("g")
+								</span>
+								@if (ingredient.LastRejection is { } rejection)
+								{
+									<span class="review-item__rejection">
+										Previously rejected: <em>@rejection.Reason</em>
+									</span>
+								}
+							</div>
+							<div class="fh-cluster">
+								<AppButton Variant="ButtonVariant.Success" Icon="check-lg" Size="ButtonSize.Small"
+								           Disabled="@busy"
+								           OnClick="() => ApproveIngredientAsync(ingredient)">
+									Approve
+								</AppButton>
+								<AppButton Variant="ButtonVariant.OutlineDanger" Icon="x-lg" Size="ButtonSize.Small"
+								           Disabled="@busy"
+								           OnClick="() => StartReject(ReviewKind.Ingredient, ingredient.Id, ingredient.Name)">
+									Reject
+								</AppButton>
+							</div>
+						</li>
+					}
+				</ul>
+			</section>
+		}
+	}
+</div>
+
+<Modal Title="@($"Reject \"{rejectTargetName}\"")" @bind-Visible="rejectDialogOpen">
+	<EditForm Model="rejectModel" OnValidSubmit="ConfirmRejectAsync" FormName="reject-review-form">
+		<TextField Label="Reason" Placeholder="Tell the author what is wrong with it"
+		           @bind-Value="rejectReason"/>
+
+		<div class="form-check review-reject__delete">
+			<input class="form-check-input" type="checkbox" id="reject-delete"
+			       checked="@rejectDelete"
+			       @onchange="e => rejectDelete = (bool?) e.Value ?? false"/>
+			<label class="form-check-label" for="reject-delete">
+				Delete it as well
+			</label>
+		</div>
+		<p class="fh-muted review-reject__hint">
+			@(rejectDelete
+				? "The item is removed. The reason is kept so the author can be told."
+				: "The item stays with its author, unpublished, so they can fix and resubmit it.")
+		</p>
+
+		<div class="fh-cluster">
+			<AppButton Type="submit" Variant="ButtonVariant.Danger" Icon="x-lg" Disabled="@busy">
+				Reject
+			</AppButton>
+			<AppButton Variant="ButtonVariant.OutlineSecondary" OnClick="CancelReject">Cancel</AppButton>
+		</div>
+	</EditForm>
+</Modal>
+
+@code {
+	private ReviewQueueDto? queue;
+	private bool busy;
+
+	// --- reject dialog state ---
+	private enum ReviewKind
+	{
+		Recipe,
+		Ingredient
+	}
+
+	private bool rejectDialogOpen;
+	private ReviewKind rejectKind;
+	private Guid rejectTargetId;
+	private string rejectTargetName = string.Empty;
+	private string rejectReason = string.Empty;
+	private bool rejectDelete;
+
+	// EditForm needs a model instance; the fields live above, so this is just a handle.
+	private readonly object rejectModel = new();
+
+	protected override async Task OnInitializedAsync() => await LoadAsync();
+
+	private async Task LoadAsync()
+	{
+		await ReviewService.GetQueueAsync()
+			.OnSuccess(data => queue = data)
+			.OnFailure();
+	}
+
+	private async Task ApproveRecipeAsync(PendingRecipeDto recipe)
+	{
+		busy = true;
+		await ReviewService.ApproveRecipeAsync(recipe.Id)
+			.OnSuccess(async () => await LoadAsync(), $"Approved \"{recipe.Name}\".")
+			.OnFailure();
+		busy = false;
+	}
+
+	private async Task ApproveIngredientAsync(PendingIngredientDto ingredient)
+	{
+		busy = true;
+		await ReviewService.ApproveIngredientAsync(ingredient.Id)
+			.OnSuccess(async () => await LoadAsync(), $"Approved \"{ingredient.Name}\".")
+			.OnFailure();
+		busy = false;
+	}
+
+	private void StartReject(ReviewKind kind, Guid id, string name)
+	{
+		rejectKind = kind;
+		rejectTargetId = id;
+		rejectTargetName = name;
+		rejectReason = string.Empty;
+		rejectDelete = false;
+		rejectDialogOpen = true;
+	}
+
+	private void CancelReject() => rejectDialogOpen = false;
+
+	private async Task ConfirmRejectAsync()
+	{
+		// The server rejects a blank reason too; this keeps the dialog open instead of
+		// bouncing the user out on a validation error they can fix in place.
+		if (string.IsNullOrWhiteSpace(rejectReason))
+		{
+			MessageService.ShowMessage(WebConstants.Messages.Review.ReasonRequired, isError: true);
+			return;
+		}
+
+		busy = true;
+
+		var call = rejectKind == ReviewKind.Recipe
+			? ReviewService.RejectRecipeAsync(rejectTargetId, rejectReason, rejectDelete)
+			: ReviewService.RejectIngredientAsync(rejectTargetId, rejectReason, rejectDelete);
+
+		await call.OnSuccess(async () =>
+			{
+				rejectDialogOpen = false;
+				await LoadAsync();
+			}, rejectDelete ? WebConstants.Messages.Review.RejectedAndDeleted : WebConstants.Messages.Review.Rejected)
+			.OnFailure();
+
+		busy = false;
+	}
+
+}

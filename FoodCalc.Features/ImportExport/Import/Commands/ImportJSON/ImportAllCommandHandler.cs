@@ -48,7 +48,14 @@ public class ImportAllCommandHandler(
                 {
                     Id = ingredientDto.Id,
                     Name = ingredientDto.Name,
-                    ShouldBeAddedToShoppingCart = ingredientDto.ShouldBeAddedToShoppingCart
+                    ShouldBeAddedToShoppingCart = ingredientDto.ShouldBeAddedToShoppingCart,
+                    CreatedByUserId = request.ImportedByUserId,
+                    // Imported rows arrive approved. Import is an Admin-only restore of curated
+                    // data, not a submission, and the alternative is worse than untidy: an
+                    // unapproved row is invisible to everyone but its author, so a restored
+                    // backup would silently come back empty for the whole user base.
+                    IsReviewed = true,
+                    FirstApprovedDate = DateTime.UtcNow
                 });
             }
 
@@ -66,7 +73,10 @@ public class ImportAllCommandHandler(
                     {
                         Id = recipeDto.Id,
                         Name = recipeDto.Name,
-                        CreatedByUserId = request.ImportedByUserId
+                        CreatedByUserId = request.ImportedByUserId,
+                        // Approved on arrival — see the note on the ingredient import above.
+                        IsReviewed = true,
+                        FirstApprovedDate = DateTime.UtcNow
                     });
                 }
             }
@@ -92,7 +102,10 @@ public class ImportAllCommandHandler(
                     Name = riDto.Name,
                     Amount = riDto.Amount,
                     IngredientAmount = (IngredientAmountType) riDto.IngredientAmount,
-                    ShouldBeAddedToShoppingCart = riDto.ShouldBeAddedToShoppingCart
+                    ShouldBeAddedToShoppingCart = riDto.ShouldBeAddedToShoppingCart,
+                    // Reviewed, so the restored recipe does not read as wholly rewritten the
+                    // first time someone edits it.
+                    IsReviewed = true
                 });
             }
 

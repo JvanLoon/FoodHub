@@ -1,19 +1,59 @@
 @page "/admin"
+@inject AuthStateService AuthStateService
+@inject NavigationManager Navigation
 
 <PageTitle>Admin</PageTitle>
 
-<div class="fh-stack">
-	<PageHeader Title="Admin Panel"/>
+@* Moderators reach this page for the review queue and nothing else, so the tab set is built
+   from the caller's role rather than rendered whole and partly hidden — a Tab registers itself
+   with the TabSet on init, so a tab that must not exist has to not be rendered at all.
+   The API enforces the same split independently; this only decides what is worth showing. *@
+@if (_authorized)
+{
+	<div class="fh-stack">
+		<PageHeader Title="@(_isAdmin ? "Admin Panel" : "Moderation")"/>
 
-	<TabSet>
-		<Tab Title="Users" Icon="people">
-			<UserList/>
-		</Tab>
-		<Tab Title="Import/Export" Icon="arrow-down-up">
-			<DataImportExport/>
-		</Tab>
-		<Tab Title="Error test" Icon="bug">
-			<ErrorTest/>
-		</Tab>
-	</TabSet>
-</div>
+		<TabSet>
+			<Tab Title="Review" Icon="check2-square">
+				<ReviewQueue/>
+			</Tab>
+			@if (_isAdmin)
+			{
+				<Tab Title="Users" Icon="people">
+					<UserList/>
+				</Tab>
+				<Tab Title="Import/Export" Icon="arrow-down-up">
+					<DataImportExport/>
+				</Tab>
+				<Tab Title="Error test" Icon="bug">
+					<ErrorTest/>
+				</Tab>
+			}
+		</TabSet>
+	</div>
+}
+
+@code {
+	private bool _authorized;
+	private bool _isAdmin;
+
+	protected override async Task OnInitializedAsync()
+	{
+		try
+		{
+			_isAdmin = await AuthStateService.IsAdminAsync();
+			_authorized = _isAdmin || await AuthStateService.IsInAnyRoleAsync("Moderator");
+		}
+		catch
+		{
+			_isAdmin = false;
+			_authorized = false;
+		}
+
+		// Nothing renders until authorization is settled, so a user who types /admin never
+		// sees the panel flash before the redirect (same approach as RoleGuard).
+		if (!_authorized)
+			Navigation.NavigateTo("/");
+	}
+
+}

@@ -8,6 +8,23 @@ public class AuthStateService(AuthTokenService authTokenService)
 
     public async Task<string?> GetEmailAsync() => await authTokenService.GetEmailAsync();
 
+    /// <summary>The logged-in account's IdentityUser id, for "is this mine?" checks in the UI.</summary>
+    public async Task<string?> GetUserIdAsync() => await authTokenService.GetUserIdAsync();
+
+    /// <summary>
+    /// True if the UI should offer edit controls for content authored by
+    /// <paramref name="ownerUserId"/>. Mirrors the server's rule (author or Admin); the API
+    /// re-checks on every write, so this only decides what is worth rendering.
+    /// </summary>
+    public async Task<bool> CanEditContentAsync(string ownerUserId)
+    {
+        if (await IsAdminAsync())
+            return true;
+
+        var userId = await GetUserIdAsync();
+        return !string.IsNullOrEmpty(userId) && userId == ownerUserId;
+    }
+
     public async Task<List<string>> GetRolesAsync() => await authTokenService.GetRolesAsync();
 
     public async Task<bool> IsAdminAsync()

@@ -15,7 +15,7 @@ public class GetRecipeByIdEndpoint(IMediator mediator) : Endpoint<RecipeByIdRequ
 
     public override async Task HandleAsync(RecipeByIdRequest req, CancellationToken ct)
     {
-        var result = await mediator.Send(new GetRecipeByIdQuery(req.Id), ct);
+        var result = await mediator.Send(new GetRecipeByIdQuery(req.Id, User.GetUserId()), ct);
 
         await result.Match(value => Send.OkAsync(value, ct), errors => this.SendErrorsAsync(errors, ct: ct));
     }

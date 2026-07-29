@@ -24,6 +24,14 @@
 	}
 	else
 	{
+		@if (recipe.Id != Guid.Empty && !recipe.IsReviewed)
+		{
+			<div class="recipe-pending-banner">
+				<i class="bi bi-hourglass-split" aria-hidden="true"></i>
+				<span>@WebConstants.Messages.Review.PendingApproval</span>
+			</div>
+		}
+
 		<div class="recipe-name">
 			@if (!isEditingName)
 			{
@@ -174,12 +182,9 @@
 
 	protected override async Task OnInitializedAsync()
 	{
-		if (!await AuthStateService.IsInAnyRoleAsync("Admin"))
-		{
-			Navigation.NavigateTo("/");
-			return;
-		}
-
+		// Creating is open to every signed-in user. Editing an existing recipe is checked
+		// against its author once the recipe is loaded (see RefreshRecipeAsync) — the id is
+		// not enough to decide here, and the API refuses the write either way.
 		await IngredientService.GetAllIngredientsAsync()
 			.OnSuccess((data) =>
 			{
@@ -214,6 +219,13 @@
 		await RecipeService.GetRecipeByIdAsync(RecipeId)
 			.OnSuccess((data) => recipe = data)
 			.OnFailure();
+
+		// A recipe you may see but not edit (someone else's, once approved) sends you back to
+		// the read-only view rather than showing a form whose every save would be refused.
+		if (recipe.Id != Guid.Empty && !await AuthStateService.CanEditContentAsync(recipe.CreatedByUserId))
+		{
+			Navigation.NavigateTo($"/recipe/{recipe.Id}");
+		}
 	}
 
 	private async Task CreateRecipeAsync()

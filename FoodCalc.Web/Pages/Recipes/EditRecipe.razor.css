@@ -65,3 +65,17 @@
     display: inline-flex;
     gap: var(--fh-space-1);
 }
+
+/* Explains why a just-saved recipe is not showing up for anyone else. Every edit puts
+   the recipe back in this state, so it reappears after each save. */
+.recipe-pending-banner {
+    display: flex;
+    align-items: center;
+    gap: var(--fh-space-2);
+    padding: var(--fh-space-3) var(--fh-space-4);
+    border: 1px solid var(--fh-warning);
+    border-radius: var(--fh-radius-md);
+    background: var(--fh-surface-sunken);
+    color: var(--fh-text-muted);
+    font-size: var(--fh-text-sm);
+}

@@ -1,5 +1,6 @@
 ﻿using ErrorOr;
 using FoodCalc.Features.Mapping;
+using FoodCalc.Features.Review;
 using FoodHub.DTOs;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -14,9 +15,14 @@ public class GetRecipeByIdQueryHandler(FoodHubDbContext context, ILogger<GetReci
     {
         try
         {
-            var recipe = await context.Recipes.SingleOrDefaultAsync(r => r.Id == request.Id, cancellationToken);
+            var recipe = await context.Recipes.VisibleTo(request.RequestingUserId)
+                .SingleOrDefaultAsync(r => r.Id == request.Id, cancellationToken);
 
-            if (recipe is null) { return Error.Failure(description: ErrorMessages.Common.NotFound("Recipe")); }
+            // NotFound, not Failure, so this leaves as a 404 — and note it is also what a
+            // caller gets for someone else's unapproved recipe: the visibility filter above
+            // removes it from the query entirely, so "exists but is not yours" is
+            // indistinguishable from "does not exist", which is the intended answer.
+            if (recipe is null) { return Error.NotFound(description: ErrorMessages.Common.NotFound("Recipe")); }
 
             return recipe.ToDto();
         }

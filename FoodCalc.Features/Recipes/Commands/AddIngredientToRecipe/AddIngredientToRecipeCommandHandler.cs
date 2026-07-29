@@ -20,6 +20,14 @@ public class AddIngredientToRecipeCommandHandler(
         {
             var dto = request.RecipeItem;
 
+            var recipe = await context.Recipes.SingleOrDefaultAsync(r => r.Id == dto.RecipeId, cancellationToken);
+
+            if (recipe is null)
+                return Error.NotFound(description: ErrorMessages.Common.NotFound("Recipe"));
+
+            if (!request.Acting.CanEdit(recipe.CreatedByUserId))
+                return Error.Forbidden(description: ErrorMessages.Review.NotOwned("recipe"));
+
             var existing = await context.RecipeItems.FirstOrDefaultAsync(
                 ri => ri.Id == dto.Id && ri.RecipeId == dto.RecipeId, cancellationToken);
 
@@ -30,11 +38,19 @@ public class AddIngredientToRecipeCommandHandler(
                 existing.IngredientAmount = (IngredientAmountType) dto.IngredientAmount;
                 existing.ShouldBeAddedToShoppingCart = dto.ShouldBeAddedToShoppingCart;
 
+                // Changing one line sends the whole recipe back for approval, and marks this
+                // line so the review screen can point the moderator straight at it.
+                existing.IsReviewed = false;
+                recipe.IsReviewed = false;
+
                 await context.SaveChangesAsync(cancellationToken);
                 return existing.ToDto();
             }
 
             RecipeItem mappedRecipeItem = dto.ToEntity();
+            mappedRecipeItem.IsReviewed = false;
+            recipe.IsReviewed = false;
+
             context.RecipeItems.Add(mappedRecipeItem);
             await context.SaveChangesAsync(cancellationToken);
             return mappedRecipeItem.ToDto();

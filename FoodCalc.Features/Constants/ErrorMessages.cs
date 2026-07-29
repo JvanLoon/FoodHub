@@ -48,6 +48,18 @@ public static class ErrorMessages
         public const string DeleteFromRecipeFailed = "Failed to delete ingredient from recipe";
     }
 
+    /// <summary>Moderation / approval wording.</summary>
+    public static class Review
+    {
+        private const string _notOwnedTemplate = "You can only edit a {0} you created.";
+
+        public static string NotOwned(string entityName) => string.Format(_notOwnedTemplate, entityName);
+
+        public const string ReasonRequired = "A rejection needs a reason.";
+        public const string NoUser = "A recipe cannot be created without a logged-in user.";
+        public const string AlreadyReviewed = "That item has already been approved.";
+    }
+
     /// <summary>User-specific wording.</summary>
     public static class User
     {

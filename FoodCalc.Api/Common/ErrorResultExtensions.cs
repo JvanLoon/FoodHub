@@ -30,9 +30,35 @@ public static class ErrorResultExtensions
     /// </summary>
     public static Task SendErrorsAsync(this BaseEndpoint ep,
         List<Error> errors,
-        int statusCode = 400,
+        int? statusCode = null,
         CancellationToken ct = default) =>
-        ep.SendFailuresAsync(errors.Select(e => new ValidationFailure(FieldNameFor(e), e.Description)), statusCode, ct);
+        ep.SendFailuresAsync(errors.Select(e => new ValidationFailure(FieldNameFor(e), e.Description)),
+            statusCode ?? StatusCodeFor(errors), ct);
+
+    /// <summary>
+    /// Derives the response status from the errors themselves, so a handler that says
+    /// <c>Error.Forbidden</c> does not arrive as a 400 the client has to guess about. Only when
+    /// every error agrees — a mixed bag falls back to 400, which is what the whole API returned
+    /// before this existed. The body shape is unchanged either way.
+    /// </summary>
+    private static int StatusCodeFor(List<Error> errors)
+    {
+        if (errors.Count == 0)
+            return 400;
+
+        var type = errors[0].Type;
+        if (errors.Any(e => e.Type != type))
+            return 400;
+
+        return type switch
+        {
+            ErrorType.NotFound => 404,
+            ErrorType.Forbidden => 403,
+            ErrorType.Unauthorized => 401,
+            ErrorType.Conflict => 409,
+            _ => 400
+        };
+    }
 
     private static string FieldNameFor(Error error) =>
         string.IsNullOrWhiteSpace(error.Code) || error.Code == _defaultErrorOrCode ? _generalErrorsField : error.Code;

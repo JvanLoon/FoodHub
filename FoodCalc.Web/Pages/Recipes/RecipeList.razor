@@ -34,12 +34,22 @@
 				@foreach (RecipeDto recipe in pagedResult.Items)
 				{
 					<RecipeCard Title="@(recipe.Name ?? string.Empty)"
-					            ShowActions="isAdmin"
+					            ShowActions="@CanEdit(recipe)"
 					            OnOpen="() => OpenRecipe(recipe.Id)"
 					            Selected="@SelectedRecipeIds.Contains(recipe.Id)"
 					            OnToggle="() => ToggleRecipeSelection(recipe.Id, !SelectedRecipeIds.Contains(recipe.Id))"
 					            OnEdit="() => EditRecipe(recipe.Id)"
 					            OnDelete="() => DeleteRecipe(recipe.Id)">
+						@* Only ever reached for your own recipes — the API does not return
+						   anyone else's unapproved work — so this reads as "mine, not public yet". *@
+						@if (!recipe.IsReviewed)
+						{
+							<div class="recipe-pending">
+								<Badge Variant="Badge.BadgeVariant.Warning" Icon="hourglass-split">
+									Awaiting approval
+								</Badge>
+							</div>
+						}
 						<p class="ingredients-label">Ingredients</p>
 						<ul class="ingredients-list">
 							@if (recipe.Ingredients != null)
@@ -88,14 +98,30 @@
 	private List<RecipeItemDto> AggregatedIngredients = new();
 	private ConfirmDialog? confirmDialog;
 	private bool isAdmin;
+	private string? currentUserId;
 
 	protected override async Task OnInitializedAsync()
 	{
-		try { isAdmin = await AuthStateService.IsAdminAsync(); }
-		catch { isAdmin = false; }
+		try
+		{
+			isAdmin = await AuthStateService.IsAdminAsync();
+			currentUserId = await AuthStateService.GetUserIdAsync();
+		}
+		catch
+		{
+			isAdmin = false;
+			currentUserId = null;
+		}
 
 		await LoadRecipesAsync();
 	}
+
+	/// <summary>
+	/// Whether to offer Edit/Delete on a card: the recipe's author, or an Admin. Mirrors the
+	/// server's rule — which re-checks on every write, so this only decides what to render.
+	/// </summary>
+	private bool CanEdit(RecipeDto recipe) =>
+		isAdmin || (!string.IsNullOrEmpty(currentUserId) && recipe.CreatedByUserId == currentUserId);
 
 	private async Task LoadRecipesAsync()
 	{

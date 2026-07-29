@@ -1,5 +1,6 @@
 using ErrorOr;
 using FoodCalc.Features.Mapping;
+using FoodCalc.Features.Review;
 using FoodHub.DTOs;
 using FoodHub.Persistence.Entities;
 using MediatR;
@@ -23,7 +24,10 @@ public class RandomizeMealPlanCommandHandler(FoodHubDbContext context, ILogger<R
 
             var perDay = Math.Clamp(request.RecipesPerDay, 1, MealPlanConstants.MaxRecipesPerDay);
 
-            var allRecipes = await context.Recipes.Include(r => r.Ingredients)
+            // Same visibility rule as browsing: randomize may pull in approved recipes plus
+            // the caller's own pending ones, never another user's unapproved work.
+            var allRecipes = await context.Recipes.VisibleTo(request.UserId)
+                .Include(r => r.Ingredients)
                 .ToListAsync(cancellationToken);
             if (allRecipes.Count == 0)
                 return Error.Validation(description: "There are no recipes to pick from.");

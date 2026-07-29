@@ -16,5 +16,16 @@ public class IngredientConfiguration : IEntityTypeConfiguration<Ingredient>
 
         builder.Property(ri => ri.ShouldBeAddedToShoppingCart)
             .HasDefaultValue(true);
+
+        // Mirrors RecipeConfiguration: author lookups plus a partial index for the
+        // review queue's "unreviewed only" scan.
+        builder.Property(i => i.CreatedByUserId)
+            .IsRequired();
+
+        builder.HasIndex(i => i.CreatedByUserId);
+
+        builder.HasIndex(i => i.IsReviewed)
+            .HasDatabaseName("IX_Ingredients_IsReviewed_Pending")
+            .HasFilter("\"IsReviewed\" = false");
     }
 }

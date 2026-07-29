@@ -1,5 +1,6 @@
 using ErrorOr;
 using FoodCalc.Features.Mapping;
+using FoodCalc.Features.Review;
 using FoodHub.DTOs;
 using FoodHub.Persistence.Entities;
 using MediatR;
@@ -16,7 +17,10 @@ public class AddMealPlanEntryCommandHandler(FoodHubDbContext context, ILogger<Ad
     {
         try
         {
-            var recipe = await context.Recipes.FirstOrDefaultAsync(r => r.Id == request.RecipeId, cancellationToken);
+            // Planning a recipe requires being able to see it, so an unapproved recipe
+            // belonging to someone else is "not found" here just as it is on the read path.
+            var recipe = await context.Recipes.VisibleTo(request.UserId)
+                .FirstOrDefaultAsync(r => r.Id == request.RecipeId, cancellationToken);
             if (recipe is null)
                 return Error.NotFound(description: "Recipe not found.");
 

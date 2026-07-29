@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using FoodCalc.Features.Review;
 
 namespace FoodCalc.Api.Common;
 
@@ -11,4 +12,11 @@ public static class ClaimsPrincipalExtensions
     /// </summary>
     public static string? GetUserId(this ClaimsPrincipal user) =>
         user.FindFirstValue(ClaimTypes.NameIdentifier) ?? user.FindFirstValue("sub");
+
+    /// <summary>
+    /// The caller as a content-ownership subject, for commands that mutate recipes or catalog
+    /// ingredients. Endpoints pass this straight through; the handler does the deciding.
+    /// </summary>
+    public static ActingUser ToActingUser(this ClaimsPrincipal user) =>
+        new(user.GetUserId(), user.IsInRole("Admin"));
 }

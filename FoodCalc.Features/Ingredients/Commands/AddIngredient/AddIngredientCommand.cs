@@ -4,4 +4,9 @@ using MediatR;
 
 namespace FoodCalc.Features.Ingredients.Commands.AddIngredient;
 
-public record AddIngredientCommand(CreateIngredientDto Ingredient) : IRequest<ErrorOr<IngredientDto>>;
+/// <param name="CreatedByUserId">
+/// Author of the new catalog entry. Required — an entry with no author could never be seen by
+/// anyone before approval, including whoever added it.
+/// </param>
+public record AddIngredientCommand(CreateIngredientDto Ingredient, string? CreatedByUserId = null)
+    : IRequest<ErrorOr<IngredientDto>>;

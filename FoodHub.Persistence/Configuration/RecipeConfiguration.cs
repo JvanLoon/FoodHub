@@ -24,6 +24,13 @@ public class RecipeConfiguration : IEntityTypeConfiguration<Recipe>
 
         builder.HasIndex(r => r.CreatedByUserId);
 
+        // Partial index: the review queue asks for the unreviewed rows, which are a small
+        // minority once a library is established. Quoted for the same reason as the check
+        // constraints in RecipeItemConfigurator — PostgreSQL folds unquoted identifiers.
+        builder.HasIndex(r => r.IsReviewed)
+            .HasDatabaseName("IX_Recipes_IsReviewed_Pending")
+            .HasFilter("\"IsReviewed\" = false");
+
         builder.HasMany(r => r.Ingredients)
             .WithOne()
             .HasForeignKey(k => k.RecipeId)

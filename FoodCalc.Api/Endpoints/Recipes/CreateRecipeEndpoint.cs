@@ -4,13 +4,13 @@ using MediatR;
 
 namespace FoodCalc.Api.Endpoints.Recipes;
 
-/// <summary>POST api/recipe — Admin only. Body validated by CreateRecipeValidator.</summary>
+/// <summary>POST api/recipe — any authenticated user. Body validated by CreateRecipeValidator.</summary>
 public class CreateRecipeEndpoint(IMediator mediator) : Endpoint<CreateRecipeDto, RecipeDto>
 {
     public override void Configure()
     {
         Post(ApiRoutes.Recipe.Create);
-        Roles("Admin");
+        Policies("Admin,Moderator,User");
     }
 
     public override async Task HandleAsync(CreateRecipeDto req, CancellationToken ct)

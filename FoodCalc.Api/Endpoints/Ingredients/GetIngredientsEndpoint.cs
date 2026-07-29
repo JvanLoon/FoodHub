@@ -22,7 +22,8 @@ public class GetIngredientsEndpoint(IMediator mediator) : Endpoint<GetIngredient
         {
             Page = req.Page,
             PageSize = req.PageSize,
-            Search = req.Search
+            Search = req.Search,
+            RequestingUserId = User.GetUserId()
         }, ct);
 
         await result.Match(value => Send.OkAsync(value, ct), errors => this.SendErrorsAsync(errors, ct: ct));
