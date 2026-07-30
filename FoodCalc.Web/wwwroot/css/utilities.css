@@ -81,7 +81,7 @@
 .fh-truncate {
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow-wrap: anywhere;
 }
 
 /* --- Form field wrapper ------------------------------------------------------ */
