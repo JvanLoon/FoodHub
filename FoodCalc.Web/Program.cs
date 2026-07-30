@@ -153,7 +153,6 @@ public class Program
         if (!behindProxy)
             app.UseHttpsRedirection();
 
-        app.UseStaticFiles();
         app.UseAntiforgery();
 
         //app.UseOutputCache();
@@ -162,6 +161,12 @@ public class Program
         app.UseAuthentication();
         app.UseAuthorization();
 
+
+        // Replaces UseStaticFiles: serves wwwroot from the build-time asset manifest, which is
+        // what makes the fingerprinted @Assets[..] URLs in App.razor resolve. It also sets
+        // immutable, long-lived caching on those hashed URLs — safe precisely because the URL
+        // changes whenever the content does.
+        app.MapStaticAssets();
 
         app.MapRazorComponents<App>()
             .AddInteractiveServerRenderMode();

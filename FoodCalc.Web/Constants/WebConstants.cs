@@ -91,7 +91,12 @@ public static class WebConstants
         {
             public const string LoginFailed = "Inloggen mislukt. Ongeldig e-mailadres of wachtwoord.";
             public const string LoginInvalidResponse = "Inloggen mislukt: ongeldig antwoord van de server.";
-            public const string RegisterSuccess = "Registratie gelukt! Je kunt nu inloggen.";
+            /// <summary>
+            /// A fresh IdentityUser starts with EmailConfirmed = false and LoginEndpoint
+            /// refuses those, so the account really is unusable until an admin enables it —
+            /// the old "je kunt nu inloggen" was wrong.
+            /// </summary>
+            public const string RegisterSuccess = "Account aangemaakt, In afwachting van goedkeuren";
         }
 
         /// <summary>Role &amp; password management.</summary>

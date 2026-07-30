@@ -15,20 +15,26 @@
 			document.documentElement.setAttribute('data-bs-theme', theme);
 		})();
 	</script>
-	<link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.min.css"/>
-	<link rel="stylesheet" href="lib/bootstrap-icons/bootstrap-icons.min.css"/>
-	<link rel="stylesheet" href="css/tokens.css"/>
-	<link rel="stylesheet" href="css/theme.css"/>
-	<link rel="stylesheet" href="css/utilities.css"/>
-	<link rel="stylesheet" href="app.css"/>
-	<link rel="stylesheet" href="FoodCalc.Web.styles.css"/>
+	@* @Assets[..] stamps a content hash into each URL, so a deploy changes the URL and no
+	   cache — browser or Cloudflare — can keep serving the previous build's file. Bare hrefs
+	   here meant an unchanged URL for changed content, which is how prod ended up on a
+	   four-hour-old stylesheet. Requires app.MapStaticAssets() in Program.cs. *@
+	<link rel="stylesheet" href="@Assets["lib/bootstrap/dist/css/bootstrap.min.css"]"/>
+	<link rel="stylesheet" href="@Assets["lib/bootstrap-icons/bootstrap-icons.min.css"]"/>
+	<link rel="stylesheet" href="@Assets["css/tokens.css"]"/>
+	<link rel="stylesheet" href="@Assets["css/theme.css"]"/>
+	<link rel="stylesheet" href="@Assets["css/utilities.css"]"/>
+	<link rel="stylesheet" href="@Assets["app.css"]"/>
+	<link rel="stylesheet" href="@Assets["FoodCalc.Web.styles.css"]"/>
+	@* Left unfingerprinted: browsers also probe /favicon.ico on their own, so the hashed
+	   URL buys nothing here. *@
 	<link rel="icon" type="image/png" href="favicon.png"/>
 	<HeadOutlet @rendermode="new InteractiveServerRenderMode(prerender: false)"/>
 </head>
 
 <body>
 <Routes @rendermode="new InteractiveServerRenderMode(prerender: false)"/>
-<script src="js/interop.js"></script>
-<script src="_framework/blazor.web.js"></script>
+<script src="@Assets["js/interop.js"]"></script>
+<script src="@Assets["_framework/blazor.web.js"]"></script>
 </body>
 </html>
