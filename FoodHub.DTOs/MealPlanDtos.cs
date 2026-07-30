@@ -28,4 +28,7 @@ public class RandomizeMealPlanDto
     public List<string> Ingredients { get; set; } = [];
     public int RecipesPerDay { get; set; } = 1;
     public bool Overwrite { get; set; }
+
+    /// <summary>Defaults to true so an unset flag from an older client still avoids repeats.</summary>
+    public bool UniqueOnly { get; set; } = true;
 }

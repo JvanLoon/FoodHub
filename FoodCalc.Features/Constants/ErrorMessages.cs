@@ -101,6 +101,9 @@ public static class ErrorMessages
     public static class User
     {
         public const string GetByEmailFailed = "Gebruiker ophalen op e-mailadres mislukt";
+
+        public const string CannotDeleteSelf = "Je kunt je eigen account niet verwijderen.";
+
         public const string BlackListAddFailed = "Recept verbergen mislukt";
         public const string BlackListRemoveFailed = "Recept weer zichtbaar maken mislukt";
     }

@@ -74,6 +74,9 @@ public static class ApiRoutes
         public const string Users = Base + "/users";
         public const string AllRoles = Base + "/allroles";
         public const string UserRoles = Base + "/userroles";
+
+        /// <summary>DELETE only — removes an account outright.</summary>
+        public const string User = Base + "/user";
     }
 
     public static class User

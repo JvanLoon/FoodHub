@@ -189,6 +189,11 @@
 		</div>
 
 		<label class="cal-check">
+			<input type="checkbox" @bind="_uniqueOnly"/>
+			<span>@UiText.Calendar.UniqueOnlyLabel</span>
+		</label>
+
+		<label class="cal-check">
 			<input type="checkbox" @bind="_overwriteDays"/>
 			<span>@UiText.Calendar.OverwriteLabel</span>
 		</label>
@@ -236,6 +241,9 @@
 	private string _ingredientDraft = string.Empty;
 	private int _recipesPerDay = 1;
 	private bool _overwriteDays;
+
+	// Variety is what people expect from "randomize", so it is on unless turned off.
+	private bool _uniqueOnly = true;
 
 	// All ingredient names from the DB, for the randomize dropdown.
 	private List<string> _allIngredientNames = new();
@@ -413,6 +421,7 @@
 		_ingredientMenuOpen = false;
 		_recipesPerDay = 1;
 		_overwriteDays = false;
+		_uniqueOnly = true;
 		_randomizeModalVisible = true;
 	}
 
@@ -470,7 +479,8 @@
 			Dates = _selectedDates.ToList(),
 			Ingredients = _wantedIngredients.ToList(),
 			RecipesPerDay = _recipesPerDay,
-			Overwrite = _overwriteDays
+			Overwrite = _overwriteDays,
+			UniqueOnly = _uniqueOnly
 		};
 
 		var result = await MealPlanService.RandomizeAsync(request);

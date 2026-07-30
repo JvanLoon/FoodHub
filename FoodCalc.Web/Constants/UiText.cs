@@ -309,6 +309,8 @@ public static class UiText
         public const string NoMatches = "Geen overeenkomsten";
         public const string RecipesPerDay = "Recepten per dag";
         public const string OverwriteLabel = "Bestaande recepten op de geselecteerde dagen overschrijven";
+        
+        public const string UniqueOnlyLabel = "Elke dag wat anders";
 
         public static string WeekLabel(DateOnly start) =>
             $"{start.ToString("d MMM", UiText.Culture)} – {start.AddDays(6).ToString("d MMM yyyy", UiText.Culture)}";
@@ -351,6 +353,14 @@ public static class UiText
         public const string Disabled = "Inactief";
         public const string Enable = "Activeren";
         public const string Disable = "Deactiveren";
+
+        public const string Delete = "Verwijderen";
+        public const string DeleteTitle = "Gebruiker verwijderen";
+        public const string DeleteConfirm = "Verwijderen";
+
+        public static string DeleteMessage(string? email) =>
+            $"Account “{email}” definitief verwijderen? De maaltijdkalender van deze gebruiker " +
+            "verdwijnt mee. Ingediende recepten blijven bestaan. Dit kan niet ongedaan worden gemaakt.";
     }
 
     /// <summary>Role management and password reset.</summary>

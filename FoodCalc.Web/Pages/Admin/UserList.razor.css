@@ -30,6 +30,13 @@
     }
 }
 
+.user-list__actions {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--fh-space-2);
+    flex-shrink: 0;
+}
+
 .user-list__link {
     display: flex;
     align-items: center;

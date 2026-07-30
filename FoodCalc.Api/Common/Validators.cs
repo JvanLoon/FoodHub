@@ -142,6 +142,17 @@ public class ModifyUserRoleRequestValidator : Validator<ModifyUserRoleRequest>
     }
 }
 
+/// <summary>Guards DELETE api/admin/user — an empty email would otherwise reach the handler.</summary>
+public class DeleteUserRequestValidator : Validator<DeleteUserRequest>
+{
+    public DeleteUserRequestValidator()
+    {
+        RuleFor(x => x.Email)
+            .NotEmpty()
+            .WithMessage(ValidationMessages.Account.EmailRequired);
+    }
+}
+
 /// <summary>
 /// The DELETE binds its own query-bound type, so it needs its own validator — before that
 /// type existed it shared <see cref="ModifyUserRoleRequest"/> and inherited these rules.

@@ -65,4 +65,8 @@ public class AdminService(AuthenticatedHttpClientService httpClient)
 
     public Task<ApiResult> RemoveUserRoleAsync(string email, string role) => httpClient.DeleteAsync(
         $"{ApiRoutes.Admin.UserRoles}?email={Uri.EscapeDataString(email)}&role={Uri.EscapeDataString(role)}");
+
+    /// <summary>Deletes the account outright. The API refuses if it is the caller's own.</summary>
+    public Task<ApiResult> DeleteUserAsync(string email) =>
+        httpClient.DeleteAsync($"{ApiRoutes.Admin.User}?email={Uri.EscapeDataString(email)}");
 }

@@ -99,6 +99,12 @@ public static class WebConstants
             public const string RegisterSuccess = "Account aangemaakt, In afwachting van goedkeuren";
         }
 
+        /// <summary>User administration.</summary>
+        public static class Users
+        {
+            public const string Deleted = "Gebruiker verwijderd.";
+        }
+
         /// <summary>Role &amp; password management.</summary>
         public static class Roles
         {

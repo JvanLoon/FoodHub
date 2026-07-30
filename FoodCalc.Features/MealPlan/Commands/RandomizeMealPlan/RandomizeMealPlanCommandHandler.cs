@@ -55,27 +55,42 @@ public class RandomizeMealPlanCommandHandler(FoodHubDbContext context, ILogger<R
             var rng = new Random();
             var created = new List<MealPlanEntry>();
 
+            // Fetched up front rather than per day: uniqueness spans the whole request, so the
+            // days that keep their entries have to be known before the first pick is made.
+            var existingInRange = await context.MealPlanEntries
+                .Where(m => m.UserId == request.UserId && dates.Contains(m.Date))
+                .ToListAsync(cancellationToken);
+
+            if (request.Overwrite)
+                context.MealPlanEntries.RemoveRange(existingInRange);
+
+            var keptByDay = request.Overwrite
+                ? new Dictionary<DateOnly, int>()
+                : existingInRange.GroupBy(m => m.Date)
+                    .ToDictionary(g => g.Key, g => g.Count());
+
+            // Recipes already spoken for. Seeded with whatever survives on the days we are not
+            // clearing — "something different every day" has to count those too.
+            var used = new HashSet<Guid>();
+            if (request.UniqueOnly && !request.Overwrite)
+                foreach (var entry in existingInRange)
+                    used.Add(entry.RecipeId);
+
             foreach (var date in dates)
             {
-                var existing = await context.MealPlanEntries.Where(m => m.UserId == request.UserId && m.Date == date)
-                    .ToListAsync(cancellationToken);
-
-                int currentCount;
-                if (request.Overwrite && existing.Count > 0)
-                {
-                    context.MealPlanEntries.RemoveRange(existing);
-                    currentCount = 0;
-                }
-                else { currentCount = existing.Count; }
+                var currentCount = keptByDay.GetValueOrDefault(date);
 
                 var slots = Math.Min(perDay, MealPlanConstants.MaxRecipesPerDay - currentCount);
                 if (slots <= 0)
                     continue;
 
                 // Random pick without repeats within a day where the pool allows it.
-                var picks = pool.OrderBy(_ => rng.Next())
-                    .Take(slots)
-                    .ToList();
+                var picks = request.UniqueOnly
+                    ? PickUnique(pool, used, slots, rng)
+                    : pool.OrderBy(_ => rng.Next())
+                        .Take(slots)
+                        .ToList();
+
                 foreach (var recipe in picks)
                 {
                     var entry = new MealPlanEntry
@@ -99,5 +114,37 @@ public class RandomizeMealPlanCommandHandler(FoodHubDbContext context, ILogger<R
             logger.LogError(ex, ErrorMessages.Common.AddFailed(ErrorMessages.Entities.RandomizedMealPlan));
             return Error.Failure(description: ErrorMessages.Common.AddFailed(ErrorMessages.Entities.RandomizedMealPlan));
         }
+    }
+
+    /// <summary>
+    /// Takes <paramref name="slots"/> recipes that are not in <paramref name="used"/>, adding
+    /// each pick to it so later days cannot repeat them.
+    ///
+    /// When the pool runs dry — more days than recipes — the set is cleared and the rotation
+    /// starts over. Filling the rest of the period with repeats beats leaving it empty, and
+    /// the caller asked for variety, not for fewer meals. Terminates because the pool is
+    /// known non-empty, so every iteration adds at least one pick.
+    /// </summary>
+    private static List<Recipe> PickUnique(List<Recipe> pool, HashSet<Guid> used, int slots, Random rng)
+    {
+        var picks = new List<Recipe>(slots);
+
+        while (picks.Count < slots)
+        {
+            var candidates = pool.Where(r => !used.Contains(r.Id)).ToList();
+            if (candidates.Count == 0)
+            {
+                used.Clear();
+                candidates = pool;
+            }
+
+            foreach (var recipe in candidates.OrderBy(_ => rng.Next()).Take(slots - picks.Count))
+            {
+                picks.Add(recipe);
+                used.Add(recipe.Id);
+            }
+        }
+
+        return picks;
     }
 }

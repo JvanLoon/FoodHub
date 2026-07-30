@@ -1,6 +1,5 @@
-@using FoodCalc.Web.Services.Admin
 @inject AdminService AdminService
-@inject MessageService MessageService
+@inject AuthStateService AuthStateService
 
 <div class="fh-stack">
 	<div class="user-search">
@@ -29,18 +28,29 @@
 							<Badge Variant="Badge.BadgeVariant.Danger" Icon="slash-circle">@UiText.Users.Disabled</Badge>
 						}
 					</a>
-					@if (user.Enabled)
-					{
-						<AppButton Variant="ButtonVariant.OutlineDanger" Size="ButtonSize.Small"
-						           OnClick='async () => await ToggleUserAsync(user.Email, false)'>@UiText.Users.Disable
-						</AppButton>
-					}
-					else
-					{
-						<AppButton Variant="ButtonVariant.OutlineSuccess" Size="ButtonSize.Small"
-						           OnClick='async () => await ToggleUserAsync(user.Email, true)'>@UiText.Users.Enable
-						</AppButton>
-					}
+					@* Wrapped so the row's space-between keeps the buttons together on the
+					   right instead of spreading them across the row. *@
+					<div class="user-list__actions">
+						@if (user.Id != currentUserId)
+						{
+							@if (user.Enabled)
+							{
+								<AppButton Variant="ButtonVariant.OutlineDanger" Size="ButtonSize.Small"
+								           OnClick='async () => await ToggleUserAsync(user.Email, false)'>@UiText.Users.Disable
+								</AppButton>
+							}
+							else
+							{
+								<AppButton Variant="ButtonVariant.OutlineSuccess" Size="ButtonSize.Small"
+								           OnClick='async () => await ToggleUserAsync(user.Email, true)'>@UiText.Users.Enable
+								</AppButton>
+							}
+
+							<AppButton Variant="ButtonVariant.Danger" Size="ButtonSize.Small" Icon="trash"
+							           OnClick='async () => await DeleteUserAsync(user.Email)'>@UiText.Users.Delete
+							</AppButton>
+						}
+					</div>
 				</li>
 			}
 		</ul>
@@ -57,14 +67,21 @@
 	}
 </div>
 
+<ConfirmDialog @ref="confirmDialog"/>
+
 @code {
 	private PagedResultDto<UserDto>? pagedResult;
 	private int currentPage = 1;
 	private int pageSize = 50;
 	private string searchTerm = string.Empty;
+	private ConfirmDialog? confirmDialog;
+	private string? currentUserId;
 
 	protected override async Task OnInitializedAsync()
 	{
+		// Own id first: the list renders between these two awaits, and with it still null the
+		// Delete button would flash onto your own row before being taken away again.
+		currentUserId = await AuthStateService.GetUserIdAsync();
 		await LoadUsersAsync();
 	}
 
@@ -103,6 +120,23 @@
 				if (user != null)
 					user.Enabled = enabled;
 			})
+			.OnFailure();
+	}
+
+	// Irreversible and one click away from Disable, so it always goes through a prompt that
+	// names the account. The API re-checks who the caller is and refuses a self-delete.
+	private async Task DeleteUserAsync(string email)
+	{
+		if (confirmDialog is null)
+			return;
+
+		var confirmed = await confirmDialog.ShowAsync(UiText.Users.DeleteTitle, UiText.Users.DeleteMessage(email), UiText.Users.DeleteConfirm, danger: true);
+
+		if (!confirmed)
+			return;
+
+		await AdminService.DeleteUserAsync(email)
+			.OnSuccess(async () => await LoadUsersAsync(), WebConstants.Messages.Users.Deleted)
 			.OnFailure();
 	}
 

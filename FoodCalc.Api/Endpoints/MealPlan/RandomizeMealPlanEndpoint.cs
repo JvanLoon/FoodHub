@@ -25,7 +25,8 @@ public class RandomizeMealPlanEndpoint(IMediator mediator) : Endpoint<RandomizeM
         }
 
         var result = await mediator.Send(
-            new RandomizeMealPlanCommand(userId, req.Dates, req.Ingredients, req.RecipesPerDay, req.Overwrite), ct);
+            new RandomizeMealPlanCommand(userId, req.Dates, req.Ingredients, req.RecipesPerDay, req.Overwrite,
+                req.UniqueOnly), ct);
 
         await result.Match(value => Send.OkAsync(value, ct), errors => this.SendErrorsAsync(errors, ct: ct));
     }
