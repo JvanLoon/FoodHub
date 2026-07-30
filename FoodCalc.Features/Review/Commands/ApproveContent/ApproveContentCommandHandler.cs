@@ -16,13 +16,13 @@ public class ApproveContentCommandHandler(FoodHubDbContext context, ILogger<Appr
             {
                 ReviewTargetType.Recipe => await ApproveRecipeAsync(request.TargetId, cancellationToken),
                 ReviewTargetType.RecipeItem => await ApproveRecipeItemAsync(request.TargetId, cancellationToken),
-                _ => Error.Validation(description: $"Unknown review target type: {request.TargetType}.")
+                _ => Error.Validation(description: ErrorMessages.Review.UnknownTargetType(request.TargetType))
             };
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, ErrorMessages.Common.UpdateFailed("review status"));
-            return Error.Failure(description: ErrorMessages.Common.UpdateFailed("review status"));
+            logger.LogError(ex, ErrorMessages.Common.UpdateFailed(ErrorMessages.Entities.ReviewStatus));
+            return Error.Failure(description: ErrorMessages.Common.UpdateFailed(ErrorMessages.Entities.ReviewStatus));
         }
     }
 
@@ -31,7 +31,7 @@ public class ApproveContentCommandHandler(FoodHubDbContext context, ILogger<Appr
         var recipe = await context.Recipes.SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
 
         if (recipe is null)
-            return Error.NotFound(description: ErrorMessages.Common.NotFound("Recipe"));
+            return Error.NotFound(description: ErrorMessages.Common.NotFound(ErrorMessages.Entities.Recipe));
 
         var now = DateTime.UtcNow;
 
@@ -79,7 +79,7 @@ public class ApproveContentCommandHandler(FoodHubDbContext context, ILogger<Appr
         var item = await context.RecipeItems.SingleOrDefaultAsync(ri => ri.Id == id, cancellationToken);
 
         if (item is null)
-            return Error.NotFound(description: ErrorMessages.Common.NotFound("Recipe line"));
+            return Error.NotFound(description: ErrorMessages.Common.NotFound(ErrorMessages.Entities.RecipeLine));
 
         item.IsReviewed = true;
 

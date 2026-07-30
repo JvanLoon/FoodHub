@@ -36,8 +36,8 @@ public class GetReviewQueueQueryHandler(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, ErrorMessages.Common.GetAllFailed("the review queue"));
-            return Error.Failure(description: ErrorMessages.Common.GetAllFailed("the review queue"));
+            logger.LogError(ex, ErrorMessages.Common.GetAllFailed(ErrorMessages.Entities.ReviewQueue));
+            return Error.Failure(description: ErrorMessages.Common.GetAllFailed(ErrorMessages.Entities.ReviewQueue));
         }
     }
 

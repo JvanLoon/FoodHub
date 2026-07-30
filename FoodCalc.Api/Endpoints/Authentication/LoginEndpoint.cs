@@ -24,13 +24,13 @@ public class LoginEndpoint(
         var user = await userManager.FindByEmailAsync(req.Email);
         if (user == null)
         {
-            await Send.StringAsync("No user found", 401, cancellation: ct);
+            await Send.StringAsync(ResponseMessages.Account.UserNotFound, 401, cancellation: ct);
             return;
         }
 
         if (!user.EmailConfirmed)
         {
-            await Send.StringAsync("Email not confirmed", 401, cancellation: ct);
+            await Send.StringAsync(ResponseMessages.Account.EmailNotConfirmed, 401, cancellation: ct);
             return;
         }
 
@@ -39,7 +39,7 @@ public class LoginEndpoint(
             if (user.LockoutEnd < DateTime.Now) { await userManager.SetLockoutEnabledAsync(user, false); }
             else
             {
-                await Send.StringAsync("User Lockedout", 401, cancellation: ct);
+                await Send.StringAsync(ResponseMessages.Account.UserLockedOut, 401, cancellation: ct);
                 return;
             }
         }
@@ -48,7 +48,7 @@ public class LoginEndpoint(
         if (!result.Succeeded)
         {
             await userManager.AccessFailedAsync(user);
-            await Send.StringAsync("Invalid password", 401, cancellation: ct);
+            await Send.StringAsync(ResponseMessages.Account.InvalidPassword, 401, cancellation: ct);
             return;
         }
 

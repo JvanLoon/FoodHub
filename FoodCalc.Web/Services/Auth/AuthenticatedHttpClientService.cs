@@ -127,7 +127,7 @@ public class AuthenticatedHttpClientService(
 
         // A POST/PUT/PATCH with no body carries no Content-Type either, and the API
         // answers 415 Unsupported Media Type before the endpoint ever runs — which
-        // surfaced in the UI as "That file type isn't supported". The endpoints this
+        // surfaced in the UI as the UnsupportedMediaType fallback. The endpoints this
         // affects take everything from the query string (ToggleUser, UserRoles), so
         // an empty JSON object satisfies the model binder without changing what is
         // sent. DELETE is left alone: it is legitimately bodyless.

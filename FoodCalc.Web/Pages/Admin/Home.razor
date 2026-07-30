@@ -6,13 +6,13 @@
 @inject AuthStateService AuthStateService
 @inject NavigationManager NavigationManager
 
-<PageTitle>Home</PageTitle>
+<PageTitle>@UiText.Home.Title</PageTitle>
 
 <div class="home-layout">
 	@if (!isAdmin)
 	{
 		<div class="home-header">
-			<PageHeader Title="Welcome to FoodHub" Subtitle="Plan your meals and find something to cook."/>
+			<PageHeader Title="@UiText.Home.WelcomeTitle" Subtitle="@UiText.Home.WelcomeSubtitle"/>
 		</div>
 
 		<div class="home-body">
@@ -20,24 +20,24 @@
 				<div class="fh-stat-card fh-stat-card--primary" @onclick="GoToCalendar" role="button" tabindex="0">
 					<div class="fh-stat-icon"><i class="bi bi-calendar-week"></i></div>
 					<div class="fh-stat-body">
-						<div class="fh-stat-label">Meal calendar</div>
-						<div class="fh-stat-sub fh-muted">Plan what to eat each day</div>
+						<div class="fh-stat-label">@UiText.Home.MealCalendar</div>
+						<div class="fh-stat-sub fh-muted">@UiText.Home.MealCalendarHint</div>
 					</div>
 				</div>
 
 				<div class="fh-stat-card fh-stat-card--accent" @onclick="GoToRecipes" role="button" tabindex="0">
 					<div class="fh-stat-icon"><i class="bi bi-journal-text"></i></div>
 					<div class="fh-stat-body">
-						<div class="fh-stat-label">Recipes</div>
-						<div class="fh-stat-sub fh-muted">Browse the recipe library</div>
+						<div class="fh-stat-label">@UiText.Home.Recipes</div>
+						<div class="fh-stat-sub fh-muted">@UiText.Home.RecipesHint</div>
 					</div>
 				</div>
 
 				<div class="fh-stat-card fh-stat-card--info" @onclick="GoToFindRecipes" role="button" tabindex="0">
 					<div class="fh-stat-icon"><i class="bi bi-search-heart"></i></div>
 					<div class="fh-stat-body">
-						<div class="fh-stat-label">Find recipes</div>
-						<div class="fh-stat-sub fh-muted">Search by the ingredients you have</div>
+						<div class="fh-stat-label">@UiText.Home.FindRecipes</div>
+						<div class="fh-stat-sub fh-muted">@UiText.Home.FindRecipesHint</div>
 					</div>
 				</div>
 			</section>
@@ -46,13 +46,13 @@
 	else
 	{
 		<div class="home-header">
-			<PageHeader Title="Dashboard" Subtitle="An overview of your FoodHub library."/>
+			<PageHeader Title="@UiText.Home.DashboardTitle" Subtitle="@UiText.Home.DashboardSubtitle"/>
 		</div>
 
 		<div class="home-body">
 			@if (loading)
 			{
-				<LoadingSpinner Label="Loading dashboard..."/>
+				<LoadingSpinner Label="@UiText.Home.LoadingDashboard"/>
 			}
 			else
 			{
@@ -60,7 +60,7 @@
 					<div class="fh-stat-card fh-stat-card--primary" @onclick="GoToRecipes" role="button" tabindex="0">
 						<div class="fh-stat-icon"><i class="bi bi-journal-text"></i></div>
 						<div class="fh-stat-body">
-							<div class="fh-stat-label">Recipes</div>
+							<div class="fh-stat-label">@UiText.Home.Recipes</div>
 							<div class="fh-stat-value">@recipeCount</div>
 						</div>
 					</div>
@@ -69,7 +69,7 @@
 					     tabindex="0">
 						<div class="fh-stat-icon"><i class="bi bi-egg"></i></div>
 						<div class="fh-stat-body">
-							<div class="fh-stat-label">Ingredients</div>
+							<div class="fh-stat-label">@UiText.Home.Ingredients</div>
 							<div class="fh-stat-value">@ingredientCount</div>
 						</div>
 					</div>
@@ -79,7 +79,7 @@
 						<div class="fh-stat-card fh-stat-card--info" @onclick="GoToAdmin" role="button" tabindex="0">
 							<div class="fh-stat-icon"><i class="bi bi-people"></i></div>
 							<div class="fh-stat-body">
-								<div class="fh-stat-label">Users</div>
+								<div class="fh-stat-label">@UiText.Home.Users</div>
 								<div class="fh-stat-value">@userCount</div>
 							</div>
 						</div>
@@ -88,7 +88,7 @@
 					<div class="fh-stat-card">
 						<div class="fh-stat-icon"><i class="bi bi-bar-chart"></i></div>
 						<div class="fh-stat-body">
-							<div class="fh-stat-label">Avg. ingredients / recipe</div>
+							<div class="fh-stat-label">@UiText.Home.AvgIngredientsPerRecipe</div>
 							<div class="fh-stat-value">@avgIngredientsPerRecipe.ToString("0.0")</div>
 						</div>
 					</div>
@@ -96,16 +96,16 @@
 					<div class="fh-stat-card">
 						<div class="fh-stat-icon"><i class="bi bi-cart3"></i></div>
 						<div class="fh-stat-body">
-							<div class="fh-stat-label">On shopping list</div>
+							<div class="fh-stat-label">@UiText.Home.OnShoppingList</div>
 							<div class="fh-stat-value">@shoppingCartIngredientCount</div>
-							<div class="fh-stat-sub fh-muted">of @ingredientCount ingredients</div>
+							<div class="fh-stat-sub fh-muted">@UiText.Home.OfIngredients(ingredientCount)</div>
 						</div>
 					</div>
 
 					<div class="fh-stat-card">
 						<div class="fh-stat-icon"><i class="bi bi-link-45deg"></i></div>
 						<div class="fh-stat-body">
-							<div class="fh-stat-label">Recipe-ingredient links</div>
+							<div class="fh-stat-label">@UiText.Home.RecipeIngredientLinks</div>
 							<div class="fh-stat-value">@totalRecipeItemLinks</div>
 						</div>
 					</div>
@@ -115,8 +115,8 @@
 				{
 					<section class="fh-panel">
 						<div class="fh-panel-header">
-							<h2 class="fh-subheading">Top ingredients</h2>
-							<span class="fh-muted">Most used across all recipes</span>
+							<h2 class="fh-subheading">@UiText.Home.TopIngredients</h2>
+							<span class="fh-muted">@UiText.Home.TopIngredientsHint</span>
 						</div>
 						<ol class="fh-top-list">
 							@foreach (var item in topIngredients)
@@ -125,8 +125,7 @@
 								<li>
 									<div class="fh-top-row">
 										<span class="fh-top-name">@item.Name</span>
-										<span
-											class="fh-top-count fh-muted">@item.UsageCount recipe@(item.UsageCount == 1 ? "" : "s")</span>
+										<span class="fh-top-count fh-muted">@UiText.Home.UsedInRecipes(item.UsageCount)</span>
 									</div>
 									<div class="fh-top-bar"><span style="width:@(pct)%;"></span></div>
 								</li>

@@ -3,28 +3,28 @@
 @inject RecipeService RecipeService
 @inject IJSRuntime JS
 
-<PageTitle>@(recipe?.Name ?? "Recipe")</PageTitle>
+<PageTitle>@(recipe?.Name ?? UiText.RecipeDetail.Fallback)</PageTitle>
 
 <div class="fh-stack">
-	<PageHeader Title="@(recipe?.Name ?? "Recipe")" Subtitle="Recipe details">
-		<AppButton Variant="ButtonVariant.OutlineSecondary" Icon="arrow-left" OnClick="GoBack">Back</AppButton>
+	<PageHeader Title="@(recipe?.Name ?? UiText.RecipeDetail.Fallback)" Subtitle="@UiText.RecipeDetail.Subtitle">
+		<AppButton Variant="ButtonVariant.OutlineSecondary" Icon="arrow-left" OnClick="GoBack">@UiText.Common.Back</AppButton>
 	</PageHeader>
 
 	@if (loading)
 	{
-		<LoadingSpinner Label="Loading recipe..."/>
+		<LoadingSpinner Label="@UiText.RecipeDetail.Loading"/>
 	}
 	else if (recipe is null)
 	{
-		<EmptyState Icon="journal-x" Title="Recipe not found."
-		            Message="This recipe may have been removed."/>
+		<EmptyState Icon="journal-x" Title="@UiText.RecipeDetail.NotFoundTitle"
+		            Message="@UiText.RecipeDetail.NotFoundMessage"/>
 	}
 	else
 	{
 		<div class="recipe-view">
 
 			<AppCard CssClass="recipe-view__card">
-				<h2 class="fh-subheading">Ingredients</h2>
+				<h2 class="fh-subheading">@UiText.RecipeDetail.Ingredients</h2>
 				@if (recipe.Ingredients.Count > 0)
 				{
 					<ul class="recipe-view__ingredients">
@@ -33,13 +33,13 @@
 							<li>
 								<span>@ingredient.Name</span>
 								<span class="fh-muted">
-								    @ingredient.Amount.ToFormattedString() @ingredient.IngredientAmount.ToString()
+								    @ingredient.Amount.ToFormattedString() @UiText.AmountTypes.Label(ingredient.IngredientAmount)
 							    </span>
 							</li>
 						}
 					</ul>
 				}
-				else { <p class="fh-muted">This recipe has no ingredients yet.</p> }
+				else { <p class="fh-muted">@UiText.RecipeDetail.NoIngredients</p> }
 			</AppCard>
 		</div>
 	}

@@ -6,63 +6,58 @@
 <div class="fh-stack">
 	<AppCard>
 		<p class="text-body-secondary">
-			Asks the API to fail through the same path every real endpoint uses. Each error should
-			appear as its own toast <em>and</em> in the result below.
+			@UiText.ErrorTest.Intro
 		</p>
 		<ul class="text-body-secondary">
 			<li>
-				<strong>Count &gt; 0</strong> — the server supplies the messages, so you are testing
-				the parser: <em>n</em> errors in, <em>n</em> toasts out.
+				<strong>@UiText.ErrorTest.BulletPositiveCount</strong>@UiText.ErrorTest.BulletPositiveCountText
 			</li>
 			<li>
-				<strong>Count = 0</strong> — the server sends an empty body, so the client falls back
-				to its own message for that status. That is how you check the
-				<code>WebConstants.Messages.Client</code> wording.
+				<strong>@UiText.ErrorTest.BulletZeroCount</strong>@UiText.ErrorTest.BulletZeroCountText<code>WebConstants.Messages.Client</code>.
 			</li>
 			<li>
-				<strong>A 2xx status</strong> — always a success, whatever the count. The server
-				returns its status text (e.g. <code>200 => OK</code>), which is toasted.
+				<strong>@UiText.ErrorTest.BulletSuccessStatus</strong>@UiText.ErrorTest.BulletSuccessStatusText
 			</li>
 		</ul>
 
 		<EditForm Model="form" OnValidSubmit="TriggerAsync" FormName="error-test-form">
 			<div class="error-test__controls">
-				<NumberField TValue="int" Label="Number of errors" @bind-Value="form.Count"/>
+				<NumberField TValue="int" Label="@UiText.ErrorTest.CountLabel" @bind-Value="form.Count"/>
 
-				<SelectField TValue="int" Label="Status code" @bind-Value="form.StatusCode">
-					<optgroup label="2xx — Success">
-						<option value="200">200 — OK</option>
-						<option value="201">201 — Created</option>
-						<option value="202">202 — Accepted</option>
-						<option value="204">204 — No Content</option>
+				<SelectField TValue="int" Label="@UiText.ErrorTest.StatusCodeLabel" @bind-Value="form.StatusCode">
+					<optgroup label="@UiText.ErrorTest.GroupSuccess">
+						<option value="200">@UiText.ErrorTest.Status200</option>
+						<option value="201">@UiText.ErrorTest.Status201</option>
+						<option value="202">@UiText.ErrorTest.Status202</option>
+						<option value="204">@UiText.ErrorTest.Status204</option>
 					</optgroup>
-					<optgroup label="4xx — Client">
-						<option value="400">400 — Bad Request</option>
-						<option value="401">401 — Unauthorized</option>
-						<option value="403">403 — Forbidden</option>
-						<option value="404">404 — Not Found</option>
-						<option value="405">405 — Method Not Allowed</option>
-						<option value="408">408 — Request Timeout</option>
-						<option value="409">409 — Conflict</option>
-						<option value="413">413 — Payload Too Large</option>
-						<option value="415">415 — Unsupported Media Type</option>
-						<option value="422">422 — Unprocessable Entity</option>
-						<option value="429">429 — Too Many Requests</option>
-						<option value="418">418 — I'm a teapot (unmapped)</option>
+					<optgroup label="@UiText.ErrorTest.GroupClient">
+						<option value="400">@UiText.ErrorTest.Status400</option>
+						<option value="401">@UiText.ErrorTest.Status401</option>
+						<option value="403">@UiText.ErrorTest.Status403</option>
+						<option value="404">@UiText.ErrorTest.Status404</option>
+						<option value="405">@UiText.ErrorTest.Status405</option>
+						<option value="408">@UiText.ErrorTest.Status408</option>
+						<option value="409">@UiText.ErrorTest.Status409</option>
+						<option value="413">@UiText.ErrorTest.Status413</option>
+						<option value="415">@UiText.ErrorTest.Status415</option>
+						<option value="422">@UiText.ErrorTest.Status422</option>
+						<option value="429">@UiText.ErrorTest.Status429</option>
+						<option value="418">@UiText.ErrorTest.Status418</option>
 					</optgroup>
-					<optgroup label="5xx — Server">
-						<option value="500">500 — Internal Server Error</option>
-						<option value="501">501 — Not Implemented</option>
-						<option value="502">502 — Bad Gateway</option>
-						<option value="503">503 — Service Unavailable</option>
-						<option value="504">504 — Gateway Timeout</option>
-						<option value="511">511 — Network Authentication Required</option>
+					<optgroup label="@UiText.ErrorTest.GroupServer">
+						<option value="500">@UiText.ErrorTest.Status500</option>
+						<option value="501">@UiText.ErrorTest.Status501</option>
+						<option value="502">@UiText.ErrorTest.Status502</option>
+						<option value="503">@UiText.ErrorTest.Status503</option>
+						<option value="504">@UiText.ErrorTest.Status504</option>
+						<option value="511">@UiText.ErrorTest.Status511</option>
 					</optgroup>
 				</SelectField>
 			</div>
 
 			<AppButton Type="submit" Icon="exclamation-triangle" Loading="running">
-				Trigger
+				@UiText.ErrorTest.TriggerButton
 			</AppButton>
 		</EditForm>
 	</AppCard>
@@ -70,22 +65,22 @@
 	@if (result is not null)
 	{
 		<AppCard>
-			<h3 class="h5">Last result</h3>
+			<h3 class="h5">@UiText.ErrorTest.LastResult</h3>
 
 			<p>
 				<Badge Variant="@(result.Success ? Badge.BadgeVariant.Success : Badge.BadgeVariant.Danger)">
-					@(result.Success ? "Success" : "Failed")
+					@(result.Success ? UiText.ErrorTest.Succeeded : UiText.ErrorTest.Failed)
 				</Badge>
 				<span class="text-body-secondary">HTTP @result.StatusCode</span>
 			</p>
 
 			@if (result.Errors.Count == 0)
 			{
-				<EmptyState Icon="check-circle" Title="No errors returned"/>
+				<EmptyState Icon="check-circle" Title="@UiText.ErrorTest.NoErrorsReturned"/>
 			}
 			else
 			{
-				<p class="text-body-secondary">@result.Errors.Count error(s) parsed from the response:</p>
+				<p class="text-body-secondary">@UiText.ErrorTest.ErrorsParsed(result.Errors.Count)</p>
 				<ol class="error-test__list">
 					@foreach (var error in result.Errors)
 					{

@@ -3,8 +3,8 @@
 
 <div class="@CssClass" @onclick="OnSelect">
 	<div class="cal-day__head">
-		<span class="cal-day__num">@(Compact ? Day.Day.ToString() : Day.ToString("ddd d"))</span>
-		<button type="button" class="cal-day__add" title="Add recipe"
+		<span class="cal-day__num">@(Compact ? Day.Day.ToString() : UiText.Calendar.DayLabel(Day))</span>
+		<button type="button" class="cal-day__add" title="@UiText.Calendar.AddRecipe"
 		        @onclick="OnAdd" @onclick:stopPropagation="true">
 			<i class="bi bi-plus-lg"></i>
 		</button>
@@ -13,11 +13,11 @@
 		@foreach (var entry in Entries)
 		{
 			<li class="cal-meal" title="@entry.RecipeName">
-				<button type="button" class="cal-meal__name" title="Open recipe"
+				<button type="button" class="cal-meal__name" title="@UiText.Calendar.OpenRecipe"
 				        @onclick="() => OnOpen.InvokeAsync(entry)" @onclick:stopPropagation="true">
 					@entry.RecipeName
 				</button>
-				<button type="button" class="cal-meal__x" title="Remove"
+				<button type="button" class="cal-meal__x" title="@UiText.Calendar.RemoveRecipe"
 				        @onclick="() => OnRemove.InvokeAsync(entry)" @onclick:stopPropagation="true">
 					<i class="bi bi-x"></i>
 				</button>

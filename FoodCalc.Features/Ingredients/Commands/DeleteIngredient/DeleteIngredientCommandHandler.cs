@@ -16,7 +16,7 @@ public class DeleteIngredientCommandHandler(FoodHubDbContext context, ILogger<De
             if (ingredient != null)
             {
                 if (!request.Acting.CanEdit(ingredient.CreatedByUserId))
-                    return Error.Forbidden(description: ErrorMessages.Review.NotOwned("ingredient"));
+                    return Error.Forbidden(description: ErrorMessages.Review.NotOwned(ErrorMessages.Entities.Ingredient));
 
                 context.Ingredients.Remove(ingredient);
                 await context.SaveChangesAsync(cancellationToken);
@@ -26,8 +26,8 @@ public class DeleteIngredientCommandHandler(FoodHubDbContext context, ILogger<De
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, ErrorMessages.Common.DeleteFailed("ingredient"));
-            return Error.Failure(description: ErrorMessages.Common.DeleteFailed("ingredient"));
+            logger.LogError(ex, ErrorMessages.Common.DeleteFailed(ErrorMessages.Entities.Ingredient));
+            return Error.Failure(description: ErrorMessages.Common.DeleteFailed(ErrorMessages.Entities.Ingredient));
         }
     }
 }

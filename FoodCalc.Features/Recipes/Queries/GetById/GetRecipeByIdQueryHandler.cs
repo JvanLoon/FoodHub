@@ -22,14 +22,14 @@ public class GetRecipeByIdQueryHandler(FoodHubDbContext context, ILogger<GetReci
             // caller gets for someone else's unapproved recipe: the visibility filter above
             // removes it from the query entirely, so "exists but is not yours" is
             // indistinguishable from "does not exist", which is the intended answer.
-            if (recipe is null) { return Error.NotFound(description: ErrorMessages.Common.NotFound("Recipe")); }
+            if (recipe is null) { return Error.NotFound(description: ErrorMessages.Common.NotFound(ErrorMessages.Entities.Recipe)); }
 
             return recipe.ToDto();
         }
         catch (Exception ex)
         {
             logger.LogError(ex, $"Failed to get recipe by id: {request.Id}");
-            return Error.Failure(description: $"Failed to get recipe by id: {request.Id}");
+            return Error.Failure(description: ErrorMessages.Recipe.GetByIdFailed(request.Id));
         }
     }
 }

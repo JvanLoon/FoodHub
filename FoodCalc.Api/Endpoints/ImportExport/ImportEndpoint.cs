@@ -26,13 +26,13 @@ public class ImportEndpoint(IMediator mediator) : Endpoint<ImportRequest>
         var file = req.File;
         if (file == null || file.Length == 0)
         {
-            await Send.StringAsync("No file uploaded.", 400, cancellation: ct);
+            await Send.StringAsync(ResponseMessages.Import.NoFileUploaded, 400, cancellation: ct);
             return;
         }
 
         if (!file.ContentType.Equals("application/json", StringComparison.OrdinalIgnoreCase))
         {
-            await Send.StringAsync("Only JSON files are accepted.", 400, cancellation: ct);
+            await Send.StringAsync(ResponseMessages.Import.OnlyJsonAccepted, 400, cancellation: ct);
             return;
         }
 
@@ -41,20 +41,20 @@ public class ImportEndpoint(IMediator mediator) : Endpoint<ImportRequest>
 
         if (importData == null)
         {
-            await Send.StringAsync("Invalid file content.", 400, cancellation: ct);
+            await Send.StringAsync(ResponseMessages.Import.InvalidFileContent, 400, cancellation: ct);
             return;
         }
 
         var userid = User.GetUserId();
         if (string.IsNullOrEmpty(userid))
         {
-            await Send.StringAsync("Invalid user id.", 400, cancellation: ct);
+            await Send.StringAsync(ResponseMessages.Token.InvalidUserId, 400, cancellation: ct);
             return;
         }
 
         var result = await mediator.Send(new ImportAllCommand(importData, userid), ct);
 
-        await result.Match(_ => Send.StringAsync("Import successful.", cancellation: ct),
+        await result.Match(_ => Send.StringAsync(ResponseMessages.Import.Succeeded, cancellation: ct),
             errors => this.SendErrorsAsync(errors, ct: ct));
     }
 }

@@ -20,8 +20,8 @@ public class RemoveRecipeFromBlackListCommandHandler(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to ");
-            return Error.Failure(description: "Failed to ");
+            logger.LogError(ex, "Failed to remove recipe from the blacklist");
+            return Error.Failure(description: ErrorMessages.User.BlackListRemoveFailed);
         }
     }
 }

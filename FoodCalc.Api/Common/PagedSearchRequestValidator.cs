@@ -17,8 +17,10 @@ public class PagedSearchRequestValidator<TRequest> : Validator<TRequest> where T
     public PagedSearchRequestValidator()
     {
         RuleFor(x => x.Page)
-            .GreaterThanOrEqualTo(1);
+            .GreaterThanOrEqualTo(1)
+            .WithMessage(ValidationMessages.Common.PageMinimum(1));
         RuleFor(x => x.PageSize)
-            .GreaterThanOrEqualTo(1);
+            .GreaterThanOrEqualTo(1)
+            .WithMessage(ValidationMessages.Common.PageSizeMinimum(1));
     }
 }

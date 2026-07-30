@@ -4,12 +4,12 @@
 
 <div class="fh-stack">
 	<div class="user-search">
-		<SearchBox Placeholder="Search users..." Value="@searchTerm" ValueChanged="OnSearchChanged"/>
+		<SearchBox Placeholder="@UiText.Users.SearchPlaceholder" Value="@searchTerm" ValueChanged="OnSearchChanged"/>
 	</div>
 
 	@if (pagedResult == null)
 	{
-		<LoadingSpinner Label="Loading users..."/>
+		<LoadingSpinner Label="@UiText.Users.Loading"/>
 	}
 	else if (pagedResult.Items.Any())
 	{
@@ -22,23 +22,23 @@
 						<span class="user-list__email fh-truncate">@user.Email</span>
 						@if (user.Enabled)
 						{
-							<Badge Variant="Badge.BadgeVariant.Success" Icon="check-circle">Enabled</Badge>
+							<Badge Variant="Badge.BadgeVariant.Success" Icon="check-circle">@UiText.Users.Enabled</Badge>
 						}
 						else
 						{
-							<Badge Variant="Badge.BadgeVariant.Danger" Icon="slash-circle">Disabled</Badge>
+							<Badge Variant="Badge.BadgeVariant.Danger" Icon="slash-circle">@UiText.Users.Disabled</Badge>
 						}
 					</a>
 					@if (user.Enabled)
 					{
 						<AppButton Variant="ButtonVariant.OutlineDanger" Size="ButtonSize.Small"
-						           OnClick='async () => await ToggleUserAsync(user.Email, false)'>Disable
+						           OnClick='async () => await ToggleUserAsync(user.Email, false)'>@UiText.Users.Disable
 						</AppButton>
 					}
 					else
 					{
 						<AppButton Variant="ButtonVariant.OutlineSuccess" Size="ButtonSize.Small"
-						           OnClick='async () => await ToggleUserAsync(user.Email, true)'>Enable
+						           OnClick='async () => await ToggleUserAsync(user.Email, true)'>@UiText.Users.Enable
 						</AppButton>
 					}
 				</li>
@@ -53,7 +53,7 @@
 	}
 	else
 	{
-		<EmptyState Icon="people" Title="No users found."/>
+		<EmptyState Icon="people" Title="@UiText.Users.Empty"/>
 	}
 </div>
 

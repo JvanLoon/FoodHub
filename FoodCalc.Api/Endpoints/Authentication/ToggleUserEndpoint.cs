@@ -20,7 +20,7 @@ public class ToggleUserEndpoint(UserManager<IdentityUser> userManager) : Endpoin
         var user = await userManager.FindByEmailAsync(req.Email);
         if (user == null)
         {
-            await Send.StringAsync("User not found", 404, cancellation: ct);
+            await Send.StringAsync(ResponseMessages.Account.UserNotFound, 404, cancellation: ct);
             return;
         }
 

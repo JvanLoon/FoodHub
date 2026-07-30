@@ -8,24 +8,24 @@
 @inject AuthStateService AuthStateService
 @inject NavigationManager Navigation
 
-<PageTitle>Ingredients</PageTitle>
+<PageTitle>@UiText.Ingredients.Title</PageTitle>
 
 <div class="ingredient-layout">
 	<div class="ingredient-header">
-		<PageHeader Title="Ingredients">
-			<SearchBox Placeholder="Search ingredients..." Value="@searchTerm" ValueChanged="OnSearchChanged"/>
+		<PageHeader Title="@UiText.Ingredients.Title">
+			<SearchBox Placeholder="@UiText.Ingredients.SearchPlaceholder" Value="@searchTerm" ValueChanged="OnSearchChanged"/>
 		</PageHeader>
 	</div>
 
 	<div class="ingredient-body">
 		<DataTable TItem="IngredientDto"
 		           Items="pagedResult?.Items"
-		           EmptyText="No ingredients found."
-		           LoadingText="Loading ingredients...">
+		           EmptyText="@UiText.Ingredients.Empty"
+		           LoadingText="@UiText.Ingredients.Loading">
 			<HeaderContent>
-				<th class="w-100">Name</th>
-				<th class="text-center text-nowrap">Shopping Cart</th>
-				<th class="text-end text-nowrap">Actions</th>
+				<th class="w-100">@UiText.Ingredients.ColumnName</th>
+				<th class="text-center text-nowrap">@UiText.Ingredients.ColumnShoppingList</th>
+				<th class="text-end text-nowrap">@UiText.Ingredients.ColumnActions</th>
 			</HeaderContent>
 			<RowTemplate Context="ingredient">
 				<td class="w-100 text-wrap">
@@ -45,17 +45,17 @@
 					@if (editingIngredientId == ingredient.Id)
 					{
 						<AppButton Variant="ButtonVariant.Success" Size="ButtonSize.Small" Icon="check-lg"
-						           OnClick="() => SaveEdit(ingredient)">Save
+						           OnClick="() => SaveEdit(ingredient)">@UiText.Common.Save
 						</AppButton>
 					}
 					else
 					{
 						<AppButton Variant="ButtonVariant.OutlineSecondary" Size="ButtonSize.Small" Icon="pencil"
-						           OnClick="() => StartEdit(ingredient)">Edit
+						           OnClick="() => StartEdit(ingredient)">@UiText.Common.Edit
 						</AppButton>
 					}
 					<AppButton Variant="ButtonVariant.OutlineDanger" Size="ButtonSize.Small" Icon="trash"
-					           CssClass="ms-2" OnClick="() => DeleteIngredient(ingredient.Id)">Delete
+					           CssClass="ms-2" OnClick="() => DeleteIngredient(ingredient.Id)">@UiText.Common.Delete
 					</AppButton>
 				</td>
 			</RowTemplate>

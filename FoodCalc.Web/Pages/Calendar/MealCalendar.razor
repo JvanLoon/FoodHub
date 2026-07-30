@@ -6,32 +6,32 @@
 @inject MessageService MessageService
 @inject NavigationManager Navigation
 
-<PageTitle>Meal calendar</PageTitle>
+<PageTitle>@UiText.Calendar.Title</PageTitle>
 
 <div class="cal-layout">
 	<div class="cal-header">
-		<PageHeader Title="Meal calendar" Subtitle="Plan a recipe for each day. Select two or more days to randomize.">
-			<div class="cal-toggle" role="tablist" aria-label="Calendar view">
+		<PageHeader Title="@UiText.Calendar.Title" Subtitle="@UiText.Calendar.Subtitle">
+			<div class="cal-toggle" role="tablist" aria-label="@UiText.Calendar.ViewAriaLabel">
 				<button type="button" class="cal-toggle__btn @(_viewMode == View.Week ? "cal-toggle__btn--active" : "")"
 				        role="tab" aria-selected="@(_viewMode == View.Week)" @onclick="() => _viewMode = View.Week">
-					<i class="bi bi-calendar-week" aria-hidden="true"></i> Week
+					<i class="bi bi-calendar-week" aria-hidden="true"></i> @UiText.Calendar.Week
 				</button>
 				<button type="button"
 				        class="cal-toggle__btn @(_viewMode == View.Month ? "cal-toggle__btn--active" : "")"
 				        role="tab" aria-selected="@(_viewMode == View.Month)" @onclick="() => _viewMode = View.Month">
-					<i class="bi bi-calendar-month" aria-hidden="true"></i> Month
+					<i class="bi bi-calendar-month" aria-hidden="true"></i> @UiText.Calendar.Month
 				</button>
 			</div>
 			<AppButton Variant="ButtonVariant.Primary" Icon="shuffle"
 			           Disabled="@(_selectedDates.Count < 2)"
 			           OnClick="OpenRandomize">
-				Randomize @(_selectedDates.Count >= 2 ? $"({_selectedDates.Count})" : "")
+				@UiText.Calendar.Randomize @(_selectedDates.Count >= 2 ? $"({_selectedDates.Count})" : "")
 			</AppButton>
 			@if (_selectedDates.Count > 0)
 			{
 				<AppButton Variant="ButtonVariant.OutlineSecondary" Icon="x-circle"
 				           OnClick="ClearSelection">
-					Clear selection
+					@UiText.Calendar.ClearSelection
 				</AppButton>
 			}
 		</PageHeader>
@@ -39,7 +39,7 @@
 
 	@if (_loading)
 	{
-		<LoadingSpinner Label="Loading calendar..."/>
+		<LoadingSpinner Label="@UiText.Calendar.Loading"/>
 	}
 	else
 	{
@@ -49,11 +49,11 @@
 				@* ---------- Week view ---------- *@
 				<section class="cal-panel">
 					<div class="cal-panel__head">
-						<h2 class="fh-subheading">Week</h2>
+						<h2 class="fh-subheading">@UiText.Calendar.Week</h2>
 						<div class="cal-nav">
-							<IconButton Icon="chevron-left" Title="Previous week" OnClick="PrevWeek"/>
+							<IconButton Icon="chevron-left" Title="@UiText.Calendar.PreviousWeek" OnClick="PrevWeek"/>
 							<span class="cal-nav__label">@WeekLabel</span>
-							<IconButton Icon="chevron-right" Title="Next week" OnClick="NextWeek"/>
+							<IconButton Icon="chevron-right" Title="@UiText.Calendar.NextWeek" OnClick="NextWeek"/>
 						</div>
 					</div>
 					<div class="cal-week">
@@ -75,11 +75,11 @@
 				@* ---------- Month view ---------- *@
 				<section class="cal-panel">
 					<div class="cal-panel__head">
-						<h2 class="fh-subheading">Month</h2>
+						<h2 class="fh-subheading">@UiText.Calendar.Month</h2>
 						<div class="cal-nav">
-							<IconButton Icon="chevron-left" Title="Previous month" OnClick="PrevMonth"/>
+							<IconButton Icon="chevron-left" Title="@UiText.Calendar.PreviousMonth" OnClick="PrevMonth"/>
 							<span class="cal-nav__label">@MonthLabel</span>
-							<IconButton Icon="chevron-right" Title="Next month" OnClick="NextMonth"/>
+							<IconButton Icon="chevron-right" Title="@UiText.Calendar.NextMonth" OnClick="NextMonth"/>
 						</div>
 					</div>
 					<div class="cal-month">
@@ -107,7 +107,7 @@
 
 @* ---------- Add-recipe picker ---------- *@
 <Modal @bind-Visible="_addModalVisible" Title="@AddModalTitle">
-	<SearchBox Placeholder="Search recipes..." Value="@_recipeSearch" ValueChanged="OnRecipeSearchChanged"/>
+	<SearchBox Placeholder="@UiText.Calendar.SearchRecipes" Value="@_recipeSearch" ValueChanged="OnRecipeSearchChanged"/>
 	<div class="cal-picker">
 		@foreach (var recipe in FilteredRecipes)
 		{
@@ -119,22 +119,22 @@
 		}
 		@if (!FilteredRecipes.Any())
 		{
-			<EmptyState Icon="journal-x" Title="No recipes" Message="Nothing matches that search."/>
+			<EmptyState Icon="journal-x" Title="@UiText.Calendar.NoRecipesTitle"
+			            Message="@UiText.Calendar.NoRecipesMessage"/>
 		}
 	</div>
 </Modal>
 
 @* ---------- Randomize popup ---------- *@
-<Modal @bind-Visible="_randomizeModalVisible" Title="Randomize selected days"
+<Modal @bind-Visible="_randomizeModalVisible" Title="@UiText.Calendar.RandomizeTitle"
        BodyClass="fh-modal__body--allow-overflow">
 	<ChildContent>
 		<p class="fh-muted">
-			Fills the @_selectedDates.Count selected day@(_selectedDates.Count == 1 ? "" : "s")
-			with random recipes from your library.
+			@UiText.Calendar.RandomizeIntro(_selectedDates.Count)
 		</p>
 
 		<div class="fh-field">
-			<label class="fh-label">Wanted ingredients <span class="fh-muted">(optional)</span></label>
+			<label class="fh-label">@UiText.Calendar.WantedIngredients <span class="fh-muted">@UiText.Calendar.Optional</span></label>
 			@if (_wantedIngredients.Any())
 			{
 				<div class="cal-chips">
@@ -143,7 +143,7 @@
 						<span class="cal-chip">
                         @ing
 							<button type="button" class="cal-chip__x" @onclick="() => RemoveIngredient(ing)"
-							        aria-label="Remove">
+							        aria-label="@UiText.Calendar.RemoveRecipe">
                             <i class="bi bi-x"></i>
                         </button>
                     </span>
@@ -152,12 +152,12 @@
 			}
 			<div class="cal-combo">
 				<div class="cal-combo__control">
-					<input class="cal-input" placeholder="Select or type an ingredient..."
+					<input class="cal-input" placeholder="@UiText.Calendar.IngredientPlaceholder"
 					       @bind="_ingredientDraft" @bind:event="oninput"
 					       @onfocus="() => _ingredientMenuOpen = true"
 					       @onkeydown="OnIngredientKeyDown"/>
 					<button type="button" class="cal-combo__toggle" @onclick="ToggleIngredientMenu"
-					        aria-label="Toggle ingredient list">
+					        aria-label="@UiText.Calendar.ToggleIngredientList">
 						<i class="bi bi-chevron-@(_ingredientMenuOpen ? "up" : "down")"></i>
 					</button>
 				</div>
@@ -174,7 +174,7 @@
 						@if (!IngredientOptions.Any())
 						{
 							<li class="cal-combo__empty">
-								@(_allIngredientNames.Count == 0 ? "No ingredients available" : "No matches")
+								@(_allIngredientNames.Count == 0 ? UiText.Calendar.NoIngredientsAvailable : UiText.Calendar.NoMatches)
 							</li>
 						}
 					</ul>
@@ -184,20 +184,20 @@
 
 		@* Recipes-per-day: wired up but intentionally hidden for now (defaults to 1). *@
 		<div class="fh-field" style="display:none;">
-			<label class="fh-label">Recipes per day</label>
+			<label class="fh-label">@UiText.Calendar.RecipesPerDay</label>
 			<input class="cal-input" type="number" min="1" max="20" @bind="_recipesPerDay" disabled/>
 		</div>
 
 		<label class="cal-check">
 			<input type="checkbox" @bind="_overwriteDays"/>
-			<span>Override existing recipes on the selected days</span>
+			<span>@UiText.Calendar.OverwriteLabel</span>
 		</label>
 	</ChildContent>
 
 	<Footer>
-		<AppButton Variant="ButtonVariant.OutlineSecondary" OnClick="CloseRandomize">Cancel</AppButton>
+		<AppButton Variant="ButtonVariant.OutlineSecondary" OnClick="CloseRandomize">@UiText.Common.Cancel</AppButton>
 		<AppButton Variant="ButtonVariant.Primary" Icon="shuffle" Disabled="@_randomizing" OnClick="RunRandomizeAsync">
-			@(_randomizing ? "Randomizing..." : "Randomize")
+			@(_randomizing ? UiText.Calendar.Randomizing : UiText.Calendar.Randomize)
 		</AppButton>
 	</Footer>
 </Modal>
@@ -241,7 +241,7 @@
 	private List<string> _allIngredientNames = new();
 	private bool _ingredientMenuOpen;
 
-	private static readonly string[] DayOfWeekHeaders = { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
+	private static string[] DayOfWeekHeaders => UiText.Calendar.DayHeaders;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -300,9 +300,9 @@
 		return d.AddDays(-diff);
 	}
 
-	private string WeekLabel => $"{WeekStart:d MMM} – {WeekStart.AddDays(6):d MMM yyyy}";
-	private string MonthLabel => _monthAnchor.ToString("MMMM yyyy");
-	private string AddModalTitle => $"Add recipe — {_addTargetDate:dddd d MMM}";
+	private string WeekLabel => UiText.Calendar.WeekLabel(WeekStart);
+	private string MonthLabel => UiText.Calendar.MonthLabel(_monthAnchor);
+	private string AddModalTitle => UiText.Calendar.AddModalTitle(_addTargetDate);
 
 	private IEnumerable<RecipeDto> FilteredRecipes = [];
 
@@ -389,7 +389,7 @@
 			list.Add(result.Data);
 			_addModalVisible = false;
 		}
-		else { MessageService.ShowMessage(FirstError(result, "Could not add recipe."), true, 6000); }
+		else { MessageService.ShowMessage(FirstError(result, WebConstants.Messages.Calendar.AddFailed), true, 6000); }
 	}
 
 	private async Task RemoveEntryAsync(MealPlanEntryDto entry)
@@ -400,7 +400,7 @@
 			if (_entriesByDay.TryGetValue(entry.Date, out var list))
 				list.RemoveAll(e => e.Id == entry.Id);
 		}
-		else { MessageService.ShowMessage(FirstError(result, "Could not remove recipe."), true, 6000); }
+		else { MessageService.ShowMessage(FirstError(result, WebConstants.Messages.Calendar.RemoveFailed), true, 6000); }
 	}
 
 	// ---------- Randomize ----------
@@ -481,9 +481,9 @@
 			await ReloadAsync();
 			_randomizeModalVisible = false;
 			var count = result.Data?.Count ?? 0;
-			MessageService.ShowMessage($"Added {count} recipe{(count == 1 ? "" : "s")} across {dayCount} days.", false, 4000);
+			MessageService.ShowMessage(WebConstants.Messages.Calendar.Randomized(count, dayCount), false, 4000);
 		}
-		else { MessageService.ShowMessage(FirstError(result, "Could not randomize."), true, 6000); }
+		else { MessageService.ShowMessage(FirstError(result, WebConstants.Messages.Calendar.RandomizeFailed), true, 6000); }
 	}
 
 	private static string FirstError(ApiResult result, string fallback) => result.Errors.Count > 0 ? result.Errors[0] : fallback;

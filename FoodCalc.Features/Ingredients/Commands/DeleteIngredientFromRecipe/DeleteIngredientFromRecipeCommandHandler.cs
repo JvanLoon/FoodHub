@@ -22,7 +22,7 @@ public class DeleteIngredientFromRecipeCommandHandler(
                     await context.Recipes.SingleOrDefaultAsync(r => r.Id == recipeItem.RecipeId, cancellationToken);
 
                 if (recipe is not null && !request.Acting.CanEdit(recipe.CreatedByUserId))
-                    return Error.Forbidden(description: ErrorMessages.Review.NotOwned("recipe"));
+                    return Error.Forbidden(description: ErrorMessages.Review.NotOwned(ErrorMessages.Entities.Recipe));
 
                 // Removing a line changes the recipe as much as editing one does.
                 if (recipe is not null)

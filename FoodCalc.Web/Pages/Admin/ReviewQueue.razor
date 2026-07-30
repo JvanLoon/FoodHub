@@ -11,19 +11,19 @@
 <div class="fh-stack review-queue">
 	@if (queue == null)
 	{
-		<LoadingSpinner Label="Loading review queue..."/>
+		<LoadingSpinner Label="@UiText.Review.Loading"/>
 	}
 	else if (queue.TotalCount == 0)
 	{
-		<EmptyState Icon="check2-circle" Title="Nothing to review."
-		            Message="New recipes appear here as soon as they are submitted."/>
+		<EmptyState Icon="check2-circle" Title="@UiText.Review.NothingTitle"
+		            Message="@UiText.Review.NothingMessage"/>
 	}
 	else
 	{
 		<section class="fh-stack">
 			<div class="fh-panel-header">
-				<h2 class="fh-subheading">Recipes</h2>
-				<span class="fh-muted">@queue.Recipes.Count waiting</span>
+				<h2 class="fh-subheading">@UiText.Review.RecipesHeading</h2>
+				<span class="fh-muted">@UiText.Review.Waiting(queue.Recipes.Count)</span>
 			</div>
 
 			@foreach (var recipe in queue.Recipes)
@@ -34,18 +34,17 @@
 							<span class="review-item__title">@recipe.Name</span>
 							@if (recipe.IsFirstSubmission)
 							{
-								<Badge Variant="Badge.BadgeVariant.Accent" Icon="stars">New</Badge>
+								<Badge Variant="Badge.BadgeVariant.Accent" Icon="stars">@UiText.Review.BadgeNew</Badge>
 							}
 							else
 							{
-								<Badge Variant="Badge.BadgeVariant.Info" Icon="pencil">Edited</Badge>
+								<Badge Variant="Badge.BadgeVariant.Info" Icon="pencil">@UiText.Review.BadgeEdited</Badge>
 							}
 						</div>
 					</Header>
 					<Body>
 					<p class="review-item__meta fh-muted">
-						by <strong>@recipe.CreatedByEmail</strong>
-						· submitted @recipe.ModifiedDate.ToLocalTime().ToString("g")
+						@UiText.Review.SubmittedBy(recipe.CreatedByEmail, recipe.ModifiedDate)
 					</p>
 
 					@if (recipe.Ingredients.Any())
@@ -56,18 +55,18 @@
 								<li class="review-line @(line.IsChanged ? "review-line--changed" : null)">
 									<span class="review-line__name">@line.Name</span>
 									<span class="review-line__amount fh-muted">
-										@line.Amount.ToFormattedString() @line.IngredientAmount
+										@line.Amount.ToFormattedString() @UiText.AmountTypes.Label(line.IngredientAmount)
 									</span>
 
 									@if (line.IsChanged)
 									{
 										<span class="review-line__actions">
-											<Badge Variant="Badge.BadgeVariant.Warning">changed</Badge>
-											<IconButton Icon="check-lg" Title="Approve this ingredient"
+											<Badge Variant="Badge.BadgeVariant.Warning">@UiText.Review.BadgeChanged</Badge>
+											<IconButton Icon="check-lg" Title="@UiText.Review.ApproveIngredient"
 											            Size="ButtonSize.Small" Variant="ButtonVariant.Success"
 											            Disabled="@busy"
 											            OnClick="() => ApproveLineAsync(line)"/>
-											<IconButton Icon="x-lg" Title="Reject and remove this ingredient"
+											<IconButton Icon="x-lg" Title="@UiText.Review.RejectIngredient"
 											            Size="ButtonSize.Small" Variant="ButtonVariant.Danger"
 											            Disabled="@busy"
 											            OnClick="() => RejectLineAsync(recipe, line)"/>
@@ -75,7 +74,7 @@
 									}
 									else
 									{
-										<span class="review-line__ok fh-muted" title="Approved">
+										<span class="review-line__ok fh-muted" title="@UiText.Review.ApprovedTitle">
 											<i class="bi bi-check2" aria-hidden="true"></i>
 										</span>
 									}
@@ -85,7 +84,7 @@
 					}
 					else
 					{
-						<p class="fh-muted">This recipe has no ingredients yet.</p>
+						<p class="fh-muted">@UiText.Review.NoIngredients</p>
 					}
 					</Body>
 					<Footer>
@@ -94,18 +93,18 @@
 								<AppButton Variant="ButtonVariant.Success" Icon="check-lg"
 								           Disabled="@(busy || HasPendingLines(recipe))"
 								           OnClick="() => ApproveRecipeAsync(recipe)">
-									Approve recipe
+									@UiText.Review.ApproveRecipe
 								</AppButton>
 								<AppButton Variant="ButtonVariant.OutlineDanger" Icon="trash"
 								           Disabled="@busy"
 								           OnClick="() => RejectRecipeAsync(recipe)">
-									Reject
+									@UiText.Review.Reject
 								</AppButton>
 							</div>
 							@if (HasPendingLines(recipe))
 							{
 								<span class="review-item__hint fh-muted">
-									Approve or reject every changed ingredient to enable approval.
+									@UiText.Review.PendingHint
 								</span>
 							}
 						</div>
@@ -161,7 +160,8 @@
 
 	// Removing a single ingredient during review is expected work, so it happens without a prompt.
 	private Task RejectLineAsync(PendingRecipeDto recipe, PendingRecipeItemDto line) =>
-		RunAsync(() => ReviewService.RejectRecipeItemAsync(line.Id), $"Removed \"{line.Name}\" from {recipe.Name}.");
+		RunAsync(() => ReviewService.RejectRecipeItemAsync(line.Id),
+			WebConstants.Messages.Review.LineRemoved(line.Name, recipe.Name));
 
 	// Rejecting a whole recipe deletes it outright, so confirm first.
 	private async Task RejectRecipeAsync(PendingRecipeDto recipe)
@@ -169,8 +169,8 @@
 		if (confirmDialog is null)
 			return;
 
-		var confirmed = await confirmDialog.ShowAsync("Reject recipe",
-			$"Reject and delete \"{recipe.Name}\"? This cannot be undone.", "Reject", danger: true);
+		var confirmed = await confirmDialog.ShowAsync(UiText.Review.RejectTitle,
+			UiText.Review.RejectMessage(recipe.Name), UiText.Review.Reject, danger: true);
 
 		if (confirmed)
 			await RunAsync(() => ReviewService.RejectRecipeAsync(recipe.Id), WebConstants.Messages.Review.Rejected);

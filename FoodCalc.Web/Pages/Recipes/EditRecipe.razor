@@ -6,7 +6,7 @@
 @inject MessageService MessageService
 @inject NavigationManager Navigation
 
-<PageTitle>@(IsNew ? "Create Recipe" : "Edit Recipe")</PageTitle>
+<PageTitle>@(IsNew ? UiText.RecipeEditor.CreateTitle : UiText.RecipeEditor.EditTitle)</PageTitle>
 
 <div class="fh-stack">
 	@if (recipe.Id != Guid.Empty && !recipe.IsReviewed)
@@ -21,21 +21,21 @@
 		@if (!isEditingName)
 		{
 			<h1 class="fh-heading">@recipe?.Name</h1>
-			<IconButton Icon="pencil" Title="Edit recipe name" OnClick="StartEditName"/>
+			<IconButton Icon="pencil" Title="@UiText.RecipeEditor.EditNameTitle" OnClick="StartEditName"/>
 		}
 		else
 		{
 			<EditForm Model="nameModel" OnValidSubmit="SaveRecipeName" class="recipe-name__form"
 			          FormName="edit-recipe-name">
 				<InputText @bind-Value="editedName" class="form-control"
-				           placeholder="e.g. Spaghetti Bolognese"/>
-				<AppButton Type="submit" Size="ButtonSize.Small" Icon="check-lg">Save</AppButton>
+				           placeholder="@UiText.RecipeEditor.NamePlaceholder"/>
+				<AppButton Type="submit" Size="ButtonSize.Small" Icon="check-lg">@UiText.Common.Save</AppButton>
 				@* Nothing to fall back to while the recipe is still unsaved. *@
 				@if (!IsNew)
 				{
 					<AppButton Variant="ButtonVariant.OutlineSecondary" Size="ButtonSize.Small"
 					           OnClick="CancelEditName">
-						Cancel
+						@UiText.Common.Cancel
 					</AppButton>
 				}
 			</EditForm>
@@ -44,8 +44,8 @@
 
 	@if (IsNew)
 	{
-		<EmptyState Icon="basket" Title="Name your recipe first."
-		            Message="Save a name and the ingredient editor opens up."/>
+		<EmptyState Icon="basket" Title="@UiText.RecipeEditor.NameFirstTitle"
+		            Message="@UiText.RecipeEditor.NameFirstMessage"/>
 	}
 	else
 	{
@@ -54,12 +54,12 @@
 			<div class="col-md-6">
 				<AppCard>
 					<div class="fh-field">
-						<label for="ingredientSearch" class="form-label">Search Ingredient</label>
+						<label for="ingredientSearch" class="form-label">@UiText.RecipeEditor.SearchIngredientLabel</label>
 						<div class="input-group">
 							<input id="ingredientSearch"
 							       class="form-control"
 							       type="text"
-							       placeholder="Type to search..."
+							       placeholder="@UiText.RecipeEditor.SearchIngredientPlaceholder"
 							       @bind="ingredientSearch"
 							       @bind:event="oninput"
 							       @onfocus="() => dropdownOpen = true"
@@ -67,7 +67,7 @@
 							       autocomplete="off"
 							       @onkeydown="HandleIngredientSearchKeydown"
 							       @onkeydown:preventDefault="@(ingredientSearchFocused)"/>
-							<button class="btn btn-outline-success" type="button" title="Add new ingredient"
+							<button class="btn btn-outline-success" type="button" title="@UiText.RecipeEditor.AddNewIngredient"
 							        @onclick="AddIngredient">
 								<i class="bi bi-plus-lg" aria-hidden="true"></i>
 							</button>
@@ -88,26 +88,24 @@
 								}
 								@if (!FilteredIngredients.Any())
 								{
-									<div class="dropdown-item disabled">No ingredients found.
-										Click + to add.
-									</div>
+									<div class="dropdown-item disabled">@UiText.RecipeEditor.NoIngredientsFound</div>
 								}
 							</div>
 						</div>
 
-						<NumberField TValue="decimal?" Label="Amount" @bind-Value="amountInput"/>
+						<NumberField TValue="decimal?" Label="@UiText.RecipeEditor.AmountLabel" @bind-Value="amountInput"/>
 
-						<SelectField TValue="IngredientAmountTypeDto" Label="Amount Type"
+						<SelectField TValue="IngredientAmountTypeDto" Label="@UiText.RecipeEditor.AmountTypeLabel"
 						             @bind-Value="recipeItem.IngredientAmount">
 							@foreach (IngredientAmountTypeDto amountType in Enum.GetValues<IngredientAmountTypeDto>())
 							{
-								<option value="@amountType">@amountType</option>
+								<option value="@amountType">@UiText.AmountTypes.Label(amountType)</option>
 							}
 						</SelectField>
 
 						<div class="fh-cluster">
-							<AppButton Type="submit" Icon="check-lg">Add/Save</AppButton>
-							<AppButton Variant="ButtonVariant.OutlinePrimary" OnClick="ClearForm">Clear</AppButton>
+							<AppButton Type="submit" Icon="check-lg">@UiText.RecipeEditor.AddOrSave</AppButton>
+							<AppButton Variant="ButtonVariant.OutlinePrimary" OnClick="ClearForm">@UiText.Common.Clear</AppButton>
 						</div>
 					</EditForm>
 				</AppCard>
@@ -123,13 +121,13 @@
 							<li>
                             <span>@ingredient.Name
 	                            <span class="fh-muted">
-		                            @ingredient.Amount.ToFormattedString() @ingredient.IngredientAmount
+		                            @ingredient.Amount.ToFormattedString() @UiText.AmountTypes.Label(ingredient.IngredientAmount)
 	                            </span>
                             </span>
 								<span class="ingredient-list__actions">
-                                <IconButton Icon="pencil" Title="Edit ingredient" Size="ButtonSize.Small"
+                                <IconButton Icon="pencil" Title="@UiText.RecipeEditor.EditIngredient" Size="ButtonSize.Small"
                                             OnClick="() => EditIngredient(ingredient)"/>
-                                <IconButton Icon="trash" Title="Delete ingredient" Size="ButtonSize.Small"
+                                <IconButton Icon="trash" Title="@UiText.RecipeEditor.DeleteIngredient" Size="ButtonSize.Small"
                                             Variant="ButtonVariant.Danger"
                                             OnClick="() => DeleteIngredient(ingredient.Id)"/>
                             </span>
@@ -139,8 +137,8 @@
 				}
 				else
 				{
-					<EmptyState Icon="basket" Title="No ingredients yet."
-					            Message="Search or add an ingredient on the left to build this recipe."/>
+					<EmptyState Icon="basket" Title="@UiText.RecipeEditor.NoIngredientsTitle"
+					            Message="@UiText.RecipeEditor.NoIngredientsMessage"/>
 				}
 			</div>
 		</div>

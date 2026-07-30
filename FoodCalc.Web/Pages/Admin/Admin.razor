@@ -2,7 +2,7 @@
 @inject AuthStateService AuthStateService
 @inject NavigationManager Navigation
 
-<PageTitle>Admin</PageTitle>
+<PageTitle>@UiText.Admin.PageTitle</PageTitle>
 
 @* Moderators reach this page for the review queue and nothing else, so the tab set is built
    from the caller's role rather than rendered whole and partly hidden — a Tab registers itself
@@ -11,21 +11,21 @@
 @if (_authorized)
 {
 	<div class="fh-stack">
-		<PageHeader Title="@(_isAdmin ? "Admin Panel" : "Moderation")"/>
+		<PageHeader Title="@(_isAdmin ? UiText.Admin.AdminHeading : UiText.Admin.ModerationHeading)"/>
 
 		<TabSet>
-			<Tab Title="Review" Icon="check2-square">
+			<Tab Title="@UiText.Admin.TabReview" Icon="check2-square">
 				<ReviewQueue/>
 			</Tab>
 			@if (_isAdmin)
 			{
-				<Tab Title="Users" Icon="people">
+				<Tab Title="@UiText.Admin.TabUsers" Icon="people">
 					<UserList/>
 				</Tab>
-				<Tab Title="Import/Export" Icon="arrow-down-up">
+				<Tab Title="@UiText.Admin.TabImportExport" Icon="arrow-down-up">
 					<DataImportExport/>
 				</Tab>
-				<Tab Title="Error test" Icon="bug">
+				<Tab Title="@UiText.Admin.TabErrorTest" Icon="bug">
 					<ErrorTest/>
 				</Tab>
 			}

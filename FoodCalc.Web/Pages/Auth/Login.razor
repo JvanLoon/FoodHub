@@ -6,24 +6,26 @@
 @inject AuthStateService AuthStateService
 @inject MessageService MessageService
 
-<PageTitle>Login</PageTitle>
+<PageTitle>@UiText.Auth.LoginTitle</PageTitle>
 
 <div class="auth-card">
 	<div class="auth-card__brand">
 		<i class="bi bi-basket2-fill" aria-hidden="true"></i>
 		<span>FoodHub</span>
 	</div>
-	<h3 class="auth-card__title">Welcome back</h3>
+	<h3 class="auth-card__title">@UiText.Auth.LoginHeading</h3>
 	<EditForm Model="loginModel" OnValidSubmit="HandleLogin" FormName="login-form">
 		<DataAnnotationsValidator/>
 		<ValidationSummary class="mb-3"/>
-		<TextField Label="Email" Placeholder="Enter your email" Autocomplete="username" @bind-Value="loginModel.Email"/>
-		<TextField Label="Password" Type="password" Placeholder="Enter your password" Autocomplete="current-password"
+		<TextField Label="@UiText.Auth.EmailLabel" Placeholder="@UiText.Auth.EmailPlaceholder" Autocomplete="username"
+		           @bind-Value="loginModel.Email"/>
+		<TextField Label="@UiText.Auth.PasswordLabel" Type="password" Placeholder="@UiText.Auth.PasswordPlaceholder"
+		           Autocomplete="current-password"
 		           ShowRevealToggle="true" @bind-Value="loginModel.Password"/>
-		<AppButton Type="submit" Icon="box-arrow-in-right" CssClass="w-100">Login</AppButton>
+		<AppButton Type="submit" Icon="box-arrow-in-right" CssClass="w-100">@UiText.Auth.LoginButton</AppButton>
 	</EditForm>
 	<div class="auth-card__alt">
-		<a href="/register">Create an account</a>
+		<a href="/register">@UiText.Auth.CreateAccountLink</a>
 	</div>
 </div>
 

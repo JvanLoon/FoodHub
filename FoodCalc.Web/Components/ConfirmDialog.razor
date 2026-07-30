@@ -1,6 +1,6 @@
 @* Awaitable confirmation dialog replacing JS confirm(). Usage:
    <ConfirmDialog @ref="confirmDialog" />
-   var ok = await confirmDialog.ShowAsync("Delete recipe", "Are you sure?"); *@
+   var ok = await confirmDialog.ShowAsync(UiText.Recipes.DeleteTitle, UiText.Recipes.DeleteMessage); *@
 
 <Modal Visible="_visible" VisibleChanged="HandleVisibleChanged" Title="@_title">
 	<ChildContent>
@@ -17,20 +17,20 @@
 	private bool _visible;
 	private string _title = string.Empty;
 	private string _message = string.Empty;
-	private string _confirmText = "Confirm";
-	private string _cancelText = "Cancel";
+	private string _confirmText = UiText.Common.Confirm;
+	private string _cancelText = UiText.Common.Cancel;
 	private bool _danger;
 	private TaskCompletionSource<bool>? _tcs;
 
-	public Task<bool> ShowAsync(string title, string message, string confirmText = "Confirm", string cancelText = "Cancel", bool danger = false)
+	public Task<bool> ShowAsync(string title, string message, string? confirmText = null, string? cancelText = null, bool danger = false)
 	{
 		_tcs?.TrySetResult(false);
 		_tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
 
 		_title = title;
 		_message = message;
-		_confirmText = confirmText;
-		_cancelText = cancelText;
+		_confirmText = confirmText ?? UiText.Common.Confirm;
+		_cancelText = cancelText ?? UiText.Common.Cancel;
 		_danger = danger;
 		_visible = true;
 		StateHasChanged();

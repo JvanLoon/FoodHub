@@ -31,10 +31,10 @@
 	{
 		<div class="card-footer" @onmousedown:stopPropagation>
 			<AppButton Variant="ButtonVariant.OutlineSecondary" Size="ButtonSize.Small" Icon="pencil"
-			           StopPropagation OnClick="OnEdit">Edit
+			           StopPropagation OnClick="OnEdit">@UiText.Common.Edit
 			</AppButton>
 			<AppButton Variant="ButtonVariant.OutlineDanger" Size="ButtonSize.Small" Icon="trash"
-			           StopPropagation OnClick="OnDelete">Delete
+			           StopPropagation OnClick="OnDelete">@UiText.Common.Delete
 			</AppButton>
 		</div>
 	}

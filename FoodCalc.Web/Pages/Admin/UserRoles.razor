@@ -7,33 +7,33 @@
 @inject NavigationManager Navigation
 @inject AuthStateService AuthStateService
 
-<PageTitle>User Roles</PageTitle>
+<PageTitle>@UiText.Roles.PageTitle</PageTitle>
 
 <div class="fh-stack">
-	<PageHeader Title="Manage Roles" Subtitle="@email"/>
+	<PageHeader Title="@UiText.Roles.Heading" Subtitle="@email"/>
 
 	@if (roles == null || allRoles == null)
 	{
-		<LoadingSpinner Label="Loading roles..."/>
+		<LoadingSpinner Label="@UiText.Roles.Loading"/>
 	}
 	else
 	{
 		<div class="row g-4">
 			<div class="col-md-6">
 				<AppCard>
-					<Header>Add role</Header>
+					<Header>@UiText.Roles.AddRoleHeader</Header>
 					<Body>
-					<label for="addRole" class="form-label">Role</label>
+					<label for="addRole" class="form-label">@UiText.Roles.RoleLabel</label>
 					<div class="input-group">
 						<select id="addRole" class="form-select" @bind="selectedRole">
-							<option value="">Select a role...</option>
+							<option value="">@UiText.Roles.SelectRole</option>
 							@foreach (var role in allRoles.Except(roles))
 							{
 								<option value="@role">@role</option>
 							}
 						</select>
 						<AppButton Variant="ButtonVariant.Success" Icon="plus-lg"
-						           Disabled="@(string.IsNullOrEmpty(selectedRole))" OnClick="AddRole">Add
+						           Disabled="@(string.IsNullOrEmpty(selectedRole))" OnClick="AddRole">@UiText.Common.Add
 						</AppButton>
 					</div>
 					</Body>
@@ -42,7 +42,7 @@
 
 			<div class="col-md-6">
 				<AppCard>
-					<Header>Assigned roles</Header>
+					<Header>@UiText.Roles.AssignedRolesHeader</Header>
 					<Body>
 					@if (roles.Any())
 					{
@@ -51,7 +51,7 @@
 							{
 								<li>
 									<Badge Icon="shield-check">@role</Badge>
-									<IconButton Icon="trash" Title="Remove role" Size="ButtonSize.Small"
+									<IconButton Icon="trash" Title="@UiText.Roles.RemoveRole" Size="ButtonSize.Small"
 									            Variant="ButtonVariant.Danger" OnClick="() => RemoveRole(role)"/>
 								</li>
 							}
@@ -59,7 +59,7 @@
 					}
 					else
 					{
-						<EmptyState Icon="shield" Title="No roles assigned"/>
+						<EmptyState Icon="shield" Title="@UiText.Roles.NoRoles"/>
 					}
 					</Body>
 				</AppCard>
@@ -69,16 +69,16 @@
 		<div class="row">
 			<div class="col-md-6">
 				<AppCard>
-					<Header>Reset password</Header>
+					<Header>@UiText.Roles.ResetPasswordHeader</Header>
 					<Body>
 					<EditForm Model="resetModel" OnValidSubmit="ResetPassword" FormName="reset-password-form">
 						<DataAnnotationsValidator/>
 						<ValidationSummary/>
 
-						<TextField Label="New password" Type="password" Autocomplete="new-password"
+						<TextField Label="@UiText.Roles.NewPasswordLabel" Type="password" Autocomplete="new-password"
 						           @bind-Value="resetModel.password"/>
 
-						<AppButton Type="submit" Icon="key">Reset</AppButton>
+						<AppButton Type="submit" Icon="key">@UiText.Roles.ResetButton</AppButton>
 					</EditForm>
 					</Body>
 				</AppCard>

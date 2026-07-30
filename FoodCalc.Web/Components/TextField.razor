@@ -72,6 +72,6 @@
 
 	private string EffectiveType => ShowRevealToggle && _revealed ? "text" : Type;
 
-	private string RevealLabel => _revealed ? "Hide password" : "Show password";
+	private string RevealLabel => _revealed ? UiText.Components.HidePassword : UiText.Components.ShowPassword;
 
 }

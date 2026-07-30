@@ -11,34 +11,34 @@
 	</a>
 </div>
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler"/>
+<input type="checkbox" title="@UiText.Layout.NavigationMenu" class="navbar-toggler"/>
 
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
 	<nav class="nav-list">
 		@if (isLoggedIn)
 		{
-			<NavItem Href="" Icon="house-door-fill" Label="Home" Match="NavLinkMatch.All"/>
-			<NavItem Href="/calendar" Icon="calendar-week" Label="Calendar"/>
-			<NavItem Href="/recipes" Icon="journal-text" Label="Recipes"/>
-			<NavItem Href="/recipes/find" Icon="search-heart" Label="Find recipes"/>
+			<NavItem Href="" Icon="house-door-fill" Label="@UiText.Nav.Home" Match="NavLinkMatch.All"/>
+			<NavItem Href="/calendar" Icon="calendar-week" Label="@UiText.Nav.Calendar"/>
+			<NavItem Href="/recipes" Icon="journal-text" Label="@UiText.Nav.Recipes"/>
+			<NavItem Href="/recipes/find" Icon="search-heart" Label="@UiText.Nav.FindRecipes"/>
 
 			@* Anyone may submit a recipe; it stays private to them until a moderator
 			   approves it. *@
-			<NavItem Href="/recipes/create" Icon="plus-circle" Label="Add recipe" Match="NavLinkMatch.All"/>
+			<NavItem Href="/recipes/create" Icon="plus-circle" Label="@UiText.Nav.AddRecipe" Match="NavLinkMatch.All"/>
 
 			@* Staff manage the ingredient catalog — moderators edit it now, not only admins. *@
 			@if (isAdmin || isModerator)
 			{
-				<NavItem Href="/ingredients" Icon="egg" Label="Edit Ingredients"/>
+				<NavItem Href="/ingredients" Icon="egg" Label="@UiText.Nav.EditIngredients"/>
 			}
 
 			@* Same admin page for both; a moderator only gets the review tab within it. *@
 			@if (isAdmin || isModerator)
 			{
-				<NavItem Href="/admin" Icon="gear" Label="@(isAdmin ? "Admin" : "Review")"/>
+				<NavItem Href="/admin" Icon="gear" Label="@(isAdmin ? UiText.Nav.Admin : UiText.Nav.Review)"/>
 			}
 
-			<NavItem Href="/usersettings" Icon="person" Label="User Settings"/>
+			<NavItem Href="/usersettings" Icon="person" Label="@UiText.Nav.UserSettings"/>
 		}
 	</nav>
 </div>

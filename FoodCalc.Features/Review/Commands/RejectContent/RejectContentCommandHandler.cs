@@ -30,7 +30,7 @@ public class RejectContentCommandHandler(FoodHubDbContext context, ILogger<Rejec
                     var recipe = await context.Recipes.SingleOrDefaultAsync(r => r.Id == request.TargetId,
                         cancellationToken);
                     if (recipe is null)
-                        return Error.NotFound(description: ErrorMessages.Common.NotFound("Recipe"));
+                        return Error.NotFound(description: ErrorMessages.Common.NotFound(ErrorMessages.Entities.Recipe));
 
                     // Its lines cascade with it (see RecipeConfiguration). Any ingredient those
                     // lines introduced and no other recipe uses is now an orphan — remove it.
@@ -49,7 +49,7 @@ public class RejectContentCommandHandler(FoodHubDbContext context, ILogger<Rejec
                     var item = await context.RecipeItems.SingleOrDefaultAsync(ri => ri.Id == request.TargetId,
                         cancellationToken);
                     if (item is null)
-                        return Error.NotFound(description: ErrorMessages.Common.NotFound("Recipe line"));
+                        return Error.NotFound(description: ErrorMessages.Common.NotFound(ErrorMessages.Entities.RecipeLine));
 
                     context.RecipeItems.Remove(item);
 
@@ -60,7 +60,7 @@ public class RejectContentCommandHandler(FoodHubDbContext context, ILogger<Rejec
                     break;
                 }
                 default:
-                    return Error.Validation(description: $"Unknown review target type: {request.TargetType}.");
+                    return Error.Validation(description: ErrorMessages.Review.UnknownTargetType(request.TargetType));
             }
 
             await context.SaveChangesAsync(cancellationToken);
@@ -68,8 +68,8 @@ public class RejectContentCommandHandler(FoodHubDbContext context, ILogger<Rejec
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, ErrorMessages.Common.DeleteFailed("rejected item"));
-            return Error.Failure(description: ErrorMessages.Common.DeleteFailed("rejected item"));
+            logger.LogError(ex, ErrorMessages.Common.DeleteFailed(ErrorMessages.Entities.RejectedItem));
+            return Error.Failure(description: ErrorMessages.Common.DeleteFailed(ErrorMessages.Entities.RejectedItem));
         }
     }
 

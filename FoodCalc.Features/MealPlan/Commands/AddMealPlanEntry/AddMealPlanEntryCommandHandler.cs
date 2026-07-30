@@ -22,13 +22,13 @@ public class AddMealPlanEntryCommandHandler(FoodHubDbContext context, ILogger<Ad
             var recipe = await context.Recipes.VisibleTo(request.UserId)
                 .FirstOrDefaultAsync(r => r.Id == request.RecipeId, cancellationToken);
             if (recipe is null)
-                return Error.NotFound(description: "Recipe not found.");
+                return Error.NotFound(description: ErrorMessages.Common.NotFound(ErrorMessages.Entities.Recipe));
 
             var dayCount = await context.MealPlanEntries.CountAsync(
                 m => m.UserId == request.UserId && m.Date == request.Date, cancellationToken);
             if (dayCount >= MealPlanConstants.MaxRecipesPerDay)
                 return Error.Validation(
-                    description: $"A day can hold at most {MealPlanConstants.MaxRecipesPerDay} recipes.");
+                    description: ErrorMessages.MealPlan.MaxPerDay(MealPlanConstants.MaxRecipesPerDay));
 
             var entry = new MealPlanEntry
             {
@@ -45,8 +45,8 @@ public class AddMealPlanEntryCommandHandler(FoodHubDbContext context, ILogger<Ad
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, ErrorMessages.Common.AddFailed("meal plan entry"));
-            return Error.Failure(description: ErrorMessages.Common.AddFailed("meal plan entry"));
+            logger.LogError(ex, ErrorMessages.Common.AddFailed(ErrorMessages.Entities.MealPlanEntry));
+            return Error.Failure(description: ErrorMessages.Common.AddFailed(ErrorMessages.Entities.MealPlanEntry));
         }
     }
 }

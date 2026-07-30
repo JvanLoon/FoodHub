@@ -1,24 +1,22 @@
 @page "/Error"
 @using System.Diagnostics
 
-<PageTitle>Error</PageTitle>
+<PageTitle>@UiText.ErrorPage.Title</PageTitle>
 
 <div class="error-page">
 	<i class="bi bi-emoji-dizzy" aria-hidden="true"></i>
-	<h1>Something went wrong.</h1>
-	<p>An error occurred while processing your request.</p>
+	<h1>@UiText.ErrorPage.Heading</h1>
+	<p>@UiText.ErrorPage.Message</p>
 
 	@if (ShowRequestId)
 	{
 		<p class="error-page__request">
-			<strong>Request ID:</strong> <code>@requestId</code>
+			<strong>@UiText.ErrorPage.RequestIdLabel</strong> <code>@requestId</code>
 		</p>
 	}
 
 	<p class="error-page__hint">
-		Swapping to the <strong>Development</strong> environment (set <code>ASPNETCORE_ENVIRONMENT=Development</code>
-		and restart the app) displays detailed error information. Don't enable it for deployed applications —
-		it can expose sensitive information from exceptions to end users.
+		@UiText.ErrorPage.DevHintBefore<strong>@UiText.ErrorPage.DevHintEnvironment</strong>@UiText.ErrorPage.DevHintAfter
 	</p>
 </div>
 

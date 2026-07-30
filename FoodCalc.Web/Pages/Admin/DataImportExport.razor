@@ -4,37 +4,37 @@
 @inject MessageService messageService
 @inject IOptions<ImportExportSettings> ImportExportOptions
 
-<PageTitle>Data Import/Export</PageTitle>
+<PageTitle>@UiText.ImportExport.PageTitle</PageTitle>
 
 <div class="fh-stack">
-	<PageHeader Title="Data Import/Export"/>
+	<PageHeader Title="@UiText.ImportExport.PageTitle"/>
 
 	<div class="row g-4">
 		<div class="col-md-6">
 			<AppCard>
-				<Header>Export</Header>
+				<Header>@UiText.ImportExport.ExportHeader</Header>
 				<Body>
-				<p class="fh-muted">Download all data as a .json file.</p>
-				<AppButton Icon="download" OnClick="ExportData">Export</AppButton>
+				<p class="fh-muted">@UiText.ImportExport.ExportDescription</p>
+				<AppButton Icon="download" OnClick="ExportData">@UiText.ImportExport.ExportButton</AppButton>
 				</Body>
 			</AppCard>
 		</div>
 
 		<div class="col-md-6">
 			<AppCard>
-				<Header>Import</Header>
+				<Header>@UiText.ImportExport.ImportHeader</Header>
 				<Body>
 				<div class="fh-field">
-					<label class="form-label" for="importFile">Import file (.json)</label>
+					<label class="form-label" for="importFile">@UiText.ImportExport.ImportFileLabel</label>
 					<InputFile id="importFile" class="form-control" OnChange="HandleFileSelected" accept=".json"/>
 				</div>
 				<div class="fh-cluster">
-					<AppButton Icon="upload" OnClick="ImportData">Import</AppButton>
+					<AppButton Icon="upload" OnClick="ImportData">@UiText.ImportExport.ImportButton</AppButton>
 					<AppButton Variant="ButtonVariant.OutlineSecondary" Icon="clock-history" OnClick="ImportOldData">
-						Import (old format)
+						@UiText.ImportExport.ImportOldButton
 					</AppButton>
 				</div>
-				<p class="fh-muted">Use "old format" for exports created before the ingredient rework.</p>
+				<p class="fh-muted">@UiText.ImportExport.OldFormatHint</p>
 				</Body>
 			</AppCard>
 		</div>
@@ -57,7 +57,7 @@
 			messageService.ShowMessage(WebConstants.Messages.ImportExport.PreparingExport, false, 0);
 			await importExportService.ExportAsync(ExportFormat);
 		}
-		catch (Exception ex) { messageService.ShowMessage($"Export failed: {ex.Message}", true); }
+		catch (Exception ex) { messageService.ShowMessage(WebConstants.Messages.ImportExport.ExportFailed(ex.Message), true); }
 	}
 
 	private Task ImportData() => RunImportAsync((bytes, name) => importExportService.ImportAsync(bytes, name));
@@ -95,7 +95,7 @@
 				.OnSuccess(message: WebConstants.Messages.ImportExport.ImportSucceeded)
 				.OnFailure();
 		}
-		catch (Exception ex) { messageService.ShowMessage($"Import failed: {ex.Message}", true); }
+		catch (Exception ex) { messageService.ShowMessage(WebConstants.Messages.ImportExport.ImportFailed(ex.Message), true); }
 	}
 
 }

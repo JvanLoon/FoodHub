@@ -20,10 +20,10 @@ public class UpdateRecipeCommandHandler(FoodHubDbContext context, ILogger<Update
                 await context.Recipes.SingleOrDefaultAsync(r => r.Id == request.Recipe.Id, cancellationToken);
 
             if (recipe is null)
-                return Error.NotFound(description: ErrorMessages.Common.NotFound("Recipe"));
+                return Error.NotFound(description: ErrorMessages.Common.NotFound(ErrorMessages.Entities.Recipe));
 
             if (!request.Acting.CanEdit(recipe.CreatedByUserId))
-                return Error.Forbidden(description: ErrorMessages.Review.NotOwned("recipe"));
+                return Error.Forbidden(description: ErrorMessages.Review.NotOwned(ErrorMessages.Entities.Recipe));
 
             var nameChanged = recipe.Name != request.Recipe.Name;
             recipe.Name = request.Recipe.Name;
@@ -49,8 +49,8 @@ public class UpdateRecipeCommandHandler(FoodHubDbContext context, ILogger<Update
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, ErrorMessages.Common.UpdateFailed("recipe"));
-            return Error.Failure(description: ErrorMessages.Common.UpdateFailed("recipe"));
+            logger.LogError(ex, ErrorMessages.Common.UpdateFailed(ErrorMessages.Entities.Recipe));
+            return Error.Failure(description: ErrorMessages.Common.UpdateFailed(ErrorMessages.Entities.Recipe));
         }
     }
 }

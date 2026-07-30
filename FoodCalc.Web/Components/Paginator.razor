@@ -1,11 +1,11 @@
 <div class="d-flex align-items-center justify-content-between flex-wrap mt-3 w-100">
-	<nav aria-label="Page navigation">
+	<nav aria-label="@UiText.Components.PageNavigation">
 		<ul class="pagination mb-0">
 			<li class="page-item @(Page <= 1 ? "disabled" : "")">
-				<button class="page-link" @onclick="GoToFirstPage" title="First page">&#171;</button>
+				<button class="page-link" @onclick="GoToFirstPage" title="@UiText.Components.FirstPage">&#171;</button>
 			</li>
 			<li class="page-item @(Page <= 1 ? "disabled" : "")">
-				<button class="page-link" @onclick="GoToPreviousPage" title="Previous page">&#8249;</button>
+				<button class="page-link" @onclick="GoToPreviousPage" title="@UiText.Components.PreviousPage">&#8249;</button>
 			</li>
 			@foreach (var pageNum in GetPageNumbers())
 			{
@@ -15,16 +15,16 @@
 				</li>
 			}
 			<li class="page-item @(Page >= TotalPages ? "disabled" : "")">
-				<button class="page-link" @onclick="GoToNextPage" title="Next page">&#8250;</button>
+				<button class="page-link" @onclick="GoToNextPage" title="@UiText.Components.NextPage">&#8250;</button>
 			</li>
 			<li class="page-item @(Page >= TotalPages ? "disabled" : "")">
-				<button class="page-link" @onclick="GoToLastPage" title="Last page">&#187;</button>
+				<button class="page-link" @onclick="GoToLastPage" title="@UiText.Components.LastPage">&#187;</button>
 			</li>
 		</ul>
 	</nav>
 
 	<div class="d-flex align-items-center gap-2">
-		<label class="mb-0 text-nowrap small">Per page:</label>
+		<label class="mb-0 text-nowrap small">@UiText.Components.PerPage</label>
 		<select class="form-select form-select-sm" style="width: auto;" value="@PageSize" @onchange="OnPageSizeChanged">
 			@foreach (var size in PageSizeOptions)
 			{

@@ -5,12 +5,12 @@
 	<div class="input-group">
 		<input type="text"
 		       class="form-control"
-		       placeholder="Add custom item..."
+		       placeholder="@UiText.ShoppingList.AddPlaceholder"
 		       @bind="_newItem"
 		       @bind:event="oninput"
 		       @onkeydown="OnInputKeyDown"/>
 		<AppButton Variant="ButtonVariant.OutlinePrimary" Icon="plus-lg"
-		           Disabled="@string.IsNullOrWhiteSpace(_newItem)" OnClick="AddItem">Add
+		           Disabled="@string.IsNullOrWhiteSpace(_newItem)" OnClick="AddItem">@UiText.Common.Add
 		</AppButton>
 	</div>
 </div>
@@ -22,7 +22,7 @@
 		{
 			<li>
 				<span class="ingredient-text">@item</span>
-				<IconButton Icon="x-lg" Title="Remove item" Size="ButtonSize.Small"
+				<IconButton Icon="x-lg" Title="@UiText.ShoppingList.RemoveItem" Size="ButtonSize.Small"
 				            Variant="ButtonVariant.Danger" CssClass="no-print"
 				            OnClick="() => RemoveItem(index)"/>
 			</li>
@@ -32,8 +32,8 @@
 else
 {
 	<div class="no-print">
-		<EmptyState Icon="cart" Title="No ingredients to display."
-		            Message="Select recipes on the Home page or add custom items above."/>
+		<EmptyState Icon="cart" Title="@UiText.ShoppingList.EmptyTitle"
+		            Message="@UiText.ShoppingList.EmptyMessage"/>
 	</div>
 }
 
@@ -60,7 +60,7 @@ else
 		{
 			_initialized = true;
 			_displayItems = Ingredients.Where(i => !string.IsNullOrWhiteSpace(i.Name))
-				.Select(i => $"{i.Name}: {i.Amount.ToFormattedString()} {i.IngredientAmount}")
+				.Select(i => $"{i.Name}: {i.Amount.ToFormattedString()} {UiText.AmountTypes.Label(i.IngredientAmount)}")
 				.ToList();
 			await OnItemsChanged.InvokeAsync(_displayItems);
 		}

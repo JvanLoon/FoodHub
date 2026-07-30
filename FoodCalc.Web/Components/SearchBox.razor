@@ -12,7 +12,7 @@
 	       @oninput="HandleInput"/>
 	@if (!string.IsNullOrEmpty(Value))
 	{
-		<button type="button" class="fh-search__clear" aria-label="Clear search" @onclick="ClearAsync">
+		<button type="button" class="fh-search__clear" aria-label="@UiText.Components.ClearSearch" @onclick="ClearAsync">
 			<i class="bi bi-x-lg" aria-hidden="true"></i>
 		</button>
 	}
@@ -27,7 +27,7 @@
 	public EventCallback<string> ValueChanged { get; set; }
 
 	[Parameter]
-	public string Placeholder { get; set; } = "Search...";
+	public string Placeholder { get; set; } = UiText.Components.SearchPlaceholder;
 
 	[Parameter]
 	public int DebounceMs { get; set; } = 300;

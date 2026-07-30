@@ -20,7 +20,7 @@ public class RandomizeMealPlanCommandHandler(FoodHubDbContext context, ILogger<R
             var dates = request.Dates.Distinct()
                 .ToList();
             if (dates.Count == 0)
-                return Error.Validation(description: "Select at least one day to randomize.");
+                return Error.Validation(description: ErrorMessages.MealPlan.NoDaysSelected);
 
             var perDay = Math.Clamp(request.RecipesPerDay, 1, MealPlanConstants.MaxRecipesPerDay);
 
@@ -30,7 +30,7 @@ public class RandomizeMealPlanCommandHandler(FoodHubDbContext context, ILogger<R
                 .Include(r => r.Ingredients)
                 .ToListAsync(cancellationToken);
             if (allRecipes.Count == 0)
-                return Error.Validation(description: "There are no recipes to pick from.");
+                return Error.Validation(description: ErrorMessages.MealPlan.NoRecipesToPickFrom);
 
             // Optional ingredient bias: keep recipes using any requested ingredient.
             var wanted = request.Ingredients.Where(i => !string.IsNullOrWhiteSpace(i))
@@ -96,8 +96,8 @@ public class RandomizeMealPlanCommandHandler(FoodHubDbContext context, ILogger<R
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, ErrorMessages.Common.AddFailed("randomized meal plan"));
-            return Error.Failure(description: ErrorMessages.Common.AddFailed("randomized meal plan"));
+            logger.LogError(ex, ErrorMessages.Common.AddFailed(ErrorMessages.Entities.RandomizedMealPlan));
+            return Error.Failure(description: ErrorMessages.Common.AddFailed(ErrorMessages.Entities.RandomizedMealPlan));
         }
     }
 }

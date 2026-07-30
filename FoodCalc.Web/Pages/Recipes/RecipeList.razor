@@ -9,16 +9,16 @@
 @inject NavigationManager NavigationManager
 @inject AuthStateService AuthStateService
 
-<PageTitle>Recipes</PageTitle>
+<PageTitle>@UiText.Recipes.Title</PageTitle>
 
 <div class="recipes-layout">
 	<div class="recipes-header">
-		<PageHeader Title="Recipes" Subtitle="Select recipes to build a shopping list">
-			<SearchBox Placeholder="Search recipes..." Value="@searchTerm" ValueChanged="OnSearchChanged"/>
+		<PageHeader Title="@UiText.Recipes.Title" Subtitle="@UiText.Recipes.Subtitle">
+			<SearchBox Placeholder="@UiText.Recipes.SearchPlaceholder" Value="@searchTerm" ValueChanged="OnSearchChanged"/>
 				<AppButton Variant="ButtonVariant.Primary" Icon="cart3"
 				           Disabled="@(!SelectedRecipeIds.Any())"
 				           OnClick="OpenAggregatedIngredientsPage">
-					Generate shopping list
+					@UiText.Recipes.GenerateShoppingList
 				</AppButton>
 		</PageHeader>
 	</div>
@@ -26,7 +26,7 @@
 	<div class="recipes-body">
 		@if (pagedResult == null)
 		{
-			<LoadingSpinner Label="Loading recipes..."/>
+			<LoadingSpinner Label="@UiText.Recipes.Loading"/>
 		}
 		else if (pagedResult.Items.Any())
 		{
@@ -46,11 +46,11 @@
 						{
 							<div class="recipe-pending">
 								<Badge Variant="Badge.BadgeVariant.Warning" Icon="hourglass-split">
-									Awaiting approval
+									@UiText.Recipes.AwaitingApproval
 								</Badge>
 							</div>
 						}
-						<p class="ingredients-label">Ingredients</p>
+						<p class="ingredients-label">@UiText.Recipes.IngredientsLabel</p>
 						<ul class="ingredients-list">
 							@if (recipe.Ingredients != null)
 							{
@@ -59,7 +59,7 @@
 									<li>
 										<span>@ingredient.Name</span>
 										<span
-											class="fh-muted">@ingredient.Amount.ToFormattedString() @ingredient.IngredientAmount.ToString()</span>
+											class="fh-muted">@ingredient.Amount.ToFormattedString() @UiText.AmountTypes.Label(ingredient.IngredientAmount)</span>
 									</li>
 								}
 							}
@@ -70,8 +70,8 @@
 		}
 		else
 		{
-			<EmptyState Icon="journal-x" Title="No recipes found."
-			            Message="Try a different search, or add a new recipe."/>
+			<EmptyState Icon="journal-x" Title="@UiText.Recipes.EmptyTitle"
+			            Message="@UiText.Recipes.EmptyMessage"/>
 		}
 	</div>
 
@@ -211,7 +211,7 @@
 
 	private async Task DeleteRecipe(Guid recipeId)
 	{
-		var confirmed = confirmDialog is not null && await confirmDialog.ShowAsync("Delete recipe", "Are you sure you want to delete this recipe?", "Delete", danger: true);
+		var confirmed = confirmDialog is not null && await confirmDialog.ShowAsync(UiText.Recipes.DeleteTitle, UiText.Recipes.DeleteMessage, UiText.Common.Delete, danger: true);
 		if (!confirmed)
 			return;
 

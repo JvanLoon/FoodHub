@@ -42,8 +42,8 @@ public class GetAllRecipesQueryHandler(FoodHubDbContext context, ILogger<GetAllR
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, ErrorMessages.Common.GetAllFailed("Recipes"));
-            return Error.Failure(description: ErrorMessages.Common.GetAllFailed("Recipes"));
+            logger.LogError(ex, ErrorMessages.Common.GetAllFailed(ErrorMessages.Entities.Recipes));
+            return Error.Failure(description: ErrorMessages.Common.GetAllFailed(ErrorMessages.Entities.Recipes));
         }
     }
 }

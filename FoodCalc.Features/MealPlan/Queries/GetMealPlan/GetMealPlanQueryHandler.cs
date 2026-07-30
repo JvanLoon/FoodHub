@@ -26,8 +26,8 @@ public class GetMealPlanQueryHandler(FoodHubDbContext context, ILogger<GetMealPl
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, ErrorMessages.Common.GetAllFailed("MealPlan"));
-            return Error.Failure(description: ErrorMessages.Common.GetAllFailed("MealPlan"));
+            logger.LogError(ex, ErrorMessages.Common.GetAllFailed(ErrorMessages.Entities.MealPlan));
+            return Error.Failure(description: ErrorMessages.Common.GetAllFailed(ErrorMessages.Entities.MealPlan));
         }
     }
 }

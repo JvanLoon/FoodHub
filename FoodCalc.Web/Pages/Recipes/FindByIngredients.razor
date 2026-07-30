@@ -7,11 +7,11 @@
 @inject ILocalStorageService LocalStorage
 @inject NavigationManager NavigationManager
 
-<PageTitle>Find recipes</PageTitle>
+<PageTitle>@UiText.FindRecipes.Title</PageTitle>
 
 <div class="find-layout">
-	<PageHeader Title="Find recipes"
-	            Subtitle="Add the ingredients you have, then discover what you can cook."/>
+	<PageHeader Title="@UiText.FindRecipes.Title"
+	            Subtitle="@UiText.FindRecipes.Subtitle"/>
 
 	<div class="find-content">
 		@* --- Left: ingredient list builder + settings --- *@
@@ -19,7 +19,7 @@
 			<AppCard CssClass="find-panel">
 				<Header>
 					<span class="find-panel__title">
-						<i class="bi bi-basket2" aria-hidden="true"></i> My ingredients
+						<i class="bi bi-basket2" aria-hidden="true"></i> @UiText.FindRecipes.MyIngredients
 					</span>
 				</Header>
 				<Body>
@@ -27,8 +27,8 @@
 					<div class="find-add">
 						<input type="text"
 						       class="form-control"
-						       placeholder="e.g. eggs, flour, tomato..."
-						       aria-label="Add an ingredient"
+						       placeholder="@UiText.FindRecipes.AddPlaceholder"
+						       aria-label="@UiText.FindRecipes.AddAriaLabel"
 						       autocomplete="off"
 						       role="combobox"
 						       aria-expanded="@showSuggestions"
@@ -39,7 +39,7 @@
 						       @onkeydown="OnInputKeyDown"/>
 						<AppButton Variant="ButtonVariant.Primary"
 						           Icon="plus-lg"
-						           Title="Add ingredient"
+						           Title="@UiText.FindRecipes.AddIngredient"
 						           Disabled="@string.IsNullOrWhiteSpace(newIngredient)"
 						           OnClick="AddCurrent"/>
 					</div>
@@ -69,7 +69,7 @@
 									    @onmousedown:preventDefault="true"
 									    @onmousedown="AddCurrent">
 										<i class="bi bi-plus-lg" aria-hidden="true"></i>
-										<span>Add &ldquo;@newIngredient.Trim()&rdquo;</span>
+										<span>@UiText.FindRecipes.AddQuoted(newIngredient.Trim())</span>
 									</li>
 								}
 							</ul>
@@ -80,7 +80,7 @@
 				@if (prefs.Ingredients.Count == 0)
 				{
 					<p class="find-hint fh-muted">
-						Nothing added yet. Type an ingredient above and press Enter.
+						@UiText.FindRecipes.NothingAdded
 					</p>
 				}
 				else
@@ -92,7 +92,7 @@
 									<span class="find-chip__label" title="@ingredient">@ingredient</span>
 									<button type="button"
 									        class="find-chip__remove"
-									        aria-label="@($"Remove {ingredient}")"
+									        aria-label="@UiText.FindRecipes.RemoveAriaLabel(ingredient)"
 									        @onclick="() => RemoveIngredient(ingredient)">
 										<i class="bi bi-x" aria-hidden="true"></i>
 									</button>
@@ -104,7 +104,7 @@
 					           Icon="trash"
 					           CssClass="find-clear"
 					           OnClick="ClearIngredients">
-						Clear all
+						@UiText.FindRecipes.ClearAll
 					</AppButton>
 				}
 				</Body>
@@ -113,26 +113,26 @@
 			<AppCard CssClass="find-panel">
 				<Header>
 					<span class="find-panel__title">
-						<i class="bi bi-sliders" aria-hidden="true"></i> Options
+						<i class="bi bi-sliders" aria-hidden="true"></i> @UiText.FindRecipes.Options
 					</span>
 				</Header>
 				<Body>
 				<EditForm Model="prefs" FormName="find-options">
 					<SelectField TValue="MatchMode"
-					             Label="Match"
+					             Label="@UiText.FindRecipes.MatchLabel"
 					             @bind-Value="prefs.Mode"
 					             @bind-Value:after="PersistAndRecompute">
-						<option value="@nameof(MatchMode.Any)">Contains any of my ingredients</option>
-						<option value="@nameof(MatchMode.All)">Must contain all my ingredients</option>
+						<option value="@nameof(MatchMode.Any)">@UiText.FindRecipes.MatchAny</option>
+						<option value="@nameof(MatchMode.All)">@UiText.FindRecipes.MatchAll</option>
 					</SelectField>
 
 					<SelectField TValue="SortMode"
-					             Label="Sort by"
+					             Label="@UiText.FindRecipes.SortLabel"
 					             @bind-Value="prefs.Sort"
 					             @bind-Value:after="PersistAndRecompute">
-						<option value="@nameof(SortMode.MostMatches)">Most of my ingredients</option>
-						<option value="@nameof(SortMode.FewestMissing)">Fewest missing ingredients</option>
-						<option value="@nameof(SortMode.Name)">Name (A–Z)</option>
+						<option value="@nameof(SortMode.MostMatches)">@UiText.FindRecipes.SortMostMatches</option>
+						<option value="@nameof(SortMode.FewestMissing)">@UiText.FindRecipes.SortFewestMissing</option>
+						<option value="@nameof(SortMode.Name)">@UiText.FindRecipes.SortName</option>
 					</SelectField>
 
 					<label class="find-check">
@@ -140,7 +140,7 @@
 						       class="form-check-input"
 						       checked="@prefs.Highlight"
 						       @onchange="OnHighlightChanged"/>
-						<span>Highlight my ingredients in each recipe</span>
+						<span>@UiText.FindRecipes.HighlightLabel</span>
 					</label>
 				</EditForm>
 				</Body>
@@ -151,24 +151,24 @@
 		<section class="find-results">
 			@if (allRecipes == null)
 			{
-				<LoadingSpinner Label="Loading recipes..."/>
+				<LoadingSpinner Label="@UiText.FindRecipes.Loading"/>
 			}
 			else if (prefs.Ingredients.Count == 0)
 			{
 				<EmptyState Icon="basket"
-				            Title="Add some ingredients"
-				            Message="Build your ingredient list on the left to see matching recipes."/>
+				            Title="@UiText.FindRecipes.NoIngredientsTitle"
+				            Message="@UiText.FindRecipes.NoIngredientsMessage"/>
 			}
 			else if (results.Count == 0)
 			{
 				<EmptyState Icon="search"
-				            Title="No matching recipes"
+				            Title="@UiText.FindRecipes.NoMatchesTitle"
 				            Message="@NoResultsMessage"/>
 			}
 			else
 			{
 				<p class="find-count fh-muted">
-					@results.Count @(results.Count == 1 ? "recipe" : "recipes") found
+					@UiText.FindRecipes.Found(results.Count)
 				</p>
 				<div class="fh-grid">
 					@foreach (RecipeMatch match in results)
@@ -193,7 +193,7 @@
 											@if (hit) { <i class="bi bi-check-lg" aria-hidden="true"></i> }
 											<span>@ingredient.Name</span>
 											<span class="fh-muted find-ingredients__amount">
-												@ingredient.Amount.ToFormattedString() @ingredient.IngredientAmount.ToString()
+												@ingredient.Amount.ToFormattedString() @UiText.AmountTypes.Label(ingredient.IngredientAmount)
 											</span>
 										</li>
 									}
@@ -203,20 +203,20 @@
 								@if (match.MissingCount == 0)
 								{
 									<span class="fh-muted find-card__note">
-										<i class="bi bi-bag-check" aria-hidden="true"></i> You have everything listed
+										<i class="bi bi-bag-check" aria-hidden="true"></i> @UiText.FindRecipes.HaveEverything
 									</span>
 								}
 								else
 								{
 									<span class="fh-muted find-card__note">
-										@match.MissingCount more @(match.MissingCount == 1 ? "ingredient" : "ingredients") needed
+										@UiText.FindRecipes.StillNeeded(match.MissingCount)
 									</span>
 								}
 								<AppButton Variant="ButtonVariant.OutlineSecondary"
 								           Size="ButtonSize.Small"
 								           Icon="box-arrow-up-right"
 								           OnClick="() => OpenRecipe(match.Recipe.Id)">
-									Open
+									@UiText.Common.Open
 								</AppButton>
 							</div>
 						</div>
@@ -273,7 +273,7 @@
 		}
 	}
 
-	private string NoResultsMessage => prefs.Mode == MatchMode.All ? "No recipe contains all of those ingredients. Try switching Match to \"any\"." : "None of your ingredients appear in a recipe yet.";
+	private string NoResultsMessage => prefs.Mode == MatchMode.All ? UiText.FindRecipes.NoMatchesAll : UiText.FindRecipes.NoMatchesAny;
 
 	private void ShowSuggestions() => showSuggestions = true;
 

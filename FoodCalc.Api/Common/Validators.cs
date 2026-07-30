@@ -102,7 +102,8 @@ public class ReviewTargetValidator : Validator<ReviewTargetDto>
     public ReviewTargetValidator()
     {
         RuleFor(x => x.Id)
-            .NotEmpty();
+            .NotEmpty()
+            .WithMessage(ValidationMessages.Review.TargetIdRequired);
     }
 }
 
@@ -123,7 +124,8 @@ public class GetUserRolesRequestValidator : Validator<GetUserRolesRequest>
     public GetUserRolesRequestValidator()
     {
         RuleFor(x => x.Email)
-            .NotEmpty();
+            .NotEmpty()
+            .WithMessage(ValidationMessages.Account.EmailRequired);
     }
 }
 
@@ -132,9 +134,11 @@ public class ModifyUserRoleRequestValidator : Validator<ModifyUserRoleRequest>
     public ModifyUserRoleRequestValidator()
     {
         RuleFor(x => x.Email)
-            .NotEmpty();
+            .NotEmpty()
+            .WithMessage(ValidationMessages.Account.EmailRequired);
         RuleFor(x => x.Role)
-            .NotEmpty();
+            .NotEmpty()
+            .WithMessage(ValidationMessages.Review.RoleRequired);
     }
 }
 
@@ -147,9 +151,11 @@ public class RemoveUserRoleRequestValidator : Validator<RemoveUserRoleRequest>
     public RemoveUserRoleRequestValidator()
     {
         RuleFor(x => x.Email)
-            .NotEmpty();
+            .NotEmpty()
+            .WithMessage(ValidationMessages.Account.EmailRequired);
         RuleFor(x => x.Role)
-            .NotEmpty();
+            .NotEmpty()
+            .WithMessage(ValidationMessages.Review.RoleRequired);
     }
 }
 
@@ -177,10 +183,15 @@ public class RegisterValidator : Validator<RegisterDto>
     {
         RuleFor(x => x.Email)
             .NotEmpty()
-            .EmailAddress();
+            .WithMessage(ValidationMessages.Account.EmailRequired)
+            .EmailAddress()
+            .WithMessage(ValidationMessages.Account.EmailInvalid);
         RuleFor(x => x.Password)
             .NotEmpty()
-            .Length(6, 100);
+            .WithMessage(ValidationMessages.Account.PasswordRequired)
+            .Length(ValidationMessages.Account.PasswordMinLength, ValidationMessages.Account.PasswordMaxLength)
+            .WithMessage(ValidationMessages.Account.PasswordLength(ValidationMessages.Account.PasswordMinLength,
+                ValidationMessages.Account.PasswordMaxLength));
     }
 }
 
@@ -191,10 +202,15 @@ public class ResetPasswordValidator : Validator<ResetPasswordDto>
     {
         RuleFor(x => x.Email)
             .NotEmpty()
-            .EmailAddress();
+            .WithMessage(ValidationMessages.Account.EmailRequired)
+            .EmailAddress()
+            .WithMessage(ValidationMessages.Account.EmailInvalid);
         RuleFor(x => x.Password)
             .NotEmpty()
-            .Length(6, 100);
+            .WithMessage(ValidationMessages.Account.PasswordRequired)
+            .Length(ValidationMessages.Account.PasswordMinLength, ValidationMessages.Account.PasswordMaxLength)
+            .WithMessage(ValidationMessages.Account.PasswordLength(ValidationMessages.Account.PasswordMinLength,
+                ValidationMessages.Account.PasswordMaxLength));
     }
 }
 
@@ -204,9 +220,11 @@ public class LoginValidator : Validator<LoginDto>
     public LoginValidator()
     {
         RuleFor(x => x.Email)
-            .NotEmpty();
+            .NotEmpty()
+            .WithMessage(ValidationMessages.Account.EmailRequired);
         RuleFor(x => x.Password)
-            .NotEmpty();
+            .NotEmpty()
+            .WithMessage(ValidationMessages.Account.PasswordRequired);
     }
 }
 
@@ -216,7 +234,8 @@ public class ToggleUserRequestValidator : Validator<ToggleUserRequest>
     public ToggleUserRequestValidator()
     {
         RuleFor(x => x.Email)
-            .NotEmpty();
+            .NotEmpty()
+            .WithMessage(ValidationMessages.Account.EmailRequired);
     }
 }
 
@@ -230,6 +249,7 @@ public class ExportRequestValidator : Validator<ExportRequest>
     public ExportRequestValidator()
     {
         RuleFor(x => x.Format)
-            .NotEmpty();
+            .NotEmpty()
+            .WithMessage(ValidationMessages.ImportExport.FormatRequired);
     }
 }

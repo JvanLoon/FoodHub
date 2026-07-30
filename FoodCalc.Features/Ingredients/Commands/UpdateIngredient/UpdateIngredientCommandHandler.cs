@@ -20,10 +20,10 @@ public class UpdateIngredientCommandHandler(FoodHubDbContext context, ILogger<Up
                 await context.Ingredients.SingleOrDefaultAsync(i => i.Id == request.Ingredient.Id, cancellationToken);
 
             if (ingredient is null)
-                return Error.NotFound(description: ErrorMessages.Common.NotFound("Ingredient"));
+                return Error.NotFound(description: ErrorMessages.Common.NotFound(ErrorMessages.Entities.Ingredient));
 
             if (!request.Acting.CanEdit(ingredient.CreatedByUserId))
-                return Error.Forbidden(description: ErrorMessages.Review.NotOwned("ingredient"));
+                return Error.Forbidden(description: ErrorMessages.Review.NotOwned(ErrorMessages.Entities.Ingredient));
 
             ingredient.Name = request.Ingredient.Name;
             ingredient.ShouldBeAddedToShoppingCart = request.Ingredient.ShouldBeAddedToShoppingCart;
@@ -38,8 +38,8 @@ public class UpdateIngredientCommandHandler(FoodHubDbContext context, ILogger<Up
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, ErrorMessages.Common.UpdateFailed("ingredient"));
-            return Error.Failure(description: ErrorMessages.Common.UpdateFailed("ingredient"));
+            logger.LogError(ex, ErrorMessages.Common.UpdateFailed(ErrorMessages.Entities.Ingredient));
+            return Error.Failure(description: ErrorMessages.Common.UpdateFailed(ErrorMessages.Entities.Ingredient));
         }
     }
 }

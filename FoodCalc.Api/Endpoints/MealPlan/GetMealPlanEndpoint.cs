@@ -20,7 +20,7 @@ public class GetMealPlanEndpoint(IMediator mediator) : Endpoint<GetMealPlanReque
         var userId = User.GetUserId();
         if (string.IsNullOrEmpty(userId))
         {
-            await Send.StringAsync("No user in token", 401, cancellation: ct);
+            await Send.StringAsync(ResponseMessages.Token.NoUserInToken, 401, cancellation: ct);
             return;
         }
 

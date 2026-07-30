@@ -37,7 +37,7 @@ public class GetUserRolesEndpoint(UserManager<IdentityUser> userManager) : Endpo
         var user = await userManager.FindByEmailAsync(req.Email);
         if (user == null)
         {
-            await Send.StringAsync("No user found", 401, cancellation: ct);
+            await Send.StringAsync(ResponseMessages.Account.UserNotFound, 401, cancellation: ct);
             return;
         }
 
@@ -59,7 +59,7 @@ public class AddUserRoleEndpoint(UserManager<IdentityUser> userManager) : Endpoi
         var user = await userManager.FindByEmailAsync(req.Email);
         if (user == null)
         {
-            await Send.StringAsync("No user found", 404, cancellation: ct);
+            await Send.StringAsync(ResponseMessages.Account.UserNotFound, 404, cancellation: ct);
             return;
         }
 
@@ -88,7 +88,7 @@ public class RemoveUserRoleEndpoint(UserManager<IdentityUser> userManager) : End
         var user = await userManager.FindByEmailAsync(req.Email);
         if (user == null)
         {
-            await Send.StringAsync("No user found", 404, cancellation: ct);
+            await Send.StringAsync(ResponseMessages.Account.UserNotFound, 404, cancellation: ct);
             return;
         }
 

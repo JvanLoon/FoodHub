@@ -44,8 +44,8 @@ public class GetAllUsersQueryHandler(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, ErrorMessages.Common.GetAllFailed("Users"));
-            return Error.Failure(description: ErrorMessages.Common.GetAllFailed("Users"));
+            logger.LogError(ex, ErrorMessages.Common.GetAllFailed(ErrorMessages.Entities.Users));
+            return Error.Failure(description: ErrorMessages.Common.GetAllFailed(ErrorMessages.Entities.Users));
         }
     }
 }

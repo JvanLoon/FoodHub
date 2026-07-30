@@ -2,24 +2,24 @@
 @using FoodCalc.Web.Services.Auth
 @inject AuthTokenService AuthTokenService
 
-<PageTitle>User Settings</PageTitle>
+<PageTitle>@UiText.UserSettings.Title</PageTitle>
 
 <div class="fh-stack">
-	<PageHeader Title="User Settings"/>
+	<PageHeader Title="@UiText.UserSettings.Title"/>
 
 	@if (string.IsNullOrEmpty(email))
 	{
-		<LoadingSpinner Label="Loading settings..."/>
+		<LoadingSpinner Label="@UiText.UserSettings.Loading"/>
 	}
 	else
 	{
 		<div class="settings-card">
 			<AppCard>
-				<Header>Account</Header>
+				<Header>@UiText.UserSettings.AccountHeader</Header>
 				<Body>
 				<div class="settings-row">
 					<i class="bi bi-envelope" aria-hidden="true"></i>
-					<span class="fh-muted">Email</span>
+					<span class="fh-muted">@UiText.UserSettings.EmailLabel</span>
 					<span class="settings-row__value fh-truncate" title="@email">@email</span>
 				</div>
 				</Body>

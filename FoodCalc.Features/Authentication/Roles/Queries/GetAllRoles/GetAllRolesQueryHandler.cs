@@ -24,8 +24,8 @@ public class GetAllRolesQueryHandler(FoodHubDbContext context, ILogger<GetAllUse
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, ErrorMessages.Common.GetAllFailed("Roles"));
-            return Error.Failure(description: ErrorMessages.Common.GetAllFailed("Roles"));
+            logger.LogError(ex, ErrorMessages.Common.GetAllFailed(ErrorMessages.Entities.Roles));
+            return Error.Failure(description: ErrorMessages.Common.GetAllFailed(ErrorMessages.Entities.Roles));
         }
     }
 }

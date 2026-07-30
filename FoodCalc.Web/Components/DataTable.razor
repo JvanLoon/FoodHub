@@ -48,10 +48,10 @@
 	public RenderFragment<TItem>? RowTemplate { get; set; }
 
 	[Parameter]
-	public string EmptyText { get; set; } = "Nothing here yet.";
+	public string EmptyText { get; set; } = UiText.Common.Nothing;
 
 	[Parameter]
-	public string LoadingText { get; set; } = "Loading...";
+	public string LoadingText { get; set; } = UiText.Common.Loading;
 
 	[Parameter]
 	public string? CssClass { get; set; }

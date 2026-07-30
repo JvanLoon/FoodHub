@@ -10,7 +10,7 @@
 			<i class="bi @(toast.IsError ? "bi-exclamation-triangle-fill" : "bi-check-circle-fill")"
 			   aria-hidden="true"></i>
 			<div class="fh-toast__message">@toast.Message</div>
-			<button type="button" class="fh-toast__close" aria-label="Dismiss" @onclick="() => Dismiss(toast)">
+			<button type="button" class="fh-toast__close" aria-label="@UiText.Components.DismissToast" @onclick="() => Dismiss(toast)">
 				<i class="bi bi-x-lg" aria-hidden="true"></i>
 			</button>
 		</div>

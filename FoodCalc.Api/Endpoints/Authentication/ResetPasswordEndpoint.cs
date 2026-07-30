@@ -17,7 +17,7 @@ public class ResetPasswordEndpoint(UserManager<IdentityUser> userManager) : Endp
         var user = await userManager.FindByEmailAsync(req.Email);
         if (user == null)
         {
-            await Send.StringAsync("User not found", 404, cancellation: ct);
+            await Send.StringAsync(ResponseMessages.Account.UserNotFound, 404, cancellation: ct);
             return;
         }
 
@@ -30,6 +30,6 @@ public class ResetPasswordEndpoint(UserManager<IdentityUser> userManager) : Endp
             return;
         }
 
-        await Send.StringAsync("Password has been reset successfully.", cancellation: ct);
+        await Send.StringAsync(ResponseMessages.Account.PasswordReset, cancellation: ct);
     }
 }

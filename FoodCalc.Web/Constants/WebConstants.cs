@@ -4,6 +4,9 @@ namespace FoodCalc.Web.Constants;
 /// User-facing messages and magic-string keys used by the Web client. Scoped to this
 /// project — messages are intentionally not shared with the API or Features layers, since
 /// the wording shown to the user is a UI concern.
+///
+/// All copy here is Dutch. This file holds what <em>happened</em> (toasts, confirmations);
+/// what a page <em>says</em> — headings, labels, buttons — lives in <see cref="UiText"/>.
 /// </summary>
 public static class WebConstants
 {
@@ -18,107 +21,134 @@ public static class WebConstants
         /// </summary>
         public static class Client
         {
-            public const string GenericFailure = "Something went wrong. Please try again.";
+            public const string GenericFailure = "Er is iets misgegaan. Probeer het opnieuw.";
 
             // --- 2xx Success ---
-            public const string OK = "Done.";
-            public const string Created = "Created successfully.";
-            public const string Accepted = "Accepted — this is still being processed.";
-            public const string NoContent = "Done. There was nothing to show.";
+            public const string OK = "Gelukt.";
+            public const string Created = "Succesvol aangemaakt.";
+            public const string Accepted = "Geaccepteerd — dit wordt nog verwerkt.";
+            public const string NoContent = "Klaar. Er was niets om te tonen.";
 
             // --- 4xx Client Errors ---
-            public const string BadRequest = "The request was invalid.";
-            public const string Unauthorized = "You are not signed in, or your session has expired.";
-            public const string Forbidden = "You don't have permission to do that.";
-            public const string NotFound = "The requested item was not found.";
-            public const string RequestTimeout = "The request took too long. Please try again.";
-            public const string Conflict = "That action conflicts with the current state.";
-            public const string UnsupportedMediaType = "That file type isn't supported.";
-            public const string TooManyRequests = "Too many requests. Please wait a moment and try again.";
+            public const string BadRequest = "De aanvraag was ongeldig.";
+            public const string Unauthorized = "Je bent niet ingelogd, of je sessie is verlopen.";
+            public const string Forbidden = "Je hebt geen rechten om dat te doen.";
+            public const string NotFound = "Het gevraagde item is niet gevonden.";
+            public const string RequestTimeout = "De aanvraag duurde te lang. Probeer het opnieuw.";
+            public const string Conflict = "Die actie botst met de huidige status.";
+            public const string UnsupportedMediaType = "Dat bestandstype wordt niet ondersteund.";
+            public const string TooManyRequests = "Te veel aanvragen. Wacht even en probeer het opnieuw.";
 
             // Suggested additions — see the matching arms in StatusFallback.
             /// <summary>413 — import uploads can exceed the server's request body limit.</summary>
-            public const string PayloadTooLarge = "That file is too large to upload.";
+            public const string PayloadTooLarge = "Dat bestand is te groot om te uploaden.";
 
             /// <summary>405 — a route/verb mismatch; surfaces during endpoint refactors.</summary>
-            public const string MethodNotAllowed = "That action isn't allowed here.";
+            public const string MethodNotAllowed = "Die actie is hier niet toegestaan.";
 
             /// <summary>422 — if FastEndpoints' validation status is ever moved off 400.</summary>
-            public const string UnprocessableEntity = "The request was understood but could not be processed.";
+            public const string UnprocessableEntity = "De aanvraag is begrepen maar kon niet worden verwerkt.";
 
             // --- 5xx Server Errors ---
-            public const string InternalServerError = "The server encountered an error. Please try again later.";
-            public const string NotImplemented = "That feature isn't available yet.";
-            public const string BadGateway = "The server got an invalid response upstream. Please try again later.";
-            public const string ServiceUnavailable = "The service is temporarily unavailable. Please try again later.";
+            public const string InternalServerError = "Er is een serverfout opgetreden. Probeer het later opnieuw.";
+            public const string NotImplemented = "Die functie is nog niet beschikbaar.";
+
+            public const string BadGateway =
+                "De server kreeg een ongeldig antwoord van een andere server. Probeer het later opnieuw.";
+
+            public const string ServiceUnavailable =
+                "De service is tijdelijk niet beschikbaar. Probeer het later opnieuw.";
 
             public const string NetworkAuthenticationRequired =
-                "Your network requires you to sign in before continuing.";
+                "Je netwerk vereist dat je eerst inlogt voordat je verder kunt.";
 
             /// <summary>504 — suggested addition; the upstream counterpart to <see cref="BadGateway"/>.</summary>
-            public const string GatewayTimeout = "The server took too long to respond. Please try again later.";
+            public const string GatewayTimeout =
+                "De server deed er te lang over om te antwoorden. Probeer het later opnieuw.";
 
-            public static string RequestFailed(int statusCode) => $"Request failed ({statusCode}).";
+            public static string RequestFailed(int statusCode) => $"Aanvraag mislukt ({statusCode}).";
         }
 
         /// <summary>Import / export.</summary>
         public static class ImportExport
         {
-            public const string NoFileContent = "No file content.";
-            public const string ExportUnexpectedResponse = "Export failed: the server returned an unexpected response.";
-            public const string ExportEmpty = "Export failed: file content is empty.";
-            public const string PreparingExport = "Preparing export...";
-            public const string SelectFileFirst = "Please select a file first.";
-            public const string OnlyJsonAccepted = "Only .json files are accepted.";
-            public const string CouldNotReadFile = "Could not read the selected file.";
-            public const string ImportSucceeded = "Import successful.";
+            public const string NoFileContent = "Geen bestandsinhoud.";
+            public const string ExportUnexpectedResponse = "Exporteren mislukt: de server gaf een onverwacht antwoord.";
+            public const string ExportEmpty = "Exporteren mislukt: de bestandsinhoud is leeg.";
+            public const string PreparingExport = "Export voorbereiden...";
+            public const string SelectFileFirst = "Selecteer eerst een bestand.";
+            public const string OnlyJsonAccepted = "Alleen .json-bestanden worden geaccepteerd.";
+            public const string CouldNotReadFile = "Het geselecteerde bestand kon niet worden gelezen.";
+            public const string ImportSucceeded = "Importeren gelukt.";
+
+            public static string ExportFailed(string detail) => $"Exporteren mislukt: {detail}";
+
+            public static string ImportFailed(string detail) => $"Importeren mislukt: {detail}";
         }
 
         /// <summary>Authentication.</summary>
         public static class Auth
         {
-            public const string LoginFailed = "Failed to login. Invalid email or password.";
-            public const string LoginInvalidResponse = "Login failed: invalid server response.";
-            public const string RegisterSuccess = "Registration successful! You can now login.";
+            public const string LoginFailed = "Inloggen mislukt. Ongeldig e-mailadres of wachtwoord.";
+            public const string LoginInvalidResponse = "Inloggen mislukt: ongeldig antwoord van de server.";
+            public const string RegisterSuccess = "Registratie gelukt! Je kunt nu inloggen.";
         }
 
         /// <summary>Role &amp; password management.</summary>
         public static class Roles
         {
-            public const string Added = "Role added successfully!";
-            public const string Removed = "Role removed successfully!";
-            public const string PasswordReset = "Password reset successfully!";
+            public const string Added = "Rol toegevoegd!";
+            public const string Removed = "Rol verwijderd!";
+            public const string PasswordReset = "Wachtwoord opnieuw ingesteld!";
         }
 
         /// <summary>Recipes.</summary>
         public static class Recipe
         {
-            public const string Created = "Recipe created successfully!";
-            public const string NameUpdated = "Recipe name updated successfully!";
-            public const string NameRequired = "Please enter a recipe name.";
-            public const string Deleted = "Recipe deleted successfully!";
-            public const string Updated = "Recipe updated successfully!";
+            public const string Created = "Recept aangemaakt!";
+            public const string NameUpdated = "Receptnaam bijgewerkt!";
+            public const string NameRequired = "Vul een receptnaam in.";
+            public const string Deleted = "Recept verwijderd!";
+            public const string Updated = "Recept bijgewerkt!";
         }
 
         /// <summary>Moderation queue.</summary>
         public static class Review
         {
-            public const string Approved = "Approved.";
-            public const string Rejected = "Rejected and deleted.";
+            public const string Approved = "Goedgekeurd.";
+            public const string Rejected = "Afgekeurd en verwijderd.";
 
             public const string PendingApproval =
-                "Submitted for approval — only you can see it until a moderator approves it.";
+                "Ingediend ter goedkeuring — alleen jij ziet dit totdat een moderator het goedkeurt.";
+
+            public static string LineRemoved(string lineName, string? recipeName) =>
+                $"“{lineName}” verwijderd uit {recipeName}.";
         }
 
         /// <summary>Ingredients.</summary>
         public static class Ingredient
         {
-            public const string AddedOrUpdated = "Ingredient added/updated successfully";
-            public const string Deleted = "Ingredient deleted successfully";
-            public const string Added = "Ingredient added";
-            public const string Updated = "Ingredient updated successfully!";
-            public const string NameUpdated = "Ingredient name updated successfully!";
-            public const string DeletedWithReload = "Ingredient deleted successfully!";
+            public const string AddedOrUpdated = "Ingrediënt toegevoegd/bijgewerkt";
+            public const string Deleted = "Ingrediënt verwijderd";
+            public const string Added = "Ingrediënt toegevoegd";
+            public const string Updated = "Ingrediënt bijgewerkt!";
+            public const string NameUpdated = "Ingrediëntnaam bijgewerkt!";
+            public const string DeletedWithReload = "Ingrediënt verwijderd!";
+        }
+
+        /// <summary>Meal calendar. Fallbacks for when the API returns no message of its own.</summary>
+        public static class Calendar
+        {
+            public const string AddFailed = "Kon het recept niet toevoegen.";
+            public const string RemoveFailed = "Kon het recept niet verwijderen.";
+            public const string RandomizeFailed = "Willekeurig vullen is mislukt.";
+
+            public static string Randomized(int recipeCount, int dayCount)
+            {
+                var recipes = recipeCount == 1 ? "1 recept" : $"{recipeCount} recepten";
+                var days = dayCount == 1 ? "1 dag" : $"{dayCount} dagen";
+                return $"{recipes} toegevoegd over {days}.";
+            }
         }
     }
 

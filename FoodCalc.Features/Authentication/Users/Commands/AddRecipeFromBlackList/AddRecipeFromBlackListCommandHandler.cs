@@ -19,8 +19,8 @@ public class AddRecipeFromBlackListCommandHandler(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to ");
-            return Error.Failure(description: "Failed to ");
+            logger.LogError(ex, "Failed to add recipe to the blacklist");
+            return Error.Failure(description: ErrorMessages.User.BlackListAddFailed);
         }
     }
 }

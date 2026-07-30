@@ -23,10 +23,10 @@ public class AddIngredientToRecipeCommandHandler(
             var recipe = await context.Recipes.SingleOrDefaultAsync(r => r.Id == dto.RecipeId, cancellationToken);
 
             if (recipe is null)
-                return Error.NotFound(description: ErrorMessages.Common.NotFound("Recipe"));
+                return Error.NotFound(description: ErrorMessages.Common.NotFound(ErrorMessages.Entities.Recipe));
 
             if (!request.Acting.CanEdit(recipe.CreatedByUserId))
-                return Error.Forbidden(description: ErrorMessages.Review.NotOwned("recipe"));
+                return Error.Forbidden(description: ErrorMessages.Review.NotOwned(ErrorMessages.Entities.Recipe));
 
             var existing = await context.RecipeItems.FirstOrDefaultAsync(
                 ri => ri.Id == dto.Id && ri.RecipeId == dto.RecipeId, cancellationToken);

@@ -4,26 +4,27 @@
 
 @inject NavigationManager Navigation
 
-<PageTitle>Register</PageTitle>
+<PageTitle>@UiText.Auth.RegisterTitle</PageTitle>
 
 <div class="auth-card">
 	<div class="auth-card__brand">
 		<i class="bi bi-basket2-fill" aria-hidden="true"></i>
 		<span>FoodHub</span>
 	</div>
-	<h3 class="auth-card__title">Create your account</h3>
+	<h3 class="auth-card__title">@UiText.Auth.RegisterHeading</h3>
 	<EditForm Model="registerModel" OnValidSubmit="HandleRegister" FormName="register-form">
 		<DataAnnotationsValidator/>
 		<ValidationSummary class="mb-3"/>
-		<TextField Label="Email" Placeholder="Enter your email" Autocomplete="username"
+		<TextField Label="@UiText.Auth.EmailLabel" Placeholder="@UiText.Auth.EmailPlaceholder" Autocomplete="username"
 		           @bind-Value="registerModel.Email"/>
-		<TextField Label="Password" Type="password" Placeholder="Enter your password" Autocomplete="new-password"
+		<TextField Label="@UiText.Auth.PasswordLabel" Type="password" Placeholder="@UiText.Auth.PasswordPlaceholder"
+		           Autocomplete="new-password"
 		           @bind-Value="registerModel.Password"/>
-		<AppButton Type="submit" Variant="ButtonVariant.Success" Icon="person-plus" CssClass="w-100">Register
+		<AppButton Type="submit" Variant="ButtonVariant.Success" Icon="person-plus" CssClass="w-100">@UiText.Auth.RegisterButton
 		</AppButton>
 	</EditForm>
 	<div class="auth-card__alt">
-		<a href="/login">Already have an account? Login</a>
+		<a href="/login">@UiText.Auth.HaveAccountLink</a>
 	</div>
 </div>
 

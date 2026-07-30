@@ -25,8 +25,8 @@ public class DeleteMealPlanEntryCommandHandler(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, ErrorMessages.Common.DeleteFailed("meal plan entry"));
-            return Error.Failure(description: ErrorMessages.Common.DeleteFailed("meal plan entry"));
+            logger.LogError(ex, ErrorMessages.Common.DeleteFailed(ErrorMessages.Entities.MealPlanEntry));
+            return Error.Failure(description: ErrorMessages.Common.DeleteFailed(ErrorMessages.Entities.MealPlanEntry));
         }
     }
 }
