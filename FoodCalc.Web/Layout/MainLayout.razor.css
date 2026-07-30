@@ -61,7 +61,7 @@ main {
     background: var(--fh-sidebar-bg);
 }
 
-@media (min-width: 641px) {
+@media (min-width: var(--min-width)) {
     .page {
         flex-direction: row;
         height: 100vh;

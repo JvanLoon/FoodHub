@@ -43,6 +43,8 @@
     --bs-link-hover-color-rgb: 38, 98, 52;
 
     --bs-focus-ring-color: rgba(61, 151, 80, 0.35);
+    
+    --min-width: 730px;
 }
 
 [data-bs-theme="dark"] {

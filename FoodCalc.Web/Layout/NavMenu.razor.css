@@ -54,7 +54,7 @@
     display: block;
 }
 
-@media (min-width: 641px) {
+@media (min-width: var(--min-width)) {
     .navbar-toggler {
         display: none;
     }
