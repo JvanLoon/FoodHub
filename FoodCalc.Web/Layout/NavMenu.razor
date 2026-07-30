@@ -24,7 +24,7 @@
 
 			@* Anyone may submit a recipe; it stays private to them until a moderator
 			   approves it. *@
-			<NavItem Href="/recipes/create" Icon="plus-circle" Label="Add recipe"/>
+			<NavItem Href="/recipes/create" Icon="plus-circle" Label="Add recipe" Match="NavLinkMatch.All"/>
 
 			@* Staff manage the ingredient catalog — moderators edit it now, not only admins. *@
 			@if (isAdmin || isModerator)

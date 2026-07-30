@@ -9,49 +9,46 @@
 <PageTitle>@(IsNew ? "Create Recipe" : "Edit Recipe")</PageTitle>
 
 <div class="fh-stack">
-	@if (IsNew)
+	@if (recipe.Id != Guid.Empty && !recipe.IsReviewed)
 	{
-		<PageHeader Title="Create a New Recipe"/>
-
-		<div class="create-card">
-			<AppCard>
-				<EditForm Model="nameModel" OnValidSubmit="CreateRecipeAsync" FormName="create-recipe-form">
-					<TextField Label="Recipe Name" Placeholder="e.g. Spaghetti Bolognese" @bind-Value="editedName"/>
-					<AppButton Type="submit" Icon="plus-lg">Create</AppButton>
-				</EditForm>
-			</AppCard>
+		<div class="recipe-pending-banner">
+			<i class="bi bi-hourglass-split" aria-hidden="true"></i>
+			<span>@WebConstants.Messages.Review.PendingApproval</span>
 		</div>
 	}
-	else
-	{
-		@if (recipe.Id != Guid.Empty && !recipe.IsReviewed)
-		{
-			<div class="recipe-pending-banner">
-				<i class="bi bi-hourglass-split" aria-hidden="true"></i>
-				<span>@WebConstants.Messages.Review.PendingApproval</span>
-			</div>
-		}
 
-		<div class="recipe-name">
-			@if (!isEditingName)
-			{
-				<h1 class="fh-heading">@recipe?.Name</h1>
-				<IconButton Icon="pencil" Title="Edit recipe name" OnClick="StartEditName"/>
-			}
-			else
-			{
-				<EditForm Model="nameModel" OnValidSubmit="SaveRecipeName" class="recipe-name__form"
-				          FormName="edit-recipe-name">
-					<InputText @bind-Value="editedName" class="form-control"/>
-					<AppButton Type="submit" Size="ButtonSize.Small" Icon="check-lg">Save</AppButton>
+	<div class="recipe-name">
+		@if (!isEditingName)
+		{
+			<h1 class="fh-heading">@recipe?.Name</h1>
+			<IconButton Icon="pencil" Title="Edit recipe name" OnClick="StartEditName"/>
+		}
+		else
+		{
+			<EditForm Model="nameModel" OnValidSubmit="SaveRecipeName" class="recipe-name__form"
+			          FormName="edit-recipe-name">
+				<InputText @bind-Value="editedName" class="form-control"
+				           placeholder="e.g. Spaghetti Bolognese"/>
+				<AppButton Type="submit" Size="ButtonSize.Small" Icon="check-lg">Save</AppButton>
+				@* Nothing to fall back to while the recipe is still unsaved. *@
+				@if (!IsNew)
+				{
 					<AppButton Variant="ButtonVariant.OutlineSecondary" Size="ButtonSize.Small"
 					           OnClick="CancelEditName">
 						Cancel
 					</AppButton>
-				</EditForm>
-			}
-		</div>
+				}
+			</EditForm>
+		}
+	</div>
 
+	@if (IsNew)
+	{
+		<EmptyState Icon="basket" Title="Name your recipe first."
+		            Message="Save a name and the ingredient editor opens up."/>
+	}
+	else
+	{
 		<div class="row g-4">
 			<!-- Left: ingredient form -->
 			<div class="col-md-6">
@@ -152,12 +149,16 @@
 
 @code {
 
+	// Null on /recipes/edit — the recipe doesn't exist yet. Creating and editing share this
+	// page and its name editor; ingredients can only be added once the recipe exists (needs
+	// its id), so saving the name is what creates it and switches the page to the id route.
 	[Parameter]
-	public Guid RecipeId { get; set; }
+	public Guid? RecipeId { get; set; }
 
-	// True on the /recipes/create route (no id supplied). Creating a recipe and editing one
-	// share this page; ingredients can only be added once the recipe exists (needs its id).
-	private bool IsNew => RecipeId == Guid.Empty;
+	private bool IsNew => RecipeId is null;
+
+	// Safe to unwrap everywhere it's used: those paths only run in edit mode.
+	private Guid CurrentId => RecipeId ?? Guid.Empty;
 
 	private RecipeDto recipe = new();
 	private List<IngredientDto> ingredients = new();
@@ -167,7 +168,7 @@
 
 	// Scratch buffer for the name field. The live name is only committed to `recipe.Name`
 	// (and the server) on an explicit Save, so cancelling — or navigating away — never
-	// mutates the actual recipe name. Also reused as the create-form's name input.
+	// mutates the actual recipe name.
 	private string editedName = string.Empty;
 
 	// EditForm needs a model instance; the name lives in `editedName`, so this is just a handle.
@@ -179,6 +180,15 @@
 	private bool dropdownOpen = false;
 	private bool ingredientSearchFocused = false;
 	private bool initialized;
+
+	// The router only supplies route parameters that are present in the URL, so an optional
+	// one keeps its old value when the segment disappears. Without this reset, going from
+	// /recipes/edit/{id} back to /recipes/edit stays stuck on the recipe you just left.
+	public override Task SetParametersAsync(ParameterView parameters)
+	{
+		RecipeId = null;
+		return base.SetParametersAsync(parameters);
+	}
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -207,16 +217,19 @@
 		{
 			recipe = new();
 			editedName = string.Empty;
-			isEditingName = false;
+			// Nothing to show but the name form until there's a recipe to name.
+			isEditingName = true;
 			return;
 		}
 
+		isEditingName = false;
+		editedName = string.Empty;
 		await RefreshRecipeAsync();
 	}
 
 	private async Task RefreshRecipeAsync()
 	{
-		await RecipeService.GetRecipeByIdAsync(RecipeId)
+		await RecipeService.GetRecipeByIdAsync(CurrentId)
 			.OnSuccess((data) => recipe = data)
 			.OnFailure();
 
@@ -228,25 +241,9 @@
 		}
 	}
 
-	private async Task CreateRecipeAsync()
-	{
-		if (string.IsNullOrWhiteSpace(editedName))
-		{
-			MessageService.ShowMessage(WebConstants.Messages.Recipe.NameRequired, isError: true);
-			return;
-		}
-
-		await RecipeService.AddRecipe(new CreateRecipeDto
-			{
-				Name = editedName.Trim()
-			})
-			.OnSuccess((data) => Navigation.NavigateTo($"/recipes/edit/{data.Id}"), WebConstants.Messages.Recipe.Created)
-			.OnFailure();
-	}
-
 	private async Task AddOrUpdateIngredient()
 	{
-		recipeItem.RecipeId = RecipeId;
+		recipeItem.RecipeId = CurrentId;
 		recipeItem.Amount = amountInput ?? 0;
 
 		await RecipeService.AddIngredient(recipeItem)
@@ -262,7 +259,7 @@
 		recipeItem = new RecipeItemDto
 		{
 			Id = ingredient.Id,
-			RecipeId = RecipeId,
+			RecipeId = CurrentId,
 			Name = ingredient.Name,
 			Amount = ingredient.Amount,
 			IngredientAmount = ingredient.IngredientAmount,
@@ -289,7 +286,7 @@
 		recipeItem = new RecipeItemDto
 		{
 			Id = Guid.NewGuid(),
-			RecipeId = RecipeId
+			RecipeId = CurrentId
 		};
 	}
 
@@ -299,6 +296,8 @@
 		isEditingName = true;
 	}
 
+	// Saving the name is also what creates the recipe: an unsaved one has no id, and every
+	// ingredient write needs one. Both cases go through the same form.
 	private async Task SaveRecipeName()
 	{
 		if (string.IsNullOrWhiteSpace(editedName))
@@ -307,7 +306,21 @@
 			return;
 		}
 
-		await RecipeService.UpdateRecipeName(RecipeId, editedName.Trim())
+		if (IsNew)
+		{
+			// Navigating to the id route re-enters OnParametersSetAsync, which loads the
+			// recipe and drops the page into normal edit mode.
+			await RecipeService.AddRecipe(new CreateRecipeDto
+				{
+					Name = editedName.Trim()
+				})
+				.OnSuccess((data) => Navigation.NavigateTo($"/recipes/edit/{data.Id}"), WebConstants.Messages.Recipe.Created)
+				.OnFailure();
+
+			return;
+		}
+
+		await RecipeService.UpdateRecipeName(CurrentId, editedName.Trim())
 			.OnSuccess(message: WebConstants.Messages.Recipe.NameUpdated)
 			.OnFailure();
 
