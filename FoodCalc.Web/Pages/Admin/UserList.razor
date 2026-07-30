@@ -19,14 +19,6 @@
 					<a class="user-list__link" href="/admin/userroles/@user.Email">
 						<i class="bi bi-person-circle" aria-hidden="true"></i>
 						<span class="user-list__email fh-truncate">@user.Email</span>
-						@if (user.Enabled)
-						{
-							<Badge Variant="Badge.BadgeVariant.Success" Icon="check-circle">@UiText.Users.Enabled</Badge>
-						}
-						else
-						{
-							<Badge Variant="Badge.BadgeVariant.Danger" Icon="slash-circle">@UiText.Users.Disabled</Badge>
-						}
 					</a>
 					@* Wrapped so the row's space-between keeps the buttons together on the
 					   right instead of spreading them across the row. *@
@@ -35,20 +27,19 @@
 						{
 							@if (user.Enabled)
 							{
-								<AppButton Variant="ButtonVariant.OutlineDanger" Size="ButtonSize.Small"
-								           OnClick='async () => await ToggleUserAsync(user.Email, false)'>@UiText.Users.Disable
-								</AppButton>
+								<AppButton Variant="ButtonVariant.OutlineDanger" Size="ButtonSize.Small" Icon="person-fill-slash"
+								           OnClick='async () => await ToggleUserAsync(user.Email, false)'/>
+								
 							}
 							else
 							{
-								<AppButton Variant="ButtonVariant.OutlineSuccess" Size="ButtonSize.Small"
-								           OnClick='async () => await ToggleUserAsync(user.Email, true)'>@UiText.Users.Enable
-								</AppButton>
+								<AppButton Variant="ButtonVariant.OutlineSuccess" Size="ButtonSize.Small" Icon="person-check-fill" 
+								           OnClick='async () => await ToggleUserAsync(user.Email, true)'/>
+								
 							}
 
-							<AppButton Variant="ButtonVariant.Danger" Size="ButtonSize.Small" Icon="trash"
-							           OnClick='async () => await DeleteUserAsync(user.Email)'>@UiText.Users.Delete
-							</AppButton>
+							<AppButton Variant="ButtonVariant.Danger" Size="ButtonSize.Small" Icon="trash" OnClick='async () => await DeleteUserAsync(user.Email)'/>
+							
 						}
 					</div>
 				</li>

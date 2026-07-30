@@ -349,12 +349,6 @@ public static class UiText
         public const string SearchPlaceholder = "Gebruikers zoeken...";
         public const string Loading = "Gebruikers laden...";
         public const string Empty = "Geen gebruikers gevonden.";
-        public const string Enabled = "Actief";
-        public const string Disabled = "Inactief";
-        public const string Enable = "Activeren";
-        public const string Disable = "Deactiveren";
-
-        public const string Delete = "Verwijderen";
         public const string DeleteTitle = "Gebruiker verwijderen";
         public const string DeleteConfirm = "Verwijderen";
 
