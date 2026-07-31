@@ -104,6 +104,16 @@
     --fh-sidebar-hover: rgba(255, 255, 255, 0.08);
     --fh-sidebar-active: rgba(255, 255, 255, 0.16);
 
+    /* Brand colour that has to read as text on a page surface — active tab, active
+       bottom-bar item. Green-600 is too dark to sit on the dark surfaces, so it steps
+       up; that is why this is a token rather than --fh-green-600 at each call site. */
+    --fh-brand-on-surface: var(--fh-green-600);
+
+    /* Height of the mobile bottom bar. Shared, because three separate things have to
+       agree on it: the bar itself, the padding that keeps content clear of it, and the
+       toasts and error strip that have to sit above it. */
+    --fh-bottom-nav-h: 3.5rem;
+
     /* Spacing — 4px base */
     --fh-space-1: 0.25rem;
     --fh-space-2: 0.5rem;
@@ -159,6 +169,8 @@
     --fh-info: #64a8d8;
 
     /* --fh-on-warning is deliberately not overridden — see :root. */
+
+    --fh-brand-on-surface: var(--fh-green-300);
 
     --fh-danger-rgb: 224, 108, 108;
     --fh-info-rgb: 100, 168, 216;

@@ -49,6 +49,7 @@ public static class UiText
     public static class Layout
     {
         public const string NavigationMenu = "Navigatiemenu";
+        public const string QuickNavigation = "Snelnavigatie";
         public const string Login = "Inloggen";
         public const string Logout = "Uitloggen";
         public const string UnhandledError = "Er is een onverwachte fout opgetreden.";
@@ -70,6 +71,13 @@ public static class UiText
         public const string Calendar = "Kalender";
         public const string Recipes = "Recepten";
         public const string FindRecipes = "Recepten zoeken";
+
+        /// <summary>
+        /// Bottom-bar form of <see cref="FindRecipes"/>. A third of a 375px screen is not
+        /// enough for "Recepten zoeken" without it wrapping or being clipped.
+        /// </summary>
+        public const string FindRecipesShort = "Zoeken";
+
         public const string AddRecipe = "Recept toevoegen";
 
         /// <summary>

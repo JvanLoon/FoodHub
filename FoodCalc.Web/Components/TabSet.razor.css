@@ -34,13 +34,11 @@
     }
 }
 
+/* --fh-brand-on-surface steps up in dark mode on its own, which is what the
+   [data-bs-theme="dark"] override here used to do by hand. */
 .fh-tabset__tab--active {
-    color: var(--fh-green-600);
+    color: var(--fh-brand-on-surface);
     border-bottom-color: var(--fh-green-500);
-}
-
-[data-bs-theme="dark"] .fh-tabset__tab--active {
-    color: var(--fh-green-300);
 }
 
 .fh-tabset__tab:focus-visible {

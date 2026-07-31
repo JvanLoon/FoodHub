@@ -1,0 +1,24 @@
+@* Mobile-only quick access to the three screens used most. Everything else — add recipe,
+   settings, admin — stays in the drawer behind the hamburger, so this bar never needs to
+   grow or change by role. Hidden from the shell breakpoint up, where the sidebar is
+   permanently on screen and this would just repeat it.
+
+   Rendered by MainLayout, which is the authenticated layout, so there is no role or
+   sign-in check here: every destination is open to any logged-in user. *@
+
+<nav class="fh-bottom-nav" aria-label="@UiText.Layout.QuickNavigation">
+	@* Match.All on /recipes so browsing does not stay highlighted while you are on
+	   /recipes/find or /recipes/create, which are prefixes of it. *@
+	<NavLink class="fh-bottom-nav__item" href="/recipes" Match="NavLinkMatch.All">
+		<i class="bi bi-journal-text" aria-hidden="true"></i>
+		<span>@UiText.Nav.Recipes</span>
+	</NavLink>
+	<NavLink class="fh-bottom-nav__item" href="/recipes/find">
+		<i class="bi bi-search-heart" aria-hidden="true"></i>
+		<span>@UiText.Nav.FindRecipesShort</span>
+	</NavLink>
+	<NavLink class="fh-bottom-nav__item" href="/calendar">
+		<i class="bi bi-calendar-week" aria-hidden="true"></i>
+		<span>@UiText.Nav.Calendar</span>
+	</NavLink>
+</nav>

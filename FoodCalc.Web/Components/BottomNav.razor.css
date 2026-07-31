@@ -1,0 +1,70 @@
+/* Sits below the drawer overlay (1030) so opening the hamburger dims it too, and below
+   modals (1050+) so a bottom sheet covers it rather than fighting it. */
+.fh-bottom-nav {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 1020;
+    display: flex;
+    background: var(--fh-surface);
+    border-top: 1px solid var(--fh-border);
+    /* The bar is --fh-bottom-nav-h tall; this is the home-indicator strip underneath it,
+       which has to be filled rather than left as a gap showing the page through. */
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ::deep throughout, and it is load-bearing: the items are <NavLink> components, and
+   CSS isolation only stamps the scope attribute onto elements written in this file's own
+   markup — never onto a child component's root. Without ::deep these selectors compile to
+   .fh-bottom-nav__item[b-xxx] and match nothing. Same reason NavItem.razor.css does it. */
+
+.fh-bottom-nav ::deep .fh-bottom-nav__item {
+    flex: 1 1 0;
+    /* 0 basis + min-width:0 so three equal columns survive a long label. */
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.1rem;
+    height: var(--fh-bottom-nav-h);
+    padding: 0 var(--fh-space-1);
+    color: var(--fh-text-muted);
+    text-decoration: none;
+    font-size: var(--fh-text-xs);
+    font-weight: var(--fh-weight-medium);
+    line-height: 1.2;
+    transition: color var(--fh-transition);
+}
+
+.fh-bottom-nav ::deep .fh-bottom-nav__item .bi {
+    font-size: 1.25rem;
+    line-height: 1;
+}
+
+.fh-bottom-nav ::deep .fh-bottom-nav__item span {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* NavLink adds .active for the current route. --fh-brand-on-surface rather than
+   --fh-green-600 so it stays legible on the dark surface without a dark override. */
+.fh-bottom-nav ::deep .fh-bottom-nav__item.active {
+    color: var(--fh-brand-on-surface);
+}
+
+.fh-bottom-nav ::deep .fh-bottom-nav__item:focus-visible {
+    outline: none;
+    box-shadow: var(--fh-focus-ring);
+    border-radius: var(--fh-radius-sm);
+}
+
+/* From the shell breakpoint up the sidebar is a permanent column; the bar would only
+   repeat it and eat vertical space. */
+@media (min-width: 900px) {
+    .fh-bottom-nav {
+        display: none;
+    }
+}

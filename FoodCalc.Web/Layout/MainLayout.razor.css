@@ -108,6 +108,10 @@ main {
     overflow-y: auto;
     min-height: 0;
     padding: var(--fh-space-4);
+    /* Clears the fixed bottom bar, which would otherwise sit on top of the last row of
+       content with no way to scroll past it. Removed again at the shell breakpoint,
+       where the bar is display:none. */
+    padding-bottom: calc(var(--fh-bottom-nav-h) + env(safe-area-inset-bottom) + var(--fh-space-4));
 }
 
 .content__inner {
@@ -172,6 +176,7 @@ main {
 
     .content {
         padding: var(--fh-space-3);
+        padding-bottom: calc(var(--fh-bottom-nav-h) + env(safe-area-inset-bottom) + var(--fh-space-3));
     }
 
     /* The address is long and the row is short: keep the person icon (its title still
@@ -218,6 +223,8 @@ main {
         padding: 0 var(--fh-space-5);
     }
 
+    /* Shorthand deliberately: it resets the bottom-bar clearance set above, and at this
+       width there is no bar to clear. */
     .content {
         padding: var(--fh-space-5);
     }
@@ -228,14 +235,20 @@ main {
     .topbar__brand {
         display: none;
     }
+
+    #blazor-error-ui {
+        bottom: 0;
+    }
 }
 
 /* --- Blazor circuit error strip -------------------------------------------- */
 
+/* Lifted above the bottom bar rather than given a higher z-index: the strip is a full-width
+   block, so overlapping would bury the bar's labels either way. */
 #blazor-error-ui {
     background: var(--fh-warning);
     color: var(--fh-on-warning);
-    bottom: 0;
+    bottom: calc(var(--fh-bottom-nav-h) + env(safe-area-inset-bottom));
     box-shadow: var(--fh-shadow-md);
     display: none;
     left: 0;
