@@ -1,6 +1,6 @@
 @* Sidebar navigation entry: Bootstrap-Icons glyph + label on a NavLink. *@
 
-<div class="fh-nav-item">
+<div class="fh-nav-item @CssClass">
 	<NavLink class="nav-link" href="@Href" Match="@Match" @onclick="OnNavigate">
 		<i class="bi bi-@Icon" aria-hidden="true"></i>
 		<span>@Label</span>
@@ -24,5 +24,12 @@
 	/// <summary>Raised when the link is tapped, so the mobile drawer can close itself.</summary>
 	[Parameter]
 	public EventCallback OnNavigate { get; set; }
+
+	/// <summary>
+	/// Extra classes on the item wrapper. Used for <c>fh-in-bottom-nav</c>, which hides
+	/// the entry while the mobile bottom bar is showing the same destination.
+	/// </summary>
+	[Parameter]
+	public string? CssClass { get; set; }
 
 }

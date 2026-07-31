@@ -18,15 +18,19 @@
 	<nav class="nav-list">
 		@if (isLoggedIn)
 		{
+			@* fh-in-bottom-nav marks the three entries the mobile bottom bar also offers.
+			   They stay in the markup and simply hide while that bar is on screen, so the
+			   drawer never lists the same destination twice — and the full list comes back
+			   above the shell breakpoint, where there is no bar. *@
 			<NavItem Href="" Icon="house-door-fill" Label="@UiText.Nav.Home" Match="NavLinkMatch.All" OnNavigate="OnNavigate"/>
-			<NavItem Href="/recipes" Icon="journal-text" Label="@UiText.Nav.Recipes" Match="NavLinkMatch.All" OnNavigate="OnNavigate"/>
-			<NavItem Href="/recipes/find" Icon="search-heart" Label="@UiText.Nav.FindRecipes" OnNavigate="OnNavigate"/>
+			<NavItem Href="/recipes" Icon="journal-text" Label="@UiText.Nav.Recipes" Match="NavLinkMatch.All" OnNavigate="OnNavigate" CssClass="fh-in-bottom-nav"/>
+			<NavItem Href="/recipes/find" Icon="search-heart" Label="@UiText.Nav.FindRecipes" OnNavigate="OnNavigate" CssClass="fh-in-bottom-nav"/>
 
 			@* Anyone may submit a recipe; it stays private to them until a moderator
 			   approves it. Kept in the sidebar as well as on the Recipes page. *@
 			<NavItem Href="/recipes/create" Icon="plus-circle" Label="@UiText.Nav.AddRecipe" Match="NavLinkMatch.All" OnNavigate="OnNavigate"/>
 
-			<NavItem Href="/calendar" Icon="calendar-week" Label="@UiText.Nav.Calendar" OnNavigate="OnNavigate"/>
+			<NavItem Href="/calendar" Icon="calendar-week" Label="@UiText.Nav.Calendar" OnNavigate="OnNavigate" CssClass="fh-in-bottom-nav"/>
 			<NavItem Href="/usersettings" Icon="person" Label="@UiText.Nav.UserSettings" OnNavigate="OnNavigate"/>
 
 			@* One entry, one label for both roles — the tab set inside decides what each of

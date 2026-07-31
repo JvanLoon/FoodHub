@@ -163,6 +163,19 @@
     }
 }
 
+/* --- Duplicated navigation ---------------------------------------------------
+   Marks a drawer entry whose destination is already one of the bottom bar's three
+   buttons. Hidden exactly while that bar is on screen, so the same link is never
+   offered twice; above the shell breakpoint the bar is gone and the sidebar carries
+   the full list again. Kept as a media query rather than a Blazor check because the
+   bar's visibility is itself a media query — anything else would need a resize
+   listener and could disagree with it. */
+@media (max-width: 899.98px) {
+    .fh-in-bottom-nav {
+        display: none;
+    }
+}
+
 /* --- Zebra striping ----------------------------------------------------------
    One implementation for every alternating-row list. Put .fh-zebra on the <tbody> or
    <ul> and its even-numbered children tint themselves; there used to be three separate
