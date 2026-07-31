@@ -44,14 +44,6 @@ public class ErrorTestEndpoint(IWebHostEnvironment env) : Endpoint<ErrorTestRequ
 
     public override async Task HandleAsync(ErrorTestRequest req, CancellationToken ct)
     {
-        // Inert outside development — the endpoint is registered either way, but only ever
-        // does anything on a dev machine.
-        if (env.IsProduction())
-        {
-            await Send.NotFoundAsync(ct);
-            return;
-        }
-
         // A 2xx is always success, whatever the count — errors attached to one would silently
         // vanish, so we never send them here. The body names the status (e.g. "200 => OK") so the
         // client can toast a concrete confirmation instead of a generic one. 204 is the exception:
