@@ -138,7 +138,10 @@ main {
     overscroll-behavior: contain;
     transform: translateX(-100%);
     transition: transform var(--fh-transition-slow);
-    box-shadow: var(--fh-shadow-lg);
+    /* Deliberately no shadow. Translated off-canvas the drawer's right edge sits exactly
+       on the viewport's left edge, so a blurred shadow spills back across it and reads as
+       a dark stripe down the side of every page. The dimmed overlay already separates the
+       open drawer from the content, so nothing is lost by dropping it entirely. */
 }
 
 .sidebar--open {
