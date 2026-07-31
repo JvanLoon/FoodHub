@@ -29,6 +29,14 @@
     }
 }
 
+/* Both dimensions, so a touch target grows into a bigger square rather than a rectangle. */
+@media (pointer: coarse) {
+    .fh-icon-btn {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+}
+
 .fh-icon-btn--sm {
     width: 1.75rem;
     height: 1.75rem;

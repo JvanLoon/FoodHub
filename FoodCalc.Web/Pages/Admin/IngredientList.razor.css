@@ -1,0 +1,26 @@
+.ingredient-layout {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    gap: var(--fh-space-4);
+}
+
+.ingredient-body {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+.ingredient-footer {
+    padding-top: var(--fh-space-3);
+}
+
+/* Edit + Delete side by side; wrapping keeps them inside the cell on a narrow screen
+   instead of forcing the whole table to scroll. */
+.ingredient-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--fh-space-2);
+}

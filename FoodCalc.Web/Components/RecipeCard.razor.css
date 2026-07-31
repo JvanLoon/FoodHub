@@ -8,8 +8,11 @@
     user-select: none;
     overflow: hidden;
     transition: border-color var(--fh-transition), box-shadow var(--fh-transition), transform var(--fh-transition);
+}
 
-    &:hover {
+/* Guarded: on touch the hover state sticks after a tap and the card stays nudged up. */
+@media (hover: hover) {
+    .fh-recipe-card:hover {
         transform: translateY(-2px);
     }
 }
@@ -24,7 +27,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 9rem;
+    height: clamp(6.5rem, 26vw, 9rem);
     background: linear-gradient(135deg, var(--fh-green-100), var(--fh-accent-subtle));
     color: var(--fh-green-600);
     font-size: 3rem;

@@ -17,10 +17,34 @@
 
 /* --- Stat grid ---------------------------------------------------------- */
 
+/* min(100%, …) so a single card cannot demand more width than the viewport has. */
 .fh-stat-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
-    gap: var(--fh-space-5);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+    gap: var(--fh-space-4);
+}
+
+@media (min-width: 900px) {
+    .fh-stat-grid {
+        gap: var(--fh-space-5);
+    }
+}
+
+@media (max-width: 575.98px) {
+    .fh-stat-card {
+        padding: var(--fh-space-4);
+        gap: var(--fh-space-3);
+    }
+
+    .fh-stat-icon {
+        width: 2.5rem;
+        height: 2.5rem;
+        font-size: 1.25rem;
+    }
+
+    .fh-stat-value {
+        font-size: var(--fh-text-xl);
+    }
 }
 
 .fh-stat-card {
@@ -37,15 +61,18 @@
     &[role="button"] {
         cursor: pointer;
 
-        &:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--fh-shadow-md);
-        }
-
         &:focus-visible {
             outline: none;
             box-shadow: var(--fh-focus-ring);
         }
+    }
+}
+
+/* Guarded: on touch the hover state sticks after a tap. */
+@media (hover: hover) {
+    .fh-stat-card[role="button"]:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--fh-shadow-md);
     }
 }
 

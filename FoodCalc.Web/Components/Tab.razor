@@ -8,6 +8,13 @@
 	[Parameter, EditorRequired]
 	public string Title { get; set; } = string.Empty;
 
+	/// <summary>
+	/// Stable, non-localised handle used by <see cref="TabSet.InitialTab"/> so a link can
+	/// open this tab without depending on its display title.
+	/// </summary>
+	[Parameter]
+	public string? Id { get; set; }
+
 	[Parameter]
 	public string? Icon { get; set; }
 

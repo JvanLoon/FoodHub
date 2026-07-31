@@ -4,6 +4,15 @@
     border-bottom: 1px solid var(--fh-border);
     margin-bottom: var(--fh-space-5);
     overflow-x: auto;
+
+    /* Five tabs do not fit a phone; the bar scrolls, and the scrollbar itself would sit
+       on top of the active-tab underline, so hide it. */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.fh-tabset__bar::-webkit-scrollbar {
+    display: none;
 }
 
 .fh-tabset__tab {
@@ -38,4 +47,15 @@
     outline: none;
     box-shadow: var(--fh-focus-ring);
     border-radius: var(--fh-radius-sm);
+}
+
+@media (max-width: 899.98px) {
+    .fh-tabset__bar {
+        margin-bottom: var(--fh-space-4);
+    }
+
+    .fh-tabset__tab {
+        padding: var(--fh-space-3) var(--fh-space-3);
+        font-size: var(--fh-text-sm);
+    }
 }

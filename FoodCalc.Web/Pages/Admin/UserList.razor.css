@@ -1,5 +1,5 @@
 .user-search {
-    max-width: 24rem;
+    max-width: min(24rem, 100%);
 }
 
 .user-list {
@@ -54,4 +54,21 @@
 
 .user-list__email {
     font-weight: var(--fh-weight-medium);
+}
+
+/* Email addresses are long and the action buttons are not optional; below the compact
+   breakpoint the row becomes two lines rather than squeezing the address to nothing. */
+@media (max-width: 575.98px) {
+    .user-list li {
+        flex-wrap: wrap;
+        padding: var(--fh-space-3);
+    }
+
+    .user-list__link {
+        flex: 1 1 100%;
+    }
+
+    .user-list__actions {
+        margin-left: auto;
+    }
 }

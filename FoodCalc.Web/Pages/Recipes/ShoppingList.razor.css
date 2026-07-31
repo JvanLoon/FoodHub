@@ -1,4 +1,4 @@
 .shopping-list-page {
-    max-width: 48rem;
+    max-width: min(48rem, 100%);
     margin: 0 auto;
 }

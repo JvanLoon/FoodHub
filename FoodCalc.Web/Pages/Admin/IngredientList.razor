@@ -1,25 +1,22 @@
-@page "/ingredients"
+@* Ingredient catalog. No @page of its own: it is a tab body inside Admin.razor, which
+   already gates the whole page for Admin-or-Moderator — exactly the audience this used
+   to check for itself when it lived at /ingredients. *@
 
 @using FoodCalc.Web.Constants
 @using FoodCalc.Web.Services
 @using FoodHub.DTOs
 @inject IngredientService IngredientService
 @inject MessageService MessageService
-@inject AuthStateService AuthStateService
-@inject NavigationManager Navigation
-
-<PageTitle>@UiText.Ingredients.Title</PageTitle>
 
 <div class="ingredient-layout">
 	<div class="ingredient-header">
-		<PageHeader Title="@UiText.Ingredients.Title">
-			<SearchBox Placeholder="@UiText.Ingredients.SearchPlaceholder" Value="@searchTerm" ValueChanged="OnSearchChanged"/>
-		</PageHeader>
+		<SearchBox Placeholder="@UiText.Ingredients.SearchPlaceholder" Value="@searchTerm" ValueChanged="OnSearchChanged"/>
 	</div>
 
 	<div class="ingredient-body">
 		<DataTable TItem="IngredientDto"
 		           Items="pagedResult?.Items"
+		           StackOnMobile="true"
 		           EmptyText="@UiText.Ingredients.Empty"
 		           LoadingText="@UiText.Ingredients.Loading">
 			<HeaderContent>
@@ -28,7 +25,7 @@
 				<th class="text-end text-nowrap">@UiText.Ingredients.ColumnActions</th>
 			</HeaderContent>
 			<RowTemplate Context="ingredient">
-				<td class="w-100 text-wrap">
+				<td class="w-100 text-wrap" data-label="@UiText.Ingredients.ColumnName">
 					@if (editingIngredientId == ingredient.Id)
 					{
 						<input type="text" class="form-control form-control-sm" @bind="editingName"
@@ -36,12 +33,12 @@
 					}
 					else { @ingredient.Name }
 				</td>
-				<td class="text-center text-nowrap">
+				<td class="text-center text-nowrap" data-label="@UiText.Ingredients.ColumnShoppingList">
 					<input type="checkbox" class="form-check-input"
 					       checked="@ingredient.ShouldBeAddedToShoppingCart"
 					       @onchange="(e) => OnCheckboxChanged(ingredient, e)"/>
 				</td>
-				<td class="text-end text-nowrap">
+				<td class="text-end ingredient-actions" data-label="@UiText.Ingredients.ColumnActions">
 					@if (editingIngredientId == ingredient.Id)
 					{
 						<AppButton Variant="ButtonVariant.Success" Size="ButtonSize.Small" Icon="check-lg"
@@ -55,7 +52,7 @@
 						</AppButton>
 					}
 					<AppButton Variant="ButtonVariant.OutlineDanger" Size="ButtonSize.Small" Icon="trash"
-					           CssClass="ms-2" OnClick="() => DeleteIngredient(ingredient.Id)">@UiText.Common.Delete
+					           OnClick="() => DeleteIngredient(ingredient.Id)">@UiText.Common.Delete
 					</AppButton>
 				</td>
 			</RowTemplate>
@@ -82,18 +79,7 @@
 	private string editingName = string.Empty;
 	private string searchTerm = string.Empty;
 
-	protected override async Task OnInitializedAsync()
-	{
-		// Staff (Admin or Moderator) manage the catalog; moderators can now edit ingredients
-		// and their shopping-cart flag, not only approve them.
-		if (!await AuthStateService.IsInAnyRoleAsync("Admin", "Moderator"))
-		{
-			Navigation.NavigateTo("/");
-			return;
-		}
-
-		await LoadIngredientsAsync();
-	}
+	protected override async Task OnInitializedAsync() => await LoadIngredientsAsync();
 
 	private async Task LoadIngredientsAsync()
 	{

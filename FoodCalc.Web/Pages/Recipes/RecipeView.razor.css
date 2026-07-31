@@ -1,10 +1,15 @@
 .recipe-view {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
-    gap: 16px;
+    gap: var(--fh-space-4);
 
+    /* Was a flat min-width: 450px, which forced a horizontal scrollbar on every phone.
+       The min(100%, …) basis lets the panes sit side by side when there is room and
+       stack when there is not. */
     .recipe-view__card {
-        min-width: 450px;
+        flex: 1 1 min(100%, 26rem);
+        min-width: 0;
     }
 
     .recipe-view__ingredients {

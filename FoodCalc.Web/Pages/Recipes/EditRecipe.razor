@@ -53,25 +53,28 @@
 			<!-- Left: ingredient form -->
 			<div class="col-md-6">
 				<AppCard>
-					<div class="fh-field">
+					@* Clear sits at the top: it resets the whole form, so it belongs with the
+					   field it mainly clears rather than below the save button. *@
+					<div class="ingredient-form-head">
 						<label for="ingredientSearch" class="form-label">@UiText.RecipeEditor.SearchIngredientLabel</label>
-						<div class="input-group">
-							<input id="ingredientSearch"
-							       class="form-control"
-							       type="text"
-							       placeholder="@UiText.RecipeEditor.SearchIngredientPlaceholder"
-							       @bind="ingredientSearch"
-							       @bind:event="oninput"
-							       @onfocus="() => dropdownOpen = true"
-							       @onblur="OnDropdownBlur"
-							       autocomplete="off"
-							       @onkeydown="HandleIngredientSearchKeydown"
-							       @onkeydown:preventDefault="@(ingredientSearchFocused)"/>
-							<button class="btn btn-outline-success" type="button" title="@UiText.RecipeEditor.AddNewIngredient"
-							        @onclick="AddIngredient">
-								<i class="bi bi-plus-lg" aria-hidden="true"></i>
-							</button>
-						</div>
+						<AppButton Variant="ButtonVariant.OutlinePrimary" Size="ButtonSize.Small"
+						           Icon="x-lg" OnClick="ClearForm">@UiText.RecipeEditor.ClearForm</AppButton>
+					</div>
+
+					@* No "+" button any more: an unknown name is created on its way into the
+					   recipe (see ResolveIngredientAsync), so there is nothing left to press. *@
+					<div class="fh-field">
+						<input id="ingredientSearch"
+						       class="form-control"
+						       type="text"
+						       placeholder="@UiText.RecipeEditor.SearchIngredientPlaceholder"
+						       @bind="ingredientSearch"
+						       @bind:event="oninput"
+						       @onfocus="() => dropdownOpen = true"
+						       @onblur="OnDropdownBlur"
+						       autocomplete="off"
+						       @onkeydown="HandleIngredientSearchKeydown"
+						       @onkeydown:preventDefault="@(ingredientSearchFocused)"/>
 					</div>
 
 					<EditForm Model="recipeItem" OnValidSubmit="AddOrUpdateIngredient"
@@ -105,7 +108,6 @@
 
 						<div class="fh-cluster">
 							<AppButton Type="submit" Icon="check-lg">@UiText.RecipeEditor.AddOrSave</AppButton>
-							<AppButton Variant="ButtonVariant.OutlinePrimary" OnClick="ClearForm">@UiText.Common.Clear</AppButton>
 						</div>
 					</EditForm>
 				</AppCard>
@@ -241,6 +243,11 @@
 
 	private async Task AddOrUpdateIngredient()
 	{
+		// The name may have been typed rather than picked out of the list, and it may not be in
+		// the catalog at all — resolving it here is what removed the separate "+" step.
+		if (!await ResolveIngredientAsync())
+			return;
+
 		recipeItem.RecipeId = CurrentId;
 		recipeItem.Amount = amountInput ?? 0;
 
@@ -326,30 +333,46 @@
 		await RefreshRecipeAsync(); // Refresh — pulls the committed name back from the server
 	}
 
-	private async Task AddIngredient()
+	/// <summary>
+	/// Turns whatever is typed in the search box into a real ingredient on <c>recipeItem</c>:
+	/// a name already in the catalog is matched (case-insensitively), an unknown one is created
+	/// on the spot. Returns false when there is nothing to resolve or the server refused, in
+	/// which case the caller must not go on to save.
+	/// </summary>
+	private async Task<bool> ResolveIngredientAsync()
 	{
-		await IngredientService.AddIngredientAsync(new CreateIngredientDto
-			{
-				Name = ingredientSearch
-			})
-			.OnSuccess(async () =>
-			{
-				await IngredientService.GetAllIngredientsAsync()
-					.OnSuccess((data) => ingredients = data)
-					.OnFailure();
+		var typed = ingredientSearch?.Trim();
 
-				var created = ingredients.FirstOrDefault(i => i.Name == ingredientSearch);
+		if (string.IsNullOrWhiteSpace(typed))
+			return false;
 
-				//only clear when failed
-				if (created is not null)
-				{
-					recipeItem.Name = created.Name;
-					recipeItem.ShouldBeAddedToShoppingCart = created.ShouldBeAddedToShoppingCart;
-				}
-				else { ingredientSearch = string.Empty; }
-			}, WebConstants.Messages.Ingredient.Added)
+		if (FindInCatalog(typed) is { } known)
+		{
+			SelectIngredient(known);
+			return true;
+		}
+
+		var created = await IngredientService
+			.AddIngredientAsync(new CreateIngredientDto { Name = typed })
+			.OnSuccess(message: WebConstants.Messages.Ingredient.Added)
 			.OnFailure();
+
+		if (!created.Success)
+			return false;
+
+		// The create endpoint answers with no body, so the catalog is re-read to pick up the
+		// row (and its id / shopping-list flag) that was just written.
+		ingredients = await IngredientService.GetAllIngredientsAsync().OrDefault(ingredients);
+
+		if (FindInCatalog(typed) is not { } fresh)
+			return false;
+
+		SelectIngredient(fresh);
+		return true;
 	}
+
+	private IngredientDto? FindInCatalog(string name) =>
+		ingredients.FirstOrDefault(i => string.Equals(i.Name, name, StringComparison.OrdinalIgnoreCase));
 
 	private void SelectIngredient(IngredientDto ingredient)
 	{
@@ -375,7 +398,13 @@
 
 	private async Task HandleIngredientSearchKeydown(KeyboardEventArgs e)
 	{
-		if (e.Key == "Enter") { await AddIngredient(); }
+		if (e.Key != "Enter")
+			return;
+
+		// Enter confirms the name — picking the catalog entry if there is one, creating it if
+		// there is not. It does not submit; amount and unit still have to be filled in.
+		await ResolveIngredientAsync();
+		dropdownOpen = false;
 	}
 
 }

@@ -15,11 +15,16 @@
 	<div class="recipes-header">
 		<PageHeader Title="@UiText.Recipes.Title" Subtitle="@UiText.Recipes.Subtitle">
 			<SearchBox Placeholder="@UiText.Recipes.SearchPlaceholder" Value="@searchTerm" ValueChanged="OnSearchChanged"/>
-				<AppButton Variant="ButtonVariant.Primary" Icon="cart3"
-				           Disabled="@(!SelectedRecipeIds.Any())"
-				           OnClick="OpenAggregatedIngredientsPage">
-					@UiText.Recipes.GenerateShoppingList
-				</AppButton>
+			@* Also in the sidebar, but this is where someone browsing recipes looks for it. *@
+			<AppButton Variant="ButtonVariant.Primary" Icon="plus-circle"
+			           OnClick="AddRecipe">
+				@UiText.Nav.AddRecipe
+			</AppButton>
+			<AppButton Variant="ButtonVariant.OutlineSecondary" Icon="cart3"
+			           Disabled="@(!SelectedRecipeIds.Any())"
+			           OnClick="OpenAggregatedIngredientsPage">
+				@UiText.Recipes.GenerateShoppingList
+			</AppButton>
 		</PageHeader>
 	</div>
 
@@ -198,6 +203,8 @@
 		AggregatedIngredients = ingredientDict.Values.OrderBy(i => i.Name)
 			.ToList();
 	}
+
+	private void AddRecipe() => NavigationManager.NavigateTo("/recipes/create");
 
 	private void EditRecipe(Guid recipeId)
 	{

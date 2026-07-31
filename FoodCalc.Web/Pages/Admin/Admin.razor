@@ -1,4 +1,5 @@
 @page "/admin"
+@using Microsoft.AspNetCore.WebUtilities
 @inject AuthStateService AuthStateService
 @inject NavigationManager Navigation
 
@@ -13,19 +14,24 @@
 	<div class="fh-stack">
 		<PageHeader Title="@(_isAdmin ? UiText.Admin.AdminHeading : UiText.Admin.ModerationHeading)"/>
 
-		<TabSet>
-			<Tab Title="@UiText.Admin.TabReview" Icon="check2-square">
+		<TabSet InitialTab="@_initialTab">
+			<Tab Id="review" Title="@UiText.Admin.TabReview" Icon="check2-square">
 				<ReviewQueue/>
+			</Tab>
+			@* Moderators manage the ingredient catalog too — it used to be its own
+			   /ingredients route with the same Admin-or-Moderator gate. *@
+			<Tab Id="ingredients" Title="@UiText.Admin.TabIngredients" Icon="egg">
+				<IngredientList/>
 			</Tab>
 			@if (_isAdmin)
 			{
-				<Tab Title="@UiText.Admin.TabUsers" Icon="people">
+				<Tab Id="users" Title="@UiText.Admin.TabUsers" Icon="people">
 					<UserList/>
 				</Tab>
-				<Tab Title="@UiText.Admin.TabImportExport" Icon="arrow-down-up">
+				<Tab Id="importexport" Title="@UiText.Admin.TabImportExport" Icon="arrow-down-up">
 					<DataImportExport/>
 				</Tab>
-				<Tab Title="@UiText.Admin.TabErrorTest" Icon="bug">
+				<Tab Id="errortest" Title="@UiText.Admin.TabErrorTest" Icon="bug">
 					<ErrorTest/>
 				</Tab>
 			}
@@ -36,9 +42,17 @@
 @code {
 	private bool _authorized;
 	private bool _isAdmin;
+	private string? _initialTab;
 
 	protected override async Task OnInitializedAsync()
 	{
+		// ?tab=<Tab.Id> lets a link elsewhere (the dashboard's ingredient card) land on the
+		// right tab. An unknown or missing value just leaves the first tab selected.
+		_initialTab = QueryHelpers.ParseQuery(new Uri(Navigation.Uri).Query)
+			.TryGetValue("tab", out var tab)
+			? tab.ToString()
+			: null;
+
 		try
 		{
 			_isAdmin = await AuthStateService.IsAdminAsync();

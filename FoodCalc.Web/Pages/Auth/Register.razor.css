@@ -1,6 +1,6 @@
 .auth-card {
     width: 100%;
-    max-width: 26rem;
+    max-width: min(26rem, 100%);
     padding: var(--fh-space-6);
     background: var(--fh-surface-raised);
     border: 1px solid var(--fh-border);

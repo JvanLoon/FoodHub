@@ -229,7 +229,8 @@
 	}
 
 	private void GoToRecipes() => NavigationManager.NavigateTo("/recipes");
-	private void GoToIngredients() => NavigationManager.NavigateTo("/ingredients");
+	// The catalog is a tab on the admin page now; ?tab= is what makes it the opening one.
+	private void GoToIngredients() => NavigationManager.NavigateTo("/admin?tab=ingredients");
 	private void GoToAdmin() => NavigationManager.NavigateTo("/admin");
 	private void GoToCalendar() => NavigationManager.NavigateTo("/calendar");
 	private void GoToFindRecipes() => NavigationManager.NavigateTo("/recipes/find");

@@ -1,6 +1,6 @@
-<div class="d-flex align-items-center justify-content-between flex-wrap mt-3 w-100">
+<div class="fh-paginator">
 	<nav aria-label="@UiText.Components.PageNavigation">
-		<ul class="pagination mb-0">
+		<ul class="pagination mb-0 flex-wrap">
 			<li class="page-item @(Page <= 1 ? "disabled" : "")">
 				<button class="page-link" @onclick="GoToFirstPage" title="@UiText.Components.FirstPage">&#171;</button>
 			</li>
@@ -23,9 +23,9 @@
 		</ul>
 	</nav>
 
-	<div class="d-flex align-items-center gap-2">
+	<div class="fh-paginator__size">
 		<label class="mb-0 text-nowrap small">@UiText.Components.PerPage</label>
-		<select class="form-select form-select-sm" style="width: auto;" value="@PageSize" @onchange="OnPageSizeChanged">
+		<select class="form-select form-select-sm" value="@PageSize" @onchange="OnPageSizeChanged">
 			@foreach (var size in PageSizeOptions)
 			{
 				<option value="@size">@size</option>

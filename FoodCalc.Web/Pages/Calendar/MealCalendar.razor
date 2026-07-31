@@ -10,30 +10,34 @@
 
 <div class="cal-layout">
 	<div class="cal-header">
+		@* One row: view toggle, randomize, clear. It wraps as a whole when the width runs
+		   out, so the toggle drops underneath rather than being squeezed. *@
 		<PageHeader Title="@UiText.Calendar.Title" Subtitle="@UiText.Calendar.Subtitle">
-			<div class="cal-toggle" role="tablist" aria-label="@UiText.Calendar.ViewAriaLabel">
-				<button type="button" class="cal-toggle__btn @(_viewMode == View.Week ? "cal-toggle__btn--active" : "")"
-				        role="tab" aria-selected="@(_viewMode == View.Week)" @onclick="() => _viewMode = View.Week">
-					<i class="bi bi-calendar-week" aria-hidden="true"></i> @UiText.Calendar.Week
-				</button>
-				<button type="button"
-				        class="cal-toggle__btn @(_viewMode == View.Month ? "cal-toggle__btn--active" : "")"
-				        role="tab" aria-selected="@(_viewMode == View.Month)" @onclick="() => _viewMode = View.Month">
-					<i class="bi bi-calendar-month" aria-hidden="true"></i> @UiText.Calendar.Month
-				</button>
-			</div>
-			<AppButton Variant="ButtonVariant.Primary" Icon="shuffle"
-			           Disabled="@(_selectedDates.Count < 2)"
-			           OnClick="OpenRandomize">
-				@UiText.Calendar.Randomize @(_selectedDates.Count >= 2 ? $"({_selectedDates.Count})" : "")
-			</AppButton>
-			@if (_selectedDates.Count > 0)
-			{
-				<AppButton Variant="ButtonVariant.OutlineSecondary" Icon="x-circle"
-				           OnClick="ClearSelection">
-					@UiText.Calendar.ClearSelection
+			<div class="cal-actions">
+				<div class="cal-toggle" role="tablist" aria-label="@UiText.Calendar.ViewAriaLabel">
+					<button type="button" class="cal-toggle__btn @(_viewMode == View.Week ? "cal-toggle__btn--active" : "")"
+					        role="tab" aria-selected="@(_viewMode == View.Week)" @onclick="() => _viewMode = View.Week">
+						<i class="bi bi-calendar-week" aria-hidden="true"></i> @UiText.Calendar.Week
+					</button>
+					<button type="button"
+					        class="cal-toggle__btn @(_viewMode == View.Month ? "cal-toggle__btn--active" : "")"
+					        role="tab" aria-selected="@(_viewMode == View.Month)" @onclick="() => _viewMode = View.Month">
+						<i class="bi bi-calendar-month" aria-hidden="true"></i> @UiText.Calendar.Month
+					</button>
+				</div>
+				<AppButton Variant="ButtonVariant.Primary" Icon="shuffle"
+				           Disabled="@(_selectedDates.Count < 2)"
+				           OnClick="OpenRandomize">
+					@UiText.Calendar.Randomize @(_selectedDates.Count >= 2 ? $"({_selectedDates.Count})" : "")
 				</AppButton>
-			}
+				@if (_selectedDates.Count > 0)
+				{
+					<AppButton Variant="ButtonVariant.OutlineSecondary" Icon="x-circle"
+					           OnClick="ClearSelection">
+						@UiText.Calendar.ClearSelection
+					</AppButton>
+				}
+			</div>
 		</PageHeader>
 	</div>
 

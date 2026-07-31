@@ -65,6 +65,39 @@
     border-top: 1px solid var(--fh-border);
 }
 
+/* On a phone a centred 28rem dialog is the whole screen anyway, so drop the pretence and
+   dock it to the bottom where a thumb can reach the buttons. dvh, not vh: vh is the
+   URL-bar-expanded height, which would push the footer out of view. */
+@media (max-width: 575.98px) {
+    .fh-modal {
+        padding: 0;
+        align-items: flex-end;
+    }
+
+    .fh-modal__dialog {
+        max-width: none;
+        max-height: 90dvh;
+        border-radius: var(--fh-radius-lg) var(--fh-radius-lg) 0 0;
+        border-bottom: none;
+    }
+
+    .fh-modal__header,
+    .fh-modal__footer {
+        padding: var(--fh-space-3) var(--fh-space-4);
+    }
+
+    .fh-modal__body {
+        padding: var(--fh-space-4);
+    }
+
+    /* Full-width, stacked actions rather than two small buttons in a corner. */
+    .fh-modal__footer {
+        flex-direction: column-reverse;
+        align-items: stretch;
+        padding-bottom: calc(var(--fh-space-4) + env(safe-area-inset-bottom));
+    }
+}
+
 @keyframes fh-fade-in {
     from {
         opacity: 0;

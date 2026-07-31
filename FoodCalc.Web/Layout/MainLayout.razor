@@ -4,29 +4,52 @@
 @inject MessageService MessageService
 @inject NavigationManager Navigation
 
+@* Below the shell breakpoint the sidebar is an overlaying drawer driven by _navOpen; above
+   it, the same markup is the static column and the toggle/overlay are display:none. State
+   lives here rather than in NavMenu so the toggle can sit in the top bar. *@
 <div class="page">
-	<div class="sidebar">
-		<NavMenu/>
+	<div class="sidebar @(_navOpen ? "sidebar--open" : null)">
+		<NavMenu OnNavigate="CloseNav"/>
 	</div>
+
+	<div class="nav-overlay @(_navOpen ? "nav-overlay--visible" : null)" @onclick="CloseNav"></div>
 
 	<main>
 		<header class="topbar">
+			@* A plain button rather than <IconButton> on purpose: this element is shown and
+			   hidden by the shell's own breakpoint, and a parent's isolated CSS cannot
+			   reach a child component's root element to do that. *@
+			<div class="topbar__lead">
+				<button type="button" class="topbar__toggle"
+				        title="@UiText.Layout.NavigationMenu"
+				        aria-label="@UiText.Layout.NavigationMenu"
+				        aria-expanded="@_navOpen"
+				        @onclick="ToggleNav">
+					<i class="bi bi-@(_navOpen ? "x-lg" : "list")" aria-hidden="true"></i>
+				</button>
+				<a class="topbar__brand" href="">
+					<i class="bi bi-basket2-fill" aria-hidden="true"></i>
+					<span>FoodHub</span>
+				</a>
+			</div>
+
 			<div class="topbar__actions">
 				<ThemeToggle/>
 				@if (!string.IsNullOrEmpty(userEmail))
 				{
 					<span class="topbar__email fh-truncate" title="@userEmail">
                         <i class="bi bi-person-circle" aria-hidden="true"></i>
-						@userEmail
+						<span class="topbar__email-text">@userEmail</span>
                     </span>
 					<AppButton Variant="ButtonVariant.OutlineSecondary" Size="ButtonSize.Small"
-					           Icon="box-arrow-right" OnClick="Logout">@UiText.Layout.Logout
+					           Icon="box-arrow-right" CssClass="fh-label-optional" OnClick="Logout">@UiText.Layout.Logout
 					</AppButton>
 				}
 				else
 				{
 					<AppButton Variant="ButtonVariant.Primary" Size="ButtonSize.Small"
-					           Icon="box-arrow-in-right" OnClick='() => Navigation.NavigateTo("/login")'>@UiText.Layout.Login
+					           Icon="box-arrow-in-right" CssClass="fh-label-optional"
+					           OnClick='() => Navigation.NavigateTo("/login")'>@UiText.Layout.Login
 					</AppButton>
 				}
 			</div>
@@ -49,6 +72,11 @@
 
 @code {
 	private string? userEmail;
+	private bool _navOpen;
+
+	private void ToggleNav() => _navOpen = !_navOpen;
+
+	private void CloseNav() => _navOpen = false;
 
 	protected override async Task OnInitializedAsync()
 	{

@@ -14,9 +14,18 @@
     min-height: 0;
 }
 
-@media (max-width: 62rem) {
+/* Folded into the shared breakpoint set (see css/utilities.css) — this used to be its
+   own 62rem, which was the only third value in the app. */
+@media (max-width: 1199.98px) {
     .find-content {
         grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 899.98px) {
+    .find-layout,
+    .find-content {
+        gap: var(--fh-space-4);
     }
 }
 
@@ -31,6 +40,14 @@
 .find-panel {
     position: sticky;
     top: 0;
+}
+
+/* Once the panel is stacked above the results rather than beside them, sticky would
+   pin the whole ingredient picker over the results it is meant to filter. */
+@media (max-width: 1199.98px) {
+    .find-panel {
+        position: static;
+    }
 }
 
 .find-panel__title {
@@ -279,6 +296,9 @@
     font-size: var(--fh-text-xs);
 }
 
+/* The badge is a direct child of the card, which has no padding of its own, so without
+   this it sat flush against the card's left border while the title above it was inset by
+   a full space-4 — the pill looked like it had fallen out of the card. */
 .badge-container {
-    padding-bottom: 5px;
+    padding: 0 var(--fh-space-4) var(--fh-space-3);
 }

@@ -1,7 +1,7 @@
 @* Sidebar navigation entry: Bootstrap-Icons glyph + label on a NavLink. *@
 
 <div class="fh-nav-item">
-	<NavLink class="nav-link" href="@Href" Match="@Match">
+	<NavLink class="nav-link" href="@Href" Match="@Match" @onclick="OnNavigate">
 		<i class="bi bi-@Icon" aria-hidden="true"></i>
 		<span>@Label</span>
 	</NavLink>
@@ -20,5 +20,9 @@
 
 	[Parameter]
 	public NavLinkMatch Match { get; set; } = NavLinkMatch.Prefix;
+
+	/// <summary>Raised when the link is tapped, so the mobile drawer can close itself.</summary>
+	[Parameter]
+	public EventCallback OnNavigate { get; set; }
 
 }

@@ -76,3 +76,24 @@
 .review-item__hint {
     font-size: var(--fh-text-sm);
 }
+
+/* Name + amount + approve/reject on one phone-width line squeezes the name to nothing;
+   let the line wrap and keep the amount and controls together on the second row. */
+@media (max-width: 575.98px) {
+    .review-queue {
+        gap: var(--fh-space-4);
+    }
+
+    .review-line {
+        flex-wrap: wrap;
+    }
+
+    .review-line__name {
+        flex: 1 1 100%;
+    }
+
+    .review-line__amount {
+        margin-left: 0;
+        margin-right: auto;
+    }
+}

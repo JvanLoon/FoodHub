@@ -80,17 +80,17 @@
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: var(--fh-space-1);
     overflow-y: auto;
 }
 
 .cal-meal {
     display: flex;
     align-items: center;
-    gap: var(--fh-space-1);
+    gap: var(--fh-space-2);
     background: var(--fh-surface-sunken);
     border-radius: var(--fh-radius-sm);
-    padding: 1px 2px 1px 6px;
+    padding: var(--fh-space-2) var(--fh-space-2) var(--fh-space-2) var(--fh-space-3);
     font-size: var(--fh-text-sm);
 }
 
@@ -126,4 +126,54 @@
 
 .cal-meal__x:hover {
     color: var(--fh-danger);
+}
+
+/* --- Phone: compact (month) cells ------------------------------------------------
+   A month cell is ~45px wide here, which is not enough for a recipe name or a remove
+   button. The cell keeps the day number and shows each meal as a dot, so the shape of
+   the month still reads at a glance; tapping the day opens it for the detail. Week
+   cells are full-width and are left alone. */
+
+@media (max-width: 575.98px) {
+    .cal-day--compact {
+        min-height: 3.25rem;
+        padding: 2px;
+    }
+
+    .cal-day--compact .cal-day__num {
+        font-size: var(--fh-text-xs);
+    }
+
+    /* Adding is a two-tap job at this size: tap the day, add from there. */
+    .cal-day--compact .cal-day__add {
+        display: none;
+    }
+
+    .cal-day--compact .cal-day__list {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 2px;
+        overflow: hidden;
+    }
+
+    .cal-day--compact .cal-meal {
+        padding: 0;
+        background: transparent;
+    }
+
+    .cal-day--compact .cal-meal__x {
+        display: none;
+    }
+
+    /* The name collapses to a dot: font-size:0 removes the text node, and the fixed box
+       plus background is the dot itself. */
+    .cal-day--compact .cal-meal__name {
+        flex: 0 0 auto;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--fh-accent);
+        font-size: 0;
+        overflow: hidden;
+    }
 }

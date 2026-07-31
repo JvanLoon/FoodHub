@@ -1,9 +1,14 @@
 @* Minimal styled table: pass HeaderContent (th cells) and RowTemplate (td
    cells per item). Null Items shows a loading row; an empty list shows
-   EmptyText. *@
+   EmptyText.
+
+   Set StackOnMobile when the columns are worth reading on a phone: each row then
+   becomes a card and each cell picks up its own label. That only works if the cells
+   carry data-label, so it is opt-in rather than the default — tables without it keep
+   scrolling sideways, which is still the right answer for wide, scan-only data. *@
 @typeparam TItem
 
-<div class="fh-table-wrap @CssClass">
+<div class="fh-table-wrap @(StackOnMobile ? "fh-table-wrap--stack" : null) @CssClass">
 	<table class="table table-hover fh-table align-middle">
 		<thead>
 		<tr>@HeaderContent</tr>
@@ -55,5 +60,13 @@
 
 	[Parameter]
 	public string? CssClass { get; set; }
+
+	/// <summary>
+	/// Render each row as a labelled card below the compact breakpoint instead of scrolling
+	/// the table sideways. Requires every <c>td</c> in <see cref="RowTemplate"/> to carry a
+	/// <c>data-label</c> attribute — that is where the per-cell labels come from.
+	/// </summary>
+	[Parameter]
+	public bool StackOnMobile { get; set; }
 
 }

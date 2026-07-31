@@ -40,7 +40,9 @@
     --fh-text-muted: #5f6b63;
     --fh-text-faint: #8a948d;
 
-    /* Sidebar / topbar (kept dark in both themes for brand contrast) */
+    /* Sidebar. Defined here and deliberately NOT overridden in the dark block: the nav is
+       one constant brand surface, identical in light and dark. Anything styling the nav
+       must resolve to these tokens, never to --fh-surface/--fh-text. */
     --fh-sidebar-bg: #1c4026;
     --fh-sidebar-bg-accent: #266234;
     --fh-sidebar-text: #d9e6dc;
@@ -109,9 +111,7 @@
     --fh-text-muted: #9caba2;
     --fh-text-faint: #6d7a72;
 
-    --fh-sidebar-bg: #101512;
-    --fh-sidebar-bg-accent: #1c4026;
-    --fh-sidebar-text: #c2d1c6;
+    /* No --fh-sidebar-* overrides here on purpose — see the note in :root. */
 
     --fh-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
     --fh-shadow-md: 0 3px 10px rgba(0, 0, 0, 0.45);

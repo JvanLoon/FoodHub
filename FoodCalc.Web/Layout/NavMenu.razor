@@ -4,41 +4,38 @@
 @inject AuthStateService AuthStateService
 @inject MessageService MessageService
 
+@* The drawer's own header on mobile; the top of the sidebar column on desktop. *@
 <div class="brand-row">
-	<a class="brand" href="">
+	<a class="brand" href="" @onclick="OnNavigate">
 		<i class="bi bi-basket2-fill" aria-hidden="true"></i>
 		<span>FoodHub</span>
 	</a>
 </div>
 
-<input type="checkbox" title="@UiText.Layout.NavigationMenu" class="navbar-toggler"/>
-
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+@* Always rendered — MainLayout's drawer decides whether it is on screen, so there is no
+   toggler here and nothing reaches into the DOM to close itself. *@
+<div class="nav-scrollable">
 	<nav class="nav-list">
 		@if (isLoggedIn)
 		{
-			<NavItem Href="" Icon="house-door-fill" Label="@UiText.Nav.Home" Match="NavLinkMatch.All"/>
-			<NavItem Href="/calendar" Icon="calendar-week" Label="@UiText.Nav.Calendar"/>
-			<NavItem Href="/recipes" Icon="journal-text" Label="@UiText.Nav.Recipes"/>
-			<NavItem Href="/recipes/find" Icon="search-heart" Label="@UiText.Nav.FindRecipes"/>
+			<NavItem Href="" Icon="house-door-fill" Label="@UiText.Nav.Home" Match="NavLinkMatch.All" OnNavigate="OnNavigate"/>
+			<NavItem Href="/recipes" Icon="journal-text" Label="@UiText.Nav.Recipes" Match="NavLinkMatch.All" OnNavigate="OnNavigate"/>
+			<NavItem Href="/recipes/find" Icon="search-heart" Label="@UiText.Nav.FindRecipes" OnNavigate="OnNavigate"/>
 
 			@* Anyone may submit a recipe; it stays private to them until a moderator
-			   approves it. *@
-			<NavItem Href="/recipes/create" Icon="plus-circle" Label="@UiText.Nav.AddRecipe" Match="NavLinkMatch.All"/>
+			   approves it. Kept in the sidebar as well as on the Recipes page. *@
+			<NavItem Href="/recipes/create" Icon="plus-circle" Label="@UiText.Nav.AddRecipe" Match="NavLinkMatch.All" OnNavigate="OnNavigate"/>
 
-			@* Staff manage the ingredient catalog — moderators edit it now, not only admins. *@
+			<NavItem Href="/calendar" Icon="calendar-week" Label="@UiText.Nav.Calendar" OnNavigate="OnNavigate"/>
+			<NavItem Href="/usersettings" Icon="person" Label="@UiText.Nav.UserSettings" OnNavigate="OnNavigate"/>
+
+			@* One entry, one label for both roles — the tab set inside decides what each of
+			   them can actually do. The ingredient catalog lives in there too, which is why
+			   it no longer has a sidebar entry of its own. *@
 			@if (isAdmin || isModerator)
 			{
-				<NavItem Href="/ingredients" Icon="egg" Label="@UiText.Nav.EditIngredients"/>
+				<NavItem Href="/admin" Icon="gear" Label="@UiText.Nav.Admin" OnNavigate="OnNavigate"/>
 			}
-
-			@* Same admin page for both; a moderator only gets the review tab within it. *@
-			@if (isAdmin || isModerator)
-			{
-				<NavItem Href="/admin" Icon="gear" Label="@(isAdmin ? UiText.Nav.Admin : UiText.Nav.Review)"/>
-			}
-
-			<NavItem Href="/usersettings" Icon="person" Label="@UiText.Nav.UserSettings"/>
 		}
 	</nav>
 </div>
@@ -47,6 +44,10 @@
 	private bool isAdmin;
 	private bool isModerator;
 	private bool isLoggedIn;
+
+	/// <summary>Raised on every link tap so the mobile drawer can close itself.</summary>
+	[Parameter]
+	public EventCallback OnNavigate { get; set; }
 
 	protected override async Task OnInitializedAsync()
 	{

@@ -8,9 +8,19 @@
     display: block;
 }
 
+/* Toggle and buttons share one row and wrap together when it no longer fits, so the
+   toggle ends up underneath Randomize rather than half-width beside it. */
+.cal-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--fh-space-3);
+}
+
 /* View toggle (Week / Month) */
 .cal-toggle {
     display: inline-flex;
+    flex: 0 0 auto;
     border: 1px solid var(--fh-border);
     border-radius: var(--fh-radius-md);
     overflow: hidden;
@@ -50,6 +60,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-wrap: wrap;
     margin-bottom: var(--fh-space-3);
     gap: var(--fh-space-3);
 }
@@ -57,11 +68,15 @@
 .cal-nav {
     display: flex;
     align-items: center;
+    flex: 1 1 12rem;
     gap: var(--fh-space-2);
 }
 
+/* Was min-width: 10rem inside a space-between head — enough to push the head wider than
+   a phone on its own. It can shrink; the chevrons either side keep it centred. */
 .cal-nav__label {
-    min-width: 10rem;
+    min-width: 0;
+    flex: 1 1 auto;
     text-align: center;
     font-weight: 600;
     color: var(--fh-text);
@@ -74,7 +89,8 @@
     gap: var(--fh-space-2);
 }
 
-/* Month: 7-column grid, headers then day cells. */
+/* Month: 7-column grid, headers then day cells. minmax(0, 1fr) — not auto — is what lets
+   the columns actually shrink below their content width on a phone. */
 .cal-month {
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
@@ -87,6 +103,47 @@
     font-weight: 600;
     color: var(--fh-text-muted);
     padding-bottom: var(--fh-space-1);
+    overflow: hidden;
+}
+
+/* The toggle keeps its natural width; the buttons take the rest of the row. */
+@media (max-width: 575.98px) {
+    .cal-actions {
+        width: 100%;
+        gap: var(--fh-space-2);
+    }
+
+    .cal-actions .btn {
+        flex: 1 1 auto;
+    }
+}
+
+/* A month of 7 columns has ~45px per cell on a phone. The grid stays — dropping to a
+   list would lose the shape of the month, which is the point of the view — but the
+   cells give up their padding and the meal names give up their text (CalDay switches
+   to dots). */
+@media (max-width: 899.98px) {
+    .cal-panel {
+        padding: var(--fh-space-3);
+    }
+
+    .cal-month {
+        gap: 3px;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .cal-panel {
+        padding: var(--fh-space-2);
+    }
+
+    .cal-month {
+        gap: 2px;
+    }
+
+    .cal-month__dow {
+        font-size: var(--fh-text-xs);
+    }
 }
 
 /* ---- Recipe picker ---- */

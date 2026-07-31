@@ -30,20 +30,38 @@
 	[Parameter]
 	public RenderFragment? ChildContent { get; set; }
 
+	/// <summary>
+	/// <see cref="Tab.Id"/> to open on first render instead of the first tab. Ignored once
+	/// the user has picked a tab, and ignored if no tab carries that id.
+	/// </summary>
+	[Parameter]
+	public string? InitialTab { get; set; }
+
 	private readonly List<Tab> _tabs = new();
+	private bool _userPicked;
 
 	internal Tab? ActiveTab { get; private set; }
 
 	internal void AddTab(Tab tab)
 	{
 		_tabs.Add(tab);
-		ActiveTab ??= tab;
+
+		// Tabs register themselves as they render, so the requested one may arrive after a
+		// default has already been chosen — it still wins, until the user picks for himself.
+		if (ActiveTab is null || (!_userPicked && IsRequested(tab)))
+			ActiveTab = tab;
+
 		StateHasChanged();
 	}
+
+	private bool IsRequested(Tab tab) =>
+		!string.IsNullOrEmpty(InitialTab) &&
+		string.Equals(tab.Id, InitialTab, StringComparison.OrdinalIgnoreCase);
 
 	private void Activate(Tab tab)
 	{
 		ActiveTab = tab;
+		_userPicked = true;
 	}
 
 }

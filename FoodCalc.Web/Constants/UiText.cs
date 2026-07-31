@@ -63,9 +63,13 @@ public static class UiText
         public const string Recipes = "Recepten";
         public const string FindRecipes = "Recepten zoeken";
         public const string AddRecipe = "Recept toevoegen";
-        public const string EditIngredients = "Ingrediënten beheren";
+
+        /// <summary>
+        /// One label for admins and moderators alike: the entry leads to the same page and
+        /// the tab set inside it is what actually differs per role.
+        /// </summary>
         public const string Admin = "Beheer";
-        public const string Review = "Beoordelen";
+
         public const string UserSettings = "Instellingen";
     }
 
@@ -186,8 +190,17 @@ public static class UiText
 
         public const string SearchIngredientLabel = "Ingrediënt zoeken";
         public const string SearchIngredientPlaceholder = "Typ om te zoeken...";
-        public const string AddNewIngredient = "Nieuw ingrediënt toevoegen";
-        public const string NoIngredientsFound = "Geen ingrediënten gevonden. Klik op + om er een toe te voegen.";
+
+        /// <summary>Deliberately English — asked for by name.</summary>
+        public const string ClearForm = "Clear";
+
+        /// <summary>
+        /// There is no "+" button any more: an unknown name is created on its way into the
+        /// recipe, so the empty dropdown says what will happen rather than what to press.
+        /// </summary>
+        public const string NoIngredientsFound =
+            "Geen ingrediënten gevonden. Dit ingrediënt wordt aangemaakt zodra je het toevoegt.";
+
         public const string AmountLabel = "Hoeveelheid";
         public const string AmountTypeLabel = "Eenheid";
         public const string AddOrSave = "Toevoegen/Opslaan";
@@ -338,6 +351,7 @@ public static class UiText
         public const string AdminHeading = "Beheerpaneel";
         public const string ModerationHeading = "Moderatie";
         public const string TabReview = "Beoordelen";
+        public const string TabIngredients = "Ingrediënten";
         public const string TabUsers = "Gebruikers";
         public const string TabImportExport = "Import/Export";
         public const string TabErrorTest = "Fouttest";

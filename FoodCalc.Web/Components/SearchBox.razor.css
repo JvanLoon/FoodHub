@@ -1,6 +1,15 @@
 .fh-search {
     position: relative;
-    min-width: 14rem;
+    /* min(…, 100%) so the box never demands more room than the viewport has. */
+    min-width: min(14rem, 100%);
+    flex: 1 1 14rem;
+    max-width: 24rem;
+}
+
+@media (max-width: 575.98px) {
+    .fh-search {
+        max-width: none;
+    }
 }
 
 .fh-search__icon {

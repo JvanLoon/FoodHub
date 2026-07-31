@@ -34,3 +34,84 @@
 .fh-table ::deep tbody tr:nth-child(even) td {
     background: var(--fh-surface-sunken);
 }
+
+/* --- Stacked (opt-in, phones) -------------------------------------------------
+   Below the compact breakpoint a --stack table drops out of table layout entirely and
+   each row becomes a card: the header row is hidden and every cell carries its own
+   label from data-label. The wrapper loses its border because the cards now have one. */
+
+@media (max-width: 899.98px) {
+    .fh-table-wrap--stack {
+        background: transparent;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+        overflow-x: visible;
+    }
+
+    .fh-table-wrap--stack .fh-table {
+        display: block;
+    }
+
+    .fh-table-wrap--stack .fh-table ::deep thead {
+        /* Visually gone, but the labels live on in each cell's data-label. */
+        display: none;
+    }
+
+    .fh-table-wrap--stack .fh-table ::deep tbody {
+        display: flex;
+        flex-direction: column;
+        gap: var(--fh-space-3);
+    }
+
+    .fh-table-wrap--stack .fh-table ::deep tbody tr {
+        display: block;
+        background: var(--fh-surface);
+        border: 1px solid var(--fh-border);
+        border-radius: var(--fh-radius-lg);
+        box-shadow: var(--fh-shadow-sm);
+        overflow: hidden;
+    }
+
+    .fh-table-wrap--stack .fh-table ::deep tbody td {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--fh-space-3);
+        width: auto;
+        padding: var(--fh-space-2) var(--fh-space-4);
+        text-align: left;
+    }
+
+    /* Zebra striping reads as noise once rows are cards. */
+    .fh-table-wrap--stack .fh-table ::deep tbody tr:nth-child(even) td {
+        background: transparent;
+    }
+
+    .fh-table-wrap--stack .fh-table ::deep tbody td:first-child {
+        padding-top: var(--fh-space-3);
+    }
+
+    .fh-table-wrap--stack .fh-table ::deep tbody td:last-child {
+        padding-bottom: var(--fh-space-3);
+        border-bottom: none;
+    }
+
+    .fh-table-wrap--stack .fh-table ::deep tbody td[data-label]::before {
+        content: attr(data-label);
+        flex: 0 0 auto;
+        font-size: var(--fh-text-xs);
+        font-weight: var(--fh-weight-semibold);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--fh-text-muted);
+    }
+
+    /* The loading/empty placeholders span the table and have no label of their own. */
+    .fh-table-wrap--stack .fh-table ::deep tbody td[colspan] {
+        display: block;
+        background: var(--fh-surface);
+        border: 1px solid var(--fh-border);
+        border-radius: var(--fh-radius-lg);
+    }
+}

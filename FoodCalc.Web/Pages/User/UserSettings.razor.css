@@ -1,5 +1,5 @@
 .settings-card {
-    max-width: 28rem;
+    max-width: min(28rem, 100%);
 }
 
 .settings-row {

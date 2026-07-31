@@ -1,7 +1,11 @@
+/* Shell. Mobile-first: the sidebar is an off-canvas drawer and only becomes a static
+   column at the 900px shell breakpoint (see the breakpoint note in css/utilities.css). */
+
 .page {
     position: relative;
     display: flex;
     flex-direction: column;
+    min-height: 100dvh;
     background: var(--fh-bg);
 }
 
@@ -13,14 +17,65 @@ main {
     min-height: 0;
 }
 
+/* --- Top bar --------------------------------------------------------------- */
+
 .topbar {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    height: 3.5rem;
-    padding: 0 var(--fh-space-5);
+    justify-content: space-between;
+    gap: var(--fh-space-3);
+    min-height: 3.5rem;
+    padding: 0 var(--fh-space-4);
     background: var(--fh-surface);
     border-bottom: 1px solid var(--fh-border);
+}
+
+.topbar__lead {
+    display: flex;
+    align-items: center;
+    gap: var(--fh-space-2);
+    min-width: 0;
+}
+
+.topbar__toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 2.75rem;
+    height: 2.75rem;
+    margin-left: calc(var(--fh-space-2) * -1);
+    border: none;
+    border-radius: var(--fh-radius-md);
+    background: transparent;
+    color: var(--fh-text-muted);
+    font-size: 1.25rem;
+    cursor: pointer;
+    transition: background-color var(--fh-transition), color var(--fh-transition);
+}
+
+.topbar__toggle:hover {
+    background: var(--fh-surface-sunken);
+    color: var(--fh-text);
+}
+
+.topbar__toggle:focus-visible {
+    outline: none;
+    box-shadow: var(--fh-focus-ring);
+}
+
+.topbar__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--fh-space-2);
+    color: var(--fh-text);
+    font-weight: var(--fh-weight-bold);
+    text-decoration: none;
+}
+
+.topbar__brand .bi {
+    font-size: 1.2rem;
+    color: var(--fh-accent);
 }
 
 .topbar__actions {
@@ -41,7 +96,10 @@ main {
 
 .topbar__email .bi {
     font-size: 1.1rem;
+    flex: 0 0 auto;
 }
+
+/* --- Content --------------------------------------------------------------- */
 
 .content {
     flex: 1;
@@ -49,37 +107,130 @@ main {
     flex-direction: column;
     overflow-y: auto;
     min-height: 0;
-    padding: var(--fh-space-5);
+    padding: var(--fh-space-4);
 }
 
 .content__inner {
     width: 100%;
     margin: 0 auto;
+    min-width: 0;
 }
+
+/* --- Sidebar / drawer ------------------------------------------------------- */
 
 .sidebar {
     background: var(--fh-sidebar-bg);
+
+    /* Off-canvas by default. Kept in the DOM (and only translated away) so opening it
+       is a compositor-only animation and the links stay focusable-in-order once open. */
+    position: fixed;
+    inset-block: 0;
+    left: 0;
+    z-index: 1040;
+    width: min(17rem, 82vw);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    transform: translateX(-100%);
+    transition: transform var(--fh-transition-slow);
+    box-shadow: var(--fh-shadow-lg);
 }
 
-@media (min-width: 730px) {
+.sidebar--open {
+    transform: translateX(0);
+}
+
+.nav-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1030;
+    background: rgba(10, 15, 12, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--fh-transition-slow), visibility var(--fh-transition-slow);
+}
+
+.nav-overlay--visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sidebar,
+    .nav-overlay {
+        transition: none;
+    }
+}
+
+/* --- Phone ------------------------------------------------------------------ */
+
+@media (max-width: 575.98px) {
+    .topbar {
+        padding: 0 var(--fh-space-3);
+    }
+
+    .content {
+        padding: var(--fh-space-3);
+    }
+
+    /* The address is long and the row is short: keep the person icon (its title still
+       carries the address) and drop the text. */
+    .topbar__email-text {
+        display: none;
+    }
+
+    .topbar__email {
+        max-width: none;
+    }
+
+    /* The basket alone carries the brand here; the word is what tips the row over. */
+    .topbar__brand span {
+        display: none;
+    }
+}
+
+/* --- Shell breakpoint: drawer becomes a static column ----------------------- */
+
+@media (min-width: 900px) {
     .page {
         flex-direction: row;
-        height: 100vh;
+        height: 100dvh;
     }
 
     .sidebar {
-        width: 250px;
-        height: 100vh;
         position: sticky;
         top: 0;
+        inset-block: auto;
+        z-index: auto;
+        width: 250px;
+        flex: 0 0 250px;
+        height: 100dvh;
+        transform: none;
+        transition: none;
+        box-shadow: none;
     }
 
     .topbar {
         position: sticky;
         top: 0;
         z-index: 1;
+        padding: 0 var(--fh-space-5);
+    }
+
+    .content {
+        padding: var(--fh-space-5);
+    }
+
+    /* The drawer affordances have no job once the column is permanent. */
+    .nav-overlay,
+    .topbar__toggle,
+    .topbar__brand {
+        display: none;
     }
 }
+
+/* --- Blazor circuit error strip -------------------------------------------- */
 
 #blazor-error-ui {
     background: var(--fh-warning);

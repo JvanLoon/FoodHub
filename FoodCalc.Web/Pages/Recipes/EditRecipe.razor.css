@@ -12,6 +12,22 @@
     max-width: 32rem;
 }
 
+/* Label on the left, Clear on the right, on the line above the search field. */
+.ingredient-form-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--fh-space-3);
+    margin-bottom: var(--fh-space-1);
+}
+
+.ingredient-form-head .form-label {
+    margin-bottom: 0;
+    font-size: var(--fh-text-sm);
+    font-weight: var(--fh-weight-medium);
+    color: var(--fh-text-muted);
+}
+
 .ingredient-dropdown {
     position: relative;
     width: 100%;
@@ -60,6 +76,29 @@
 .ingredient-list__actions {
     display: inline-flex;
     gap: var(--fh-space-1);
+    flex-shrink: 0;
+}
+
+/* Name, amount and the action buttons do not fit one phone-width line; wrap instead of
+   letting the row push the page sideways. */
+@media (max-width: 575.98px) {
+    .recipe-name {
+        flex-wrap: wrap;
+    }
+
+    .recipe-name ::deep .recipe-name__form {
+        flex: 1 1 100%;
+        max-width: none;
+    }
+
+    .ingredient-list li {
+        flex-wrap: wrap;
+        padding: var(--fh-space-3);
+    }
+
+    .ingredient-list__actions {
+        margin-left: auto;
+    }
 }
 
 /* Explains why a just-saved recipe is not showing up for anyone else. Every edit puts

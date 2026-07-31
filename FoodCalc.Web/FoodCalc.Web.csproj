@@ -4,23 +4,24 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-    </PropertyGroup>
+      <UserSecretsId>7fc833f3-b805-441d-a866-0f54f5ba5566</UserSecretsId>
+  </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Blazored.LocalStorage" Version="4.5.0"/>
-        <PackageReference Include="DotNetEnv" Version="3.2.0"/>
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.10"/>
-        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.19.2"/>
+        <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
+        <PackageReference Include="DotNetEnv" Version="3.2.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.10" />
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.19.2" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\FoodHub.DTOs\FoodHub.DTOs.csproj"/>
-        <ProjectReference Include="..\FoodHub.ServiceDefaults\FoodHub.ServiceDefaults.csproj"/>
+        <ProjectReference Include="..\FoodHub.DTOs\FoodHub.DTOs.csproj" />
+        <ProjectReference Include="..\FoodHub.ServiceDefaults\FoodHub.ServiceDefaults.csproj" />
     </ItemGroup>
 
     <ItemGroup>
         <!-- User-facing message + key constants available to services and components. -->
-        <Using Include="FoodCalc.Web.Constants"/>
+        <Using Include="FoodCalc.Web.Constants" />
     </ItemGroup>
 
 </Project>
