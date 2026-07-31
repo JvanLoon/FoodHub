@@ -17,7 +17,7 @@
 
 @if (_displayItems.Any())
 {
-	<ul class="ingredient-print-list">
+	<ul class="ingredient-print-list fh-zebra">
 		@foreach (var (item, index) in _displayItems.Select((item, i) => (item, i)))
 		{
 			<li>

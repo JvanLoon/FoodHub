@@ -10,52 +10,36 @@
     white-space: nowrap;
 }
 
+/* Each variant is one --fh-tint-* pair. The tints themselves flip in tokens.css, so
+   there are no [data-bs-theme="dark"] blocks here — there used to be four, each
+   repeating the same two declarations with different hex. */
+
 .fh-badge--neutral {
     background: var(--fh-surface-sunken);
     color: var(--fh-text-muted);
 }
 
 .fh-badge--success {
-    background: var(--fh-green-100);
-    color: var(--fh-green-800);
+    background: var(--fh-tint-success-bg);
+    color: var(--fh-tint-success-text);
 }
 
 .fh-badge--danger {
-    background: #fbe3e3;
-    color: #8f2424;
+    background: var(--fh-tint-danger-bg);
+    color: var(--fh-tint-danger-text);
 }
 
 .fh-badge--warning {
-    background: #fdf3d7;
-    color: #7a5a08;
+    background: var(--fh-tint-warning-bg);
+    color: var(--fh-tint-warning-text);
 }
 
 .fh-badge--info {
-    background: #e0eef8;
-    color: #205a86;
+    background: var(--fh-tint-info-bg);
+    color: var(--fh-tint-info-text);
 }
 
 .fh-badge--accent {
     background: var(--fh-accent-subtle);
     color: var(--fh-accent);
-}
-
-[data-bs-theme="dark"] .fh-badge--success {
-    background: #1e3a27;
-    color: var(--fh-green-200);
-}
-
-[data-bs-theme="dark"] .fh-badge--danger {
-    background: #3d2020;
-    color: #eda2a2;
-}
-
-[data-bs-theme="dark"] .fh-badge--warning {
-    background: #3b3116;
-    color: #f2c14e;
-}
-
-[data-bs-theme="dark"] .fh-badge--info {
-    background: #1d3245;
-    color: #9cc8e8;
 }

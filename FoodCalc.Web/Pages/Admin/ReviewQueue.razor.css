@@ -9,8 +9,9 @@
     flex-wrap: wrap;
 }
 
+/* Typography comes from the shared .fh-card-title. */
 .review-item__title {
-    font-weight: var(--fh-weight-medium);
+    min-width: 0;
 }
 
 .review-item__meta {

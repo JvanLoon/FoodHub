@@ -90,8 +90,8 @@
 }
 
 .fh-stat-card--primary .fh-stat-icon {
-    background: var(--fh-green-50);
-    color: var(--fh-green-700);
+    background: var(--fh-tint-success-bg);
+    color: var(--fh-tint-success-text);
 }
 
 .fh-stat-card--accent .fh-stat-icon {
@@ -99,18 +99,10 @@
     color: var(--fh-accent);
 }
 
+/* --fh-info-rgb rather than the tint pair: the icon wants a wash of its own colour at a
+   low alpha, not the flatter fill an alert uses. Both channels flip with the theme. */
 .fh-stat-card--info .fh-stat-icon {
-    background: rgba(46, 123, 181, 0.12);
-    color: var(--fh-info);
-}
-
-[data-bs-theme="dark"] .fh-stat-card--primary .fh-stat-icon {
-    background: rgba(95, 178, 111, 0.15);
-    color: var(--fh-green-300);
-}
-
-[data-bs-theme="dark"] .fh-stat-card--info .fh-stat-icon {
-    background: rgba(100, 168, 216, 0.18);
+    background: rgba(var(--fh-info-rgb), 0.14);
     color: var(--fh-info);
 }
 
@@ -214,12 +206,8 @@
     span {
         display: block;
         height: 100%;
-        background: var(--fh-green-500);
+        background: var(--fh-success);
         border-radius: inherit;
         transition: width var(--fh-transition-slow);
     }
-}
-
-[data-bs-theme="dark"] .fh-top-bar span {
-    background: var(--fh-green-400);
 }

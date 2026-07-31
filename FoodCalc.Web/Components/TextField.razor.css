@@ -1,17 +1,5 @@
-.fh-field {
-    display: flex;
-    flex-direction: column;
-    gap: var(--fh-space-1);
-    margin-bottom: var(--fh-space-4);
-}
-
-.fh-field ::deep .form-label {
-    margin-bottom: 0;
-    font-size: var(--fh-text-sm);
-    font-weight: var(--fh-weight-medium);
-    color: var(--fh-text-muted);
-}
-
+/* .fh-field, its label and its validation message are styled once, globally, in
+   css/utilities.css. This file only carries what is genuinely local to this control. */
 .fh-field__control {
     position: relative;
     display: flex;
@@ -47,9 +35,4 @@
     border-radius: var(--fh-radius-sm);
     box-shadow: var(--fh-focus-ring);
     color: var(--fh-text);
-}
-
-.fh-field ::deep .validation-message {
-    font-size: var(--fh-text-sm);
-    color: var(--fh-danger);
 }

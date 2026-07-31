@@ -45,7 +45,7 @@
 
 .cal-toggle__btn--active {
     background: var(--fh-accent);
-    color: #fff;
+    color: var(--fh-on-brand);
 }
 
 .cal-panel {

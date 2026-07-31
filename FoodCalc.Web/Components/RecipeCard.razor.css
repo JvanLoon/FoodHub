@@ -77,11 +77,14 @@
     cursor: default;
 }
 
+/* Typography comes from .fh-card-title; this only makes a button look like text.
+   No `font: inherit` — that shorthand would reset the size and weight the shared
+   title rule just set. */
 .card-title--link {
+    display: block;
     background: transparent;
     border: none;
     padding: 0;
-    font: inherit;
     color: inherit;
     text-align: left;
     cursor: pointer;

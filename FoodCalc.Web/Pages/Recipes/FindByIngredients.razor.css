@@ -105,21 +105,16 @@
     font-size: 0.9em;
 }
 
+/* Same tint as the chips it produces, so hovering an option previews the chip. */
 .find-combo__option:hover,
 .find-combo__option.is-active {
-    background: var(--fh-green-100);
-    color: var(--fh-green-800);
+    background: var(--fh-tint-success-bg);
+    color: var(--fh-tint-success-text);
 }
 
 .find-combo__option:hover .bi,
 .find-combo__option.is-active .bi {
-    color: var(--fh-green-600);
-}
-
-[data-bs-theme="dark"] .find-combo__option:hover,
-[data-bs-theme="dark"] .find-combo__option.is-active {
-    background: #1e3a27;
-    color: var(--fh-green-200);
+    color: currentColor;
 }
 
 .find-combo__option--new {
@@ -146,15 +141,10 @@
     max-width: 100%;
     padding: 0.2rem 0.35rem 0.2rem 0.65rem;
     border-radius: var(--fh-radius-pill);
-    background: var(--fh-green-100);
-    color: var(--fh-green-800);
+    background: var(--fh-tint-success-bg);
+    color: var(--fh-tint-success-text);
     font-size: var(--fh-text-sm);
     font-weight: var(--fh-weight-medium);
-}
-
-[data-bs-theme="dark"] .find-chip {
-    background: #1e3a27;
-    color: var(--fh-green-200);
 }
 
 .find-chip__label {
@@ -179,8 +169,10 @@
     transition: background var(--fh-transition);
 }
 
+/* currentColor at a low alpha: the chip's own ink darkens it in light mode and lightens
+   it in dark, so one rule covers both without a [data-bs-theme] override. */
 .find-chip__remove:hover {
-    background: rgba(0, 0, 0, 0.12);
+    background: color-mix(in srgb, currentColor 18%, transparent);
 }
 
 .find-clear {
@@ -224,9 +216,13 @@
     transition: box-shadow var(--fh-transition), transform var(--fh-transition);
 }
 
-.find-card:hover {
-    box-shadow: var(--fh-shadow-md);
-    transform: translateY(-2px);
+/* Guarded like the other cards: on touch the hover state sticks after a tap and the
+   card stays nudged up until something else is tapped. */
+@media (hover: hover) {
+    .find-card:hover {
+        box-shadow: var(--fh-shadow-md);
+        transform: translateY(-2px);
+    }
 }
 
 .find-card__header {
@@ -237,8 +233,7 @@
     padding: var(--fh-space-4) var(--fh-space-4) var(--fh-space-2);
 }
 
-.find-card__header .card-title {
-    margin: 0;
+.find-card__header .fh-card-title {
     min-width: 0;
 }
 

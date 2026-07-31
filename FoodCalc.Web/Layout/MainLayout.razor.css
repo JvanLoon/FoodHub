@@ -145,7 +145,7 @@ main {
     position: fixed;
     inset: 0;
     z-index: 1030;
-    background: rgba(10, 15, 12, 0.5);
+    background: var(--fh-scrim);
     opacity: 0;
     visibility: hidden;
     transition: opacity var(--fh-transition-slow), visibility var(--fh-transition-slow);
@@ -234,7 +234,7 @@ main {
 
 #blazor-error-ui {
     background: var(--fh-warning);
-    color: #1f2823;
+    color: var(--fh-on-warning);
     bottom: 0;
     box-shadow: var(--fh-shadow-md);
     display: none;

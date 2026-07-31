@@ -31,9 +31,7 @@
     border-bottom: none;
 }
 
-.fh-table ::deep tbody tr:nth-child(even) td {
-    background: var(--fh-surface-sunken);
-}
+/* Striping comes from the global .fh-zebra on <tbody> — see css/utilities.css. */
 
 /* --- Stacked (opt-in, phones) -------------------------------------------------
    Below the compact breakpoint a --stack table drops out of table layout entirely and

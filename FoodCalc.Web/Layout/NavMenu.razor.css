@@ -15,7 +15,7 @@
     display: inline-flex;
     align-items: center;
     gap: var(--fh-space-2);
-    color: #fff;
+    color: var(--fh-on-brand);
     font-size: var(--fh-text-lg);
     font-weight: var(--fh-weight-bold);
     text-decoration: none;

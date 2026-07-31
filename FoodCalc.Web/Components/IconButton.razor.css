@@ -62,7 +62,7 @@
     color: var(--fh-danger);
 
     &:hover:not(:disabled) {
-        background: rgba(206, 59, 59, 0.1);
+        background: rgba(var(--fh-danger-rgb), 0.1);
         color: var(--fh-danger);
     }
 }
@@ -78,5 +78,5 @@
 
 [data-bs-theme="dark"] .fh-icon-btn--primary:hover:not(:disabled),
 [data-bs-theme="dark"] .fh-icon-btn--success:hover:not(:disabled) {
-    background: rgba(95, 178, 111, 0.15);
+    background: rgba(var(--fh-green-400-rgb), 0.15);
 }

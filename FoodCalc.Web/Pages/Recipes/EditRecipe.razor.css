@@ -4,6 +4,35 @@
     gap: var(--fh-space-3);
 }
 
+/* Stacked below the shell breakpoint, side by side above it — the form on a fixed track
+   because it is a form (it gains nothing from being half a 1400px page), the ingredient
+   list taking whatever is left. minmax(0, …) on both so long ingredient names wrap
+   instead of widening the track. */
+.recipe-editor {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--fh-space-4);
+    align-items: start;
+}
+
+/* The narrow-desktop tier, not the 900px shell one: at 900px the sidebar comes back at
+   the same moment, so splitting there would leave the ingredient list about 200px wide.
+   Waiting for 1200px means both tracks are usable when they finally appear. */
+@media (min-width: 1200px) {
+    .recipe-editor {
+        grid-template-columns: minmax(0, 24rem) minmax(0, 1fr);
+        gap: var(--fh-space-5);
+    }
+}
+
+/* Stacked, the form is the thing being used, so it gets a readable measure rather than
+   stretching a five-field form across the full width of a tablet. */
+@media (max-width: 1199.98px) {
+    .recipe-editor__form {
+        max-width: min(32rem, 100%);
+    }
+}
+
 .recipe-name ::deep .recipe-name__form {
     display: flex;
     align-items: center;
@@ -65,10 +94,6 @@
 
         &:last-child {
             border-bottom: none;
-        }
-
-        &:nth-child(even) {
-            background: var(--fh-surface-sunken);
         }
     }
 }

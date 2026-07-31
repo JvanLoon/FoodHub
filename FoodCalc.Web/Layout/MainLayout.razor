@@ -56,7 +56,18 @@
 		</header>
 		<article class="content">
 			<div class="content__inner">
-				@Body
+				@* Keyed on the current URL so navigating away from a page that threw resets
+				   the boundary — without that, the error panel would stick for the rest of
+				   the session. *@
+				<ErrorBoundary @key="Navigation.Uri">
+					<ChildContent>@Body</ChildContent>
+					<ErrorContent>
+						<div class="fh-render-error" role="alert">
+							<i class="bi bi-exclamation-octagon-fill" aria-hidden="true"></i>
+							<span>@UiText.Layout.ComponentError</span>
+						</div>
+					</ErrorContent>
+				</ErrorBoundary>
 			</div>
 		</article>
 	</main>

@@ -22,19 +22,9 @@
 
 /* --- Page skeleton -------------------------------------------------------- */
 
-.fh-page {
-    display: flex;
-    flex-direction: column;
-    gap: var(--fh-space-5);
-    padding: var(--fh-space-5) 0;
-}
-
-@media (max-width: 899.98px) {
-    .fh-page {
-        gap: var(--fh-space-4);
-        padding: var(--fh-space-4) 0;
-    }
-}
+/* Both used by PageHeader. .fh-page, .fh-page-body, .fh-page-footer, .fh-surface and
+   .fh-surface--raised used to sit here too and were referenced by nothing — pages build
+   their own layouts out of .fh-stack and AppCard instead. */
 
 .fh-page-header {
     display: flex;
@@ -49,41 +39,6 @@
     flex-wrap: wrap;
     align-items: center;
     gap: var(--fh-space-3);
-}
-
-.fh-page-body {
-    display: flex;
-    flex-direction: column;
-    gap: var(--fh-space-4);
-}
-
-.fh-page-footer {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: var(--fh-space-3);
-    padding-top: var(--fh-space-4);
-    border-top: 1px solid var(--fh-border);
-}
-
-/* --- Surfaces ------------------------------------------------------------- */
-
-.fh-surface {
-    background: var(--fh-surface);
-    border: 1px solid var(--fh-border);
-    border-radius: var(--fh-radius-lg);
-    padding: var(--fh-space-5);
-}
-
-@media (max-width: 899.98px) {
-    .fh-surface {
-        padding: var(--fh-space-4);
-    }
-}
-
-.fh-surface--raised {
-    background: var(--fh-surface-raised);
-    box-shadow: var(--fh-shadow-md);
 }
 
 /* --- Text ------------------------------------------------------------------ */
@@ -106,13 +61,32 @@
     color: var(--fh-text-muted);
 }
 
+/* The name of a recipe, wherever one is shown on a card: the grid, the find results,
+   the review queue. It is the thing being scanned for, so it gets weight and size of its
+   own rather than inheriting Bootstrap's h5 (1.25rem / 500), which left it competing with
+   the ingredient rows beneath it. Global so every card resolves to the same rule. */
+.fh-card-title {
+    margin: 0;
+    font-size: var(--fh-text-xl);
+    font-weight: var(--fh-weight-bold);
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    color: var(--fh-text);
+    overflow-wrap: anywhere;
+}
+
 .fh-truncate {
     overflow: hidden;
     text-overflow: ellipsis;
     overflow-wrap: anywhere;
 }
 
-/* --- Form field wrapper ------------------------------------------------------ */
+/* --- Form field wrapper ------------------------------------------------------
+   The single definition. TextField/NumberField/SelectField each used to carry a
+   byte-identical copy in their own scoped CSS — three places to drift, and the scoped
+   copies won on specificity, so the global one was doing nothing. Global works here
+   precisely because it is not scoped: it reaches the label and validation message
+   wherever the field component puts them, with no ::deep needed. */
 
 .fh-field {
     display: flex;
@@ -128,6 +102,11 @@
     color: var(--fh-text-muted);
 }
 
+.fh-field .validation-message {
+    font-size: var(--fh-text-sm);
+    color: var(--fh-danger);
+}
+
 /* --- Composition ------------------------------------------------------------ */
 
 /* Vertical stack with a consistent gap */
@@ -137,20 +116,12 @@
     gap: var(--fh-space-4);
 }
 
-.fh-stack--tight {
-    gap: var(--fh-space-2);
-}
-
 /* Horizontal cluster that wraps */
 .fh-cluster {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: var(--fh-space-3);
-}
-
-.fh-cluster--end {
-    justify-content: flex-end;
 }
 
 /* On a phone a wrapped row of buttons reads as a ragged grid; stretch them to full
@@ -165,11 +136,6 @@
     .fh-toolbar > .fh-search,
     .fh-cluster > .btn {
         flex: 1 1 100%;
-    }
-
-    .fh-page-footer {
-        flex-direction: column-reverse;
-        align-items: stretch;
     }
 }
 
@@ -195,6 +161,24 @@
     .fh-label-optional > .spinner-border {
         font-size: var(--fh-text-md);
     }
+}
+
+/* --- Zebra striping ----------------------------------------------------------
+   One implementation for every alternating-row list. Put .fh-zebra on the <tbody> or
+   <ul> and its even-numbered children tint themselves; there used to be three separate
+   nth-child rules (the data table, the recipe editor's ingredient list, the shopping
+   list) that could drift apart.
+
+   The second selector is not redundant: Bootstrap paints .table cells individually
+   (`.table > :not(caption) > * > *` sets background-color), so a tint on the <tr> alone
+   would be painted over — inside a table the cells have to carry it. */
+
+.fh-zebra > *:nth-child(even) {
+    background: var(--fh-surface-sunken);
+}
+
+.fh-zebra > tr:nth-child(even) > td {
+    background: var(--fh-surface-sunken);
 }
 
 /* --- Touch targets ---------------------------------------------------------- */

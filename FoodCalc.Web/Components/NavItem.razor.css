@@ -20,12 +20,12 @@
     }
 
     &.nav-link:hover {
-        background: rgba(255, 255, 255, 0.08);
-        color: #fff;
+        background: var(--fh-sidebar-hover);
+        color: var(--fh-on-brand);
     }
 
     &.nav-link.active {
-        background: rgba(255, 255, 255, 0.16);
-        color: #fff;
+        background: var(--fh-sidebar-active);
+        color: var(--fh-on-brand);
     }
 }

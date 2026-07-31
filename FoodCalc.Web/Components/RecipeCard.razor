@@ -18,12 +18,12 @@
 	<div class="card-body">
 		@if (OnOpen.HasDelegate)
 		{
-			<button type="button" class="card-title card-title--link" title="@Title"
+			<button type="button" class="fh-card-title card-title--link" title="@Title"
 			        @onmousedown:stopPropagation @onclick="OnOpen">@Title</button>
 		}
 		else
 		{
-			<h5 class="card-title" title="@Title">@Title</h5>
+			<h5 class="fh-card-title" title="@Title">@Title</h5>
 		}
 		@ChildContent
 	</div>

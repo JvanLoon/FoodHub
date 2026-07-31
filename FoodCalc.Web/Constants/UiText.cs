@@ -53,6 +53,14 @@ public static class UiText
         public const string Logout = "Uitloggen";
         public const string UnhandledError = "Er is een onverwachte fout opgetreden.";
         public const string Reload = "Herladen";
+
+        /// <summary>
+        /// Shown in place of a page that threw while rendering. Distinct from
+        /// <see cref="UnhandledError"/>: that one is the circuit dying, this one is a single
+        /// page failing while the rest of the app keeps working.
+        /// </summary>
+        public const string ComponentError =
+            "Deze pagina kon niet worden geladen. Probeer het opnieuw of ga terug naar Start.";
     }
 
     /// <summary>Sidebar entries.</summary>

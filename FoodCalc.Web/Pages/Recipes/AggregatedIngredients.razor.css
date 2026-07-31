@@ -21,10 +21,6 @@
         align-items: center;
         gap: var(--fh-space-3);
         padding: var(--fh-space-1) var(--fh-space-3);
-
-        &:nth-child(even) {
-            background-color: var(--fh-surface-sunken);
-        }
     }
 }
 
@@ -60,8 +56,10 @@
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
 
+            /* Paper needs its own stripe: --fh-surface-sunken is near-black in dark
+               mode, and print-color-adjust would faithfully render it. */
             &:nth-child(even) {
-                background-color: #f0f0f0 !important;
+                background-color: var(--fh-print-zebra) !important;
             }
         }
     }

@@ -49,9 +49,13 @@
 	}
 	else
 	{
-		<div class="row g-4">
+		@* Own grid rather than Bootstrap's row/col-md-6: col-md- splits at 768px, which is
+		   exactly the width where the sidebar has already become a drawer, so a large phone
+		   got two cramped half-columns and a lot of empty page. This splits at the same
+		   900px the shell does, and gives the form a fixed track instead of half the page. *@
+		<div class="recipe-editor">
 			<!-- Left: ingredient form -->
-			<div class="col-md-6">
+			<div class="recipe-editor__form">
 				<AppCard>
 					@* Clear sits at the top: it resets the whole form, so it belongs with the
 					   field it mainly clears rather than below the save button. *@
@@ -114,10 +118,10 @@
 			</div>
 
 			<!-- Right: current ingredients -->
-			<div class="col-md-6">
+			<div class="recipe-editor__list">
 				@if (recipe?.Ingredients is { Count: > 0 } ingredientsList)
 				{
-					<ul class="ingredient-list">
+					<ul class="ingredient-list fh-zebra">
 						@foreach (var ingredient in ingredientsList)
 						{
 							<li>

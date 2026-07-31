@@ -39,19 +39,19 @@
 
     --bs-link-color: var(--fh-green-600);
     --bs-link-hover-color: var(--fh-green-700);
-    --bs-link-color-rgb: 45, 122, 62;
-    --bs-link-hover-color-rgb: 38, 98, 52;
+    --bs-link-color-rgb: var(--fh-green-600-rgb);
+    --bs-link-hover-color-rgb: var(--fh-green-700-rgb);
 
-    --bs-focus-ring-color: rgba(61, 151, 80, 0.35);
+    --bs-focus-ring-color: rgba(var(--fh-green-500-rgb), 0.35);
 }
 
 [data-bs-theme="dark"] {
     --bs-primary: var(--fh-green-400);
     --bs-link-color: var(--fh-green-300);
     --bs-link-hover-color: var(--fh-green-200);
-    --bs-link-color-rgb: 144, 205, 155;
-    --bs-link-hover-color-rgb: 188, 226, 194;
-    --bs-focus-ring-color: rgba(95, 178, 111, 0.4);
+    --bs-link-color-rgb: var(--fh-green-300-rgb);
+    --bs-link-hover-color-rgb: var(--fh-green-200-rgb);
+    --bs-focus-ring-color: rgba(var(--fh-green-400-rgb), 0.4);
 }
 
 /* --- Buttons ------------------------------------------------------------- */
@@ -64,17 +64,17 @@
 .btn-primary {
     --bs-btn-bg: var(--fh-green-600);
     --bs-btn-border-color: var(--fh-green-600);
-    --bs-btn-color: #fff;
+    --bs-btn-color: var(--fh-on-brand);
     --bs-btn-hover-bg: var(--fh-green-700);
     --bs-btn-hover-border-color: var(--fh-green-700);
-    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-color: var(--fh-on-brand);
     --bs-btn-active-bg: var(--fh-green-800);
     --bs-btn-active-border-color: var(--fh-green-800);
-    --bs-btn-active-color: #fff;
+    --bs-btn-active-color: var(--fh-on-brand);
     --bs-btn-disabled-bg: var(--fh-green-600);
     --bs-btn-disabled-border-color: var(--fh-green-600);
-    --bs-btn-disabled-color: #fff;
-    --bs-btn-focus-shadow-rgb: 61, 151, 80;
+    --bs-btn-disabled-color: var(--fh-on-brand);
+    --bs-btn-focus-shadow-rgb: var(--fh-green-500-rgb);
 }
 
 .btn-outline-primary {
@@ -82,11 +82,11 @@
     --bs-btn-border-color: var(--fh-green-500);
     --bs-btn-hover-bg: var(--fh-green-600);
     --bs-btn-hover-border-color: var(--fh-green-600);
-    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-color: var(--fh-on-brand);
     --bs-btn-active-bg: var(--fh-green-700);
     --bs-btn-active-border-color: var(--fh-green-700);
-    --bs-btn-active-color: #fff;
-    --bs-btn-focus-shadow-rgb: 61, 151, 80;
+    --bs-btn-active-color: var(--fh-on-brand);
+    --bs-btn-focus-shadow-rgb: var(--fh-green-500-rgb);
 }
 
 [data-bs-theme="dark"] .btn-outline-primary {
@@ -111,20 +111,16 @@
     --bs-btn-border-color: var(--fh-success);
     --bs-btn-hover-bg: var(--fh-green-700);
     --bs-btn-hover-border-color: var(--fh-green-700);
-    --bs-btn-focus-shadow-rgb: 61, 151, 80;
+    --bs-btn-focus-shadow-rgb: var(--fh-green-500-rgb);
 }
 
+/* --fh-danger-hover flips in tokens.css, so the dark override this used to need is gone. */
 .btn-danger {
     --bs-btn-bg: var(--fh-danger);
     --bs-btn-border-color: var(--fh-danger);
-    --bs-btn-hover-bg: #b32f2f;
-    --bs-btn-hover-border-color: #b32f2f;
-    --bs-btn-focus-shadow-rgb: 206, 59, 59;
-}
-
-[data-bs-theme="dark"] .btn-danger {
-    --bs-btn-hover-bg: #d15858;
-    --bs-btn-hover-border-color: #d15858;
+    --bs-btn-hover-bg: var(--fh-danger-hover);
+    --bs-btn-hover-border-color: var(--fh-danger-hover);
+    --bs-btn-focus-shadow-rgb: var(--fh-danger-rgb);
 }
 
 /* --- Forms --------------------------------------------------------------- */
@@ -189,48 +185,41 @@
 
 /* --- Alerts -------------------------------------------------------------- */
 
-.alert-success {
-    --bs-alert-bg: var(--fh-green-50);
-    --bs-alert-border-color: var(--fh-green-200);
-    --bs-alert-color: var(--fh-green-800);
-}
+/* Same --fh-tint-* triplets the badges use, so an alert and a badge of the same status
+   read as the same colour. Both flip in tokens.css — no dark overrides needed here. */
 
-[data-bs-theme="dark"] .alert-success {
-    --bs-alert-bg: #1a2e20;
-    --bs-alert-border-color: var(--fh-green-800);
-    --bs-alert-color: var(--fh-green-200);
+.alert-success {
+    --bs-alert-bg: var(--fh-tint-success-bg);
+    --bs-alert-border-color: var(--fh-tint-success-border);
+    --bs-alert-color: var(--fh-tint-success-text);
 }
 
 .alert-danger {
-    --bs-alert-bg: #fbeaea;
-    --bs-alert-border-color: #f0bcbc;
-    --bs-alert-color: #8f2424;
+    --bs-alert-bg: var(--fh-tint-danger-bg);
+    --bs-alert-border-color: var(--fh-tint-danger-border);
+    --bs-alert-color: var(--fh-tint-danger-text);
 }
 
-[data-bs-theme="dark"] .alert-danger {
-    --bs-alert-bg: #331a1a;
-    --bs-alert-border-color: #6e2c2c;
-    --bs-alert-color: #eda2a2;
+.alert-warning {
+    --bs-alert-bg: var(--fh-tint-warning-bg);
+    --bs-alert-border-color: var(--fh-tint-warning-border);
+    --bs-alert-color: var(--fh-tint-warning-text);
 }
 
-/* --- Nav / badges / pagination ------------------------------------------- */
-
-.nav-pills {
-    --bs-nav-pills-link-active-bg: var(--fh-green-600);
-    --bs-nav-pills-link-active-color: #fff;
-    --bs-nav-pills-border-radius: var(--fh-radius-md);
+.alert-info {
+    --bs-alert-bg: var(--fh-tint-info-bg);
+    --bs-alert-border-color: var(--fh-tint-info-border);
+    --bs-alert-color: var(--fh-tint-info-text);
 }
 
-.nav-tabs {
-    --bs-nav-tabs-link-active-color: var(--fh-green-700);
-    --bs-nav-tabs-link-active-bg: var(--fh-surface);
-    --bs-nav-tabs-link-active-border-color: var(--fh-border) var(--fh-border) var(--fh-surface);
-    --bs-nav-tabs-border-color: var(--fh-border);
-}
+/* --- Pagination ----------------------------------------------------------- */
 
-.badge.text-bg-primary {
-    background-color: var(--fh-green-600) !important;
-}
+/* Bootstrap's .nav-tabs, .nav-pills, .badge, .modal and .toast are deliberately not
+   bridged: tabs, badges, modals and toasts are all self-authored components under
+   Components/ (fh-tabset, fh-badge, fh-modal, fh-toast), because the Bootstrap ones
+   need Bootstrap's JS and this app does not load it. Overrides for them used to sit
+   here and could never match anything — if you add markup that needs one, write the
+   component instead. Pagination is the exception: Paginator does use .pagination. */
 
 .pagination {
     --bs-pagination-active-bg: var(--fh-green-600);
@@ -253,21 +242,3 @@
     --bs-pagination-focus-color: var(--fh-green-200);
 }
 
-/* --- Modal / toast ------------------------------------------------------- */
-
-.modal {
-    --bs-modal-bg: var(--fh-surface-raised);
-    --bs-modal-border-color: var(--fh-border);
-    --bs-modal-border-radius: var(--fh-radius-lg);
-    --bs-modal-header-border-color: var(--fh-border);
-    --bs-modal-footer-border-color: var(--fh-border);
-}
-
-.toast {
-    --bs-toast-bg: var(--fh-surface-raised);
-    --bs-toast-border-color: var(--fh-border);
-    --bs-toast-border-radius: var(--fh-radius-md);
-    --bs-toast-header-bg: transparent;
-    --bs-toast-header-color: var(--fh-text);
-    box-shadow: var(--fh-shadow-md);
-}

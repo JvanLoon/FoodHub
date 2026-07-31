@@ -1,6 +1,8 @@
 .login-layout {
     position: relative;
-    min-height: 100vh;
+    /* dvh, not vh: on mobile vh is the URL-bar-collapsed height, so a centred card gets
+       pushed below the fold while the bar is still expanded. */
+    min-height: 100dvh;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -11,8 +13,8 @@
 }
 
 [data-bs-theme="dark"] .login-layout {
-    background-image: radial-gradient(circle at 15% 20%, rgba(45, 122, 62, 0.2) 0%, transparent 45%),
-    radial-gradient(circle at 85% 80%, rgba(232, 118, 45, 0.12) 0%, transparent 45%);
+    background-image: radial-gradient(circle at 15% 20%, rgba(var(--fh-green-600-rgb), 0.2) 0%, transparent 45%),
+    radial-gradient(circle at 85% 80%, rgba(var(--fh-accent-rgb), 0.12) 0%, transparent 45%);
 }
 
 .login-layout__theme {

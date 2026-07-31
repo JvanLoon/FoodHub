@@ -70,7 +70,7 @@
 
 .cal-day__add:hover {
     background: var(--fh-accent);
-    color: #fff;
+    color: var(--fh-on-brand);
     border-color: var(--fh-accent);
 }
 
