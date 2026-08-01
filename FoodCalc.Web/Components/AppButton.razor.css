@@ -7,6 +7,35 @@ button {
     transition: background-color var(--fh-transition), border-color var(--fh-transition), color var(--fh-transition);
 }
 
+/* Solid accent at rest, so an available action looks available rather than looking like a
+   disabled one. Distinct from the primary green beside it by hue rather than weight, so
+   neither out-shouts the other.
+   White text is a deliberate choice, not an oversight: it measures 2.95:1 on --fh-accent,
+   under the 4.5:1 WCAG AA minimum for normal text. Darkening the fill to --fh-accent-strong
+   would take white to 5.8:1 if that trade is ever wanted. */
+.fh-btn-accent {
+    --bs-btn-bg: var(--fh-accent);
+    --bs-btn-border-color: var(--fh-accent);
+    --bs-btn-color: var(--fh-on-brand);
+    --bs-btn-hover-bg: var(--fh-accent-hover);
+    --bs-btn-hover-border-color: var(--fh-accent-hover);
+    --bs-btn-hover-color: var(--fh-on-brand);
+    --bs-btn-active-bg: var(--fh-accent-hover);
+    --bs-btn-active-border-color: var(--fh-accent-hover);
+    --bs-btn-active-color: var(--fh-on-brand);
+    /* Disabled is this button's DEFAULT state — it waits for a recipe to be selected — so
+       it has to stay findable rather than disappear, otherwise nobody discovers the
+       feature. It drops to the tinted fill and muted ink: clearly the same button, clearly
+       not ready. Against the solid fill above, the difference is unmistakable.
+       Bootstrap's 0.65 disabled opacity is overridden to 1 on purpose — stacked on an
+       already-muted colour it was what made this button vanish into the page. */
+    --bs-btn-disabled-bg: var(--fh-accent-subtle);
+    --bs-btn-disabled-border-color: var(--fh-border-strong);
+    --bs-btn-disabled-color: var(--fh-text-muted);
+    --bs-btn-disabled-opacity: 1;
+    --bs-btn-focus-shadow-rgb: var(--fh-accent-rgb);
+}
+
 .fh-btn-ghost {
     --bs-btn-bg: transparent;
     --bs-btn-border-color: transparent;

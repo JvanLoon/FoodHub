@@ -29,6 +29,12 @@
     --fh-accent-subtle: #fdf0e6;
     --fh-accent-rgb: 232, 118, 45;
 
+    /* Accent dark enough to be readable AS TEXT on --fh-accent-subtle. --fh-accent itself
+       manages only 2.66:1 there, below the 4.5:1 minimum; this is 5.2:1. Use --fh-accent
+       for fills and glyphs, --fh-accent-strong wherever accent-coloured words sit on a
+       tinted background. */
+    --fh-accent-strong: #a34e14;
+
     /* Ink on a saturated brand fill — primary buttons, the active view toggle, the
        sidebar's own text at full strength. Constant: those fills stay dark in both
        themes, so their text stays light. */
@@ -161,6 +167,8 @@
     --fh-accent: #f0883e;
     --fh-accent-hover: #f49a5b;
     --fh-accent-subtle: #3a2a1c;
+    /* On the dark tint --fh-accent already clears AA at 5.4:1, so no darker variant. */
+    --fh-accent-strong: var(--fh-accent);
 
     --fh-success: #5fb26f;
     --fh-danger: #e06c6c;
