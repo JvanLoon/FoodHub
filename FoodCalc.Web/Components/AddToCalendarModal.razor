@@ -1,0 +1,289 @@
+@* Pick the days to eat an already-chosen recipe.
+
+   Reuses CalDay rather than the calendar page: that page is a 500-line screen carrying a
+   randomize flow, a per-day recipe picker and remove buttons, none of which mean anything
+   once the recipe is decided — and it owns Modals of its own, which cannot nest here.
+   What is shared is the day cell and the week/month shape around it.
+
+   Host this once per page and drive it with ShowAsync; it keeps no state between openings. *@
+
+@using FoodCalc.Web.Services
+@inject MealPlanService MealPlanService
+@inject MessageService MessageService
+
+<Modal @bind-Visible="_visible" Title="@UiText.Calendar.AddToCalendarTitle(RecipeName)" OnClosed="Reset">
+	<ChildContent>
+		<div class="atc">
+			<p class="fh-muted atc__hint">@UiText.Calendar.PickDaysHint</p>
+
+			<div class="cal-toggle" role="tablist" aria-label="@UiText.Calendar.ViewAriaLabel">
+				<button type="button" class="cal-toggle__btn @(_viewMode == View.Week ? "cal-toggle__btn--active" : "")"
+				        role="tab" aria-selected="@(_viewMode == View.Week)" @onclick="() => _viewMode = View.Week">
+					<i class="bi bi-calendar-week" aria-hidden="true"></i> @UiText.Calendar.Week
+				</button>
+				<button type="button" class="cal-toggle__btn @(_viewMode == View.Month ? "cal-toggle__btn--active" : "")"
+				        role="tab" aria-selected="@(_viewMode == View.Month)" @onclick="() => _viewMode = View.Month">
+					<i class="bi bi-calendar-month" aria-hidden="true"></i> @UiText.Calendar.Month
+				</button>
+			</div>
+
+			<div class="atc__nav">
+				@if (_viewMode == View.Week)
+				{
+					<IconButton Icon="chevron-left" Title="@UiText.Calendar.PreviousWeek" OnClick="PrevWeek"/>
+					<span class="atc__label">@UiText.Calendar.WeekLabel(WeekStart)</span>
+					<IconButton Icon="chevron-right" Title="@UiText.Calendar.NextWeek" OnClick="NextWeek"/>
+				}
+				else
+				{
+					<IconButton Icon="chevron-left" Title="@UiText.Calendar.PreviousMonth" OnClick="PrevMonth"/>
+					<span class="atc__label">@UiText.Calendar.MonthLabel(_monthAnchor)</span>
+					<IconButton Icon="chevron-right" Title="@UiText.Calendar.NextMonth" OnClick="NextMonth"/>
+				}
+			</div>
+
+			@if (_loading)
+			{
+				<LoadingSpinner Label="@UiText.Calendar.Loading"/>
+			}
+			else if (_viewMode == View.Week)
+			{
+				<div class="cal-week">
+					@foreach (var day in WeekDays)
+					{
+						<CalDay Day="day" Compact="false" ReadOnly="true"
+						        Selected="_selected.Contains(day)"
+						        Disabled="AlreadyPlanned(day)"
+						        Entries="EntriesFor(day)"
+						        OnSelect="() => Toggle(day)"/>
+					}
+				</div>
+			}
+			else
+			{
+				<div class="cal-month">
+					@foreach (var dow in UiText.Calendar.DayHeaders)
+					{
+						<div class="cal-month__dow">@dow</div>
+					}
+					@foreach (var day in MonthGridDays)
+					{
+						<CalDay Day="day" Compact="true" ReadOnly="true"
+						        Selected="_selected.Contains(day)"
+						        Disabled="AlreadyPlanned(day)"
+						        IsOtherMonth="day.Month != _monthAnchor.Month"
+						        Entries="EntriesFor(day)"
+						        OnSelect="() => Toggle(day)"/>
+					}
+				</div>
+			}
+		</div>
+	</ChildContent>
+
+	<Footer>
+		<span class="fh-muted atc__count">
+			@(_selected.Count == 0 ? UiText.Calendar.NothingSelected() : UiText.Calendar.DaysSelected(_selected.Count))
+		</span>
+		<AppButton Variant="ButtonVariant.OutlineSecondary" OnClick="CloseAsync">@UiText.Common.Close</AppButton>
+		<AppButton Variant="ButtonVariant.Primary" Icon="check-lg"
+		           Disabled="@(_selected.Count == 0)" Loading="_saving"
+		           OnClick="SaveAsync">
+			@UiText.Calendar.SaveDays(_selected.Count)
+		</AppButton>
+	</Footer>
+</Modal>
+
+@code {
+
+	[Parameter]
+	public EventCallback OnSaved { get; set; }
+
+	private enum View
+	{
+		Week,
+		Month
+	}
+
+	private bool _visible;
+	private bool _loading;
+	private bool _saving;
+
+	private Guid _recipeId;
+	private View _viewMode = View.Week;
+
+	private DateOnly _weekAnchor = Today;
+	private DateOnly _monthAnchor = new(DateTime.Today.Year, DateTime.Today.Month, 1);
+
+	// Survives view switches and navigation on purpose: picking Monday in week view and
+	// then a date three months out should keep both.
+	private readonly HashSet<DateOnly> _selected = new();
+
+	private Dictionary<DateOnly, List<MealPlanEntryDto>> _entriesByDay = new();
+
+	private string RecipeName { get; set; } = string.Empty;
+
+	private static DateOnly Today => DateOnly.FromDateTime(DateTime.Today);
+
+	/// <summary>Opens the picker for one recipe, starting from today.</summary>
+	public async Task ShowAsync(Guid recipeId, string recipeName)
+	{
+		_recipeId = recipeId;
+		RecipeName = recipeName;
+		_selected.Clear();
+		_viewMode = View.Week;
+		_weekAnchor = Today;
+		_monthAnchor = new DateOnly(DateTime.Today.Year, DateTime.Today.Month, 1);
+		_visible = true;
+		_loading = true;
+		StateHasChanged();
+
+		await ReloadAsync();
+		_loading = false;
+
+		// Called from the parent's event handler, so Blazor's automatic re-render lands on
+		// the caller, not here — without this the picker sits on its spinner forever.
+		StateHasChanged();
+	}
+
+	private async Task CloseAsync()
+	{
+		_visible = false;
+		Reset();
+		await Task.CompletedTask;
+	}
+
+	private void Reset()
+	{
+		_selected.Clear();
+		_entriesByDay = new Dictionary<DateOnly, List<MealPlanEntryDto>>();
+	}
+
+	// ---------- Ranges ----------
+
+	private static DateOnly StartOfWeek(DateOnly d)
+	{
+		// Monday-based, matching the calendar page and UiText.Calendar.DayHeaders.
+		var diff = ((int) d.DayOfWeek + 6) % 7;
+		return d.AddDays(-diff);
+	}
+
+	private DateOnly WeekStart => StartOfWeek(_weekAnchor);
+
+	private IEnumerable<DateOnly> WeekDays => Enumerable.Range(0, 7)
+		.Select(i => WeekStart.AddDays(i));
+
+	private DateOnly MonthGridStart => StartOfWeek(_monthAnchor);
+
+	private DateOnly MonthGridEnd => StartOfWeek(_monthAnchor.AddMonths(1)
+			.AddDays(-1))
+		.AddDays(6);
+
+	private IEnumerable<DateOnly> MonthGridDays
+	{
+		get
+		{
+			var days = new List<DateOnly>();
+			for (var d = MonthGridStart; d <= MonthGridEnd; d = d.AddDays(1))
+				days.Add(d);
+			return days;
+		}
+	}
+
+	private List<MealPlanEntryDto> EntriesFor(DateOnly day) =>
+		_entriesByDay.TryGetValue(day, out var list) ? list : [];
+
+	private bool AlreadyPlanned(DateOnly day) => EntriesFor(day)
+		.Any(e => e.RecipeId == _recipeId);
+
+	/// <summary>
+	/// Fetches whichever span the visible view covers. Both are requested so switching
+	/// between week and month does not blank the grid while a second call runs.
+	/// </summary>
+	private async Task ReloadAsync()
+	{
+		var from = WeekStart < MonthGridStart ? WeekStart : MonthGridStart;
+		var weekEnd = WeekStart.AddDays(6);
+		var to = weekEnd > MonthGridEnd ? weekEnd : MonthGridEnd;
+
+		var entries = await MealPlanService.GetRangeAsync(from, to)
+			.OrDefault([]);
+
+		_entriesByDay = entries.GroupBy(e => e.Date)
+			.ToDictionary(g => g.Key, g => g.ToList());
+	}
+
+	// ---------- Navigation ----------
+
+	private async Task PrevWeek()
+	{
+		_weekAnchor = _weekAnchor.AddDays(-7);
+		await ReloadAsync();
+	}
+
+	private async Task NextWeek()
+	{
+		_weekAnchor = _weekAnchor.AddDays(7);
+		await ReloadAsync();
+	}
+
+	private async Task PrevMonth()
+	{
+		_monthAnchor = _monthAnchor.AddMonths(-1);
+		await ReloadAsync();
+	}
+
+	private async Task NextMonth()
+	{
+		_monthAnchor = _monthAnchor.AddMonths(1);
+		await ReloadAsync();
+	}
+
+	private void Toggle(DateOnly day)
+	{
+		if (!_selected.Add(day))
+			_selected.Remove(day);
+	}
+
+	// ---------- Save ----------
+
+	/// <summary>
+	/// One POST per day — MealPlanService.AddAsync takes a single date and there is no bulk
+	/// endpoint — so the batch can succeed partly. The outcome is counted and reported once
+	/// rather than as a row of identical toasts.
+	/// </summary>
+	private async Task SaveAsync()
+	{
+		if (_selected.Count == 0 || _saving)
+			return;
+
+		_saving = true;
+		StateHasChanged();
+
+		var added = 0;
+		var failed = 0;
+
+		foreach (var day in _selected.OrderBy(d => d))
+		{
+			var result = await MealPlanService.AddAsync(day, _recipeId);
+			if (result.Success)
+				added++;
+			else
+				failed++;
+		}
+
+		_saving = false;
+
+		if (added > 0)
+		{
+			MessageService.ShowMessage(WebConstants.Messages.Calendar.AddedToDays(added, failed), isError: false);
+			_visible = false;
+			Reset();
+			await OnSaved.InvokeAsync();
+		}
+		else
+		{
+			MessageService.ShowMessage(WebConstants.Messages.Calendar.AddFailed, isError: true);
+		}
+	}
+
+}

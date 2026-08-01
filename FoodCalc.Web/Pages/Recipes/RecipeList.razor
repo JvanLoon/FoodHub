@@ -57,6 +57,7 @@
 					            OnOpen="() => OpenRecipe(recipe.Id)"
 					            Selected="@SelectedRecipeIds.Contains(recipe.Id)"
 					            OnToggle="() => ToggleRecipeSelection(recipe.Id, !SelectedRecipeIds.Contains(recipe.Id))"
+					            OnAddToCalendar="() => OpenCalendarAsync(recipe)"
 					            OnEdit="() => EditRecipe(recipe.Id)"
 					            OnDelete="() => DeleteRecipe(recipe.Id)">
 						@* Only ever reached for your own recipes — the API does not return
@@ -108,7 +109,11 @@
 
 <ConfirmDialog @ref="confirmDialog"/>
 
+@* One instance for the whole grid — it is told which recipe to plan when it is opened. *@
+<AddToCalendarModal @ref="calendarModal"/>
+
 @code {
+	private AddToCalendarModal? calendarModal;
 	private PagedResultDto<RecipeDto>? pagedResult;
 	private int currentPage = 1;
 	private int pageSize = 10;
@@ -219,6 +224,9 @@
 	}
 
 	private void AddRecipe() => NavigationManager.NavigateTo("/recipes/create");
+
+	private Task OpenCalendarAsync(RecipeDto recipe) =>
+		calendarModal?.ShowAsync(recipe.Id, recipe.Name ?? string.Empty) ?? Task.CompletedTask;
 
 	private void EditRecipe(Guid recipeId)
 	{

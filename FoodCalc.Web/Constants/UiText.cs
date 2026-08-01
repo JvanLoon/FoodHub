@@ -308,7 +308,7 @@ public static class UiText
         public const string Month = "Maand";
         public const string Randomize = "Willekeurig vullen";
         public const string Randomizing = "Bezig met vullen...";
-        public const string ClearSelection = "Selectie wissen";
+        public const string ClearSelection = "Wis selectie";
         public const string Loading = "Kalender laden...";
 
         public const string PreviousWeek = "Vorige week";
@@ -329,6 +329,23 @@ public static class UiText
         public const string AddRecipe = "Recept toevoegen";
         public const string OpenRecipe = "Recept openen";
         public const string RemoveRecipe = "Verwijderen";
+
+        // ---- Add-to-calendar picker (from a recipe card or the recipe page) ----
+
+        public const string AddToCalendar = "Toevoegen aan kalender";
+        public const string AlreadyPlanned = "Dit recept staat al op deze dag";
+
+        public const string PickDaysHint =
+            "Kies de dagen waarop je dit wilt eten. Dagen waarop het al staat, kun je niet kiezen.";
+
+        public static string AddToCalendarTitle(string recipeName) => $"Toevoegen aan kalender — {recipeName}";
+
+        public static string SaveDays(int count) => count == 0 ? "Opslaan" : $"Opslaan ({count})";
+
+        public static string DaysSelected(int count) =>
+            count == 1 ? "1 dag geselecteerd" : $"{count} dagen geselecteerd";
+
+        public static string NothingSelected() => "Nog geen dagen geselecteerd";
 
         public const string RandomizeTitle = "Geselecteerde dagen willekeurig vullen";
 

@@ -7,6 +7,13 @@
 
 <div class="fh-stack">
 	<PageHeader Title="@(recipe?.Name ?? UiText.RecipeDetail.Fallback)" Subtitle="@UiText.RecipeDetail.Subtitle">
+		@* Only once the recipe has loaded — the picker needs its id and name. *@
+		@if (recipe is not null)
+		{
+			<AppButton Variant="ButtonVariant.Accent" Icon="calendar-plus" OnClick="OpenCalendarAsync">
+				@UiText.Calendar.AddToCalendar
+			</AppButton>
+		}
 		<AppButton Variant="ButtonVariant.OutlineSecondary" Icon="arrow-left" OnClick="GoBack">@UiText.Common.Back</AppButton>
 	</PageHeader>
 
@@ -45,6 +52,8 @@
 	}
 </div>
 
+<AddToCalendarModal @ref="calendarModal"/>
+
 @code {
 
 	[Parameter]
@@ -52,6 +61,12 @@
 
 	private RecipeDto? recipe;
 	private bool loading = true;
+	private AddToCalendarModal? calendarModal;
+
+	private Task OpenCalendarAsync() =>
+		recipe is null || calendarModal is null
+			? Task.CompletedTask
+			: calendarModal.ShowAsync(recipe.Id, recipe.Name ?? string.Empty);
 
 	protected override async Task OnInitializedAsync()
 	{

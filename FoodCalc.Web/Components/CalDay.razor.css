@@ -29,6 +29,33 @@
     opacity: 0.5;
 }
 
+/* Already holds the recipe being added: still readable as context, but not a target. */
+.cal-day--disabled {
+    cursor: default;
+    background: var(--fh-surface-sunken);
+    border-style: dashed;
+}
+
+.cal-day--disabled:hover {
+    border-color: var(--fh-border);
+}
+
+.cal-day__planned {
+    color: var(--fh-success);
+    font-size: 0.9rem;
+    line-height: 1;
+}
+
+/* Read-only meal name: no button affordance, no hover. */
+.cal-meal__name--static {
+    cursor: default;
+}
+
+.cal-meal__name--static:hover {
+    color: var(--fh-text);
+    text-decoration: none;
+}
+
 /* Week cells are tall; month cells are compact squares. */
 .cal-day {
     min-height: 5.5rem;

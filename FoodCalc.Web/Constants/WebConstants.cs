@@ -160,6 +160,19 @@ public static class WebConstants
                 var days = dayCount == 1 ? "1 dag" : $"{dayCount} dagen";
                 return $"{recipes} toegevoegd over {days}.";
             }
+
+            /// <summary>
+            /// One message for a batch of single-day adds. There is no bulk endpoint, so a
+            /// save is N calls and can succeed only partly — saying so is more useful than a
+            /// row of identical toasts or a success that quietly lost two days.
+            /// </summary>
+            public static string AddedToDays(int added, int failed)
+            {
+                var days = added == 1 ? "1 dag" : $"{added} dagen";
+                return failed == 0
+                    ? $"Toegevoegd aan {days}."
+                    : $"Toegevoegd aan {days}. {failed} mislukt.";
+            }
         }
     }
 

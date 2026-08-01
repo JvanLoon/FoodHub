@@ -69,12 +69,20 @@
 
 .fh-recipe-card > .card-footer {
     display: flex;
+    align-items: center;
     justify-content: flex-end;
     gap: var(--fh-space-2);
     background: transparent;
     border-top: 1px solid var(--fh-border);
     padding: var(--fh-space-3) var(--fh-space-4);
     cursor: default;
+}
+
+/* Holds the footer's bottom-left slot. margin-right:auto rather than space-between on the
+   footer, so the owner actions stay right-aligned whether or not this is rendered. */
+.fh-recipe-card__lead {
+    display: inline-flex;
+    margin-right: auto;
 }
 
 /* Typography comes from .fh-card-title; this only makes a button look like text.

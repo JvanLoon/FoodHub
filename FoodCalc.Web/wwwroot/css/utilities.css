@@ -176,6 +176,89 @@
     }
 }
 
+/* --- Calendar layout ----------------------------------------------------------
+   The view toggle and the week/month grids, shared by the calendar page and the
+   add-to-calendar picker. Global rather than scoped because two components render this
+   markup and Blazor's isolation would only reach whichever file the rules lived in —
+   the alternative was copying ~40 lines into the second one.
+
+   The day cell itself stays in CalDay.razor.css: that markup belongs to one component,
+   so it can stay scoped to it. Everything page-specific (.cal-panel, .cal-nav, the
+   randomize and picker styling) also stays in MealCalendar.razor.css. */
+
+.cal-toggle {
+    display: inline-flex;
+    flex: 0 0 auto;
+    border: 1px solid var(--fh-border);
+    border-radius: var(--fh-radius-md);
+    overflow: hidden;
+    background: var(--fh-surface);
+}
+
+.cal-toggle__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--fh-space-1);
+    padding: var(--fh-space-2) var(--fh-space-3);
+    border: none;
+    background: transparent;
+    color: var(--fh-text-muted);
+    cursor: pointer;
+    font: inherit;
+}
+
+.cal-toggle__btn + .cal-toggle__btn {
+    border-left: 1px solid var(--fh-border);
+}
+
+.cal-toggle__btn--active {
+    background: var(--fh-accent);
+    color: var(--fh-on-brand);
+}
+
+/* Week: a single column of tall day rows. */
+.cal-week {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--fh-space-2);
+}
+
+/* Month: 7-column grid, headers then day cells. minmax(0, 1fr) — not auto — is what lets
+   the columns actually shrink below their content width on a phone. */
+.cal-month {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: var(--fh-space-1);
+}
+
+.cal-month__dow {
+    text-align: center;
+    font-size: var(--fh-text-sm);
+    font-weight: 600;
+    color: var(--fh-text-muted);
+    padding-bottom: var(--fh-space-1);
+    overflow: hidden;
+}
+
+/* A month of 7 columns has ~45px per cell on a phone. The grid stays — dropping to a
+   list would lose the shape of the month, which is the point of the view — but the cells
+   give up their padding and the meal names give up their text (CalDay switches to dots). */
+@media (max-width: 899.98px) {
+    .cal-month {
+        gap: 3px;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .cal-month {
+        gap: 2px;
+    }
+
+    .cal-month__dow {
+        font-size: var(--fh-text-xs);
+    }
+}
+
 /* --- Zebra striping ----------------------------------------------------------
    One implementation for every alternating-row list. Put .fh-zebra on the <tbody> or
    <ul> and its even-numbered children tint themselves; there used to be three separate

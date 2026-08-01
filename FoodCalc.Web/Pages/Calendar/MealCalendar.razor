@@ -28,7 +28,7 @@
 				<AppButton Variant="ButtonVariant.Primary" Icon="shuffle"
 				           Disabled="@(_selectedDates.Count < 2)"
 				           OnClick="OpenRandomize">
-					@UiText.Calendar.Randomize @(_selectedDates.Count >= 2 ? $"({_selectedDates.Count})" : "")
+					@UiText.Calendar.Randomize
 				</AppButton>
 				@if (_selectedDates.Count > 0)
 				{

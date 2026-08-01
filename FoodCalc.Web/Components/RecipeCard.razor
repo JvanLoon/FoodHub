@@ -27,15 +27,31 @@
 		}
 		@ChildContent
 	</div>
-	@if (ShowActions)
+	@* The footer used to render only for owners, because edit and delete were all it held.
+	   Add-to-calendar is for everyone, so the footer now appears whenever either is
+	   available and each half is gated separately. *@
+	@if (ShowActions || OnAddToCalendar.HasDelegate)
 	{
 		<div class="card-footer" @onmousedown:stopPropagation>
-			<AppButton Variant="ButtonVariant.OutlineSecondary" Size="ButtonSize.Small" Icon="pencil"
-			           StopPropagation OnClick="OnEdit">@UiText.Common.Edit
-			</AppButton>
-			<AppButton Variant="ButtonVariant.OutlineDanger" Size="ButtonSize.Small" Icon="trash"
-			           StopPropagation OnClick="OnDelete">@UiText.Common.Delete
-			</AppButton>
+			@if (OnAddToCalendar.HasDelegate)
+			{
+				@* Wrapped so the scoped margin rule has an element it can reach: IconButton
+				   is a child component, and its root never carries this file's scope. *@
+				<span class="fh-recipe-card__lead">
+					<IconButton Icon="calendar-plus" Title="@UiText.Calendar.AddToCalendar"
+					            Variant="ButtonVariant.Primary" StopPropagation
+					            OnClick="OnAddToCalendar"/>
+				</span>
+			}
+			@if (ShowActions)
+			{
+				<AppButton Variant="ButtonVariant.OutlineSecondary" Size="ButtonSize.Small" Icon="pencil"
+				           StopPropagation OnClick="OnEdit">@UiText.Common.Edit
+				</AppButton>
+				<AppButton Variant="ButtonVariant.OutlineDanger" Size="ButtonSize.Small" Icon="trash"
+				           StopPropagation OnClick="OnDelete">@UiText.Common.Delete
+				</AppButton>
+			}
 		</div>
 	}
 </div>
@@ -65,6 +81,13 @@
 
 	[Parameter]
 	public EventCallback OnDelete { get; set; }
+
+	/// <summary>
+	/// Plan this recipe on the calendar. Available to every signed-in user, unlike
+	/// <see cref="OnEdit"/> and <see cref="OnDelete"/>; leave unset to omit the button.
+	/// </summary>
+	[Parameter]
+	public EventCallback OnAddToCalendar { get; set; }
 
 	[Parameter]
 	public RenderFragment? ChildContent { get; set; }

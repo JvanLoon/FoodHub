@@ -17,36 +17,9 @@
     gap: var(--fh-space-3);
 }
 
-/* View toggle (Week / Month) */
-.cal-toggle {
-    display: inline-flex;
-    flex: 0 0 auto;
-    border: 1px solid var(--fh-border);
-    border-radius: var(--fh-radius-md);
-    overflow: hidden;
-    background: var(--fh-surface);
-}
-
-.cal-toggle__btn {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--fh-space-1);
-    padding: var(--fh-space-2) var(--fh-space-3);
-    border: none;
-    background: transparent;
-    color: var(--fh-text-muted);
-    cursor: pointer;
-    font: inherit;
-}
-
-.cal-toggle__btn + .cal-toggle__btn {
-    border-left: 1px solid var(--fh-border);
-}
-
-.cal-toggle__btn--active {
-    background: var(--fh-accent);
-    color: var(--fh-on-brand);
-}
+/* .cal-toggle*, .cal-week, .cal-month and .cal-month__dow moved to css/utilities.css —
+   the add-to-calendar picker renders the same markup, and scoped CSS here could never
+   reach it. What is left in this file is genuinely page-only. */
 
 .cal-panel {
     background: var(--fh-surface);
@@ -82,30 +55,6 @@
     color: var(--fh-text);
 }
 
-/* Week: a single column of tall day rows. */
-.cal-week {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--fh-space-2);
-}
-
-/* Month: 7-column grid, headers then day cells. minmax(0, 1fr) — not auto — is what lets
-   the columns actually shrink below their content width on a phone. */
-.cal-month {
-    display: grid;
-    grid-template-columns: repeat(7, minmax(0, 1fr));
-    gap: var(--fh-space-1);
-}
-
-.cal-month__dow {
-    text-align: center;
-    font-size: var(--fh-text-sm);
-    font-weight: 600;
-    color: var(--fh-text-muted);
-    padding-bottom: var(--fh-space-1);
-    overflow: hidden;
-}
-
 /* The toggle keeps its natural width; the buttons take the rest of the row. */
 @media (max-width: 575.98px) {
     .cal-actions {
@@ -126,23 +75,11 @@
     .cal-panel {
         padding: var(--fh-space-3);
     }
-
-    .cal-month {
-        gap: 3px;
-    }
 }
 
 @media (max-width: 575.98px) {
     .cal-panel {
         padding: var(--fh-space-2);
-    }
-
-    .cal-month {
-        gap: 2px;
-    }
-
-    .cal-month__dow {
-        font-size: var(--fh-text-xs);
     }
 }
 
