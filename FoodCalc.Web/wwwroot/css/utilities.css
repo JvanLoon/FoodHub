@@ -134,23 +134,9 @@
 
     .fh-toolbar > .btn,
     .fh-toolbar > .fh-search,
-    .fh-toolbar > .fh-tooltip-host,
     .fh-cluster > .btn {
         flex: 1 1 100%;
     }
-
-    /* The wrapper is the flex item now, so the button has to fill it. */
-    .fh-tooltip-host > .btn {
-        width: 100%;
-    }
-}
-
-/* --- Tooltip host --------------------------------------------------------------
-   Wrapper whose only job is to own a title attribute for a control that cannot show
-   one itself. A disabled button receives no mouse events, so a title on the button
-   is silently ignored — putting it on a wrapper is what makes the hint appear. */
-.fh-tooltip-host {
-    display: inline-flex;
 }
 
 /* Collapse a button to its icon on a phone. The label is a bare text node inside

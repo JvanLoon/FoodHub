@@ -13,25 +13,33 @@
 
 <div class="recipes-layout">
 	<div class="recipes-header">
-		<PageHeader Title="@UiText.Recipes.Title" Subtitle="@UiText.Recipes.Subtitle">
+		@* No Subtitle: the hint below says the same thing, and says it only while it is
+		   actually true. Two near-identical sentences stacked read as a mistake. *@
+		<PageHeader Title="@UiText.Recipes.Title">
 			<SearchBox Placeholder="@UiText.Recipes.SearchPlaceholder" Value="@searchTerm" ValueChanged="OnSearchChanged"/>
 			@* Also in the sidebar, but this is where someone browsing recipes looks for it. *@
 			<AppButton Variant="ButtonVariant.Primary" Icon="plus-circle"
 			           OnClick="AddRecipe">
 				@UiText.Nav.AddRecipe
 			</AppButton>
-			@* The title lives on the wrapper, not the button: a disabled button receives no
-			   mouse events, so its own title attribute would never surface a tooltip. Set
-			   only while disabled — once recipes are selected the button explains itself. *@
-			<span class="fh-tooltip-host"
-			      title="@(SelectedRecipeIds.Any() ? null : UiText.Recipes.ShoppingListDisabledHint)">
-				<AppButton Variant="ButtonVariant.Accent" Icon="cart3"
-				           Disabled="@(!SelectedRecipeIds.Any())"
-				           OnClick="OpenAggregatedIngredientsPage">
-					@UiText.Recipes.GenerateShoppingList
-				</AppButton>
-			</span>
+			<AppButton Variant="ButtonVariant.Accent" Icon="cart3"
+			           Disabled="@(!SelectedRecipeIds.Any())"
+			           OnClick="OpenAggregatedIngredientsPage">
+				@UiText.Recipes.GenerateShoppingList
+			</AppButton>
 		</PageHeader>
+
+		@* Why the shopping-list button is inactive, stated in the page rather than in a
+		   tooltip: a title attribute never appears on touch, and this is a phone-first
+		   layout. Inside the header block so it sits directly under the toolbar rather
+		   than a full layout gap away. Disappears the moment a recipe is selected. *@
+		@if (!SelectedRecipeIds.Any())
+		{
+			<p class="recipes-hint fh-muted">
+				<i class="bi bi-info-circle" aria-hidden="true"></i>
+				<span>@UiText.Recipes.ShoppingListHint</span>
+			</p>
+		}
 	</div>
 
 	<div class="recipes-body">

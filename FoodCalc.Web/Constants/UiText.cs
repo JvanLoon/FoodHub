@@ -169,15 +169,15 @@ public static class UiText
     public static class Recipes
     {
         public const string Title = "Recepten";
-        public const string Subtitle = "Selecteer recepten om een boodschappenlijst te maken";
         public const string SearchPlaceholder = "Recepten zoeken...";
         public const string GenerateShoppingList = "Boodschappenlijst maken";
 
         /// <summary>
-        /// Why the shopping-list button is inactive. Shown only while it is disabled — once
-        /// a recipe is selected the button speaks for itself.
+        /// Why the shopping-list button is inactive. Rendered as a line under the header
+        /// while nothing is selected, and gone once something is — it replaced the page's
+        /// permanent subtitle, which said the same thing whether or not it still applied.
         /// </summary>
-        public const string ShoppingListDisabledHint =
+        public const string ShoppingListHint =
             "Selecteer een of meerdere recepten om een boodschappenlijst te maken";
         public const string Loading = "Recepten laden...";
         public const string AwaitingApproval = "Wacht op goedkeuring";

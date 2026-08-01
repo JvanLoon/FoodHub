@@ -6,6 +6,22 @@
     gap: var(--fh-space-5);
 }
 
+/* Sits under the header while nothing is selected, saying what the inactive
+   shopping-list button is waiting for. A line rather than a tooltip because a title
+   attribute never surfaces on touch. */
+.recipes-hint {
+    display: flex;
+    align-items: center;
+    gap: var(--fh-space-2);
+    margin: var(--fh-space-3) 0 0;
+    font-size: var(--fh-text-sm);
+}
+
+.recipes-hint .bi {
+    flex: 0 0 auto;
+    font-size: 1rem;
+}
+
 .recipes-body {
     flex: 1;
     overflow-y: auto;
