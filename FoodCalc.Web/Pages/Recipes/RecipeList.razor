@@ -20,11 +20,17 @@
 			           OnClick="AddRecipe">
 				@UiText.Nav.AddRecipe
 			</AppButton>
-			<AppButton Variant="ButtonVariant.Accent" Icon="cart3"
-			           Disabled="@(!SelectedRecipeIds.Any())"
-			           OnClick="OpenAggregatedIngredientsPage">
-				@UiText.Recipes.GenerateShoppingList
-			</AppButton>
+			@* The title lives on the wrapper, not the button: a disabled button receives no
+			   mouse events, so its own title attribute would never surface a tooltip. Set
+			   only while disabled — once recipes are selected the button explains itself. *@
+			<span class="fh-tooltip-host"
+			      title="@(SelectedRecipeIds.Any() ? null : UiText.Recipes.ShoppingListDisabledHint)">
+				<AppButton Variant="ButtonVariant.Accent" Icon="cart3"
+				           Disabled="@(!SelectedRecipeIds.Any())"
+				           OnClick="OpenAggregatedIngredientsPage">
+					@UiText.Recipes.GenerateShoppingList
+				</AppButton>
+			</span>
 		</PageHeader>
 	</div>
 

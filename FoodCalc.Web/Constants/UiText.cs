@@ -172,6 +172,13 @@ public static class UiText
         public const string Subtitle = "Selecteer recepten om een boodschappenlijst te maken";
         public const string SearchPlaceholder = "Recepten zoeken...";
         public const string GenerateShoppingList = "Boodschappenlijst maken";
+
+        /// <summary>
+        /// Why the shopping-list button is inactive. Shown only while it is disabled — once
+        /// a recipe is selected the button speaks for itself.
+        /// </summary>
+        public const string ShoppingListDisabledHint =
+            "Selecteer een of meerdere recepten om een boodschappenlijst te maken";
         public const string Loading = "Recepten laden...";
         public const string AwaitingApproval = "Wacht op goedkeuring";
         public const string IngredientsLabel = "Ingrediënten";
