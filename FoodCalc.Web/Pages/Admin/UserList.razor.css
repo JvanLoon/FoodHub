@@ -54,21 +54,18 @@
 
 .user-list__email {
     font-weight: var(--fh-weight-medium);
+
+    /* Break mid-word once the column gets narrow. An address has no break opportunity a
+       browser will take on its own — no spaces, and the @ and dots do not count — so
+       without this it stays one unbreakable run and pushes the row wide. */
+    overflow-wrap: anywhere;
 }
 
-/* Email addresses are long and the action buttons are not optional; below the compact
-   breakpoint the row becomes two lines rather than squeezing the address to nothing. */
+/* Only the padding tightens on a phone. The address wraps onto a second line inside its
+   own column instead of the row breaking in two, which keeps the buttons beside the user
+   they belong to. */
 @media (max-width: 575.98px) {
     .user-list li {
-        flex-wrap: wrap;
         padding: var(--fh-space-3);
-    }
-
-    .user-list__link {
-        flex: 1 1 100%;
-    }
-
-    .user-list__actions {
-        margin-left: auto;
     }
 }

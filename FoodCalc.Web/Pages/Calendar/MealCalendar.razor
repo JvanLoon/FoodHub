@@ -316,7 +316,14 @@
 	private string MonthLabel => UiText.Calendar.MonthLabel(_monthAnchor);
 	private string AddModalTitle => UiText.Calendar.AddModalTitle(_addTargetDate);
 
-	private IEnumerable<RecipeDto> FilteredRecipes = [];
+	/// <summary>
+	/// Derived rather than assigned: as a field it was only ever filled by the search handler,
+	/// so the picker opened empty and only found its recipes once you had typed something and
+	/// erased it again.
+	/// </summary>
+	private IEnumerable<RecipeDto> FilteredRecipes => string.IsNullOrWhiteSpace(_recipeSearch)
+		? _allRecipes
+		: _allRecipes.Where(r => r.Name.Contains(_recipeSearch, StringComparison.OrdinalIgnoreCase));
 
 	private List<MealPlanEntryDto> EntriesFor(DateOnly day) => _entriesByDay.TryGetValue(day, out var list) ? list : [];
 
@@ -377,13 +384,7 @@
 		_addModalVisible = true;
 	}
 
-	private void OnRecipeSearchChanged(string value)
-	{
-		_recipeSearch = value;
-
-		FilteredRecipes = string.IsNullOrWhiteSpace(_recipeSearch) ? _allRecipes : _allRecipes.Where(r => r.Name.Contains(_recipeSearch, StringComparison.OrdinalIgnoreCase));
-		StateHasChanged();
-	}
+	private void OnRecipeSearchChanged(string value) => _recipeSearch = value;
 
 	private void OpenRecipe(MealPlanEntryDto entry) => Navigation.NavigateTo($"/recipe/{entry.RecipeId}");
 

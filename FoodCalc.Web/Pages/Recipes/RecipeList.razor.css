@@ -1,9 +1,36 @@
+/* Tighter than the usual section gap: the sticky toolbar carries padding of its own, so
+   the wider spacing stacked with it left the header floating well clear of the list. */
 .recipes-layout {
     display: flex;
     flex-direction: column;
     flex: 1;
     min-height: 0;
-    gap: var(--fh-space-5);
+    gap: var(--fh-space-4);
+}
+
+/* Search and the shopping-list button stay reachable while you work down a long list, so
+   they pin to the top once the title and the add button have scrolled away.
+
+   The two offsets both cancel the shell's content padding, which .content publishes as
+   --fh-content-pad because it differs per breakpoint:
+
+   - `top` is negative so the bar sticks against the border edge rather than the padding
+     edge; at top: 0 a strip of scrolling rows would show in the gutter above it.
+   - `margin-inline` pulls it out to the same edges sideways, and the padding puts the
+     controls back in line with the rest of the page.
+
+   Without them the bar would be an opaque block with content visibly sliding past on
+   three sides of it. */
+.recipes-tools {
+    position: sticky;
+    top: calc(var(--fh-content-pad, 0px) * -1);
+    z-index: 2;
+
+    margin-inline: calc(var(--fh-content-pad, 0px) * -1);
+    padding: var(--fh-space-3) var(--fh-content-pad, 0px);
+
+    /* Opaque, or the cards scroll through it. */
+    background: var(--fh-bg);
 }
 
 /* Sits under the header while nothing is selected, saying what the inactive
@@ -13,7 +40,8 @@
     display: flex;
     align-items: center;
     gap: var(--fh-space-2);
-    margin: var(--fh-space-3) 0 0;
+    /* The layout gap already separates it from the toolbar above. */
+    margin: 0;
     font-size: var(--fh-text-sm);
 }
 

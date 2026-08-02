@@ -1,11 +1,20 @@
 /* Shell. Mobile-first: the sidebar is an off-canvas drawer and only becomes a static
    column at the 900px shell breakpoint (see the breakpoint note in css/utilities.css). */
 
+/* A real height, not a minimum. The rest of the shell is built around .content being the
+   one thing that scrolls — main is overflow:hidden and both it and .content carry
+   min-height: 0 — and none of that engages unless something up here is actually bounded.
+   With min-height the shell simply grew past the viewport instead, the document took over
+   the scrolling, and .content became a scroll container that never scrolls. Anything
+   position:sticky inside a page then had .content for a scrollport and so never stuck.
+
+   The consequence is deliberate: the top bar stays put on a phone as well, where it used
+   to scroll away. dvh so the browser's own collapsing chrome is accounted for. */
 .page {
     position: relative;
     display: flex;
     flex-direction: column;
-    min-height: 100dvh;
+    height: 100dvh;
     background: var(--fh-bg);
 }
 
@@ -107,7 +116,12 @@ main {
     flex-direction: column;
     overflow-y: auto;
     min-height: 0;
-    padding: var(--fh-space-4);
+
+    /* Published rather than inlined because it changes at two breakpoints and a page that
+       wants a sticky bar has to cancel it out exactly — see .recipes-tools. Custom
+       properties inherit, so a scoped stylesheet can read it without knowing the shell. */
+    --fh-content-pad: var(--fh-space-4);
+    padding: var(--fh-content-pad);
     /* Clears the fixed bottom bar, which would otherwise sit on top of the last row of
        content with no way to scroll past it. Removed again at the shell breakpoint,
        where the bar is display:none. */
@@ -178,7 +192,8 @@ main {
     }
 
     .content {
-        padding: var(--fh-space-3);
+        --fh-content-pad: var(--fh-space-3);
+        padding: var(--fh-content-pad);
         padding-bottom: calc(var(--fh-bottom-nav-h) + env(safe-area-inset-bottom) + var(--fh-space-3));
     }
 
@@ -201,9 +216,9 @@ main {
 /* --- Shell breakpoint: drawer becomes a static column ----------------------- */
 
 @media (min-width: 900px) {
+    /* Height is set on the base rule now — only the direction changes here. */
     .page {
         flex-direction: row;
-        height: 100dvh;
     }
 
     .sidebar {
@@ -229,7 +244,8 @@ main {
     /* Shorthand deliberately: it resets the bottom-bar clearance set above, and at this
        width there is no bar to clear. */
     .content {
-        padding: var(--fh-space-5);
+        --fh-content-pad: var(--fh-space-5);
+        padding: var(--fh-content-pad);
     }
 
     /* The drawer affordances have no job once the column is permanent. */

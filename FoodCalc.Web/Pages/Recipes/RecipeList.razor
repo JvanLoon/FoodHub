@@ -12,35 +12,45 @@
 <PageTitle>@UiText.Recipes.Title</PageTitle>
 
 <div class="recipes-layout">
-	<div class="recipes-header">
-		@* No Subtitle: the hint below says the same thing, and says it only while it is
-		   actually true. Two near-identical sentences stacked read as a mistake. *@
-		<PageHeader Title="@UiText.Recipes.Title">
-			<SearchBox Placeholder="@UiText.Recipes.SearchPlaceholder" Value="@searchTerm" ValueChanged="OnSearchChanged"/>
-			@* Also in the sidebar, but this is where someone browsing recipes looks for it. *@
-			<AppButton Variant="ButtonVariant.Primary" Icon="plus-circle"
-			           OnClick="AddRecipe">
-				@UiText.Nav.AddRecipe
-			</AppButton>
-			<AppButton Variant="ButtonVariant.Accent" Icon="cart3"
-			           Disabled="@(!SelectedRecipeIds.Any())"
-			           OnClick="OpenAggregatedIngredientsPage">
-				@UiText.Recipes.GenerateShoppingList
-			</AppButton>
-		</PageHeader>
+	@* Flat on purpose: .recipes-tools below is sticky, and a sticky element can only travel
+	   as far as its own parent. Wrapped in a header block it would come unpinned the moment
+	   that block scrolled out, which is exactly when it is wanted.
 
-		@* Why the shopping-list button is inactive, stated in the page rather than in a
-		   tooltip: a title attribute never appears on touch, and this is a phone-first
-		   layout. Inside the header block so it sits directly under the toolbar rather
-		   than a full layout gap away. Disappears the moment a recipe is selected. *@
-		@if (!SelectedRecipeIds.Any())
-		{
-			<p class="recipes-hint fh-muted">
-				<i class="bi bi-info-circle" aria-hidden="true"></i>
-				<span>@UiText.Recipes.ShoppingListHint</span>
-			</p>
-		}
+	   No Subtitle: the hint below says the same thing, and says it only while it is actually
+	   true. Two near-identical sentences stacked read as a mistake. *@
+	<PageHeader Title="@UiText.Recipes.Title">
+		@* Adding a recipe is a one-off, so it scrolls away with the title. Also in the
+		   sidebar, but this is where someone browsing recipes looks for it. *@
+		<AppButton Variant="ButtonVariant.Primary" Icon="plus-circle"
+		           OnClick="AddRecipe">
+			@UiText.Nav.AddRecipe
+		</AppButton>
+	</PageHeader>
+
+	@* Searching and building a shopping list are what you keep reaching for while working
+	   down a long list, so these two stay put. fh-toolbar for the shared row behaviour,
+	   including going full-width on a phone; recipes-tools only adds the pinning. *@
+	<div class="fh-toolbar recipes-tools">
+		<SearchBox Placeholder="@UiText.Recipes.SearchPlaceholder" Value="@searchTerm" ValueChanged="OnSearchChanged"/>
+		<AppButton Variant="ButtonVariant.Accent" Icon="cart3"
+		           Disabled="@(!SelectedRecipeIds.Any())"
+		           OnClick="OpenAggregatedIngredientsPage">
+			@UiText.Recipes.GenerateShoppingList
+		</AppButton>
 	</div>
+
+	@* Why the shopping-list button is inactive, stated in the page rather than in a
+	   tooltip: a title attribute never appears on touch, and this is a phone-first
+	   layout. Outside the sticky bar: it is read once and then never again, so pinning
+	   it would cost a third of the screen for nothing. Disappears the moment a recipe
+	   is selected. *@
+	@if (!SelectedRecipeIds.Any())
+	{
+		<p class="recipes-hint fh-muted">
+			<i class="bi bi-info-circle" aria-hidden="true"></i>
+			<span>@UiText.Recipes.ShoppingListHint</span>
+		</p>
+	}
 
 	<div class="recipes-body">
 		@if (pagedResult == null)
