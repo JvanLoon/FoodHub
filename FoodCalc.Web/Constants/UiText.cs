@@ -255,12 +255,16 @@ public static class UiText
 
         public const string MyIngredients = "Mijn ingrediënten";
         public const string AddPlaceholder = "bijv. eieren, bloem, tomaat...";
-        public const string AddAriaLabel = "Een ingrediënt toevoegen";
-        public const string AddIngredient = "Ingrediënt toevoegen";
-        public const string NothingAdded = "Nog niets toegevoegd. Typ hierboven een ingrediënt en druk op Enter.";
+        public const string AddAriaLabel = "Een ingrediënt zoeken";
+
+        public const string NothingAdded =
+            "Nog niets toegevoegd. Zoek hierboven en kies een ingrediënt uit de lijst.";
+
         public const string ClearAll = "Alles wissen";
 
-        public static string AddQuoted(string value) => $"“{value}” toevoegen";
+        // Free tekst kan niet meer: er wordt op ingrediënt-id gezocht, dus een naam die niet in
+        // de catalogus staat kan per definitie nergens op matchen.
+        public const string NoIngredientFound = "Geen ingrediënt gevonden";
 
         public static string RemoveAriaLabel(string ingredient) => $"{ingredient} verwijderen";
 

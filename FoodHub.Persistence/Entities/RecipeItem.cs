@@ -1,17 +1,28 @@
 namespace FoodHub.Persistence.Entities;
 
 /// <summary>
-/// An ingredient line that belongs to a single <see cref="Recipe"/>. This is no
-/// longer a link table to <see cref="Ingredient"/>: the name (and the
-/// shopping-cart flag) are snapshotted onto the line, so a recipe exposes its
-/// ingredients directly as recipe.Ingredients[i].Name. The <see cref="Ingredient"/>
-/// entity remains as a separate catalog used for autocomplete/management.
+/// An ingredient line that belongs to a single <see cref="Recipe"/>. This is not a
+/// link table: the name (and the shopping-cart flag) are snapshotted onto the line,
+/// so a recipe exposes its ingredients directly as recipe.Ingredients[i].Name and
+/// survives the removal of a catalog entry. The <see cref="Ingredient"/> entity is
+/// the separate catalog used for autocomplete/management, and
+/// <see cref="IngredientId"/> points back at it so lines can be compared by identity.
 /// </summary>
 public class RecipeItem : BaseEntity
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public Guid RecipeId { get; set; }
     public required string Name { get; set; }
+
+    /// <summary>
+    /// The catalog entry this line was picked from. Everything that has to decide whether two
+    /// lines are "the same ingredient" — the find-by-ingredients page above all — compares this
+    /// rather than <see cref="Name"/>, because a substring match on names calls "Linguine" a
+    /// match for "ui". Nullable, and cleared instead of cascading when the catalog entry is
+    /// deleted: losing the link must never take the recipe line with it. The server fills it in
+    /// on every write (see IngredientResolver), so null means "catalog entry deleted since".
+    /// </summary>
+    public Guid? IngredientId { get; set; }
     public decimal Amount { get; set; }
     public IngredientAmountType IngredientAmount { get; set; }
     public bool ShouldBeAddedToShoppingCart { get; set; } = true;

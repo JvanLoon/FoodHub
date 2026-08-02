@@ -33,6 +33,11 @@ public static class LegacyImportConverter
                 Id = ri.Id,
                 RecipeId = ri.RecipeId,
                 Name = name,
+                // The legacy format was a real link table, so the id it carries is exactly the
+                // catalog link the current model wants back. Only forwarded when the exported
+                // catalog actually contains it: a dangling id would fail on the foreign key,
+                // and an unlinked line still restores.
+                IngredientId = catalog is not null ? ri.IngredientId : null,
                 Amount = ri.Amount,
                 IngredientAmount = ri.IngredientAmount,
                 ShouldBeAddedToShoppingCart = shouldBeAddedToShoppingCart

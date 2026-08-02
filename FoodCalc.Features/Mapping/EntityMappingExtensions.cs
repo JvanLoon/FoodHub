@@ -50,6 +50,7 @@ public static class EntityMappingExtensions
         Id = e.Id,
         RecipeId = e.RecipeId,
         Name = e.Name,
+        IngredientId = e.IngredientId,
         Amount = e.Amount,
         IngredientAmount = (IngredientAmountTypeDto) e.IngredientAmount,
         ShouldBeAddedToShoppingCart = e.ShouldBeAddedToShoppingCart
@@ -72,6 +73,7 @@ public static class EntityMappingExtensions
         Id = d.Id,
         RecipeId = d.RecipeId,
         Name = d.Name,
+        IngredientId = d.IngredientId,
         Amount = d.Amount,
         IngredientAmount = (IngredientAmountType) d.IngredientAmount,
         ShouldBeAddedToShoppingCart = d.ShouldBeAddedToShoppingCart
@@ -88,13 +90,15 @@ public static class EntityMappingExtensions
     {
         var amountType = (IngredientAmountType) d.IngredientAmount;
 
-        var changed = e.Name != d.Name || e.Amount != d.Amount || e.IngredientAmount != amountType ||
+        var changed = e.Name != d.Name || e.IngredientId != d.IngredientId || e.Amount != d.Amount ||
+                      e.IngredientAmount != amountType ||
                       e.ShouldBeAddedToShoppingCart != d.ShouldBeAddedToShoppingCart;
 
         if (!changed)
             return;
 
         e.Name = d.Name;
+        e.IngredientId = d.IngredientId;
         e.Amount = d.Amount;
         e.IngredientAmount = amountType;
         e.ShouldBeAddedToShoppingCart = d.ShouldBeAddedToShoppingCart;

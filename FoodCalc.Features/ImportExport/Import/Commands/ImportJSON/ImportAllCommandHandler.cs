@@ -22,6 +22,12 @@ public class ImportAllCommandHandler(
 
             await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
 
+            // Where an imported ingredient was dropped in favour of a same-named row that was
+            // already here, the id in the file no longer exists. The recipe lines still point at
+            // it, so they are redirected to the row that replaced it — without this a merge into
+            // a non-empty catalog fails on the foreign key.
+            var ingredientIdRemap = new Dictionary<Guid, Guid>();
+
             // Import Ingredients (catalog)
             foreach (var ingredientDto in data.Ingredients)
             {
@@ -42,7 +48,11 @@ public class ImportAllCommandHandler(
 
                 var existingByName = await context.Ingredients.SingleOrDefaultAsync(i => i.Name == ingredientDto.Name,
                     cancellationToken);
-                if (existingByName != null) { continue; }
+                if (existingByName != null)
+                {
+                    ingredientIdRemap[ingredientDto.Id] = existingByName.Id;
+                    continue;
+                }
 
                 context.Ingredients.Add(new Ingredient
                 {
@@ -84,11 +94,16 @@ public class ImportAllCommandHandler(
             // Import RecipeItems (ingredient lines snapshotted onto the recipe)
             foreach (RecipeItemDto riDto in data.RecipeItems)
             {
+                Guid? ingredientId = riDto.IngredientId is {} fileId && ingredientIdRemap.TryGetValue(fileId, out Guid mapped)
+                    ? mapped
+                    : riDto.IngredientId;
+
                 var existingRi = await context.RecipeItems.SingleOrDefaultAsync(ri => ri.Id == riDto.Id,
                     cancellationToken);
                 if (existingRi != null)
                 {
                     existingRi.Name = riDto.Name;
+                    existingRi.IngredientId = ingredientId;
                     existingRi.Amount = riDto.Amount;
                     existingRi.IngredientAmount = (IngredientAmountType) riDto.IngredientAmount;
                     existingRi.ShouldBeAddedToShoppingCart = riDto.ShouldBeAddedToShoppingCart;
@@ -100,6 +115,9 @@ public class ImportAllCommandHandler(
                     Id = riDto.Id,
                     RecipeId = riDto.RecipeId,
                     Name = riDto.Name,
+                    // Restored as exported, like every other column: the file carries the catalog
+                    // link, and the ingredients it points at were imported in the loop above.
+                    IngredientId = ingredientId,
                     Amount = riDto.Amount,
                     IngredientAmount = (IngredientAmountType) riDto.IngredientAmount,
                     ShouldBeAddedToShoppingCart = riDto.ShouldBeAddedToShoppingCart,

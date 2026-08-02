@@ -80,6 +80,15 @@ public static class ErrorMessages
     public static class Ingredient
     {
         public const string DeleteFromRecipeFailed = "Ingrediënt verwijderen uit recept mislukt";
+
+        /// <summary>
+        /// A recipe line must name the catalog entry it came from. Recipes are searched on that
+        /// link, so a line without one would silently never turn up — better to refuse the write
+        /// than to store something the search cannot see.
+        /// </summary>
+        private const string _unlinkedLineTemplate = "Ingrediënt \"{0}\" is niet gekoppeld aan een bestaand ingrediënt.";
+
+        public static string UnlinkedLine(string lineName) => string.Format(_unlinkedLineTemplate, lineName);
     }
 
     /// <summary>Moderation / approval wording.</summary>

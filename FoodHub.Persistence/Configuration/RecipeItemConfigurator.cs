@@ -37,5 +37,15 @@ public class RecipeItemConfigurator : IEntityTypeConfiguration<RecipeItem>
             })
             .IsUnique()
             .HasDatabaseName("UX_RecipeItem_RecipeId_Name");
+
+        // No navigation property: the line owns its snapshot and never needs to walk to the
+        // catalog entry. SetNull rather than Cascade — deleting an ingredient from the catalog
+        // must leave the recipes that use it intact, only unlinked.
+        builder.HasOne<Ingredient>()
+            .WithMany()
+            .HasForeignKey(ri => ri.IngredientId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        builder.HasIndex(ri => ri.IngredientId);
     }
 }

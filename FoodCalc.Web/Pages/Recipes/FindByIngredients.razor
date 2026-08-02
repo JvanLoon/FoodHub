@@ -32,44 +32,39 @@
 						       autocomplete="off"
 						       role="combobox"
 						       aria-expanded="@showSuggestions"
-						       value="@newIngredient"
+						       value="@searchValue"
 						       @oninput="OnQueryInput"
 						       @onfocus="ShowSuggestions"
 						       @onblur="OnInputBlur"
 						       @onkeydown="OnInputKeyDown"/>
-						<AppButton Variant="ButtonVariant.Primary"
-						           Icon="plus-lg"
-						           Title="@UiText.FindRecipes.AddIngredient"
-						           Disabled="@string.IsNullOrWhiteSpace(newIngredient)"
-						           OnClick="AddCurrent"/>
 					</div>
 
+					@* No "+" button and no free-text option: a term that is not a catalog entry has
+					   no id, and matching runs on ids only, so it could never match anything. *@
 					@if (showSuggestions)
 					{
-						List<string> options = FilteredSuggestions;
-						if (options.Count > 0 || !string.IsNullOrWhiteSpace(newIngredient))
+						List<IngredientDto> options = FilteredSuggestions;
+						if (options.Count > 0 || !string.IsNullOrWhiteSpace(searchValue))
 						{
 							<ul class="find-combo__menu" role="listbox">
 								@for (int i = 0; i < options.Count; i++)
 								{
 									int index = i;
-									string name = options[i];
+									IngredientDto option = options[i];
 									<li role="option"
 									    aria-selected="@(index == activeIndex)"
 									    class="find-combo__option @(index == activeIndex ? "is-active" : null)"
 									    @onmousedown:preventDefault="true"
-									    @onmousedown="() => SelectSuggestion(name)">
+									    @onmousedown="() => SelectSuggestion(option)">
 										<i class="bi bi-plus-circle" aria-hidden="true"></i>
-										<span>@name</span>
+										<span>@option.Name</span>
 									</li>
 								}
-								@if (options.Count == 0 && !string.IsNullOrWhiteSpace(newIngredient))
+								@if (options.Count == 0)
 								{
-									<li class="find-combo__option find-combo__option--new"
-									    @onmousedown:preventDefault="true"
-									    @onmousedown="AddCurrent">
-										<i class="bi bi-plus-lg" aria-hidden="true"></i>
-										<span>@UiText.FindRecipes.AddQuoted(newIngredient.Trim())</span>
+									<li class="find-combo__option find-combo__option--empty">
+										<i class="bi bi-search" aria-hidden="true"></i>
+										<span>@UiText.FindRecipes.NoIngredientFound</span>
 									</li>
 								}
 							</ul>
@@ -77,7 +72,7 @@
 					}
 				</div>
 
-				@if (prefs.Ingredients.Count == 0)
+				@if (prefs.IngredientIds.Count == 0)
 				{
 					<p class="find-hint fh-muted">
 						@UiText.FindRecipes.NothingAdded
@@ -86,14 +81,15 @@
 				else
 				{
 					<div class="find-chips">
-						@foreach (string ingredient in prefs.Ingredients)
+						@foreach (IngredientDto ingredient in SelectedIngredients)
 						{
+							Guid ingredientId = ingredient.Id;
 							<span class="find-chip">
-									<span class="find-chip__label" title="@ingredient">@ingredient</span>
+									<span class="find-chip__label" title="@ingredient.Name">@ingredient.Name</span>
 									<button type="button"
 									        class="find-chip__remove"
-									        aria-label="@UiText.FindRecipes.RemoveAriaLabel(ingredient)"
-									        @onclick="() => RemoveIngredient(ingredient)">
+									        aria-label="@UiText.FindRecipes.RemoveAriaLabel(ingredient.Name)"
+									        @onclick="() => RemoveIngredient(ingredientId)">
 										<i class="bi bi-x" aria-hidden="true"></i>
 									</button>
 								</span>
@@ -153,7 +149,7 @@
 			{
 				<LoadingSpinner Label="@UiText.FindRecipes.Loading"/>
 			}
-			else if (prefs.Ingredients.Count == 0)
+			else if (prefs.IngredientIds.Count == 0)
 			{
 				<EmptyState Icon="basket"
 				            Title="@UiText.FindRecipes.NoIngredientsTitle"
@@ -181,14 +177,14 @@
 								<Badge
 									Variant="@(match.IsFullMatch ? Badge.BadgeVariant.Success : Badge.BadgeVariant.Accent)"
 									Icon="check2-circle">
-									@match.MatchedCount / @prefs.Ingredients.Count
+									@match.MatchedCount / @prefs.IngredientIds.Count
 								</Badge>
 							</div>
 							<div class="card-body">
 								<ul class="find-ingredients">
 									@foreach (RecipeItemDto ingredient in match.Recipe.Ingredients)
 									{
-										bool hit = prefs.Highlight && match.MatchedNames.Contains(ingredient.Name);
+										bool hit = prefs.Highlight && match.MatchedItemIds.Contains(ingredient.Id);
 										<li class="@(hit ? "find-ingredients__hit" : null)">
 											@if (hit) { <i class="bi bi-check-lg" aria-hidden="true"></i> }
 											<span>@ingredient.Name</span>
@@ -229,9 +225,14 @@
 
 @code {
 	private List<RecipeDto>? allRecipes;
-	private List<string> knownIngredientNames = [];
+
+	// The whole catalog, not just its names: a selection is a catalog id, and only the id is
+	// ever compared against a recipe line. Names are for display.
+	private List<IngredientDto> catalog = [];
+	private Dictionary<Guid, IngredientDto> catalogById = [];
+
 	private List<RecipeMatch> results = [];
-	private string newIngredient = string.Empty;
+	private string searchValue = string.Empty;
 	private bool showSuggestions;
 	private int activeIndex = -1;
 
@@ -244,33 +245,111 @@
 		allRecipes = await recipeService.GetAllRecipesAsync(withIngredients: true)
 			.OrDefault(new List<RecipeDto>());
 
-		// Known ingredient names power the type-ahead suggestions; failure here is non-fatal.
+		// The catalog powers both the type-ahead and the chips; failure here is non-fatal.
 		var ingredients = await ingredientService.GetAllIngredientsAsync();
 		if (ingredients.Success && ingredients.Data is not null)
-			knownIngredientNames =
-			[
-				..ingredients.Data.Select(i => i.Name)
-					.Where(n => !string.IsNullOrWhiteSpace(n))
-					.Distinct()
-			];
+		{
+			catalog = [..ingredients.Data.Where(i => !string.IsNullOrWhiteSpace(i.Name))];
+			catalogById = catalog.ToDictionary(i => i.Id);
+		}
+
+		await ReconcileSelectionWithCatalogAsync();
 
 		Recompute();
 	}
 
 	/// <summary>
-	/// Known ingredient names for the type-ahead: excludes anything already added and filters by
-	/// the current query (case-insensitive substring). All matches are returned — the menu scrolls.
+	/// Brings the stored selection in line with the catalog we just loaded. Two things can be
+	/// stale: a list saved before this page matched on ids (names, resolved here once and
+	/// rewritten as ids), and ids whose catalog entry has since been deleted (dropped, because
+	/// nothing can be shown or matched for them). Only writes when something actually changed.
 	/// </summary>
-	private List<string> FilteredSuggestions
+	private async Task ReconcileSelectionWithCatalogAsync()
+	{
+		if (catalog.Count == 0)
+			return;
+
+		bool changed = false;
+
+		if (prefs.IngredientIds.Count == 0 && prefs.Ingredients is {Count: > 0})
+		{
+			prefs.IngredientIds =
+			[
+				..prefs.Ingredients.Select(FindByName)
+					.Where(i => i is not null)
+					.Select(i => i!.Id)
+					.Distinct()
+			];
+			changed = true;
+		}
+
+		// Cleared unconditionally: leaving the old names behind would resurrect them the next
+		// time the id list happens to be empty.
+		if (prefs.Ingredients is not null)
+		{
+			prefs.Ingredients = null;
+			changed = true;
+		}
+
+		if (prefs.IngredientIds.RemoveAll(id => !catalogById.ContainsKey(id)) > 0)
+			changed = true;
+
+		if (changed)
+			await LocalStorage.SetItemAsync(WebConstants.Storage.PantryPreferences, prefs);
+	}
+
+	private IngredientDto? FindByName(string name) =>
+		catalog.FirstOrDefault(i => string.Equals(i.Name.Trim(), name.Trim(), StringComparison.OrdinalIgnoreCase));
+
+	/// <summary>The selected catalog entries, in the order they were added.</summary>
+	private IEnumerable<IngredientDto> SelectedIngredients =>
+		prefs.IngredientIds.Where(catalogById.ContainsKey).Select(id => catalogById[id]);
+
+	/// <summary>
+	/// Type-ahead suggestions: still a case-insensitive substring search, so "ui" keeps turning up
+	/// Bouillon and Groentebouillon, but ranked so the ingredient you actually typed comes first.
+	/// Plain alphabetical order buried "Ui" below every word that merely contains those letters.
+	/// All matches are returned — the menu scrolls.
+	/// </summary>
+	private List<IngredientDto> FilteredSuggestions
 	{
 		get
 		{
-			string query = newIngredient.Trim();
-			return knownIngredientNames.Where(n => !prefs.Ingredients.Contains(n, StringComparer.OrdinalIgnoreCase))
-				.Where(n => query.Length == 0 || n.Contains(query, StringComparison.OrdinalIgnoreCase))
-				.OrderBy(n => n)
+			string query = searchValue.Trim();
+
+			IEnumerable<IngredientDto> candidates = catalog.Where(i => !prefs.IngredientIds.Contains(i.Id));
+
+			if (query.Length == 0)
+				return candidates.OrderBy(i => i.Name, StringComparer.OrdinalIgnoreCase)
+					.ToList();
+
+			return candidates.Where(i => i.Name.Contains(query, StringComparison.OrdinalIgnoreCase))
+				.OrderBy(i => Rank(i.Name, query))
+				.ThenBy(i => i.Name.Length)
+				.ThenBy(i => i.Name, StringComparer.OrdinalIgnoreCase)
 				.ToList();
 		}
+	}
+
+	/// <summary>
+	/// How well a name answers the query: exact, then starts-with, then a word inside the name
+	/// starting with it ("Rode ui"), then a match anywhere ("Bouillon"). Lower sorts first.
+	/// </summary>
+	private static int Rank(string name, string query)
+	{
+		if (name.Trim().Equals(query, StringComparison.OrdinalIgnoreCase))
+			return 0;
+
+		if (name.StartsWith(query, StringComparison.OrdinalIgnoreCase))
+			return 1;
+
+		foreach (string word in name.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+		{
+			if (word.StartsWith(query, StringComparison.OrdinalIgnoreCase))
+				return 2;
+		}
+
+		return 3;
 	}
 
 	private string NoResultsMessage => prefs.Mode == MatchMode.All ? UiText.FindRecipes.NoMatchesAll : UiText.FindRecipes.NoMatchesAny;
@@ -279,7 +358,7 @@
 
 	private void OnQueryInput(ChangeEventArgs e)
 	{
-		newIngredient = e.Value?.ToString() ?? string.Empty;
+		searchValue = e.Value?.ToString() ?? string.Empty;
 		showSuggestions = true;
 		activeIndex = -1;
 	}
@@ -294,7 +373,7 @@
 
 	private async Task OnInputKeyDown(KeyboardEventArgs e)
 	{
-		List<string> options = FilteredSuggestions;
+		List<IngredientDto> options = FilteredSuggestions;
 
 		switch (e.Key)
 		{
@@ -308,10 +387,13 @@
 					activeIndex = activeIndex <= 0 ? options.Count - 1 : activeIndex - 1;
 			break;
 			case "Enter":
+				// No fallback to the typed text: only a catalog entry carries an id, and without
+				// one there is nothing to match on. Enter on nothing selected takes the best
+				// suggestion, which after ranking is the exact name whenever there is one.
 				if (activeIndex >= 0 && activeIndex < options.Count)
 					await SelectSuggestion(options[activeIndex]);
-				else
-					await AddCurrent();
+				else if (options.Count > 0 && searchValue.Trim().Length > 0)
+					await SelectSuggestion(options[0]);
 			break;
 			case "Escape":
 				showSuggestions = false;
@@ -320,20 +402,12 @@
 		}
 	}
 
-	private Task SelectSuggestion(string name) => AddValue(name);
-
-	private Task AddCurrent() => AddValue(newIngredient);
-
-	private async Task AddValue(string value)
+	private async Task SelectSuggestion(IngredientDto ingredient)
 	{
-		string trimmed = value.Trim();
-		if (trimmed.Length == 0)
-			return;
+		if (!prefs.IngredientIds.Contains(ingredient.Id))
+			prefs.IngredientIds.Add(ingredient.Id);
 
-		if (!prefs.Ingredients.Contains(trimmed, StringComparer.OrdinalIgnoreCase))
-			prefs.Ingredients.Add(trimmed);
-
-		newIngredient = string.Empty;
+		searchValue = string.Empty;
 		activeIndex = -1;
 		// Keep the menu open so several ingredients can be added in a row — the input keeps focus
 		// because option mousedown suppresses blur.
@@ -341,15 +415,15 @@
 		await PersistAndRecompute();
 	}
 
-	private async Task RemoveIngredient(string ingredient)
+	private async Task RemoveIngredient(Guid ingredientId)
 	{
-		prefs.Ingredients.RemoveAll(i => string.Equals(i, ingredient, StringComparison.OrdinalIgnoreCase));
+		prefs.IngredientIds.Remove(ingredientId);
 		await PersistAndRecompute();
 	}
 
 	private async Task ClearIngredients()
 	{
-		prefs.Ingredients.Clear();
+		prefs.IngredientIds.Clear();
 		await PersistAndRecompute();
 	}
 
@@ -372,49 +446,44 @@
 	}
 
 	/// <summary>
-	/// Matches every recipe against the current ingredient list, then filters and sorts
-	/// according to the chosen options. A recipe ingredient counts as a match when its
-	/// name contains one of my terms (case-insensitive), so "egg" matches "Eggs".
+	/// Matches every recipe against the current selection, then filters and sorts according to the
+	/// chosen options. A recipe line counts as a match only when it points at the same catalog
+	/// entry — never when its name merely looks alike. Names were compared with Contains before,
+	/// which handed "Linguine" a green tick for "ui"; even exact name equality would still break
+	/// on a rename, so the id is the only thing read here.
 	/// </summary>
 	private void Recompute()
 	{
 		if (allRecipes is null)
 			return;
 
-		string[] terms =
-		[
-			..prefs.Ingredients.Select(i => i.Trim())
-				.Where(t => t.Length > 0)
-		];
+		var selected = prefs.IngredientIds.ToHashSet();
 		var matches = new List<RecipeMatch>();
 
 		foreach (RecipeDto recipe in allRecipes)
 		{
 			List<RecipeItemDto> recipeIngredients = recipe.Ingredients ?? [];
-			var matchedNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-			int matchedTerms = 0;
 
-			foreach (string term in terms)
+			// Two sets: the lines to tick in the card, and the catalog entries they cover. They
+			// differ when one recipe lists the same ingredient on more than one line — the badge
+			// counts what I brought, not how often the recipe mentions it.
+			var matchedItemIds = new HashSet<Guid>();
+			var matchedIngredientIds = new HashSet<Guid>();
+
+			foreach (RecipeItemDto ri in recipeIngredients)
 			{
-				bool termHit = false;
-				foreach (RecipeItemDto ri in recipeIngredients)
+				if (ri.IngredientId is {} ingredientId && selected.Contains(ingredientId))
 				{
-					if (ri.Name.Contains(term, StringComparison.OrdinalIgnoreCase))
-					{
-						matchedNames.Add(ri.Name);
-						termHit = true;
-					}
+					matchedItemIds.Add(ri.Id);
+					matchedIngredientIds.Add(ingredientId);
 				}
-
-				if (termHit)
-					matchedTerms++;
 			}
 
-			int missing = recipeIngredients.Count(ri => !matchedNames.Contains(ri.Name));
-			matches.Add(new RecipeMatch(recipe, matchedTerms, matchedNames, missing));
+			int missing = recipeIngredients.Count - matchedItemIds.Count;
+			matches.Add(new RecipeMatch(recipe, matchedIngredientIds.Count, matchedItemIds, missing));
 		}
 
-		IEnumerable<RecipeMatch> filtered = prefs.Mode == MatchMode.All ? matches.Where(m => m.MatchedCount == terms.Length && terms.Length > 0) : matches.Where(m => m.MatchedCount > 0);
+		IEnumerable<RecipeMatch> filtered = prefs.Mode == MatchMode.All ? matches.Where(m => m.MatchedCount == selected.Count && selected.Count > 0) : matches.Where(m => m.MatchedCount > 0);
 
 		results = [..Sort(filtered)];
 	}
@@ -445,13 +514,24 @@
 
 	public sealed class Preferences
 	{
-		public List<string> Ingredients { get; set; } = [];
+		/// <summary>Catalog ids, in the order they were picked.</summary>
+		public List<Guid> IngredientIds { get; set; } = [];
+
+		/// <summary>
+		/// What this list used to be, before matching moved to ids. Kept only so a returning
+		/// visitor's saved list can be translated once (see ReconcileSelectionWithCatalogAsync)
+		/// instead of silently emptying; it is nulled out on the first load that reads it.
+		/// </summary>
+		public List<string>? Ingredients { get; set; }
+
 		public MatchMode Mode { get; set; } = MatchMode.Any;
 		public SortMode Sort { get; set; } = SortMode.MostMatches;
 		public bool Highlight { get; set; } = true;
 	}
 
-	private sealed record RecipeMatch(RecipeDto Recipe, int MatchedCount, HashSet<string> MatchedNames, int MissingCount)
+	/// <param name="MatchedCount">How many of my ingredients this recipe uses.</param>
+	/// <param name="MatchedItemIds">Ids of the recipe's own lines that matched, for the tick marks.</param>
+	private sealed record RecipeMatch(RecipeDto Recipe, int MatchedCount, HashSet<Guid> MatchedItemIds, int MissingCount)
 	{
 		public bool IsFullMatch => MatchedCount > 0 && MissingCount == 0;
 	}

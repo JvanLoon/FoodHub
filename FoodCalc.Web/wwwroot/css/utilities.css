@@ -193,6 +193,7 @@
     border-radius: var(--fh-radius-md);
     overflow: hidden;
     background: var(--fh-surface);
+    max-width: 300px;
 }
 
 .cal-toggle__btn {
@@ -205,6 +206,8 @@
     color: var(--fh-text-muted);
     cursor: pointer;
     font: inherit;
+    width: stretch;
+    justify-content: center;
 }
 
 .cal-toggle__btn + .cal-toggle__btn {

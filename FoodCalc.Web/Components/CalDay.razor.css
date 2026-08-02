@@ -106,9 +106,10 @@
     margin: 0;
     padding: 0;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: var(--fh-space-1);
     overflow-y: auto;
+    flex-wrap: wrap;
 }
 
 .cal-meal {

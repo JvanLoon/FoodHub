@@ -117,8 +117,15 @@
     color: currentColor;
 }
 
-.find-combo__option--new {
+/* Not selectable — there is nothing to add, since only catalog entries can be matched. */
+.find-combo__option--empty {
     font-style: italic;
+    color: var(--fh-text-muted);
+    cursor: default;
+}
+
+.find-combo__option--empty:hover {
+    background: none;
     color: var(--fh-text-muted);
 }
 

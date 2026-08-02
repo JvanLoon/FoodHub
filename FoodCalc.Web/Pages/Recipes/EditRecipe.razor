@@ -270,6 +270,7 @@
 			Id = ingredient.Id,
 			RecipeId = CurrentId,
 			Name = ingredient.Name,
+			IngredientId = ingredient.IngredientId,
 			Amount = ingredient.Amount,
 			IngredientAmount = ingredient.IngredientAmount,
 			ShouldBeAddedToShoppingCart = ingredient.ShouldBeAddedToShoppingCart
@@ -381,6 +382,10 @@
 	private void SelectIngredient(IngredientDto ingredient)
 	{
 		recipeItem.Name = ingredient.Name;
+		// The link the find page matches on. The server resolves it from the name anyway, so
+		// this is a hint rather than a guarantee — but sending it keeps the picked entry when
+		// the catalog holds two rows with the same name.
+		recipeItem.IngredientId = ingredient.Id;
 		recipeItem.ShouldBeAddedToShoppingCart = ingredient.ShouldBeAddedToShoppingCart;
 		ingredientSearch = ingredient.Name;
 		dropdownOpen = false;

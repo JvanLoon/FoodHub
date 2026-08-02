@@ -7,7 +7,6 @@
 
    Host this once per page and drive it with ShowAsync; it keeps no state between openings. *@
 
-@using FoodCalc.Web.Services
 @inject MealPlanService MealPlanService
 @inject MessageService MessageService
 
@@ -88,7 +87,7 @@
 		<AppButton Variant="ButtonVariant.Primary" Icon="check-lg"
 		           Disabled="@(_selected.Count == 0)" Loading="_saving"
 		           OnClick="SaveAsync">
-			@UiText.Calendar.SaveDays(_selected.Count)
+			@UiText.Calendar.SaveDays(0)
 		</AppButton>
 	</Footer>
 </Modal>
