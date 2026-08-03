@@ -183,7 +183,7 @@
 								<ul class="find-ingredients">
 									@foreach (RecipeItemDto ingredient in match.Recipe.Ingredients)
 									{
-										bool hit = prefs.Highlight && match.SelectedIngredientIds.Contains(ingredient.Id);
+										bool hit = prefs.Highlight && match.IsIngredientSelected(ingredient.IngredientId);
 										<li class="@(hit ? "find-ingredients__hit" : string.Empty)">
 											@if (hit) { <i class="bi bi-check-lg" aria-hidden="true"></i> }
 											<span>@ingredient.Ingredient.Name</span>
