@@ -29,5 +29,5 @@ public class Recipe : BaseEntity
     /// </summary>
     public DateTime? FirstApprovedDate { get; set; }
 
-    public List<RecipeItem>? Ingredients { get; set; } = [];
+    public List<RecipeItem> Ingredients { get; set; } = [];
 }

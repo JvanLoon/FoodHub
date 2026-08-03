@@ -42,7 +42,8 @@ public class PendingRecipeDto
 public class PendingRecipeItemDto
 {
     public Guid Id { get; set; }
-    public string Name { get; set; } = string.Empty;
+    public Guid IngredientId { get; set; }
+    public IngredientDto Ingredient { get; set; } = null!;
     public decimal Amount { get; set; }
     public IngredientAmountTypeDto IngredientAmount { get; set; }
 

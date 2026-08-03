@@ -186,7 +186,7 @@
 
 	private void ComputeRecipeStats(List<RecipeDto> recipes)
 	{
-		totalRecipeItemLinks = recipes.Sum(r => r.Ingredients?.Count ?? 0);
+		totalRecipeItemLinks = recipes.Sum(r => r.Ingredients.Count);
 		avgIngredientsPerRecipe = recipes.Count == 0 ? 0 : (double) totalRecipeItemLinks / recipes.Count;
 
 		var seenShoppingIngredients = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -194,25 +194,24 @@
 
 		foreach (var recipe in recipes)
 		{
-			if (recipe.Ingredients == null) continue;
+			if (recipe.Ingredients.Any()) continue;
 			var recipeItemNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 			foreach (var ri in recipe.Ingredients)
 			{
 				if (ri.ShouldBeAddedToShoppingCart)
-					seenShoppingIngredients.Add(ri.Name);
+					seenShoppingIngredients.Add(ri.Ingredient.Name);
 
-				if (recipeItemNames.Add(ri.Name))
+				if (recipeItemNames.Add(ri.Ingredient.Name))
 				{
-					if (!usage.TryGetValue(ri.Name, out var u))
+					if (!usage.TryGetValue(ri.Ingredient.Name, out var u))
 					{
 						u = new IngredientUsage
 						{
-							Name = ri.Name
+							Name = ri.Ingredient.Name
 						};
-						usage[ri.Name] = u;
+						usage[ri.Ingredient.Name] = u;
 					}
-
-
+					
 					u.UsageCount++;
 				}
 			}

@@ -1,12 +1,11 @@
 ﻿using ErrorOr;
-using FoodCalc.Features;
 using FoodCalc.Features.Mapping;
 using FoodCalc.Features.Review;
 using FoodHub.DTOs;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
-namespace FoodCalc.Feature.Ingredients.Queries.GetAllIngredients;
+namespace FoodCalc.Features.Ingredients.Queries.GetAllIngredients;
 
 public class GetAllIngredientsQueryHandler(FoodHubDbContext context, ILogger<GetAllIngredientsQueryHandler> logger)
     : IRequestHandler<GetAllIngredientsQuery, ErrorOr<PagedResultDto<IngredientDto>>>

@@ -127,7 +127,6 @@
 					             @bind-Value="prefs.Sort"
 					             @bind-Value:after="PersistAndRecompute">
 						<option value="@nameof(SortMode.MostMatches)">@UiText.FindRecipes.SortMostMatches</option>
-						<option value="@nameof(SortMode.FewestMissing)">@UiText.FindRecipes.SortFewestMissing</option>
 						<option value="@nameof(SortMode.Name)">@UiText.FindRecipes.SortName</option>
 					</SelectField>
 
@@ -175,19 +174,19 @@
 							</div>
 							<div class="badge-container">
 								<Badge
-									Variant="@(match.IsFullMatch ? Badge.BadgeVariant.Success : Badge.BadgeVariant.Accent)"
+									Variant="Badge.BadgeVariant.Accent"
 									Icon="check2-circle">
-									@match.MatchedCount / @prefs.IngredientIds.Count
+									@match.SelectedIngredientIds.Count / @prefs.IngredientIds.Count
 								</Badge>
 							</div>
 							<div class="card-body">
 								<ul class="find-ingredients">
 									@foreach (RecipeItemDto ingredient in match.Recipe.Ingredients)
 									{
-										bool hit = prefs.Highlight && match.MatchedItemIds.Contains(ingredient.Id);
-										<li class="@(hit ? "find-ingredients__hit" : null)">
+										bool hit = prefs.Highlight && match.SelectedIngredientIds.Contains(ingredient.Id);
+										<li class="@(hit ? "find-ingredients__hit" : string.Empty)">
 											@if (hit) { <i class="bi bi-check-lg" aria-hidden="true"></i> }
-											<span>@ingredient.Name</span>
+											<span>@ingredient.Ingredient.Name</span>
 											<span class="fh-muted find-ingredients__amount">
 												@ingredient.Amount.ToFormattedString() @UiText.AmountTypes.Label(ingredient.IngredientAmount)
 											</span>
@@ -270,26 +269,6 @@
 			return;
 
 		bool changed = false;
-
-		if (prefs.IngredientIds.Count == 0 && prefs.Ingredients is {Count: > 0})
-		{
-			prefs.IngredientIds =
-			[
-				..prefs.Ingredients.Select(FindByName)
-					.Where(i => i is not null)
-					.Select(i => i!.Id)
-					.Distinct()
-			];
-			changed = true;
-		}
-
-		// Cleared unconditionally: leaving the old names behind would resurrect them the next
-		// time the id list happens to be empty.
-		if (prefs.Ingredients is not null)
-		{
-			prefs.Ingredients = null;
-			changed = true;
-		}
 
 		if (prefs.IngredientIds.RemoveAll(id => !catalogById.ContainsKey(id)) > 0)
 			changed = true;
@@ -463,41 +442,35 @@
 		foreach (RecipeDto recipe in allRecipes)
 		{
 			List<RecipeItemDto> recipeIngredients = recipe.Ingredients ?? [];
-
-			// Two sets: the lines to tick in the card, and the catalog entries they cover. They
-			// differ when one recipe lists the same ingredient on more than one line — the badge
-			// counts what I brought, not how often the recipe mentions it.
-			var matchedItemIds = new HashSet<Guid>();
-			var matchedIngredientIds = new HashSet<Guid>();
-
+			HashSet<Guid> machedIngredientIds = [];
+			
 			foreach (RecipeItemDto ri in recipeIngredients)
 			{
-				if (ri.IngredientId is {} ingredientId && selected.Contains(ingredientId))
+				var ingredientId = ri.IngredientId;
+				if (selected.Contains(ingredientId))
 				{
-					matchedItemIds.Add(ri.Id);
-					matchedIngredientIds.Add(ingredientId);
+					machedIngredientIds.Add(ingredientId);
 				}
 			}
+			
+			matches.Add(new RecipeMatch(recipe, machedIngredientIds));
 
-			int missing = recipeIngredients.Count - matchedItemIds.Count;
-			matches.Add(new RecipeMatch(recipe, matchedIngredientIds.Count, matchedItemIds, missing));
 		}
 
-		IEnumerable<RecipeMatch> filtered = prefs.Mode == MatchMode.All ? matches.Where(m => m.MatchedCount == selected.Count && selected.Count > 0) : matches.Where(m => m.MatchedCount > 0);
+		IEnumerable<RecipeMatch> filtered = prefs.Mode == MatchMode.All 
+			? matches.Where(m => m.SelectedIngredientIds.Count == selected.Count && selected.Count > 0)
+			: matches.Where(m => m.SelectedIngredientIds.Count > 0);
 
 		results = [..Sort(filtered)];
 	}
 
 	private IEnumerable<RecipeMatch> Sort(IEnumerable<RecipeMatch> source) => prefs.Sort switch
-	{
-		SortMode.FewestMissing => source.OrderBy(m => m.MissingCount)
-			.ThenByDescending(m => m.MatchedCount)
-			.ThenBy(m => m.Recipe.Name),
-		SortMode.Name => source.OrderBy(m => m.Recipe.Name),
-		_ => source.OrderByDescending(m => m.MatchedCount)
-			.ThenBy(m => m.MissingCount)
-			.ThenBy(m => m.Recipe.Name),
-	};
+		{
+			SortMode.MostMatches => source.OrderByDescending(m => m.SelectedIngredientIds.Count)
+				.ThenBy(m => m.MissingCount)
+				.ThenBy(m => m.Recipe.Name),
+			SortMode.Name or _ => source.OrderBy(m => m.Recipe.Name)
+		};
 
 	public enum MatchMode
 	{
@@ -508,7 +481,6 @@
 	public enum SortMode
 	{
 		MostMatches,
-		FewestMissing,
 		Name
 	}
 
@@ -516,24 +488,14 @@
 	{
 		/// <summary>Catalog ids, in the order they were picked.</summary>
 		public List<Guid> IngredientIds { get; set; } = [];
-
-		/// <summary>
-		/// What this list used to be, before matching moved to ids. Kept only so a returning
-		/// visitor's saved list can be translated once (see ReconcileSelectionWithCatalogAsync)
-		/// instead of silently emptying; it is nulled out on the first load that reads it.
-		/// </summary>
-		public List<string>? Ingredients { get; set; }
-
 		public MatchMode Mode { get; set; } = MatchMode.Any;
 		public SortMode Sort { get; set; } = SortMode.MostMatches;
 		public bool Highlight { get; set; } = true;
 	}
 
-	/// <param name="MatchedCount">How many of my ingredients this recipe uses.</param>
-	/// <param name="MatchedItemIds">Ids of the recipe's own lines that matched, for the tick marks.</param>
-	private sealed record RecipeMatch(RecipeDto Recipe, int MatchedCount, HashSet<Guid> MatchedItemIds, int MissingCount)
+	public sealed record RecipeMatch(RecipeDto Recipe, HashSet<Guid> SelectedIngredientIds)
 	{
-		public bool IsFullMatch => MatchedCount > 0 && MissingCount == 0;
+		public bool IsIngredientSelected(Guid ingredientId) => SelectedIngredientIds.Contains(ingredientId);
+		public int MissingCount => Recipe.Ingredients.Count - SelectedIngredientIds.Count;
 	}
-
 }

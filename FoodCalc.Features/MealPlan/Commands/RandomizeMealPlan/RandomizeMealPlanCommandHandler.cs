@@ -27,7 +27,6 @@ public class RandomizeMealPlanCommandHandler(FoodHubDbContext context, ILogger<R
             // Same visibility rule as browsing: randomize may pull in approved recipes plus
             // the caller's own pending ones, never another user's unapproved work.
             var allRecipes = await context.Recipes.VisibleTo(request.UserId)
-                .Include(r => r.Ingredients)
                 .ToListAsync(cancellationToken);
             if (allRecipes.Count == 0)
                 return Error.Validation(description: ErrorMessages.MealPlan.NoRecipesToPickFrom);
@@ -43,7 +42,7 @@ public class RandomizeMealPlanCommandHandler(FoodHubDbContext context, ILogger<R
             if (wanted.Count > 0)
             {
                 var matched = allRecipes.Where(r => r.Ingredients != null &&
-                                                    r.Ingredients.Any(ri => wanted.Any(w => ri.Name.Contains(w,
+                                                    r.Ingredients.Any(ri => wanted.Any(w => ri.Ingredient.Name.Contains(w,
                                                         StringComparison.InvariantCultureIgnoreCase))))
                     .ToList();
 

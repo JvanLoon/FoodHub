@@ -88,7 +88,7 @@
 								@foreach (var ingredient in FilteredIngredients)
 								{
 									<button type="button"
-									        class="dropdown-item @(recipeItem.Name == ingredient.Name ? "active" : "")"
+									        class="dropdown-item @(recipeItem.Ingredient is not null && recipeItem.Ingredient.Name == ingredient.Name ? "active" : "")"
 									        @onclick="() => SelectIngredient(ingredient)">
 										@ingredient.Name
 									</button>
@@ -125,7 +125,7 @@
 						@foreach (var ingredient in ingredientsList)
 						{
 							<li>
-                            <span>@ingredient.Name
+                            <span>@ingredient.Ingredient.Name
 	                            <span class="fh-muted">
 		                            @ingredient.Amount.ToFormattedString() @UiText.AmountTypes.Label(ingredient.IngredientAmount)
 	                            </span>
@@ -269,14 +269,14 @@
 		{
 			Id = ingredient.Id,
 			RecipeId = CurrentId,
-			Name = ingredient.Name,
 			IngredientId = ingredient.IngredientId,
+			Ingredient = ingredient.Ingredient,
 			Amount = ingredient.Amount,
 			IngredientAmount = ingredient.IngredientAmount,
 			ShouldBeAddedToShoppingCart = ingredient.ShouldBeAddedToShoppingCart
 		};
 		amountInput = ingredient.Amount == 0 ? null : ingredient.Amount;
-		ingredientSearch = ingredient.Name;
+		ingredientSearch = ingredient.Ingredient.Name;
 	}
 
 	private async Task DeleteIngredient(Guid recipeItemId)
@@ -296,13 +296,17 @@
 		recipeItem = new RecipeItemDto
 		{
 			Id = Guid.NewGuid(),
-			RecipeId = CurrentId
+			RecipeId = CurrentId,
+			IngredientId = Guid.Empty,
+			Ingredient = null!,
+			Amount = 0,
+			IngredientAmount = 0
 		};
 	}
 
 	private void StartEditName()
 	{
-		editedName = recipe.Name ?? string.Empty;
+		editedName = recipe.Name;
 		isEditingName = true;
 	}
 
@@ -381,11 +385,8 @@
 
 	private void SelectIngredient(IngredientDto ingredient)
 	{
-		recipeItem.Name = ingredient.Name;
-		// The link the find page matches on. The server resolves it from the name anyway, so
-		// this is a hint rather than a guarantee — but sending it keeps the picked entry when
-		// the catalog holds two rows with the same name.
 		recipeItem.IngredientId = ingredient.Id;
+		recipeItem.Ingredient = ingredient;
 		recipeItem.ShouldBeAddedToShoppingCart = ingredient.ShouldBeAddedToShoppingCart;
 		ingredientSearch = ingredient.Name;
 		dropdownOpen = false;

@@ -1,9 +1,8 @@
 ﻿using ErrorOr;
-using FoodCalc.Features;
 using FoodHub.DTOs;
 using MediatR;
 
-namespace FoodCalc.Feature.Ingredients.Queries.GetAllIngredients;
+namespace FoodCalc.Features.Ingredients.Queries.GetAllIngredients;
 
 public class GetAllIngredientsQuery : IRequest<ErrorOr<PagedResultDto<IngredientDto>>>, IPagedSearchQuery
 {

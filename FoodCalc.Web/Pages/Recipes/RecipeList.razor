@@ -62,7 +62,7 @@
 			<div class="fh-grid">
 				@foreach (RecipeDto recipe in pagedResult.Items)
 				{
-					<RecipeCard Title="@(recipe.Name ?? string.Empty)"
+					<RecipeCard Title="@(recipe.Name)"
 					            ShowActions="@CanEdit(recipe)"
 					            OnOpen="() => OpenRecipe(recipe.Id)"
 					            Selected="@SelectedRecipeIds.Contains(recipe.Id)"
@@ -87,7 +87,7 @@
 								foreach (RecipeItemDto ingredient in recipe.Ingredients)
 								{
 									<li>
-										<span>@ingredient.Name</span>
+										<span>@ingredient.Ingredient.Name</span>
 										<span
 											class="fh-muted">@ingredient.Amount.ToFormattedString() @UiText.AmountTypes.Label(ingredient.IngredientAmount)</span>
 									</li>
@@ -212,25 +212,27 @@
 			{
 				if (ri.ShouldBeAddedToShoppingCart)
 				{
-					var key = (ri.Name.ToLowerInvariant(), ri.IngredientAmount);
+					var key = (ri.Ingredient.Name.ToLowerInvariant(), ri.IngredientAmount);
 					if (ingredientDict.TryGetValue(key, out var existing)) { existing.Amount += ri.Amount; }
 					else
 					{
 						// Clone to avoid mutating original
 						ingredientDict[key] = new RecipeItemDto
 						{
-							Name = ri.Name,
+							Id = ri.Id,
+							RecipeId = ri.RecipeId,
+							IngredientId = ri.IngredientId,
+							Ingredient = ri.Ingredient,
 							IngredientAmount = ri.IngredientAmount,
 							Amount = ri.Amount,
-							ShouldBeAddedToShoppingCart = ri.ShouldBeAddedToShoppingCart
+							ShouldBeAddedToShoppingCart = ri.ShouldBeAddedToShoppingCart,
 						};
 					}
 				}
 			}
 		}
 
-		AggregatedIngredients = ingredientDict.Values.OrderBy(i => i.Name)
-			.ToList();
+		AggregatedIngredients = ingredientDict.Values.OrderBy(i => i.Ingredient.Name).ToList();
 	}
 
 	private void AddRecipe() => NavigationManager.NavigateTo("/recipes/create");

@@ -59,8 +59,8 @@ else
 		if (Ingredients.Count > 0)
 		{
 			_initialized = true;
-			_displayItems = Ingredients.Where(i => !string.IsNullOrWhiteSpace(i.Name))
-				.Select(i => $"{i.Name}: {i.Amount.ToFormattedString()} {UiText.AmountTypes.Label(i.IngredientAmount)}")
+			_displayItems = Ingredients.Where(i => !string.IsNullOrWhiteSpace(i.Ingredient.Name))
+				.Select(i => $"{i.Ingredient.Name}: {i.Amount.ToFormattedString()} {UiText.AmountTypes.Label(i.IngredientAmount)}")
 				.ToList();
 			await OnItemsChanged.InvokeAsync(_displayItems);
 		}

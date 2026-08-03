@@ -15,11 +15,13 @@ public class DeleteIngredientFromRecipeCommandHandler(
     {
         try
         {
-            var recipeItem = await context.RecipeItems.SingleOrDefaultAsync(r => r.Id == request.Id, cancellationToken);
+            var recipeItem = await context.RecipeItems
+                .SingleOrDefaultAsync(r => r.Id == request.Id, cancellationToken);
+            
             if (recipeItem != null)
             {
-                var recipe =
-                    await context.Recipes.SingleOrDefaultAsync(r => r.Id == recipeItem.RecipeId, cancellationToken);
+                var recipe = await context.Recipes
+                    .SingleOrDefaultAsync(r => r.Id == recipeItem.RecipeId, cancellationToken);
 
                 if (recipe is not null && !request.Acting.CanEdit(recipe.CreatedByUserId))
                     return Error.Forbidden(description: ErrorMessages.Review.NotOwned(ErrorMessages.Entities.Recipe));

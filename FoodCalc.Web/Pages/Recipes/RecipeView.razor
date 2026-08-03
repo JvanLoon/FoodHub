@@ -38,7 +38,7 @@
 						@foreach (var ingredient in recipe.Ingredients)
 						{
 							<li>
-								<span>@ingredient.Name</span>
+								<span>@ingredient.Ingredient.Name</span>
 								<span class="fh-muted">
 								    @ingredient.Amount.ToFormattedString() @UiText.AmountTypes.Label(ingredient.IngredientAmount)
 							    </span>

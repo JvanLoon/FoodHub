@@ -45,7 +45,7 @@ public class ApproveContentCommandHandler(FoodHubDbContext context, ILogger<Appr
         foreach (var item in recipe.Ingredients ?? [])
         {
             item.IsReviewed = true;
-            lineNames.Add(item.Name);
+            lineNames.Add(item.Ingredient.Name);
         }
 
         // The recipe is the only review gate: approving it also approves the ingredient records

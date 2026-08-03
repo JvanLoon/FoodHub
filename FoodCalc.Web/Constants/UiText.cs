@@ -274,7 +274,6 @@ public static class UiText
         public const string MatchAll = "Moet al mijn ingrediënten bevatten";
         public const string SortLabel = "Sorteren op";
         public const string SortMostMatches = "Meeste van mijn ingrediënten";
-        public const string SortFewestMissing = "Minste ontbrekende ingrediënten";
         public const string SortName = "Naam (A–Z)";
         public const string HighlightLabel = "Mijn ingrediënten in elk recept markeren";
 
@@ -442,7 +441,6 @@ public static class UiText
         public const string ImportHeader = "Importeren";
         public const string ImportFileLabel = "Importbestand (.json)";
         public const string ImportButton = "Importeren";
-        public const string ImportOldButton = "Importeren (oud formaat)";
 
         public const string OldFormatHint =
             "Gebruik “oud formaat” voor exports van vóór de ingrediëntenherziening.";

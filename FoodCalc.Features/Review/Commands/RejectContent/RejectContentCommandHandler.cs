@@ -27,35 +27,36 @@ public class RejectContentCommandHandler(FoodHubDbContext context, ILogger<Rejec
             {
                 case ReviewTargetType.Recipe:
                 {
-                    var recipe = await context.Recipes.SingleOrDefaultAsync(r => r.Id == request.TargetId,
-                        cancellationToken);
+                    var recipe = await context.Recipes
+                        .SingleOrDefaultAsync(r => r.Id == request.TargetId, cancellationToken);
+                    
                     if (recipe is null)
                         return Error.NotFound(description: ErrorMessages.Common.NotFound(ErrorMessages.Entities.Recipe));
 
                     // Its lines cascade with it (see RecipeConfiguration). Any ingredient those
                     // lines introduced and no other recipe uses is now an orphan — remove it.
-                    var names = (recipe.Ingredients ?? []).Select(i => i.Name)
+                    var names = (recipe.Ingredients ?? []).Select(i => i.Ingredient.Name)
                         .ToList();
 
                     context.Recipes.Remove(recipe);
 
                     await RemoveOrphanIngredientsAsync(names,
-                        name => context.RecipeItems.AnyAsync(ri => ri.RecipeId != recipe.Id && ri.Name == name,
+                        name => context.RecipeItems.AnyAsync(ri => ri.RecipeId != recipe.Id && ri.Ingredient.Name == name,
                             cancellationToken), cancellationToken);
                     break;
                 }
                 case ReviewTargetType.RecipeItem:
                 {
-                    var item = await context.RecipeItems.SingleOrDefaultAsync(ri => ri.Id == request.TargetId,
-                        cancellationToken);
+                    var item = await context.RecipeItems.Include(recipeItem => recipeItem.Ingredient)
+                        .SingleOrDefaultAsync(ri => ri.Id == request.TargetId, cancellationToken);
                     if (item is null)
                         return Error.NotFound(description: ErrorMessages.Common.NotFound(ErrorMessages.Entities.RecipeLine));
 
                     context.RecipeItems.Remove(item);
 
                     // If nothing else uses this ingredient, drop the ingredient record too.
-                    await RemoveOrphanIngredientsAsync([item.Name],
-                        name => context.RecipeItems.AnyAsync(ri => ri.Id != item.Id && ri.Name == name,
+                    await RemoveOrphanIngredientsAsync([item.Ingredient.Name],
+                        name => context.RecipeItems.AnyAsync(ri => ri.Id != item.Id && ri.Ingredient.Name == name,
                             cancellationToken), cancellationToken);
                     break;
                 }

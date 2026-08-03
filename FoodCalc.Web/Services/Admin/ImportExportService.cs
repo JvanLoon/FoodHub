@@ -14,10 +14,6 @@ public class ImportExportService(AuthenticatedHttpClientService httpClient, IJSR
     public Task<ApiResult> ImportAsync(byte[] fileContent, string fileName) =>
         UploadAsync(ApiRoutes.ImportExport.Import, fileContent, fileName);
 
-    /// <summary>Imports a JSON export produced before the RecipeItem rework (legacy format).</summary>
-    public Task<ApiResult> ImportOldAsync(byte[] fileContent, string fileName) =>
-        UploadAsync(ApiRoutes.ImportExport.ImportOld, fileContent, fileName);
-
     private async Task<ApiResult> UploadAsync(string route, byte[] fileContent, string fileName)
     {
         if (fileContent.Length == 0)

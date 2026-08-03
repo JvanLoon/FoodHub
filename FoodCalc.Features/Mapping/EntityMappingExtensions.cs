@@ -49,8 +49,8 @@ public static class EntityMappingExtensions
     {
         Id = e.Id,
         RecipeId = e.RecipeId,
-        Name = e.Name,
         IngredientId = e.IngredientId,
+        Ingredient = e.Ingredient.ToDto(),
         Amount = e.Amount,
         IngredientAmount = (IngredientAmountTypeDto) e.IngredientAmount,
         ShouldBeAddedToShoppingCart = e.ShouldBeAddedToShoppingCart
@@ -59,7 +59,8 @@ public static class EntityMappingExtensions
     public static PendingRecipeItemDto ToPendingDto(this RecipeItem e) => new()
     {
         Id = e.Id,
-        Name = e.Name,
+        IngredientId = e.IngredientId,
+        Ingredient = e.Ingredient.ToDto(),
         Amount = e.Amount,
         IngredientAmount = (IngredientAmountTypeDto) e.IngredientAmount,
         IsChanged = !e.IsReviewed
@@ -72,7 +73,6 @@ public static class EntityMappingExtensions
     {
         Id = d.Id,
         RecipeId = d.RecipeId,
-        Name = d.Name,
         IngredientId = d.IngredientId,
         Amount = d.Amount,
         IngredientAmount = (IngredientAmountType) d.IngredientAmount,
@@ -90,14 +90,14 @@ public static class EntityMappingExtensions
     {
         var amountType = (IngredientAmountType) d.IngredientAmount;
 
-        var changed = e.Name != d.Name || e.IngredientId != d.IngredientId || e.Amount != d.Amount ||
+        var changed = e.Ingredient.Name != d.Ingredient.Name || e.IngredientId != d.IngredientId || e.Amount != d.Amount ||
                       e.IngredientAmount != amountType ||
                       e.ShouldBeAddedToShoppingCart != d.ShouldBeAddedToShoppingCart;
 
         if (!changed)
             return;
 
-        e.Name = d.Name;
+        e.Ingredient = d.Ingredient.ToEntity();
         e.IngredientId = d.IngredientId;
         e.Amount = d.Amount;
         e.IngredientAmount = amountType;
@@ -112,7 +112,7 @@ public static class EntityMappingExtensions
         Name = e.Name,
         CreatedByUserId = e.CreatedByUserId,
         IsReviewed = e.IsReviewed,
-        Ingredients = e.Ingredients is null ? [] : [..e.Ingredients.Select(ri => ri.ToDto())]
+        Ingredients = [..e.Ingredients.Select(ri => ri.ToDto())]
     };
 
     /// <summary>Projection for the review queue: every line, with the changed ones flagged.</summary>
@@ -125,9 +125,7 @@ public static class EntityMappingExtensions
         CreatedDate = e.CreatedDate,
         ModifiedDate = e.ModifiedDate,
         IsFirstSubmission = e.FirstApprovedDate is null,
-        Ingredients = e.Ingredients is null ? 
-            [] : 
-            e.Ingredients.OrderBy(ri => ri.Name).Select(ri => ri.ToPendingDto()).ToList()
+        Ingredients = e.Ingredients.OrderBy(ri => ri.Ingredient.Name).Select(ri => ri.ToPendingDto()).ToList()
     };
 
     public static List<RecipeDto> ToDtoList(this IEnumerable<Recipe> items) => items.Select(r => r.ToDto())

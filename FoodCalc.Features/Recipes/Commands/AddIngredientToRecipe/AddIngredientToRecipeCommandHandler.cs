@@ -28,17 +28,11 @@ public class AddIngredientToRecipeCommandHandler(
 
             if (!request.Acting.CanEdit(recipe.CreatedByUserId))
                 return Error.Forbidden(description: ErrorMessages.Review.NotOwned(ErrorMessages.Entities.Recipe));
-
-            // The caller says which catalog entry this line is; we only check that it is real and
-            // that they can see it. Deriving it from the name instead would silently pick a
-            // different row whenever two entries share a name, and would turn "add a line" into
-            // a call that quietly writes to the catalog. The client creates the entry first
-            // (see ResolveIngredientAsync in EditRecipe.razor) and sends its id.
-            if (dto.IngredientId is not {} ingredientId ||
-                !await context.Ingredients.VisibleTo(request.Acting.UserId)
-                    .AnyAsync(i => i.Id == ingredientId, cancellationToken))
+            
+            if (!await context.Ingredients.VisibleTo(request.Acting.UserId)
+                    .AnyAsync(i => i.Id == dto.IngredientId, cancellationToken))
             {
-                return Error.Validation(description: ErrorMessages.Ingredient.UnlinkedLine(dto.Name));
+                return Error.Validation(description: ErrorMessages.Ingredient.UnlinkedLine(dto.Ingredient.Name));
             }
 
             var existing = await context.RecipeItems.FirstOrDefaultAsync(
@@ -46,8 +40,7 @@ public class AddIngredientToRecipeCommandHandler(
 
             if (existing != null)
             {
-                existing.Name = dto.Name;
-                existing.IngredientId = ingredientId;
+                existing.IngredientId = dto.IngredientId;
                 existing.Amount = dto.Amount;
                 existing.IngredientAmount = (IngredientAmountType) dto.IngredientAmount;
                 existing.ShouldBeAddedToShoppingCart = dto.ShouldBeAddedToShoppingCart;
@@ -62,7 +55,7 @@ public class AddIngredientToRecipeCommandHandler(
             }
 
             RecipeItem mappedRecipeItem = dto.ToEntity();
-            mappedRecipeItem.IngredientId = ingredientId;
+            mappedRecipeItem.IngredientId = dto.IngredientId;
             mappedRecipeItem.IsReviewed = false;
             recipe.IsReviewed = false;
 

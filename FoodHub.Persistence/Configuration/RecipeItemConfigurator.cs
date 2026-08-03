@@ -10,10 +10,6 @@ public class RecipeItemConfigurator : IEntityTypeConfiguration<RecipeItem>
     {
         builder.HasKey(ri => ri.Id);
 
-        builder.Property(ri => ri.Name)
-            .HasMaxLength(450)
-            .IsRequired();
-
         builder.Property(ri => ri.Amount)
             .IsRequired()
             .HasColumnType("decimal(10,2)");
@@ -33,19 +29,19 @@ public class RecipeItemConfigurator : IEntityTypeConfiguration<RecipeItem>
         builder.HasIndex(ri => new
             {
                 ri.RecipeId,
-                ri.Name
+                ri.IngredientId
             })
             .IsUnique()
-            .HasDatabaseName("UX_RecipeItem_RecipeId_Name");
-
-        // No navigation property: the line owns its snapshot and never needs to walk to the
-        // catalog entry. SetNull rather than Cascade — deleting an ingredient from the catalog
-        // must leave the recipes that use it intact, only unlinked.
-        builder.HasOne<Ingredient>()
+            .HasDatabaseName("UX_RecipeItem_RecipeId_IngredientId");
+        
+        builder.HasOne<Ingredient>(i => i.Ingredient)
             .WithMany()
             .HasForeignKey(ri => ri.IngredientId)
             .OnDelete(DeleteBehavior.SetNull);
 
         builder.HasIndex(ri => ri.IngredientId);
+
+        builder.Navigation(r => r.Ingredient)
+            .AutoInclude();
     }
 }

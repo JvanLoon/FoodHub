@@ -21,11 +21,13 @@ public class AddMealPlanEntryCommandHandler(FoodHubDbContext context, ILogger<Ad
             // belonging to someone else is "not found" here just as it is on the read path.
             var recipe = await context.Recipes.VisibleTo(request.UserId)
                 .FirstOrDefaultAsync(r => r.Id == request.RecipeId, cancellationToken);
+            
             if (recipe is null)
                 return Error.NotFound(description: ErrorMessages.Common.NotFound(ErrorMessages.Entities.Recipe));
 
             var dayCount = await context.MealPlanEntries.CountAsync(
                 m => m.UserId == request.UserId && m.Date == request.Date, cancellationToken);
+            
             if (dayCount >= MealPlanConstants.MaxRecipesPerDay)
                 return Error.Validation(
                     description: ErrorMessages.MealPlan.MaxPerDay(MealPlanConstants.MaxRecipesPerDay));

@@ -31,7 +31,6 @@ public class UpdateRecipeCommandHandler(FoodHubDbContext context, ILogger<Update
             // than per line, and before anything is assigned, so a rejected request leaves the
             // tracked recipe exactly as it was found.
             var sentIds = request.Recipe.Ingredients.Select(item => item.IngredientId)
-                .OfType<Guid>()
                 .Distinct()
                 .ToList();
 
@@ -41,17 +40,17 @@ public class UpdateRecipeCommandHandler(FoodHubDbContext context, ILogger<Update
                 .ToListAsync(cancellationToken);
 
             RecipeItemDto? unlinked =
-                request.Recipe.Ingredients.FirstOrDefault(item => item.IngredientId is not {} id || !knownIds.Contains(id));
+                request.Recipe.Ingredients.FirstOrDefault(item => !knownIds.Contains(item.IngredientId));
 
             if (unlinked is not null)
-                return Error.Validation(description: ErrorMessages.Ingredient.UnlinkedLine(unlinked.Name));
+                return Error.Validation(description: ErrorMessages.Ingredient.UnlinkedLine(unlinked.Ingredient.Name));
 
             var nameChanged = recipe.Name != request.Recipe.Name;
             recipe.Name = request.Recipe.Name;
 
             // Reconcile the recipe's items with the set provided in the request:
             // update the ones still present, remove the missing, add the new.
-            recipe.Ingredients?.Sync(request.Recipe.Ingredients, keyOfExisting: item => item.Id,
+            recipe.Ingredients.Sync(request.Recipe.Ingredients, keyOfExisting: item => item.Id,
                 keyOfIncoming: dto => dto.Id, create: dto => dto.ToEntity(), update: (dto, item) => dto.ApplyTo(item));
 
             // Ask the change tracker what Sync actually did rather than assuming a request

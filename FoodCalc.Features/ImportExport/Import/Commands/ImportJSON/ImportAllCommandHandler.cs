@@ -1,4 +1,5 @@
 using ErrorOr;
+using FoodCalc.Features.Mapping;
 using FoodHub.DTOs;
 using FoodHub.Persistence.Entities;
 using MediatR;
@@ -94,16 +95,11 @@ public class ImportAllCommandHandler(
             // Import RecipeItems (ingredient lines snapshotted onto the recipe)
             foreach (RecipeItemDto riDto in data.RecipeItems)
             {
-                Guid? ingredientId = riDto.IngredientId is {} fileId && ingredientIdRemap.TryGetValue(fileId, out Guid mapped)
-                    ? mapped
-                    : riDto.IngredientId;
-
-                var existingRi = await context.RecipeItems.SingleOrDefaultAsync(ri => ri.Id == riDto.Id,
-                    cancellationToken);
+                var ingredientEntity = riDto.Ingredient.ToEntity();
+                var existingRi = await context.RecipeItems.SingleOrDefaultAsync(ri => ri.Id == riDto.Id, cancellationToken);
                 if (existingRi != null)
                 {
-                    existingRi.Name = riDto.Name;
-                    existingRi.IngredientId = ingredientId;
+                    existingRi.Ingredient = ingredientEntity;
                     existingRi.Amount = riDto.Amount;
                     existingRi.IngredientAmount = (IngredientAmountType) riDto.IngredientAmount;
                     existingRi.ShouldBeAddedToShoppingCart = riDto.ShouldBeAddedToShoppingCart;
@@ -114,10 +110,7 @@ public class ImportAllCommandHandler(
                 {
                     Id = riDto.Id,
                     RecipeId = riDto.RecipeId,
-                    Name = riDto.Name,
-                    // Restored as exported, like every other column: the file carries the catalog
-                    // link, and the ingredients it points at were imported in the loop above.
-                    IngredientId = ingredientId,
+                    Ingredient = ingredientEntity,
                     Amount = riDto.Amount,
                     IngredientAmount = (IngredientAmountType) riDto.IngredientAmount,
                     ShouldBeAddedToShoppingCart = riDto.ShouldBeAddedToShoppingCart,

@@ -3,6 +3,7 @@ using FoodCalc.Features.Mapping;
 using FoodCalc.Features.Review;
 using FoodHub.DTOs;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Features.Recipes.Queries.GetAllRecipes;
@@ -15,10 +16,13 @@ public class GetAllRecipesQueryHandler(FoodHubDbContext context, ILogger<GetAllR
     {
         try
         {
-            var query = context.Recipes.VisibleTo(request.RequestingUserId);
+            var query = context.Recipes
+                .Include(r => r.Ingredients)
+                .ThenInclude(ri => ri.Ingredient)
+                .VisibleTo(request.RequestingUserId);
 
             if (!string.IsNullOrWhiteSpace(request.Search))
-                query = query.Where(r => r.Name != null && r.Name.Contains(request.Search));
+                query = query.Where(r => r.Name.Contains(request.Search));
 
             var paged = await query.ToPagedResultAsync(request, cancellationToken);
 

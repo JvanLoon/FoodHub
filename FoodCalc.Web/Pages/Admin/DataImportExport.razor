@@ -30,9 +30,6 @@
 				</div>
 				<div class="fh-cluster">
 					<AppButton Icon="upload" OnClick="ImportData">@UiText.ImportExport.ImportButton</AppButton>
-					<AppButton Variant="ButtonVariant.OutlineSecondary" Icon="clock-history" OnClick="ImportOldData">
-						@UiText.ImportExport.ImportOldButton
-					</AppButton>
 				</div>
 				<p class="fh-muted">@UiText.ImportExport.OldFormatHint</p>
 				</Body>
@@ -61,8 +58,6 @@
 	}
 
 	private Task ImportData() => RunImportAsync((bytes, name) => importExportService.ImportAsync(bytes, name));
-
-	private Task ImportOldData() => RunImportAsync((bytes, name) => importExportService.ImportOldAsync(bytes, name));
 
 	private async Task RunImportAsync(Func<byte[], string, Task<ApiResult>> import)
 	{

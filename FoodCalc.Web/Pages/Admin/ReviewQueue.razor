@@ -53,7 +53,7 @@
 							@foreach (var line in recipe.Ingredients)
 							{
 								<li class="review-line @(line.IsChanged ? "review-line--changed" : null)">
-									<span class="review-line__name">@line.Name</span>
+									<span class="review-line__name">@line.Ingredient.Name</span>
 									<span class="review-line__amount fh-muted">
 										@line.Amount.ToFormattedString() @UiText.AmountTypes.Label(line.IngredientAmount)
 									</span>
@@ -161,7 +161,7 @@
 	// Removing a single ingredient during review is expected work, so it happens without a prompt.
 	private Task RejectLineAsync(PendingRecipeDto recipe, PendingRecipeItemDto line) =>
 		RunAsync(() => ReviewService.RejectRecipeItemAsync(line.Id),
-			WebConstants.Messages.Review.LineRemoved(line.Name, recipe.Name));
+			WebConstants.Messages.Review.LineRemoved(line.Ingredient.Name, recipe.Name));
 
 	// Rejecting a whole recipe deletes it outright, so confirm first.
 	private async Task RejectRecipeAsync(PendingRecipeDto recipe)

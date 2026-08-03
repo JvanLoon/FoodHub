@@ -108,7 +108,6 @@ public static class ApiRoutes
     {
         private const string Base = "api/importexport";
         public const string Import = Base + "/import";
-        public const string ImportOld = Base + "/importold";
         public const string Export = Base + "/export";
     }
 }
