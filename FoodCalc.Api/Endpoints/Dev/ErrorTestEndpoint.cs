@@ -31,7 +31,7 @@ public class ErrorTestRequest
 /// </list>
 /// </para>
 /// </summary>
-public class ErrorTestEndpoint(IWebHostEnvironment env) : Endpoint<ErrorTestRequest>
+public class ErrorTestEndpoint : Endpoint<ErrorTestRequest>
 {
     /// <summary>Upper bound so a stray query string can't ask for a million toasts.</summary>
     private const int _maxCount = 20;

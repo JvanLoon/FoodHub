@@ -1,5 +1,6 @@
 ﻿using ErrorOr;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Features.Authentication.Users.Commands.RemoveRecipeFromBlackList;
@@ -16,7 +17,7 @@ public class RemoveRecipeFromBlackListCommandHandler(
         {
             //await unitOfWork.RecipeRepository.DeleteAsync(request.Id, cancellationToken);
 
-            return true;
+            return await context.RecipeBlackLists.AnyAsync(cancellationToken: cancellationToken);
         }
         catch (Exception ex)
         {
