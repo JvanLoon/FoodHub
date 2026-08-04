@@ -22,7 +22,6 @@ public static class ApiRoutes
         public const string Login = Base + "/login";
         public const string Register = Base + "/register";
         public const string ResetPassword = Base + "/resetpassword";
-        public const string CheckJwtToken = Base + "/checkjwttoken";
         public const string ToggleUser = Base + "/toggleUser";
 
         /// <summary>Keeps the caller's presence fresh. The body is empty — the ping is the point.</summary>

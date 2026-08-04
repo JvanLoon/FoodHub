@@ -108,8 +108,15 @@ public static class Program
                 options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
                 {
                     ValidateIssuer = true,
+
+                    // Inert, and left visible rather than deleted so it is not mistaken for an
+                    // oversight: ValidateAudience is off, so ValidAudience is never consulted and
+                    // LoginEndpoint mints no "aud" claim for it to match. Jwt__Audience is
+                    // therefore unused config today. Turning this on means adding the claim at
+                    // mint time in the same change, or every token stops validating.
                     ValidateAudience = false,
                     ValidAudience = jwtSettings?.Audience,
+
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = jwtSettings?.Issuer,
