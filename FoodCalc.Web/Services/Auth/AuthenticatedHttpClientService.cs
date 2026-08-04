@@ -3,6 +3,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using FoodCalc.Web.Constants;
+using Microsoft.AspNetCore.Components;
 
 namespace FoodCalc.Web.Services.Auth;
 
@@ -17,16 +18,66 @@ public class AuthenticatedHttpClientService(
     HttpClient httpClient,
     AuthTokenService authTokenService,
     ILogger<AuthenticatedHttpClientService> logger,
-    MessageService? messageService)
+    MessageService? messageService,
+    NavigationManager navigation)
 {
     private static readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
 
-    private async Task AttachTokenAsync()
+    /// <summary>
+    /// Set once the session has been abandoned, so a page that fired several requests at once
+    /// does not try to sign out and navigate several times over.
+    /// </summary>
+    private bool _sessionAbandoned;
+
+    /// <summary>Attaches the bearer token, and reports whether there was one to attach.</summary>
+    private async Task<bool> AttachTokenAsync()
     {
         var token = await authTokenService.GetTokenAsync();
-        httpClient.DefaultRequestHeaders.Authorization = !string.IsNullOrWhiteSpace(token)
+        var hasToken = !string.IsNullOrWhiteSpace(token);
+
+        httpClient.DefaultRequestHeaders.Authorization = hasToken
             ? new AuthenticationHeaderValue("Bearer", token)
             : null;
+
+        return hasToken;
+    }
+
+    /// <summary>
+    /// Handles a 401 that came back from a request we did send credentials on — the token has
+    /// been refused, so it is finished. Before the API could revoke anything this only happened
+    /// on expiry, which the client noticed for itself; now that disabling an account or changing
+    /// its roles invalidates a token mid-session, the browser has no other way to find out. Left
+    /// alone it would keep believing it was signed in, because the token has not expired, and
+    /// every request would fail behind an error toast until it eventually did.
+    ///
+    /// Only fires when a token was actually attached, so a wrong password on the login form —
+    /// also a 401 — is left to the page to report.
+    /// </summary>
+    private async Task AbandonSessionAsync()
+    {
+        if (_sessionAbandoned)
+            return;
+
+        _sessionAbandoned = true;
+
+        // AuthTokenService rather than AuthStateService: the latter reaches PresenceService,
+        // which is built on this class, and injecting it here would close that loop. Nothing is
+        // lost by going direct, because the reload below rebuilds the circuit from scratch.
+        await authTokenService.RemoveTokenAsync();
+
+        try
+        {
+            // forceLoad, so the circuit is torn down with it — that stops the presence heartbeat
+            // and drops any component still holding state from the abandoned session.
+            navigation.NavigateTo("/login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            // Navigating from a background timer (the heartbeat) is not always allowed. The token
+            // is already gone, so the next page load lands on the login page anyway — MainLayout
+            // redirects there when it finds no valid token.
+            logger.LogDebug(ex, "Could not redirect to the login page after a rejected token");
+        }
     }
 
     // ----- Typed helpers returning ApiResult -----
@@ -74,11 +125,18 @@ public class AuthenticatedHttpClientService(
     {
         try
         {
-            using var response = await SendRawAsync(method, requestUri, content);
-            var result = response.IsSuccessStatusCode
-                ? ApiResult.Ok((int) response.StatusCode)
-                : ApiResult.Fail(await ExtractErrorsAsync(response, method, requestUri), (int) response.StatusCode);
-            return await DecorateAsync(result);
+            var (response, tokenAttached) = await SendRawAsync(method, requestUri, content);
+            using (response)
+            {
+                if (tokenAttached && response.StatusCode == HttpStatusCode.Unauthorized)
+                    await AbandonSessionAsync();
+
+                var result = response.IsSuccessStatusCode
+                    ? ApiResult.Ok((int) response.StatusCode)
+                    : ApiResult.Fail(await ExtractErrorsAsync(response, method, requestUri),
+                        (int) response.StatusCode);
+                return await DecorateAsync(result);
+            }
         }
         catch (Exception ex)
         {
@@ -92,15 +150,21 @@ public class AuthenticatedHttpClientService(
     {
         try
         {
-            using var response = await SendRawAsync(method, requestUri, content);
-            if (!response.IsSuccessStatusCode)
+            var (response, tokenAttached) = await SendRawAsync(method, requestUri, content);
+            using (response)
             {
-                var errors = await ExtractErrorsAsync(response, method, requestUri);
-                return await DecorateAsync(ApiResult<T>.Fail(errors, (int) response.StatusCode));
-            }
+                if (tokenAttached && response.StatusCode == HttpStatusCode.Unauthorized)
+                    await AbandonSessionAsync();
 
-            var data = await ReadDataAsync<T>(response);
-            return await DecorateAsync(ApiResult<T>.Ok(data!, (int) response.StatusCode));
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errors = await ExtractErrorsAsync(response, method, requestUri);
+                    return await DecorateAsync(ApiResult<T>.Fail(errors, (int) response.StatusCode));
+                }
+
+                var data = await ReadDataAsync<T>(response);
+                return await DecorateAsync(ApiResult<T>.Ok(data!, (int) response.StatusCode));
+            }
         }
         catch (Exception ex)
         {
@@ -121,9 +185,15 @@ public class AuthenticatedHttpClientService(
         return result;
     }
 
-    private async Task<HttpResponseMessage> SendRawAsync(HttpMethod method, string requestUri, HttpContent? content)
+    /// <summary>
+    /// Sends the request and reports whether it carried a token, which is what tells a 401
+    /// "your session is finished" apart from a 401 that simply means "wrong password".
+    /// </summary>
+    private async Task<(HttpResponseMessage Response, bool TokenAttached)> SendRawAsync(HttpMethod method,
+        string requestUri,
+        HttpContent? content)
     {
-        await AttachTokenAsync();
+        var tokenAttached = await AttachTokenAsync();
 
         // A POST/PUT/PATCH with no body carries no Content-Type either, and the API
         // answers 415 Unsupported Media Type before the endpoint ever runs — which
@@ -138,7 +208,7 @@ public class AuthenticatedHttpClientService(
         {
             Content = content
         };
-        return await httpClient.SendAsync(request);
+        return (await httpClient.SendAsync(request), tokenAttached);
     }
 
     /// <summary>Deserialize the success body. Handles raw string endpoints and empty bodies.</summary>

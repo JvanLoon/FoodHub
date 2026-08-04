@@ -5,6 +5,7 @@ using FoodCalc.Web.Services;
 using FoodCalc.Web.Services.Admin;
 using FoodCalc.Web.Services.Auth;
 using FoodCalc.Web.Services.User;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -71,7 +72,7 @@ public class Program
             var httpClient = httpClientFactory.CreateClient("ApiClient");
             return new AuthenticatedHttpClientService(httpClient, authTokenService,
                 sp.GetRequiredService<ILogger<AuthenticatedHttpClientService>>(),
-                sp.GetRequiredService<MessageService>());
+                sp.GetRequiredService<MessageService>(), sp.GetRequiredService<NavigationManager>());
         });
 
         // CORS config
