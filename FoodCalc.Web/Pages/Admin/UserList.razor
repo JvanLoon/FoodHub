@@ -98,17 +98,18 @@
 	private ConfirmDialog? confirmDialog;
 	private string? currentUserId;
 
-	// Half the API's write throttle, so a user who has just gone online or offline is picked up
-	// on the next tick or the one after — and the "laatst actief" lines, which are re-rendered
-	// each tick, never drift more than a few seconds behind the minute they claim.
+	// Shorter than the clients' 60s heartbeat, so a user who has just come online is picked up
+	// within about one beat, and well inside the API's three-minute presence window. It also
+	// keeps the "laatst actief" lines honest: they are re-rendered every tick, so they never
+	// drift more than half a minute behind the figure they claim.
 	private static readonly TimeSpan PollInterval = TimeSpan.FromSeconds(30);
 
 	private CancellationTokenSource? pollCts;
 	private Task? pollLoop;
 
 	/// <summary>
-	/// The roles every authenticated endpoint accepts — the "Admin,Moderator,User" policy the API
-	/// gates them with. An account holding none of them can sign in and then do nothing at all.
+	/// Every role the API's policies name. An account holding none of them passes no policy at
+	/// all, so it can sign in and then do nothing whatsoever.
 	/// </summary>
 	private static readonly string[] UsableRoles = ["Admin", "Moderator", "User"];
 

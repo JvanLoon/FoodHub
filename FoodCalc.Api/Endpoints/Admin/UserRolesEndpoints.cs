@@ -37,7 +37,10 @@ public class GetUserRolesEndpoint(UserManager<IdentityUser> userManager) : Endpo
         var user = await userManager.FindByEmailAsync(req.Email);
         if (user == null)
         {
-            await Send.StringAsync(ResponseMessages.Account.UserNotFound, 401, cancellation: ct);
+            // 404, matching the two endpoints below. It used to answer 401, which says "your
+            // credentials are the problem" about a request whose credentials were fine — the
+            // account being asked about simply is not there.
+            await Send.StringAsync(ResponseMessages.Account.UserNotFound, 404, cancellation: ct);
             return;
         }
 

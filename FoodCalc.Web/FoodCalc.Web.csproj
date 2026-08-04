@@ -10,7 +10,11 @@
     <ItemGroup>
         <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
         <PackageReference Include="DotNetEnv" Version="3.2.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.10" />
+        <!--
+          No Authentication.JwtBearer here: this app does not validate tokens and holds no
+          signing key. System.IdentityModel.Tokens.Jwt stays because AuthTokenService still
+          *reads* claims out of the token, which ReadJwtToken does without a signature check.
+        -->
         <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.19.2" />
     </ItemGroup>
 

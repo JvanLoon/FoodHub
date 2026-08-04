@@ -32,8 +32,8 @@ openssl rand -base64 36
 For `POSTGRES_PASSWORD`, avoid `:` `@` `/` — they terminate fields in a Npgsql connection string and will produce a
 confusing "host not found" error.
 
-The JWT key must be **at least 32 bytes**; the API now refuses to start otherwise. The same key must be set on *both*
-the API and the Web container — the front end validates the tokens the API signs.
+The JWT key must be **at least 32 bytes**; the API now refuses to start otherwise. It goes to the **api container
+only** — never to `web`. See the warning in §4 for why.
 
 Put the new values in `.env` (gitignored, see `.env.example`). Nothing secret goes back into any committed file.
 
