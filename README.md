@@ -125,6 +125,22 @@ Bootstrap__AdminPassword=<generated>
 The account is created only while the users table is completely empty, so it cannot overwrite anything or run twice.
 Sign in, change the password, then clear both variables. See [deployment.md](deployment.md) for the full story.
 
+### Enabling an account — use the UI, not SQL
+
+New registrations arrive disabled. Enabling one from the admin **Gebruikers** tab does *two* things: it clears
+the lockout, **and** it grants the `User` role.
+
+Flipping `EmailConfirmed` / `LockoutEnabled` directly in the database only does the first. You get a **floating
+account**: it signs in fine and looks completely normal, but it holds no role at all, so every role-gated
+endpoint answers `403` for it. The visible symptom is presence — the heartbeat and sign-out endpoints are
+role-gated, so the account never shows a green dot in the user list and never gets a "laatst actief" time,
+however much the person is actually using the app.
+
+> ⚠️ Nothing warns you about this. The account works, so it looks fine until you notice it is never online.
+
+To repair one, either add the `User` role from **Gebruikersrollen**, or disable and re-enable the account from
+the **Gebruikers** tab — the enable path grants the role whenever it is missing.
+
 ### Data persistence
 
 The database is stored in the named volume `pgdata`, and DataProtection keys (auth/antiforgery) in
