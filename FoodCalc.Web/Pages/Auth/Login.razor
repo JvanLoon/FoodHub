@@ -32,6 +32,30 @@
 @code {
 	private LoginDto loginModel = new();
 
+	/// <summary>
+	/// Sends an already signed-in visitor straight on instead of asking them to log in again —
+	/// the usual way here is a bookmark, or Back after signing in.
+	///
+	/// There is no renewing a token short of the password: the API issues a 12-hour JWT and has
+	/// no refresh endpoint, so "still valid" is the whole of what can be checked. Anything else
+	/// leaves the form up.
+	/// </summary>
+	protected override async Task OnInitializedAsync()
+	{
+		if (await AuthStateService.IsLoggedInAsync())
+		{
+			// replace, so Back does not come straight back to a login page that will only
+			// bounce them forward again.
+			Navigation.NavigateTo("/", replace: true);
+			return;
+		}
+
+		// Expired, unreadable, or nothing stored at all — stay and show the form. Whatever was
+		// there is dropped now so it cannot be mistaken for a session by anything that only
+		// checks whether a token exists.
+		await AuthStateService.DiscardTokenAsync();
+	}
+
 	private async Task HandleLogin()
 	{
 		await LoginService.LoginAsync(loginModel)

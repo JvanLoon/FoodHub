@@ -53,6 +53,19 @@ public class AuthStateService(AuthTokenService authTokenService, PresenceService
         await NotifyAuthStateChangedAsync();
     }
 
+    /// <summary>
+    /// Throws away a token that could not be used anyway — expired, or not a JWT at all.
+    ///
+    /// Not SignOutAsync: that pings the API to mark the account offline, and the ping is
+    /// authenticated with the very token being discarded, so it could only ever fail. There is
+    /// also nothing to mark offline — presence lapsed on its own long before the token did.
+    /// </summary>
+    public async Task DiscardTokenAsync()
+    {
+        await authTokenService.RemoveTokenAsync();
+        await NotifyAuthStateChangedAsync();
+    }
+
     public async Task SignOutAsync()
     {
         // Before the token goes: the ping that marks the account offline is itself authenticated,

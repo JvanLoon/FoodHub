@@ -24,17 +24,30 @@ public class AuthTokenService(ILocalStorageService localStorage)
         await localStorage.RemoveItemAsync(_tokenName);
     }
 
-    public async Task<string?> GetEmailAsync()
+    /// <summary>
+    /// The stored token's claims, or null when there is no token or it cannot be parsed.
+    ///
+    /// Local storage is the user's to edit, and a value left behind by an older build may not be
+    /// a JWT at all. To every caller here the two cases mean the same thing — there is nothing
+    /// usable — so a garbled token is reported as absent rather than thrown out of a lifecycle
+    /// method, where it would surface as a crashed component instead of a login page.
+    /// </summary>
+    private async Task<JwtSecurityToken?> ReadTokenAsync()
     {
         var token = await GetTokenAsync();
         if (string.IsNullOrEmpty(token))
             return null;
 
-        var handler = new JwtSecurityTokenHandler();
-        var jwt = handler.ReadJwtToken(token);
-        var emailClaim = jwt.Claims.FirstOrDefault(c => c.Type == "email");
+        try { return new JwtSecurityTokenHandler().ReadJwtToken(token); }
+        catch (ArgumentException) { return null; }
+    }
 
-        return emailClaim?.Value;
+    public async Task<string?> GetEmailAsync()
+    {
+        var jwt = await ReadTokenAsync();
+
+        return jwt?.Claims.FirstOrDefault(c => c.Type == "email")
+            ?.Value;
     }
 
     /// <summary>
@@ -44,12 +57,9 @@ public class AuthTokenService(ILocalStorageService localStorage)
     /// </summary>
     public async Task<string?> GetUserIdAsync()
     {
-        var token = await GetTokenAsync();
-        if (string.IsNullOrEmpty(token))
+        var jwt = await ReadTokenAsync();
+        if (jwt is null)
             return null;
-
-        var handler = new JwtSecurityTokenHandler();
-        var jwt = handler.ReadJwtToken(token);
 
         // The raw claim is "sub"; the inbound-claim mapping that would rename it to
         // nameidentifier runs on the API, not here, so check both.
@@ -58,36 +68,32 @@ public class AuthTokenService(ILocalStorageService localStorage)
             ?.Value;
     }
 
+    /// <summary>
+    /// True unless there is a readable token with an expiry still in the future. Every other
+    /// case — nothing stored, not a JWT, no <c>exp</c>, an <c>exp</c> that is not a number —
+    /// counts as expired, because none of them can be used to call the API.
+    /// </summary>
     public async Task<bool> IsTokenExpiredAsync()
     {
-        var token = await GetTokenAsync();
-        if (string.IsNullOrEmpty(token))
-            return true;
+        var jwt = await ReadTokenAsync();
 
-        var handler = new JwtSecurityTokenHandler();
-        var jwt = handler.ReadJwtToken(token);
-        var exp = jwt.Claims.FirstOrDefault(c => c.Type == "exp")
+        var exp = jwt?.Claims.FirstOrDefault(c => c.Type == "exp")
             ?.Value;
 
-        if (exp == null)
+        if (!long.TryParse(exp, out var seconds))
             return true;
 
-        var expDate = DateTimeOffset.FromUnixTimeSeconds(long.Parse(exp));
-        return expDate < DateTimeOffset.UtcNow;
+        return DateTimeOffset.FromUnixTimeSeconds(seconds) < DateTimeOffset.UtcNow;
     }
 
     public async Task<List<string>> GetRolesAsync()
     {
-        var token = await GetTokenAsync();
-        if (string.IsNullOrEmpty(token))
+        var jwt = await ReadTokenAsync();
+        if (jwt is null)
             return [];
 
-        var handler = new JwtSecurityTokenHandler();
-        var jwt = handler.ReadJwtToken(token);
-        var roles = jwt.Claims.Where(c => c.Type.Contains("role"))
+        return jwt.Claims.Where(c => c.Type.Contains("role"))
             .Select(c => c.Value)
             .ToList();
-
-        return roles;
     }
 }
