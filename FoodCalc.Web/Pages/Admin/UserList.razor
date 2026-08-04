@@ -1,3 +1,4 @@
+@implements IAsyncDisposable
 @inject AdminService AdminService
 @inject AuthStateService AuthStateService
 
@@ -84,12 +85,90 @@
 	private ConfirmDialog? confirmDialog;
 	private string? currentUserId;
 
+	// Half the API's write throttle, so a user who has just gone online or offline is picked up
+	// on the next tick or the one after — and the "laatst actief" lines, which are re-rendered
+	// each tick, never drift more than a few seconds behind the minute they claim.
+	private static readonly TimeSpan PollInterval = TimeSpan.FromSeconds(30);
+
+	private CancellationTokenSource? pollCts;
+	private Task? pollLoop;
+
 	protected override async Task OnInitializedAsync()
 	{
 		// Own id first: the list renders between these two awaits, and with it still null the
 		// Delete button would flash onto your own row before being taken away again.
 		currentUserId = await AuthStateService.GetUserIdAsync();
 		await LoadUsersAsync();
+
+		pollCts = new CancellationTokenSource();
+		pollLoop = PollPresenceAsync(pollCts.Token);
+	}
+
+	/// <summary>
+	/// Keeps the dots and the "laatst actief" lines current while the tab stays open. Only
+	/// presence is re-read — the accounts themselves, and their roles, do not change under you.
+	/// </summary>
+	private async Task PollPresenceAsync(CancellationToken ct)
+	{
+		using var timer = new PeriodicTimer(PollInterval);
+
+		try
+		{
+			while (await timer.WaitForNextTickAsync(ct))
+				await RefreshPresenceAsync(ct);
+		}
+		catch (OperationCanceledException)
+		{
+			// Normal: the tab was left, or the circuit went away.
+		}
+	}
+
+	private async Task RefreshPresenceAsync(CancellationToken ct)
+	{
+		// Captured so the reply can be checked against the page it was asked about: a search or a
+		// page change mid-flight replaces this object, and the answer is then about a list that
+		// is no longer on screen.
+		var asked = pagedResult;
+		if (asked is null || asked.Items.Count == 0)
+			return;
+
+		var result = await AdminService.GetPresenceAsync(asked.Items.Select(u => u.Id));
+
+		// No OrDefault and no OnFailure on purpose: this runs every 30 seconds, and an API that
+		// is briefly down would otherwise raise a toast on every tick. A skipped refresh costs
+		// nothing — the next one has the same answer.
+		if (!result.Success || result.Data is null || ct.IsCancellationRequested || !ReferenceEquals(pagedResult, asked))
+			return;
+
+		var byId = asked.Items.ToDictionary(u => u.Id);
+		foreach (var presence in result.Data)
+		{
+			if (!byId.TryGetValue(presence.UserId, out var user))
+				continue;
+
+			user.IsOnline = presence.IsOnline;
+			user.LastSeenUtc = presence.LastSeenUtc;
+		}
+
+		// Unconditional, even when nothing came back changed: "laatst actief 7 min geleden" is
+		// measured against the clock, so it goes stale on its own and has to be re-rendered.
+		await InvokeAsync(StateHasChanged);
+	}
+
+	public async ValueTask DisposeAsync()
+	{
+		if (pollCts is null)
+			return;
+
+		await pollCts.CancelAsync();
+
+		if (pollLoop is not null)
+			try { await pollLoop; }
+			catch (OperationCanceledException) {}
+
+		pollCts.Dispose();
+		pollCts = null;
+		pollLoop = null;
 	}
 
 	private async Task LoadUsersAsync()

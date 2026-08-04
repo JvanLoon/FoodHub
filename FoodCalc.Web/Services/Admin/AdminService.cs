@@ -23,6 +23,17 @@ public class AdminService(AuthenticatedHttpClientService httpClient)
         return ApiResult<List<UserDto>>.Ok([..paged.Data!.Items], paged.StatusCode);
     }
 
+    /// <summary>
+    /// Current online state for the accounts on screen. Polled by the user list, so it stays
+    /// deliberately narrow — no roles, no paging, just the two fields that move.
+    /// </summary>
+    public Task<ApiResult<List<UserPresenceDto>>> GetPresenceAsync(IEnumerable<string> userIds) =>
+        httpClient.PostAsync<UserPresenceRequest, List<UserPresenceDto>>(ApiRoutes.Admin.Presence,
+            new UserPresenceRequest
+            {
+                UserIds = [..userIds]
+            });
+
     // Posted as a body rather than a query string, so the shape is checked by the compiler
     // against the API's request type — and so an address containing '+' survives the trip.
     public Task<ApiResult> ToggleUserAsync(string email, bool enable = true) => httpClient.PostAsync(

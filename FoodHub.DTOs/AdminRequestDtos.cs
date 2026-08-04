@@ -26,3 +26,13 @@ public class ModifyUserRoleRequest
 
     public string Role { get; set; } = string.Empty;
 }
+
+/// <summary>
+/// Body of POST api/admin/presence — refresh who is online without re-fetching the user list.
+/// A POST for what is really a read, because the client asks about a whole page of accounts at
+/// once and a hundred ids do not belong in a query string.
+/// </summary>
+public class UserPresenceRequest
+{
+    public List<string> UserIds { get; set; } = [];
+}

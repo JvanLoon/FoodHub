@@ -81,6 +81,9 @@ public static class ApiRoutes
         public const string AllRoles = Base + "/allroles";
         public const string UserRoles = Base + "/userroles";
 
+        /// <summary>POST — who of these accounts is online right now. Polled by the user list.</summary>
+        public const string Presence = Base + "/presence";
+
         /// <summary>DELETE only — removes an account outright.</summary>
         public const string User = Base + "/user";
     }
