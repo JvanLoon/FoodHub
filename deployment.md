@@ -171,8 +171,17 @@ cause.
 Aspire's injected `foodcalc` connection string and the compose-supplied values authoritative.
 
 > Because `FoodCalc.Api/appsettings.json` is gone, `Jwt__Issuer` and `Jwt__Audience`
-> no longer have a committed default. Both compose files now set them explicitly —
-> token validation checks the issuer, so a missing value breaks every login.
+> no longer have a committed default. The compose files set them explicitly on the
+> **api** service — token validation checks the issuer, so a missing value breaks
+> every login.
+
+> ⚠️ **`Jwt__Key` goes to the API only — never to the web service.** The tokens are
+> HS256, so the key signs as well as verifies: any process holding it can mint a
+> token for any account with any role. `web` is the container the tunnel exposes,
+> while `api` publishes no ports at all, so giving `web` the key handed the reachable
+> process the ability to forge credentials for the protected one. It gained nothing in
+> return — the front end never validated a token, it only reads claims to decide what
+> to render, and that needs no key.
 
 ### Fail-fast validation
 
@@ -222,14 +231,17 @@ No committed file carries working secrets any more, so a plain (non-Aspire) loca
 ```bash
 cp FoodCalc.Api/.env.example FoodCalc.Api/.env
 cp FoodCalc.Web/.env.example FoodCalc.Web/.env
-openssl rand -base64 48        # Jwt__Key — paste the SAME value into both files
+openssl rand -base64 48        # Jwt__Key — FoodCalc.Api/.env only
 ```
 
 Then fill in the Postgres password in `FoodCalc.Api/.env`.
 
-Neither project has an `appsettings.json` any more, so **without a `.env` the app does not start** — it fails on
-`WebServer:BaseAddress` or `Jwt:Key` being absent. That is intentional: a missing config file is a loud failure, an
-empty committed default is a silent one.
+`FoodCalc.Web/.env` carries no `Jwt__*` at all — see the warning in §4. The web app neither validates tokens nor needs
+the key.
+
+Neither project has an `appsettings.json` any more, so **without a `.env` the app does not start** — the API fails on
+`WebServer:BaseAddress` or `Jwt:Key` being absent, the web app on `API:BaseAddress`. That is intentional: a missing
+config file is a loud failure, an empty committed default is a silent one.
 
 **Running through the Aspire AppHost is unaffected** — it injects its own `foodcalc`
 connection string, and `NoClobber` means it wins over the file. Only `Jwt__Key` needs setting.

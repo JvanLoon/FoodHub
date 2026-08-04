@@ -5,7 +5,6 @@ using FoodCalc.Web.Services;
 using FoodCalc.Web.Services.Admin;
 using FoodCalc.Web.Services.Auth;
 using FoodCalc.Web.Services.User;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -102,37 +101,19 @@ public class Program
             //options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
         });
 
-        builder.Services.AddAuthentication("JwtBearer")
-            .AddJwtBearer("JwtBearer", options =>
-            {
-                var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtOptions>();
-                string? key = jwtSettings?.Key;
-
-                if (string.IsNullOrWhiteSpace(key))
-                    throw new InvalidOperationException("JWT key is not configured.");
-
-                options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = false,
-                    ValidAudience = jwtSettings?.Audience,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = jwtSettings?.Issuer,
-                    IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
-                        System.Text.Encoding.UTF8.GetBytes(key)),
-                    ClockSkew = TimeSpan.Zero
-                };
-
-                options.SaveToken = true;
-
-                options.Events = new JwtBearerEvents
-                {
-                    //Allows you to hook into JWT authentication events (e.g., for logging, custom validation).
-                    OnAuthenticationFailed = context => { return Task.CompletedTask; }
-                };
-            });
-        builder.Services.AddAuthorization();
+        // No JWT validation here, and deliberately no signing key in this process.
+        //
+        // The tokens are HS256, so the key does not merely verify them — it mints them. A
+        // process holding it can forge a token for any account with any role. This one is the
+        // internet-facing container (the tunnel points at web; api publishes no ports at all),
+        // so keeping the key here handed the exposed process the ability to forge credentials
+        // for the one that was deliberately kept unreachable.
+        //
+        // It bought nothing: nothing in this project is [Authorize]-gated or uses AuthorizeView,
+        // so the ClaimsPrincipal that validation produced was never read. Page gating is
+        // RoleGuard plus AuthStateService, and the API re-checks every request independently.
+        // AuthTokenService only needs to *read* claims, which ReadJwtToken does without
+        // verifying a signature and therefore without a key.
 
         var app = builder.Build();
 
@@ -159,10 +140,6 @@ public class Program
         //app.UseOutputCache();
         app.UseCors("AllowAPI");
 
-        app.UseAuthentication();
-        app.UseAuthorization();
-
-
         // Replaces UseStaticFiles: serves wwwroot from the build-time asset manifest, which is
         // what makes the fingerprinted @Assets[..] URLs in App.razor resolve. It also sets
         // immutable, long-lived caching on those hashed URLs — safe precisely because the URL
@@ -176,11 +153,4 @@ public class Program
 
         app.Run();
     }
-}
-
-public class JwtOptions
-{
-    public string Key { get; set; } = string.Empty;
-    public string Issuer { get; set; } = string.Empty;
-    public string Audience { get; set; } = string.Empty;
 }

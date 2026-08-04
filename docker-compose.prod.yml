@@ -77,11 +77,12 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - API__BaseAddress=http://api:8080
-      - Jwt__Key=${JWT_KEY:?set JWT_KEY in .env}
-      # FoodCalc.Api/appsettings.json is no longer committed, so these non-secret
-      # values have to be supplied here — token validation checks the issuer.
-      - Jwt__Issuer=FoodCalc
-      - Jwt__Audience=FoodHub-Api-user
+      # No Jwt__* here on purpose. The tokens are HS256, so the key signs as well as
+      # verifies and anyone holding it can forge a token for any account and any role.
+      # This is the container cloudflared exposes; the api service, which does need the
+      # key, publishes no ports at all. Handing the key to the reachable process undid
+      # part of that isolation and bought nothing — the front end only reads claims to
+      # decide what to render, which needs no key, and the API re-checks every request.
     volumes:
       # DataProtection keys. If this volume is lost every session cookie and
       # antiforgery token is invalidated and users are silently logged out.

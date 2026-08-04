@@ -81,10 +81,11 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       # Internal docker-network address of the API.
       - API__BaseAddress=http://api:8080
-      # Must match the API's key — the web front end validates the same tokens.
-      - Jwt__Key=${JWT_KEY:?set JWT_KEY in .env}
-      - Jwt__Issuer=FoodCalc
-      - Jwt__Audience=FoodHub-Api-user
+      # No Jwt__* here on purpose. The tokens are HS256, so the key signs as well as
+      # verifies and anyone holding it can forge an admin token. This is the container
+      # the tunnel exposes; the API, which does need the key, publishes no ports. The
+      # front end only reads claims to decide what to render, which needs no key, and
+      # the API re-checks every request anyway.
     volumes:
       # DataProtection keys: persisted so auth/antiforgery survive a recompose.
       # Path matches Environment.SpecialFolder.LocalApplicationData for root.
