@@ -18,13 +18,26 @@
 			{
 				<li>
 					<a class="user-list__link" href="/admin/userroles/@user.Email">
-						@* The dot is positioned against this wrapper, so it tracks the icon rather
+						@* The badge is positioned against this wrapper, so it tracks the icon rather
 						   than the row — the row grows a line taller for anyone who is offline. *@
 						<span class="user-list__avatar">
 							<i class="bi bi-person-circle" aria-hidden="true"></i>
-							@if (user.IsOnline)
+							@* The cross wins over the dot on purpose. Signing in stamps presence
+							   directly (that endpoint is anonymous), so a role-less account can
+							   genuinely be "online" for three minutes while being unable to call
+							   anything — a green dot there would be the least useful thing to say
+							   about it. *@
+							@if (!HasUsableRole(user))
 							{
-								<span class="user-list__dot" title="@UiText.Users.Online" aria-label="@UiText.Users.Online"></span>
+								<span class="user-list__badge user-list__badge--norole"
+								      title="@UiText.Users.NoRole" aria-label="@UiText.Users.NoRole">
+									<i class="bi bi-x" aria-hidden="true"></i>
+								</span>
+							}
+							else if (user.IsOnline)
+							{
+								<span class="user-list__badge user-list__badge--online"
+								      title="@UiText.Users.Online" aria-label="@UiText.Users.Online"></span>
 							}
 						</span>
 						<span class="user-list__identity">
@@ -92,6 +105,20 @@
 
 	private CancellationTokenSource? pollCts;
 	private Task? pollLoop;
+
+	/// <summary>
+	/// The roles every authenticated endpoint accepts — the "Admin,Moderator,User" policy the API
+	/// gates them with. An account holding none of them can sign in and then do nothing at all.
+	/// </summary>
+	private static readonly string[] UsableRoles = ["Admin", "Moderator", "User"];
+
+	/// <summary>
+	/// False for the account described under "Enabling an account" in the README: enabled straight
+	/// in the database, so it never picked up a role. It looks entirely normal until you notice it
+	/// is never online — presence is role-gated like everything else, so its heartbeat is refused.
+	/// </summary>
+	private static bool HasUsableRole(UserDto user) =>
+		user.Roles.Any(role => UsableRoles.Contains(role, StringComparer.OrdinalIgnoreCase));
 
 	protected override async Task OnInitializedAsync()
 	{

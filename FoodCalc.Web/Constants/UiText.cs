@@ -417,6 +417,12 @@ public static class UiText
         public const string NeverSignedIn = "Nog nooit ingelogd";
 
         /// <summary>
+        /// Tooltip on the cross. Names the fix as well as the problem: on its own "geen rol" reads
+        /// like a setting someone chose, rather than an account that cannot do anything.
+        /// </summary>
+        public const string NoRole = "Geen rol toegewezen — dit account kan niets. Voeg de rol User toe via Gebruikersrollen.";
+
+        /// <summary>
         /// "Laatst actief …" for a user who is not online. Only ever shown alongside a false
         /// IsOnline, so it never has to describe the present.
         /// </summary>

@@ -59,20 +59,51 @@
 }
 
 /* Sits in the notch of the person icon's shoulder. The ring is the row background rather than a
-   border colour, so the dot reads as floating above the icon instead of welded to it. */
-.user-list__dot {
+   border colour, so the badge reads as floating above the icon instead of welded to it. */
+.user-list__badge {
     position: absolute;
     right: -1px;
     bottom: 0;
-    width: 0.55rem;
-    height: 0.55rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     border-radius: 50%;
-    background: var(--fh-success);
     box-shadow: 0 0 0 2px var(--fh-surface);
 }
 
-.user-list li:hover .user-list__dot {
+.user-list li:hover .user-list__badge {
     box-shadow: 0 0 0 2px var(--fh-surface-sunken);
+}
+
+.user-list__badge--online {
+    width: 0.55rem;
+    height: 0.55rem;
+    background: var(--fh-success);
+}
+
+/* Wider than the online dot because it has to hold a glyph, and it earns the room: an account
+   with no role is broken, not merely idle. */
+.user-list__badge--norole {
+    width: 0.85rem;
+    height: 0.85rem;
+    background: var(--fh-danger);
+    /* The cross is the only thing in here, so the icon's own line-height would otherwise push it
+       off centre inside a circle this small. */
+    line-height: 1;
+}
+
+.user-list__badge--norole .bi {
+    /* Overrides the 1.25rem the link sets for the person icon — that is the avatar's size, not
+       this glyph's. */
+    font-size: 0.7rem;
+
+    /* The row background, matching the ring, so the cross reads as cut out of the circle. Also
+       the safer contrast: white would sit on the lighter red the dark theme uses. */
+    color: var(--fh-surface);
+}
+
+.user-list li:hover .user-list__badge--norole .bi {
+    color: var(--fh-surface-sunken);
 }
 
 /* The address and the "laatst actief" line stack, so the row grows a line for offline users
