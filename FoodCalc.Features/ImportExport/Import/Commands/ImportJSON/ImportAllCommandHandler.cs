@@ -134,7 +134,12 @@ public class ImportAllCommandHandler(
                             Email = userDto.Email,
                             UserName = userDto.Email,
                             EmailConfirmed = userDto.EmailConfirmed,
-                            LockoutEnabled = userDto.LockoutEnabled
+
+                            // Not restored from the file. LockoutEnabled is an invariant now —
+                            // always on, see ToggleUserEndpoint — and any export taken before
+                            // that carries false for every enabled account, so importing one
+                            // would quietly switch brute-force protection back off.
+                            LockoutEnabled = true
                         };
                         await userManager.CreateAsync(user);
                         if (userDto.Roles != null)
@@ -152,9 +157,11 @@ public class ImportAllCommandHandler(
                         changed = true;
                     }
 
-                    if (existing.LockoutEnabled != userDto.LockoutEnabled)
+                    // Same for an account that already exists: the import repairs LockoutEnabled
+                    // towards the invariant rather than towards whatever the file says.
+                    if (!existing.LockoutEnabled)
                     {
-                        existing.LockoutEnabled = userDto.LockoutEnabled;
+                        existing.LockoutEnabled = true;
                         changed = true;
                     }
 

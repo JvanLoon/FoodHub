@@ -31,26 +31,34 @@ public class LoginEndpoint(
             return;
         }
 
+        // Whether an account is enabled is carried by EmailConfirmed alone (see
+        // ToggleUserEndpoint). Lockout used to double as that flag, which is precisely why it
+        // never got round to doing its own job.
         if (!user.EmailConfirmed)
         {
             await Send.StringAsync(ResponseMessages.Account.EmailNotConfirmed, 401, cancellation: ct);
             return;
         }
 
-        if (user.LockoutEnabled)
+        // lockoutOnFailure: true is the entire brute-force protection. Identity counts the
+        // failure, locks the account for Lockout.DefaultLockoutTimeSpan once
+        // Lockout.MaxFailedAccessAttempts is reached, refuses while a lockout is live, and
+        // resets the count on success.
+        //
+        // Counting failures by hand — AccessFailedAsync after the fact — does not work: it
+        // writes LockoutEnd, but every read of it goes through UserManager.IsLockedOutAsync,
+        // which returns false outright when LockoutEnabled is off. The count went up and
+        // nothing ever acted on it.
+        var result = await signInManager.CheckPasswordSignInAsync(user, req.Password, lockoutOnFailure: true);
+
+        if (result.IsLockedOut)
         {
-            if (user.LockoutEnd < DateTime.Now) { await userManager.SetLockoutEnabledAsync(user, false); }
-            else
-            {
-                await Send.StringAsync(ResponseMessages.Account.UserLockedOut, 401, cancellation: ct);
-                return;
-            }
+            await Send.StringAsync(ResponseMessages.Account.UserLockedOut, 401, cancellation: ct);
+            return;
         }
 
-        var result = await signInManager.CheckPasswordSignInAsync(user, req.Password, false);
         if (!result.Succeeded)
         {
-            await userManager.AccessFailedAsync(user);
             await Send.StringAsync(ResponseMessages.Account.InvalidPassword, 401, cancellation: ct);
             return;
         }

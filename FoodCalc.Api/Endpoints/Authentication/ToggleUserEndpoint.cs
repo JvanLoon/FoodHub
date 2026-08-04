@@ -26,16 +26,25 @@ public class ToggleUserEndpoint(UserManager<IdentityUser> userManager) : Endpoin
 
         user.EmailConfirmed = req.Enable;
 
+        // Always on, in both branches. LockoutEnabled means "may this account be locked out",
+        // not "is it disabled" — and clearing it here is what left every working account with no
+        // brute-force protection at all, because UserManager.IsLockedOutAsync short-circuits to
+        // false when it is off. Asserted rather than assumed, so any account that predates the
+        // fix heals the next time it is toggled.
+        user.LockoutEnabled = true;
+
         if (req.Enable)
         {
-            // Enable: clear any lockout so the account can sign in again.
-            user.LockoutEnabled = false;
+            // Clear a live lockout so a re-enabled account is not still serving out a ban, and
+            // reset the count that produced it.
             user.LockoutEnd = null;
+            user.AccessFailedCount = 0;
         }
         else
         {
-            // Disable: truly lock the account out (login blocks on both EmailConfirmed and this).
-            user.LockoutEnabled = true;
+            // Beside EmailConfirmed rather than instead of it: now that lockout is genuinely
+            // enforced, this also stops any sign-in path that goes through SignInManager without
+            // repeating the EmailConfirmed check.
             user.LockoutEnd = DateTimeOffset.MaxValue;
         }
 

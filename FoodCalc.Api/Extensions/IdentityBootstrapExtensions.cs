@@ -64,25 +64,22 @@ public static class IdentityBootstrapExtensions
         {
             UserName = email,
             Email = email,
-            EmailConfirmed = true, // Enabled/disabled is gated on EmailConfirmed, see ToggleUserEndpoint.
-            LockoutEnabled = false,
-            LockoutEnd = null
+            EmailConfirmed = true // Enabled/disabled is gated on EmailConfirmed, see ToggleUserEndpoint.
         };
 
         var result = await userManager.CreateAsync(admin, password);
         if (!result.Succeeded)
             throw new InvalidOperationException($"Could not create the bootstrap admin account: {Describe(result)}");
 
-        // LockoutEnabled = false on the entity above does NOT survive creation:
-        // UserManager.CreateAsync re-enables lockout on every new user whenever
-        // Lockout.AllowedForNewUsers is set, which Program.cs does. It has to be
-        // turned off again afterwards, or the one account that can reach the admin
-        // UI can be locked out of it by five bad guesses — including your own.
-        var unlocked = await userManager.SetLockoutEnabledAsync(admin, false);
-        if (!unlocked.Succeeded)
-            throw new InvalidOperationException(
-                $"Created the bootstrap admin but could not disable its lockout: {Describe(unlocked)}");
-
+        // Lockout is deliberately left on, which CreateAsync does for us while
+        // Lockout.AllowedForNewUsers is set. This account used to have it switched off again
+        // straight afterwards, to protect the one login that can reach the admin UI from being
+        // locked out by five bad guesses — including your own.
+        //
+        // That trade was the wrong way round. The cost of leaving it on is a ten-minute wait
+        // (Lockout.DefaultLockoutTimeSpan) after five failures. The cost of turning it off was
+        // an admin account that could be guessed at forever, and it is the single most valuable
+        // account in the system.
         var roled = await userManager.AddToRolesAsync(admin, ApplicationRoles);
         if (!roled.Succeeded)
             throw new InvalidOperationException(
