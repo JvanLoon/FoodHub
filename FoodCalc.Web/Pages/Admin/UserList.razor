@@ -17,8 +17,24 @@
 			{
 				<li>
 					<a class="user-list__link" href="/admin/userroles/@user.Email">
-						<i class="bi bi-person-circle" aria-hidden="true"></i>
-						<span class="user-list__email">@user.Email</span>
+						@* The dot is positioned against this wrapper, so it tracks the icon rather
+						   than the row — the row grows a line taller for anyone who is offline. *@
+						<span class="user-list__avatar">
+							<i class="bi bi-person-circle" aria-hidden="true"></i>
+							@if (user.IsOnline)
+							{
+								<span class="user-list__dot" title="@UiText.Users.Online" aria-label="@UiText.Users.Online"></span>
+							}
+						</span>
+						<span class="user-list__identity">
+							<span class="user-list__email">@user.Email</span>
+							@* Offline only: while they are online the dot already says so, and
+							   "laatst actief zojuist" underneath it would just be noise. *@
+							@if (!user.IsOnline)
+							{
+								<span class="user-list__last-active">@UiText.Users.LastActive(user.LastSeenUtc)</span>
+							}
+						</span>
 					</a>
 					@* Wrapped so the row's space-between keeps the buttons together on the
 					   right instead of spreading them across the row. *@

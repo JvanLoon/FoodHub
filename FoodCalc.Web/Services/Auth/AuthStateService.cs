@@ -1,6 +1,6 @@
 namespace FoodCalc.Web.Services.Auth;
 
-public class AuthStateService(AuthTokenService authTokenService)
+public class AuthStateService(AuthTokenService authTokenService, PresenceService presenceService)
 {
     public event Func<Task>? OnAuthStateChanged;
 
@@ -49,11 +49,15 @@ public class AuthStateService(AuthTokenService authTokenService)
     public async Task SignInAsync(string token)
     {
         await authTokenService.SetTokenAsync(token);
+        presenceService.Start();
         await NotifyAuthStateChangedAsync();
     }
 
     public async Task SignOutAsync()
     {
+        // Before the token goes: the ping that marks the account offline is itself authenticated,
+        // so it has to ride out on the credentials being discarded.
+        await presenceService.SignalOfflineAsync();
         await authTokenService.RemoveTokenAsync();
         await NotifyAuthStateChangedAsync();
     }

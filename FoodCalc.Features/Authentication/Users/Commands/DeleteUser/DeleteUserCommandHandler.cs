@@ -38,6 +38,11 @@ public class DeleteUserCommandHandler(
                 await context.SaveChangesAsync(cancellationToken);
             }
 
+            // Presence is per-account bookkeeping with no FK to hang it, so it goes too —
+            // otherwise the row outlives the user and a recycled id would inherit it.
+            await context.UserPresences.Where(p => p.UserId == user.Id)
+                .ExecuteDeleteAsync(cancellationToken);
+
             // Identity owns the cascade for its own tables (roles, claims, logins, tokens).
             var result = await userManager.DeleteAsync(user);
             if (!result.Succeeded)

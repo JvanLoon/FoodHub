@@ -52,6 +52,42 @@
     }
 }
 
+.user-list__avatar {
+    position: relative;
+    display: inline-flex;
+    flex-shrink: 0;
+}
+
+/* Sits in the notch of the person icon's shoulder. The ring is the row background rather than a
+   border colour, so the dot reads as floating above the icon instead of welded to it. */
+.user-list__dot {
+    position: absolute;
+    right: -1px;
+    bottom: 0;
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    background: var(--fh-success);
+    box-shadow: 0 0 0 2px var(--fh-surface);
+}
+
+.user-list li:hover .user-list__dot {
+    box-shadow: 0 0 0 2px var(--fh-surface-sunken);
+}
+
+/* The address and the "laatst actief" line stack, so the row grows a line for offline users
+   instead of the two competing for horizontal space. */
+.user-list__identity {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.user-list__last-active {
+    font-size: var(--fh-text-sm);
+    color: var(--fh-text-muted);
+}
+
 .user-list__email {
     font-weight: var(--fh-weight-medium);
 

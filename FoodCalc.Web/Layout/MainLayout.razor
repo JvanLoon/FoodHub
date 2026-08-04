@@ -1,6 +1,7 @@
 @inherits LayoutComponentBase
 @implements IDisposable
 @inject AuthStateService AuthStateService
+@inject PresenceService PresenceService
 @inject MessageService MessageService
 @inject NavigationManager Navigation
 
@@ -104,6 +105,11 @@
 			}
 
 			userEmail = await AuthStateService.GetEmailAsync();
+
+			// SignInAsync starts the heartbeat for a fresh login; this covers the other way in —
+			// a reload or a second tab, where the token is already in local storage and this
+			// circuit has never beaten. Start is idempotent.
+			PresenceService.Start();
 		}
 		catch (Exception ex) { MessageService.ShowMessage(ex.Message, true, 20000); }
 	}

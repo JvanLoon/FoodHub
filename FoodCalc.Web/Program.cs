@@ -53,6 +53,7 @@ public class Program
             .SetApplicationName("FoodHub");
 
         builder.Services.AddScoped<AuthTokenService>();
+        builder.Services.AddScoped<PresenceService>();
         builder.Services.AddScoped<AuthStateService>();
         builder.Services.AddScoped<AdminService>();
         builder.Services.AddScoped<LoginService>();

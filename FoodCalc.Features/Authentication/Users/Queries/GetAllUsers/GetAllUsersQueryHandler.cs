@@ -1,8 +1,10 @@
 ﻿using ErrorOr;
+using FoodCalc.Features.Authentication.Presence;
 using FoodCalc.Features.Mapping;
 using FoodHub.DTOs;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace FoodCalc.Features.Authentication.Users.Queries.GetAllUsers;
@@ -24,6 +26,16 @@ public class GetAllUsersQueryHandler(
 
             var paged = await query.ToPagedResultAsync(request, cancellationToken);
 
+            // One presence lookup for the whole page, keyed by id, instead of a query per row.
+            var userIds = paged.Items.Select(u => u.Id)
+                .ToList();
+
+            var presence = await context.UserPresences.Where(p => userIds.Contains(p.UserId))
+                .ToDictionaryAsync(p => p.UserId, cancellationToken);
+
+            // Captured once so every row on the page is judged against the same instant.
+            var now = DateTime.UtcNow;
+
             var userDtos = new List<UserDto>();
             foreach (var user in paged.Items)
             {
@@ -31,6 +43,11 @@ public class GetAllUsersQueryHandler(
                 var userDto = user.ToUserDto();
                 userDto.Enabled = user.EmailConfirmed;
                 userDto.Roles = roles.ToList();
+
+                var seen = presence.GetValueOrDefault(user.Id);
+                userDto.IsOnline = PresenceWindow.IsOnline(seen, now);
+                userDto.LastSeenUtc = seen?.LastSeenUtc;
+
                 userDtos.Add(userDto);
             }
 

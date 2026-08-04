@@ -24,6 +24,12 @@ public static class ApiRoutes
         public const string ResetPassword = Base + "/resetpassword";
         public const string CheckJwtToken = Base + "/checkjwttoken";
         public const string ToggleUser = Base + "/toggleUser";
+
+        /// <summary>Keeps the caller's presence fresh. The body is empty — the ping is the point.</summary>
+        public const string Heartbeat = Base + "/heartbeat";
+
+        /// <summary>Marks the caller offline straight away instead of waiting for the window to lapse.</summary>
+        public const string SignOut = Base + "/signout";
     }
 
     public static class Recipe

@@ -1,4 +1,6 @@
 using FastEndpoints;
+using FoodCalc.Features.Authentication.Presence.Commands.TouchPresence;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -11,7 +13,8 @@ namespace FoodCalc.Api.Endpoints.Authentication;
 public class LoginEndpoint(
     IConfiguration configuration,
     UserManager<IdentityUser> userManager,
-    SignInManager<IdentityUser> signInManager) : Endpoint<LoginDto, AuthResponseDto>
+    SignInManager<IdentityUser> signInManager,
+    IMediator mediator) : Endpoint<LoginDto, AuthResponseDto>
 {
     public override void Configure()
     {
@@ -64,6 +67,11 @@ public class LoginEndpoint(
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         var token = new JwtSecurityToken(issuer: configuration["Jwt:Issuer"], claims: claims,
             expires: DateTime.UtcNow.AddHours(12), signingCredentials: creds);
+
+        // This route is anonymous, so PresenceMiddleware has no principal to read and skips it.
+        // Marking the user online here means an admin sees the dot at once, rather than after the
+        // client's first heartbeat a minute later.
+        await mediator.Send(new TouchPresenceCommand(user.Id), ct);
 
         var response = new AuthResponseDto
         {

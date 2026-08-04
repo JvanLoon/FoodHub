@@ -412,6 +412,46 @@ public static class UiText
         public static string DeleteMessage(string? email) =>
             $"Account “{email}” definitief verwijderen? De maaltijdkalender van deze gebruiker " +
             "verdwijnt mee. Ingediende recepten blijven bestaan. Dit kan niet ongedaan worden gemaakt.";
+
+        public const string Online = "Online";
+        public const string NeverSignedIn = "Nog nooit ingelogd";
+
+        /// <summary>
+        /// "Laatst actief …" for a user who is not online. Only ever shown alongside a false
+        /// IsOnline, so it never has to describe the present.
+        /// </summary>
+        public static string LastActive(DateTime? lastSeenUtc)
+        {
+            if (lastSeenUtc is null)
+                return NeverSignedIn;
+
+            // The API sends UTC. A missing Kind would otherwise be read as local time and put the
+            // user an hour or two in the future, so it is pinned rather than converted.
+            var seen = lastSeenUtc.Value.Kind == DateTimeKind.Unspecified
+                ? DateTime.SpecifyKind(lastSeenUtc.Value, DateTimeKind.Utc)
+                : lastSeenUtc.Value.ToUniversalTime();
+
+            var elapsed = DateTime.UtcNow - seen;
+
+            // Clock skew between the API host and this one can land the stamp slightly ahead of
+            // now. "Zojuist" is the honest reading of that, not a negative duration.
+            if (elapsed < TimeSpan.FromMinutes(1))
+                return "Laatst actief zojuist";
+
+            if (elapsed < TimeSpan.FromHours(1))
+                return $"Laatst actief {(int) elapsed.TotalMinutes} min geleden";
+
+            if (elapsed < TimeSpan.FromDays(1))
+                return $"Laatst actief {(int) elapsed.TotalHours} uur geleden";
+
+            if (elapsed < TimeSpan.FromDays(30))
+            {
+                var days = (int) elapsed.TotalDays;
+                return $"Laatst actief {days} {(days == 1 ? "dag" : "dagen")} geleden";
+            }
+
+            return $"Laatst actief op {seen.ToLocalTime():dd-MM-yyyy}";
+        }
     }
 
     /// <summary>Role management and password reset.</summary>

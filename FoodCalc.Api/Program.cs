@@ -1,6 +1,8 @@
 using FastEndpoints;
 using FastEndpoints.Swagger;
+using FoodCalc.Api.Common;
 using FoodCalc.Api.Extensions;
+using FoodCalc.Api.Middleware;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
@@ -134,6 +136,10 @@ public static class Program
         // Use the custom service registration method
         builder.Services.AddApplicationMediatR();
 
+        // Singleton: it is a rate limiter for presence writes, so it has to remember what it
+        // already wrote across requests. See PresenceThrottle.
+        builder.Services.AddSingleton<PresenceThrottle>();
+
         // CORS config
         builder.Services.AddCors(options =>
         {
@@ -178,6 +184,10 @@ public static class Program
         app.UseCors("AllowWebApp");
         app.UseAuthentication();
         app.UseAuthorization();
+
+        // After authentication, so there is a ClaimsPrincipal to read, and before the endpoints,
+        // so it wraps them and can stamp presence once the response is out.
+        app.UseMiddleware<PresenceMiddleware>();
 
         app.UseFastEndpoints(c =>
         {
