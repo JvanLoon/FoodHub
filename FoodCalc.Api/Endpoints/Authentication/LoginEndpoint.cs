@@ -66,6 +66,13 @@ public class LoginEndpoint(
         List<Claim> claims =
         [
             new Claim(JwtRegisteredClaimNames.Sub, user.Id), new Claim(JwtRegisteredClaimNames.Email, user.Email!),
+
+            // What makes the token revocable. Every request compares this against the account's
+            // current stamp, so anything that rotates it — disabling, a role change, a password
+            // reset — invalidates this token at once instead of in twelve hours.
+            // See SecurityStampCheck.
+            new Claim(userManager.Options.ClaimsIdentity.SecurityStampClaimType,
+                await userManager.GetSecurityStampAsync(user)),
         ];
 
         var roles = await userManager.GetRolesAsync(user);

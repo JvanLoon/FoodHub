@@ -57,6 +57,15 @@ public class ToggleUserEndpoint(UserManager<IdentityUser> userManager) : Endpoin
             return;
         }
 
+        // What actually kicks a disabled account out. Their token is valid for twelve hours and
+        // carries its own roles, so without this "disable" only stopped them signing in again —
+        // an open session carried on untouched. Rotating the stamp invalidates every token
+        // already issued to them. See SecurityStampCheck.
+        //
+        // Done on enable as well: that path grants the User role, and a token minted before the
+        // grant would not carry it.
+        await userManager.UpdateSecurityStampAsync(user);
+
         await Send.OkAsync(cancellation: ct);
     }
 }

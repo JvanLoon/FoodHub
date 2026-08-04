@@ -3,6 +3,7 @@ using FastEndpoints.Swagger;
 using FoodCalc.Api.Common;
 using FoodCalc.Api.Extensions;
 using FoodCalc.Api.Middleware;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
@@ -117,6 +118,14 @@ public static class Program
                 };
 
                 options.SaveToken = true;
+
+                // Signature and expiry say the token was genuine when issued; they say nothing
+                // about whether the account is still enabled, still exists, or still holds the
+                // roles written into it. See SecurityStampCheck.
+                options.Events = new JwtBearerEvents
+                {
+                    OnTokenValidated = SecurityStampCheck.OnTokenValidatedAsync
+                };
             });
 
         // Behind a TLS-terminating reverse proxy the container only ever speaks plain

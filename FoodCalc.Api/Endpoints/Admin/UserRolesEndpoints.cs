@@ -70,6 +70,11 @@ public class AddUserRoleEndpoint(UserManager<IdentityUser> userManager) : Endpoi
             return;
         }
 
+        // Roles are baked into the token, and AddToRoleAsync does not touch the security stamp
+        // on its own — so without this the grant would not reach anyone already signed in until
+        // their token expired. See SecurityStampCheck.
+        await userManager.UpdateSecurityStampAsync(user);
+
         await Send.OkAsync(cancellation: ct);
     }
 }
@@ -98,6 +103,11 @@ public class RemoveUserRoleEndpoint(UserManager<IdentityUser> userManager) : End
             await this.SendErrorsAsync(result.Errors.Select(e => e.Description), ct: ct);
             return;
         }
+
+        // The one that matters most: without it, taking Admin away from someone left them Admin
+        // for as long as their current token lasted, because the role is a claim inside it and
+        // nothing re-reads the database. See SecurityStampCheck.
+        await userManager.UpdateSecurityStampAsync(user);
 
         await Send.OkAsync(cancellation: ct);
     }
