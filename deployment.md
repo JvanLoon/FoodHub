@@ -170,10 +170,15 @@ cause.
 `DotNetEnv` is loaded with `NoClobber`, so a real environment variable always beats the file. That is what keeps
 Aspire's injected `foodcalc` connection string and the compose-supplied values authoritative.
 
-> Because `FoodCalc.Api/appsettings.json` is gone, `Jwt__Issuer` and `Jwt__Audience`
-> no longer have a committed default. The compose files set them explicitly on the
-> **api** service — token validation checks the issuer, so a missing value breaks
-> every login.
+> Because `FoodCalc.Api/appsettings.json` is gone, `Jwt__Issuer` no longer has a
+> committed default. The compose files set it explicitly on the **api** service —
+> token validation checks the issuer, so a missing value breaks every login.
+>
+> There is no `Jwt__Audience`. With one API, one issuer and one key an audience
+> would distinguish nothing, so no `aud` claim is minted and `ValidateAudience` is
+> switched off in `Program.cs`. That switch is **not** optional: the property
+> defaults to `true`, so deleting it turns audience checking on with nothing to
+> match and rejects every token with `IDX10208`.
 
 > ⚠️ **`Jwt__Key` goes to the API only — never to the web service.** The tokens are
 > HS256, so the key signs as well as verifies: any process holding it can mint a

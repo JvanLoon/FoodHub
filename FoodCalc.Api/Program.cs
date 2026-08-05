@@ -1,6 +1,5 @@
 using FastEndpoints;
 using FastEndpoints.Swagger;
-using FoodCalc.Api.Common;
 using FoodCalc.Api.Extensions;
 using FoodCalc.Api.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -8,6 +7,7 @@ using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace FoodCalc.Api;
 
@@ -21,8 +21,7 @@ public static class Program
         // compose sets are untouched — and in a container, where there is no .env,
         // this is a no-op.
         if (File.Exists(".env"))
-            DotNetEnv.Env.NoClobber()
-                .Load();
+            DotNetEnv.Env.NoClobber().Load();
 
         var builder = WebApplication.CreateBuilder(args);
 
@@ -61,6 +60,8 @@ public static class Program
         // Add Identity
         builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
             {
+                //this now uses result.IsLockedOut and result.Succeeded. when RequireConfirmedAccount is set to true,
+                //login logic breaks. dont change or change login also. for details, loginEndpoint => look at result.IsNotAllowed.
                 options.SignIn.RequireConfirmedAccount = false;
                 options.User.RequireUniqueEmail = true;
 
@@ -109,13 +110,23 @@ public static class Program
                 {
                     ValidateIssuer = true,
 
-                    // Inert, and left visible rather than deleted so it is not mistaken for an
-                    // oversight: ValidateAudience is off, so ValidAudience is never consulted and
-                    // LoginEndpoint mints no "aud" claim for it to match. Jwt__Audience is
-                    // therefore unused config today. Turning this on means adding the claim at
-                    // mint time in the same change, or every token stops validating.
+                    // Not optional, despite looking like it. This property defaults to TRUE, so
+                    // deleting the line does not mean "we ignore audiences" — it turns audience
+                    // checking ON with nothing to match, and every token is then rejected with
+                    // "IDX10208: Unable to validate audience". We mint no "aud" claim (one API,
+                    // one issuer, one key, so it would distinguish nothing), which is exactly
+                    // why the check has to be switched off in so many words.
                     ValidateAudience = false,
-                    ValidAudience = jwtSettings?.Audience,
+
+                    // Pin the signature algorithm instead of trusting the one named in the
+                    // token's own header — that header is attacker-controlled, and taking it at
+                    // face value is the shape algorithm-confusion attacks rely on.
+                    //
+                    // This also rejects SecurityAlgorithms.HmacSha256Signature. Same
+                    // cryptography, but that constant is the XML-DSig identifier and gets
+                    // written into the header verbatim rather than as the JWA name "HS256", so
+                    // LoginEndpoint has to keep signing with SecurityAlgorithms.HmacSha256.
+                    ValidAlgorithms = [SecurityAlgorithms.HmacSha256],
 
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
@@ -243,5 +254,4 @@ public class JwtOptions
 {
     public string Key { get; set; } = string.Empty;
     public string Issuer { get; set; } = string.Empty;
-    public string Audience { get; set; } = string.Empty;
 }

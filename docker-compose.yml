@@ -62,7 +62,6 @@ services:
       - "ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=FoodCalc;Username=foodhub;Password=${POSTGRES_PASSWORD:?}"
       - Jwt__Key=${JWT_KEY:?set JWT_KEY in .env}
       - Jwt__Issuer=FoodCalc
-      - Jwt__Audience=FoodHub-Api-user
       # One-shot: creates the first admin only while the users table is empty.
       # Clear both once you have signed in and changed the password.
       - Bootstrap__AdminEmail=${BOOTSTRAP_ADMIN_EMAIL:-}

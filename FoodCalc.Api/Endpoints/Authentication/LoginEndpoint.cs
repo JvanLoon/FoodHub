@@ -80,8 +80,11 @@ public class LoginEndpoint(
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-        var token = new JwtSecurityToken(issuer: configuration["Jwt:Issuer"], claims: claims,
-            expires: DateTime.UtcNow.AddHours(12), signingCredentials: creds);
+        var token = new JwtSecurityToken(
+            issuer: configuration["Jwt:Issuer"], 
+            claims: claims, 
+            expires: DateTime.UtcNow.AddHours(12), 
+            signingCredentials: creds);
 
         // This route is anonymous, so PresenceMiddleware has no principal to read and skips it.
         // Marking the user online here means an admin sees the dot at once, rather than after the
