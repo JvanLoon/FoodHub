@@ -36,3 +36,19 @@
     text-align: center;
     font-size: var(--fh-text-sm);
 }
+
+/* Where a failed login is reported. This page is rendered statically so that it can write the
+   auth cookie, which leaves it no circuit and therefore no toasts — the message has to come
+   back as part of the response to the post that failed. */
+.fh-form-error {
+    display: flex;
+    flex-direction: column;
+    gap: var(--fh-space-1);
+    padding: var(--fh-space-3) var(--fh-space-4);
+    margin-bottom: var(--fh-space-4);
+    background: var(--fh-tint-danger-bg);
+    border: 1px solid var(--fh-tint-danger-border);
+    border-radius: var(--fh-radius-md);
+    color: var(--fh-tint-danger-text);
+    font-size: var(--fh-text-sm);
+}

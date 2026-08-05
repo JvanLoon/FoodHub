@@ -104,9 +104,9 @@ public static class UiText
         public const string LastPage = "Laatste pagina";
         public const string PerPage = "Per pagina:";
 
-        // ThemeToggle
-        public const string SwitchToLight = "Overschakelen naar lichte modus";
-        public const string SwitchToDark = "Overschakelen naar donkere modus";
+        // ThemeToggle. One label for both directions: which icon shows is decided in CSS from
+        // the theme attribute, and the server has no way to know which of the two it would be.
+        public const string ToggleTheme = "Wisselen tussen lichte en donkere modus";
 
         // TextField password reveal
         public const string HidePassword = "Wachtwoord verbergen";

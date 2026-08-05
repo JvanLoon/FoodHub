@@ -1,3 +1,5 @@
+@using Microsoft.AspNetCore.Components.Endpoints
+
 <!DOCTYPE html>
 <html lang="nl">
 
@@ -29,12 +31,50 @@
 	@* Left unfingerprinted: browsers also probe /favicon.ico on their own, so the hashed
 	   URL buys nothing here. *@
 	<link rel="icon" type="image/png" href="favicon.png"/>
-	<HeadOutlet @rendermode="new InteractiveServerRenderMode(prerender: false)"/>
+	@if (RetryForCookie)
+	{
+		@* Arrived from another site, so the Strict auth cookie was withheld — but the Lax hint
+		   came through, so there is a session to recover. Reloading from inside the loaded
+		   document is a same-site navigation, which does carry the cookie, and location.replace
+		   keeps the URL and leaves no extra history entry to go Back into.
+
+		   In <head> and before anything else so it fires before the page is drawn: the visitor
+		   should never see a flash of the signed-out layout. The meta refresh is the same thing
+		   for a browser with script off. AuthCookie.UseSessionHint has already dropped the hint,
+		   so this can happen at most once. *@
+		<script>location.replace(location.href);</script>
+		<noscript>
+			<meta http-equiv="refresh" content="0"/>
+		</noscript>
+	}
+	<HeadOutlet @rendermode="RenderMode"/>
 </head>
 
 <body>
-<Routes @rendermode="new InteractiveServerRenderMode(prerender: false)"/>
+<Routes @rendermode="RenderMode"/>
 <script src="@Assets["js/interop.js"]"></script>
 <script src="@Assets["_framework/blazor.web.js"]"></script>
 </body>
 </html>
+
+@code {
+
+	[CascadingParameter]
+	private HttpContext HttpContext { get; set; } = default!;
+
+	/// <summary>
+	/// Interactive for the app, static for the pages that have to write a cookie.
+	///
+	/// Signing in sets a cookie, and a cookie is set with a response header — so it can only
+	/// happen during a real HTTP request, never over the SignalR circuit. A page marked
+	/// <c>[ExcludeFromInteractiveRouting]</c> makes AcceptsInteractiveRouting return false for
+	/// the request that asked for it, and null here renders that request statically, giving the
+	/// page an HttpContext to sign in with. Everything else is unchanged.
+	/// </summary>
+	private IComponentRenderMode? RenderMode => HttpContext.AcceptsInteractiveRouting()
+		? new InteractiveServerRenderMode(prerender: false)
+		: null;
+
+	private bool RetryForCookie => HttpContext.Items.ContainsKey(AuthCookie.RetryFlag);
+
+}

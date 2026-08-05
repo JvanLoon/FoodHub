@@ -5,6 +5,7 @@ using FoodCalc.Web.Services;
 using FoodCalc.Web.Services.Admin;
 using FoodCalc.Web.Services.Auth;
 using FoodCalc.Web.Services.User;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.Json;
@@ -52,7 +53,42 @@ public class Program
             .PersistKeysToFileSystem(new DirectoryInfo(keysPath))
             .SetApplicationName("FoodHub");
 
-        builder.Services.AddScoped<AuthTokenService>();
+        // The browser's only credential. It carries the JWT as an encrypted claim (see
+        // AuthCookie), so the token itself never reaches the browser and no script can read it.
+        builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            .AddCookie(options =>
+            {
+                options.Cookie.Name = AuthCookie.CookieName;
+                options.Cookie.HttpOnly = true;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+
+                // Strict, so a cross-site request carries no cookie at all. That is what lets
+                // /auth/logout be a plain GET the circuit can navigate to: a forged cross-site
+                // navigation to it arrives unauthenticated and signs nobody out.
+                //
+                // The cost is the first hop in from an external link — a mail, a chat, a search
+                // result — which arrives without the cookie and therefore lands on the login page.
+                // The session is not gone; the next navigation inside the site is same-site and
+                // sends the cookie again. Lax trades that back for a logout that must be a POST.
+                options.Cookie.SameSite = SameSiteMode.Strict;
+
+                options.LoginPath = "/login";
+                options.LogoutPath = AuthCookie.LogoutPath;
+                options.AccessDeniedPath = "/";
+
+                // Every ticket carries an explicit ExpiresUtc taken from the JWT's own exp, so
+                // this is only the fallback for a ticket that somehow has none. Not sliding: the
+                // JWT cannot be renewed short of the password, so extending the cookie past it
+                // would leave the UI looking signed in while every API call 401s.
+                options.ExpireTimeSpan = TimeSpan.FromHours(12);
+                options.SlidingExpiration = false;
+            });
+
+        builder.Services.AddAuthorization();
+        builder.Services.AddCascadingAuthenticationState();
+        builder.Services.AddHttpContextAccessor();
+
+        builder.Services.AddScoped<TokenProvider>();
         builder.Services.AddScoped<PresenceService>();
         builder.Services.AddScoped<AuthStateService>();
         builder.Services.AddScoped<AdminService>();
@@ -68,9 +104,9 @@ public class Program
         builder.Services.AddScoped<AuthenticatedHttpClientService>(sp =>
         {
             var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
-            var authTokenService = sp.GetRequiredService<AuthTokenService>();
+            var tokenProvider = sp.GetRequiredService<TokenProvider>();
             var httpClient = httpClientFactory.CreateClient("ApiClient");
-            return new AuthenticatedHttpClientService(httpClient, authTokenService,
+            return new AuthenticatedHttpClientService(httpClient, tokenProvider,
                 sp.GetRequiredService<ILogger<AuthenticatedHttpClientService>>(),
                 sp.GetRequiredService<MessageService>(), sp.GetRequiredService<NavigationManager>());
         });
@@ -102,7 +138,7 @@ public class Program
             //options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
         });
 
-        // No JWT validation here, and deliberately no signing key in this process.
+        // Still no JWT *validation* here, and still deliberately no signing key in this process.
         //
         // The tokens are HS256, so the key does not merely verify them — it mints them. A
         // process holding it can forge a token for any account with any role. This one is the
@@ -110,11 +146,10 @@ public class Program
         // so keeping the key here handed the exposed process the ability to forge credentials
         // for the one that was deliberately kept unreachable.
         //
-        // It bought nothing: nothing in this project is [Authorize]-gated or uses AuthorizeView,
-        // so the ClaimsPrincipal that validation produced was never read. Page gating is
-        // RoleGuard plus AuthStateService, and the API re-checks every request independently.
-        // AuthTokenService only needs to *read* claims, which ReadJwtToken does without
-        // verifying a signature and therefore without a key.
+        // The cookie scheme above does not change that. It authenticates the *browser* to this
+        // app with a ticket this app minted and Data Protection signed; the JWT rides inside as
+        // an opaque string that only ever gets read for its claims (ReadJwtToken, no signature
+        // check, no key) and forwarded to the API, which validates it properly.
 
         var app = builder.Build();
 
@@ -136,6 +171,16 @@ public class Program
         if (!behindProxy)
             app.UseHttpsRedirection();
 
+        // Removed in 95118a6 because nothing consumed the principal they produced. The cookie
+        // scheme is what earns them back: UseAuthentication is what turns the cookie into
+        // HttpContext.User, which is where every role check and the JWT itself now come from.
+        // Both must run before UseAntiforgery, which validates per-endpoint against that user.
+        app.UseAuthentication();
+        app.UseAuthorization();
+
+        // Straight after UseAuthentication, because it works off the principal that produced.
+        app.UseSessionHint();
+
         app.UseAntiforgery();
 
         //app.UseOutputCache();
@@ -149,6 +194,18 @@ public class Program
 
         app.MapRazorComponents<App>()
             .AddInteractiveServerRenderMode();
+
+        // Signing out has to happen in a real HTTP request: a cookie cannot be cleared over the
+        // SignalR circuit, because there are no response headers to clear it in. A GET rather
+        // than a form post so the circuit can simply navigate here — safe because the cookie is
+        // SameSite=Strict, so a cross-site navigation to this route arrives with no session to
+        // end. Marking the account offline is the caller's job and happens before the trip here,
+        // while the JWT is still usable.
+        app.MapGet(AuthCookie.LogoutPath, async (HttpContext http) =>
+        {
+            await AuthCookie.SignOutAsync(http);
+            return Results.Redirect("/login");
+        });
 
         app.MapDefaultEndpoints();
 

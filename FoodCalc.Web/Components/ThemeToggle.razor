@@ -1,35 +1,17 @@
 @* Light/dark switch. The persisted theme is applied before first paint by the
-   inline script in App.razor; this component only reads and toggles it. *@
-@inject IJSRuntime JS
+   inline script in App.razor; this component only offers the toggle.
+
+   Plain JS rather than an @onclick, and both icons rendered with CSS picking one rather than a
+   field deciding: the login page renders statically (see App.razor's render-mode gate), where
+   there is no circuit to dispatch an event to and no JS interop to ask the current theme with.
+   The same change means the switch also works on every other page before the circuit has
+   finished connecting, rather than sitting dead for a moment with the wrong icon. *@
 
 <button type="button"
         class="fh-theme-toggle"
-        title="@(_isDark ? UiText.Components.SwitchToLight : UiText.Components.SwitchToDark)"
-        aria-label="@(_isDark ? UiText.Components.SwitchToLight : UiText.Components.SwitchToDark)"
-        @onclick="ToggleAsync">
-	<i class="bi @(_isDark ? "bi-sun" : "bi-moon-stars")" aria-hidden="true"></i>
+        title="@UiText.Components.ToggleTheme"
+        aria-label="@UiText.Components.ToggleTheme"
+        onclick="themeInterop.toggle()">
+	<i class="bi bi-moon-stars fh-theme-toggle__in-light" aria-hidden="true"></i>
+	<i class="bi bi-sun fh-theme-toggle__in-dark" aria-hidden="true"></i>
 </button>
-
-@code {
-	private bool _isDark;
-
-	protected override async Task OnAfterRenderAsync(bool firstRender)
-	{
-		if (!firstRender) return;
-
-		var theme = await JS.InvokeAsync<string>("themeInterop.get");
-		var isDark = theme == "dark";
-		if (isDark != _isDark)
-		{
-			_isDark = isDark;
-			StateHasChanged();
-		}
-	}
-
-	private async Task ToggleAsync()
-	{
-		_isDark = !_isDark;
-		await JS.InvokeVoidAsync("themeInterop.set", _isDark ? "dark" : "light");
-	}
-
-}

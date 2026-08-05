@@ -1,6 +1,6 @@
 @page "/usersettings"
 @using FoodCalc.Web.Services.Auth
-@inject AuthTokenService AuthTokenService
+@inject AuthStateService AuthStateService
 
 <PageTitle>@UiText.UserSettings.Title</PageTitle>
 
@@ -33,7 +33,7 @@
 
 	protected override async Task OnInitializedAsync()
 	{
-		email = await AuthTokenService.GetEmailAsync();
+		email = await AuthStateService.GetEmailAsync();
 	}
 
 }

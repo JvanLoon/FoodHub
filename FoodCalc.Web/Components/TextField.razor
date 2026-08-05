@@ -10,22 +10,29 @@
 	<div class="fh-field__control @(ShowRevealToggle ? "fh-field__control--with-toggle" : null)">
 		<InputText id="@Id"
 		           class="form-control"
-		           type="@EffectiveType"
+		           type="@Type"
 		           placeholder="@Placeholder"
 		           autocomplete="@Autocomplete"
 		           Value="@Value"
 		           ValueChanged="ValueChanged"
 		           ValueExpression="ValueExpression"/>
+		@* Plain JS rather than an @onclick: the only field that asks for this is the password on
+		   the login page, which renders statically (see App.razor) and has no circuit to
+		   dispatch an event to. The labels ride along as data attributes because the swap
+		   happens in the browser, where the Dutch strings are not otherwise available. *@
 		@if (ShowRevealToggle)
 		{
 			<button type="button"
 			        class="fh-field__reveal"
-			        title="@RevealLabel"
-			        aria-label="@RevealLabel"
+			        title="@UiText.Components.ShowPassword"
+			        aria-label="@UiText.Components.ShowPassword"
 			        aria-controls="@Id"
-			        aria-pressed="@(_revealed ? "true" : "false")"
-			        @onclick="() => _revealed = !_revealed">
-				<i class="bi bi-@(_revealed ? "eye-slash" : "eye")" aria-hidden="true"></i>
+			        aria-pressed="false"
+			        data-reveal-for="@Id"
+			        data-label-show="@UiText.Components.ShowPassword"
+			        data-label-hide="@UiText.Components.HidePassword"
+			        onclick="fieldInterop.toggleReveal(this)">
+				<i class="bi bi-eye" aria-hidden="true"></i>
 			</button>
 		}
 	</div>
@@ -67,11 +74,5 @@
 
 	[Parameter]
 	public Expression<Func<string?>>? ValueExpression { get; set; }
-
-	private bool _revealed;
-
-	private string EffectiveType => ShowRevealToggle && _revealed ? "text" : Type;
-
-	private string RevealLabel => _revealed ? UiText.Components.HidePassword : UiText.Components.ShowPassword;
 
 }

@@ -1,15 +1,34 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Components.Authorization;
+
 namespace FoodCalc.Web.Services.Auth;
 
-public class AuthStateService(AuthTokenService authTokenService, PresenceService presenceService)
+/// <summary>
+/// The UI's view of who is signed in, read off the ClaimsPrincipal behind the auth cookie.
+///
+/// Everything here only decides what is worth rendering. The API re-checks every request against
+/// the JWT independently, so a wrong answer here shows the wrong buttons — it does not grant
+/// anything.
+///
+/// There is no SignIn here any more: signing in writes a cookie, which only a real HTTP request
+/// can do (see <see cref="AuthCookie"/>). Login is a form post to a static-rendered page, and
+/// signing out is a navigation to <see cref="AuthCookie.LogoutPath"/>. What is left of sign-out
+/// on this side is the part that has to happen first, while the JWT is still usable: telling the
+/// API the user has gone.
+/// </summary>
+public class AuthStateService(AuthenticationStateProvider authenticationStateProvider, PresenceService presenceService)
 {
-    public event Func<Task>? OnAuthStateChanged;
+    private async Task<ClaimsPrincipal> UserAsync() =>
+        (await authenticationStateProvider.GetAuthenticationStateAsync()).User;
 
-    public async Task<bool> IsLoggedInAsync() => !await authTokenService.IsTokenExpiredAsync();
+    public async Task<bool> IsLoggedInAsync() => (await UserAsync()).Identity?.IsAuthenticated == true;
 
-    public async Task<string?> GetEmailAsync() => await authTokenService.GetEmailAsync();
+    public async Task<string?> GetEmailAsync() => (await UserAsync()).FindFirst(ClaimTypes.Email)
+        ?.Value;
 
     /// <summary>The logged-in account's IdentityUser id, for "is this mine?" checks in the UI.</summary>
-    public async Task<string?> GetUserIdAsync() => await authTokenService.GetUserIdAsync();
+    public async Task<string?> GetUserIdAsync() => (await UserAsync()).FindFirst(ClaimTypes.NameIdentifier)
+        ?.Value;
 
     /// <summary>
     /// True for staff (Admin or Moderator), who may edit any recipe or ingredient. Mirrors the
@@ -31,58 +50,26 @@ public class AuthStateService(AuthTokenService authTokenService, PresenceService
         return !string.IsNullOrEmpty(userId) && userId == ownerUserId;
     }
 
-    public async Task<List<string>> GetRolesAsync() => await authTokenService.GetRolesAsync();
+    public async Task<List<string>> GetRolesAsync() => (await UserAsync()).FindAll(ClaimTypes.Role)
+        .Select(c => c.Value)
+        .ToList();
 
-    public async Task<bool> IsAdminAsync()
-    {
-        var roles = await authTokenService.GetRolesAsync();
-        return roles.Contains("Admin");
-    }
+    public async Task<bool> IsAdminAsync() => (await UserAsync()).IsInRole("Admin");
 
     /// <summary>True if the logged-in user holds at least one of the given roles.</summary>
     public async Task<bool> IsInAnyRoleAsync(params string[] roles)
     {
-        var mine = await authTokenService.GetRolesAsync();
-        return mine.Any(r => roles.Contains(r, StringComparer.OrdinalIgnoreCase));
-    }
-
-    public async Task SignInAsync(string token)
-    {
-        await authTokenService.SetTokenAsync(token);
-        presenceService.Start();
-        await NotifyAuthStateChangedAsync();
+        var user = await UserAsync();
+        return roles.Any(user.IsInRole);
     }
 
     /// <summary>
-    /// Throws away a token that could not be used anyway — expired, or not a JWT at all.
+    /// Marks the account offline and stops the heartbeat, before the caller navigates to
+    /// <see cref="AuthCookie.LogoutPath"/> to drop the cookie.
     ///
-    /// Not SignOutAsync: that pings the API to mark the account offline, and the ping is
-    /// authenticated with the very token being discarded, so it could only ever fail. There is
-    /// also nothing to mark offline — presence lapsed on its own long before the token did.
+    /// Order matters and cannot be reversed: the ping that marks the account offline is itself
+    /// authenticated with the JWT inside the cookie, so it has to go out while that cookie is
+    /// still there.
     /// </summary>
-    public async Task DiscardTokenAsync()
-    {
-        await authTokenService.RemoveTokenAsync();
-        await NotifyAuthStateChangedAsync();
-    }
-
-    public async Task SignOutAsync()
-    {
-        // Before the token goes: the ping that marks the account offline is itself authenticated,
-        // so it has to ride out on the credentials being discarded.
-        await presenceService.SignalOfflineAsync();
-        await authTokenService.RemoveTokenAsync();
-        await NotifyAuthStateChangedAsync();
-    }
-
-    public async Task NotifyAuthStateChangedAsync()
-    {
-        if (OnAuthStateChanged == null) return;
-        foreach (var handler in OnAuthStateChanged.GetInvocationList()
-            .Cast<Func<Task>>())
-        {
-            try { await handler(); }
-            catch {}
-        }
-    }
+    public async Task SignalSignOutAsync() => await presenceService.SignalOfflineAsync();
 }

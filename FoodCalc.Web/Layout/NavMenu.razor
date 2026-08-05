@@ -1,6 +1,5 @@
 @using FoodCalc.Web.Services
 @using FoodCalc.Web.Services.Auth
-@implements IDisposable
 @inject AuthStateService AuthStateService
 @inject MessageService MessageService
 
@@ -53,19 +52,10 @@
 	[Parameter]
 	public EventCallback OnNavigate { get; set; }
 
+	// Read once and left alone. The cookie behind these answers is written and cleared by whole
+	// HTTP requests, so nothing can change them part-way through a circuit's life — signing in or
+	// out rebuilds the circuit, and this runs again.
 	protected override async Task OnInitializedAsync()
-	{
-		AuthStateService.OnAuthStateChanged += HandleAuthStateChangedAsync;
-		await RefreshStateAsync();
-	}
-
-	private async Task HandleAuthStateChangedAsync()
-	{
-		await RefreshStateAsync();
-		await InvokeAsync(StateHasChanged);
-	}
-
-	private async Task RefreshStateAsync()
 	{
 		try
 		{
@@ -74,11 +64,6 @@
 			isModerator = isLoggedIn && await AuthStateService.IsInAnyRoleAsync("Moderator");
 		}
 		catch (Exception ex) { MessageService.ShowMessage(ex.Message, true, 0); }
-	}
-
-	public void Dispose()
-	{
-		AuthStateService.OnAuthStateChanged -= HandleAuthStateChangedAsync;
 	}
 
 }

@@ -1,10 +1,17 @@
 @page "/login"
 @layout Layout.LoginLayout
 
+@* Static SSR, alone among the pages. Signing in writes a cookie, a cookie is written with a
+   response header, and a circuit has no response to put one on — so this page has to be handled
+   inside a real HTTP request. The attribute is what App.razor's render-mode gate reads.
+
+   The visible cost is that nothing on this page is interactive: no toasts, and the theme switch
+   and the password reveal have to work without a circuit, which is why both are plain JS. *@
+@attribute [ExcludeFromInteractiveRouting]
+
+@using Microsoft.AspNetCore.WebUtilities
 @inject LoginService LoginService
 @inject NavigationManager Navigation
-@inject AuthStateService AuthStateService
-@inject MessageService MessageService
 
 <PageTitle>@UiText.Auth.LoginTitle</PageTitle>
 
@@ -14,14 +21,28 @@
 		<span>FoodHub</span>
 	</div>
 	<h3 class="auth-card__title">@UiText.Auth.LoginHeading</h3>
-	<EditForm Model="loginModel" OnValidSubmit="HandleLogin" FormName="login-form">
+
+	@* Rendered into the response of the failed post itself, rather than raised as a toast:
+	   a toast needs a circuit, and there is none here. *@
+	@if (_errors.Count > 0)
+	{
+		<div class="fh-form-error" role="alert">
+			@foreach (var error in _errors)
+			{
+				<div>@error</div>
+			}
+		</div>
+	}
+
+	<EditForm Model="loginModel" method="post" OnValidSubmit="HandleLogin" FormName="login-form">
+		<AntiforgeryToken/>
 		<DataAnnotationsValidator/>
 		<ValidationSummary class="mb-3"/>
 		<TextField Label="@UiText.Auth.EmailLabel" Placeholder="@UiText.Auth.EmailPlaceholder" Autocomplete="username"
-		           @bind-Value="loginModel.Email"/>
+		           @bind-Value="loginModel!.Email"/>
 		<TextField Label="@UiText.Auth.PasswordLabel" Type="password" Placeholder="@UiText.Auth.PasswordPlaceholder"
 		           Autocomplete="current-password"
-		           ShowRevealToggle="true" @bind-Value="loginModel.Password"/>
+		           ShowRevealToggle="true" @bind-Value="loginModel!.Password"/>
 		<AppButton Type="submit" Icon="box-arrow-in-right" CssClass="w-100">@UiText.Auth.LoginButton</AppButton>
 	</EditForm>
 	<div class="auth-card__alt">
@@ -30,47 +51,95 @@
 </div>
 
 @code {
-	private LoginDto loginModel = new();
+
+	[CascadingParameter]
+	private HttpContext HttpContext { get; set; } = default!;
+
+	// Left null and filled in below rather than initialized here: form binding assigns to this
+	// property on a post, and an initializer on it would be overwritten with null (BL0008).
+	[SupplyParameterFromForm(FormName = "login-form")]
+	private LoginDto? loginModel { get; set; }
+
+	private List<string> _errors = [];
 
 	/// <summary>
 	/// Sends an already signed-in visitor straight on instead of asking them to log in again —
 	/// the usual way here is a bookmark, or Back after signing in.
 	///
-	/// There is no renewing a token short of the password: the API issues a 12-hour JWT and has
-	/// no refresh endpoint, so "still valid" is the whole of what can be checked. Anything else
-	/// leaves the form up.
+	/// Just the cookie now: the auth middleware has already decided whether it is valid and
+	/// unexpired by the time this runs, so there is no token to parse and no expiry to check.
+	/// An expired cookie simply arrives as an unauthenticated request and the form is shown.
+	///
+	/// There is still no renewing a session short of the password — the API issues a 12-hour JWT
+	/// and has no refresh endpoint.
 	/// </summary>
-	protected override async Task OnInitializedAsync()
+	protected override void OnInitialized()
 	{
-		if (await AuthStateService.IsLoggedInAsync())
+		loginModel ??= new LoginDto();
+
+		// Not on the post: submitting credentials while holding a live cookie is a deliberate
+		// re-login, and bouncing it would silently keep the old session.
+		if (HttpContext.Request.Method == HttpMethods.Get && HttpContext.User.Identity?.IsAuthenticated == true)
 		{
 			// replace, so Back does not come straight back to a login page that will only
 			// bounce them forward again.
-			Navigation.NavigateTo("/", replace: true);
-			return;
+			Navigation.NavigateTo(ReturnUrl, replace: true);
 		}
+	}
 
-		// Expired, unreadable, or nothing stored at all — stay and show the form. Whatever was
-		// there is dropped now so it cannot be mistaken for a session by anything that only
-		// checks whether a token exists.
-		await AuthStateService.DiscardTokenAsync();
+	/// <summary>
+	/// Where to go once signed in: back to whatever sent them here, or the home page.
+	///
+	/// Checked rather than trusted. This value arrives in the query string, so anyone can put
+	/// anything in it, and handing it to a redirect unexamined is an open redirect — a link that
+	/// genuinely starts on this site and ends on someone else's, which is exactly the shape a
+	/// phishing link wants. Only a path on this site gets through: one leading slash and no
+	/// second one, which would make it protocol-relative and so another host entirely.
+	/// </summary>
+	private string ReturnUrl
+	{
+		get
+		{
+			var requested = QueryHelpers.ParseQuery(new Uri(Navigation.Uri).Query)
+				.TryGetValue("returnUrl", out var value)
+				? value.ToString()
+				: null;
+
+			if (string.IsNullOrEmpty(requested) || !requested.StartsWith('/'))
+				return "/";
+
+			// "//evil.example" and "/\evil.example" are both read as another host by browsers.
+			if (requested.StartsWith("//") || requested.StartsWith("/\\"))
+				return "/";
+
+			// Nowhere to come back to but the form itself.
+			return requested.StartsWith("/login", StringComparison.OrdinalIgnoreCase) ? "/" : requested;
+		}
 	}
 
 	private async Task HandleLogin()
 	{
-		await LoginService.LoginAsync(loginModel)
-			.OnSuccess(async void (data) =>
-			{
-				if (data?.Token == null)
-				{
-					MessageService.ShowMessage(WebConstants.Messages.Auth.LoginInvalidResponse, true);
-					return;
-				}
+		var result = await LoginService.LoginAsync(loginModel!);
 
-				await AuthStateService.SignInAsync(data.Token);
-				Navigation.NavigateTo("/");
-			})
-			.OnFailure();
+		if (!result.Success)
+		{
+			_errors = result.Errors.ToList();
+			return;
+		}
+
+		if (result.Data?.Token is null)
+		{
+			_errors = [WebConstants.Messages.Auth.LoginInvalidResponse];
+			return;
+		}
+
+		// The JWT stops here. It goes into the cookie, encrypted, and the browser gets an opaque
+		// blob it cannot read — which is the entire point of this page being what it is.
+		await AuthCookie.SignInAsync(HttpContext, result.Data.Token);
+
+		// The form posts back to this same URL, query string and all, so the returnUrl that came
+		// in on the GET is still here to send them on with.
+		Navigation.NavigateTo(ReturnUrl);
 	}
 
 }

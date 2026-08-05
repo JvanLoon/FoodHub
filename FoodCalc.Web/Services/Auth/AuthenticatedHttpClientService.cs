@@ -16,7 +16,7 @@ namespace FoodCalc.Web.Services.Auth;
 /// </summary>
 public class AuthenticatedHttpClientService(
     HttpClient httpClient,
-    AuthTokenService authTokenService,
+    TokenProvider tokenProvider,
     ILogger<AuthenticatedHttpClientService> logger,
     MessageService? messageService,
     NavigationManager navigation)
@@ -32,7 +32,7 @@ public class AuthenticatedHttpClientService(
     /// <summary>Attaches the bearer token, and reports whether there was one to attach.</summary>
     private async Task<bool> AttachTokenAsync()
     {
-        var token = await authTokenService.GetTokenAsync();
+        var token = await tokenProvider.GetTokenAsync();
         var hasToken = !string.IsNullOrWhiteSpace(token);
 
         httpClient.DefaultRequestHeaders.Authorization = hasToken
@@ -52,32 +52,38 @@ public class AuthenticatedHttpClientService(
     ///
     /// Only fires when a token was actually attached, so a wrong password on the login form —
     /// also a 401 — is left to the page to report.
+    ///
+    /// Nothing can be cleared from in here any more. The credential is a cookie, and a cookie is
+    /// dropped with a response header, which a circuit has none of. So this navigates to the
+    /// logout route instead and lets a real request do it.
     /// </summary>
-    private async Task AbandonSessionAsync()
+    private Task AbandonSessionAsync()
     {
         if (_sessionAbandoned)
-            return;
+            return Task.CompletedTask;
 
         _sessionAbandoned = true;
 
-        // AuthTokenService rather than AuthStateService: the latter reaches PresenceService,
-        // which is built on this class, and injecting it here would close that loop. Nothing is
-        // lost by going direct, because the reload below rebuilds the circuit from scratch.
-        await authTokenService.RemoveTokenAsync();
-
         try
         {
-            // forceLoad, so the circuit is torn down with it — that stops the presence heartbeat
-            // and drops any component still holding state from the abandoned session.
-            navigation.NavigateTo("/login", forceLoad: true);
+            // forceLoad, so this leaves the circuit rather than routing inside it — which is the
+            // whole point, since only a real request can clear the cookie. It also tears the
+            // circuit down, stopping the presence heartbeat and dropping any component still
+            // holding state from the abandoned session.
+            //
+            // No offline ping first, unlike a deliberate sign-out: the token has just been
+            // refused, so the ping could only 401 as well.
+            navigation.NavigateTo(AuthCookie.LogoutPath, forceLoad: true);
         }
         catch (Exception ex)
         {
-            // Navigating from a background timer (the heartbeat) is not always allowed. The token
-            // is already gone, so the next page load lands on the login page anyway — MainLayout
-            // redirects there when it finds no valid token.
-            logger.LogDebug(ex, "Could not redirect to the login page after a rejected token");
+            // Navigating from a background timer (the heartbeat) is not always allowed. The
+            // cookie then survives, but every request it authorises keeps coming back 401, and
+            // the next one that reaches here from a real interaction will make the trip.
+            logger.LogDebug(ex, "Could not redirect to the logout route after a rejected token");
         }
+
+        return Task.CompletedTask;
     }
 
     // ----- Typed helpers returning ApiResult -----

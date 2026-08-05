@@ -176,10 +176,13 @@ public static class WebConstants
         }
     }
 
-    /// <summary>Browser storage keys.</summary>
+    /// <summary>
+    /// Browser storage keys. Nothing to do with authentication any more — the token lives in an
+    /// httpOnly cookie the browser cannot read, and what is left here is page state that is the
+    /// user's own business.
+    /// </summary>
     public static class Storage
     {
-        public const string AuthToken = "Authorization";
         public const string AggregatedIngredients = "aggregated-ingredients";
         public const string ShoppingListItems = "shopping-list-items";
         public const string PantryPreferences = "pantry-preferences";

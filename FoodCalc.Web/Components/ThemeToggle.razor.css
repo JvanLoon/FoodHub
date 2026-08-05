@@ -22,3 +22,11 @@
         box-shadow: var(--fh-focus-ring);
     }
 }
+
+/* Which icon shows is decided by the attribute the <head> script already set on <html>, so it
+   is right on the very first paint and needs neither JS nor a render pass to correct itself.
+   The moon offers dark mode, the sun offers light. */
+html[data-bs-theme="dark"] .fh-theme-toggle__in-light,
+html[data-bs-theme="light"] .fh-theme-toggle__in-dark {
+    display: none;
+}
