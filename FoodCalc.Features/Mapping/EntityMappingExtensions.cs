@@ -36,14 +36,6 @@ public static class EntityMappingExtensions
         // endpoints alone, never by echoing a flag back in a request body.
     };
 
-    // CreateIngredientDto leaves Id/CreatedDate/ModifiedDate at their entity defaults, and
-    // IsReviewed at false — a new entry is always unapproved. The caller sets CreatedByUserId.
-    public static Ingredient ToEntity(this CreateIngredientDto d) => new()
-    {
-        Name = d.Name,
-        ShouldBeAddedToShoppingCart = d.ShouldBeAddedToShoppingCart
-    };
-
     // ---------- RecipeItem ----------
     public static RecipeItemDto ToDto(this RecipeItem e) => new()
     {
@@ -66,8 +58,8 @@ public static class EntityMappingExtensions
         IsChanged = !e.IsReviewed
     };
 
-    public static List<RecipeItemDto> ToDtoList(this IEnumerable<RecipeItem> items) => items.Select(ri => ri.ToDto())
-        .ToList();
+    public static List<RecipeItemDto> ToDtoList(this IEnumerable<RecipeItem> items) => 
+        items.Select(ri => ri.ToDto()).ToList();
 
     public static RecipeItem ToEntity(this RecipeItemDto d) => new()
     {
@@ -90,7 +82,9 @@ public static class EntityMappingExtensions
     {
         var amountType = (IngredientAmountType) d.IngredientAmount;
 
-        var changed = e.Ingredient.Name != d.Ingredient.Name || e.IngredientId != d.IngredientId || e.Amount != d.Amount ||
+        var changed = e.Ingredient.Name != d.Ingredient.Name ||
+                      e.IngredientId != d.IngredientId ||
+                      e.Amount != d.Amount ||
                       e.IngredientAmount != amountType ||
                       e.ShouldBeAddedToShoppingCart != d.ShouldBeAddedToShoppingCart;
 
@@ -125,7 +119,9 @@ public static class EntityMappingExtensions
         CreatedDate = e.CreatedDate,
         ModifiedDate = e.ModifiedDate,
         IsFirstSubmission = e.FirstApprovedDate is null,
-        Ingredients = e.Ingredients.OrderBy(ri => ri.Ingredient.Name).Select(ri => ri.ToPendingDto()).ToList()
+        Ingredients = e.Ingredients.OrderBy(ri => ri.Ingredient.Name)
+            .Select(ri => ri.ToPendingDto())
+            .ToList()
     };
 
     public static List<RecipeDto> ToDtoList(this IEnumerable<Recipe> items) => items.Select(r => r.ToDto())

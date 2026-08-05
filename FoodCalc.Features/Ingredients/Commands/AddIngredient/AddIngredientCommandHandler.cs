@@ -20,7 +20,12 @@ namespace FoodCalc.Features.Ingredients.Commands.AddIngredient
 
             try
             {
-                Ingredient ingredient = request.Ingredient.ToEntity();
+                Ingredient ingredient = new Ingredient
+                {
+                    Name = request.IngredientName,
+                    ShouldBeAddedToShoppingCart = true
+                };
+                
                 ingredient.CreatedByUserId = request.CreatedByUserId;
 
                 // Unapproved on creation for everyone, admins included — same rule as recipes.

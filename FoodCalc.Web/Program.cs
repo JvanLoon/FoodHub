@@ -63,7 +63,7 @@ public class Program
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 
                 // Strict, so a cross-site request carries no cookie at all. That is what lets
-                // /auth/logout be a plain GET the circuit can navigate to: a forged cross-site
+                // /logout be a plain GET the circuit can navigate to: a forged cross-site
                 // navigation to it arrives unauthenticated and signs nobody out.
                 //
                 // The cost is the first hop in from an external link — a mail, a chat, a search
@@ -72,7 +72,7 @@ public class Program
                 // sends the cookie again. Lax trades that back for a logout that must be a POST.
                 options.Cookie.SameSite = SameSiteMode.Strict;
 
-                options.LoginPath = "/login";
+                options.LoginPath = AuthCookie.LoginPath;
                 options.LogoutPath = AuthCookie.LogoutPath;
                 options.AccessDeniedPath = "/";
 
@@ -207,7 +207,7 @@ public class Program
         app.MapGet(AuthCookie.LogoutPath, async (HttpContext http) =>
         {
             await AuthCookie.SignOutAsync(http);
-            return Results.Redirect("/login");
+            return Results.Redirect(AuthCookie.LoginPath);
         });
 
         app.MapDefaultEndpoints();

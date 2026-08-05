@@ -12,12 +12,6 @@ public class UpdateRecipeDto
     public List<RecipeItemDto> Ingredients { get; set; } = [];
 }
 
-public class CreateIngredientDto
-{
-    public string Name { get; set; } = string.Empty;
-    public bool ShouldBeAddedToShoppingCart { get; set; } = true;
-}
-
 public class UpdateIngredientDto
 {
     public Guid Id { get; set; }

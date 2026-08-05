@@ -41,7 +41,9 @@ public static class AuthCookie
     /// <summary>Set by the middleware when this request should reload itself once. Read by App.razor.</summary>
     public const string RetryFlag = "FoodHub.RetryForCookie";
 
-    public const string LogoutPath = "/auth/logout";
+    
+    public const string LoginPath = "/login";
+    public const string LogoutPath = "/logout";
 
     /// <summary>
     /// Where the JWT itself lives: a private claim on the principal, and so inside the encrypted

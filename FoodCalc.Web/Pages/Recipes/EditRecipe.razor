@@ -9,7 +9,7 @@
 <PageTitle>@(IsNew ? UiText.RecipeEditor.CreateTitle : UiText.RecipeEditor.EditTitle)</PageTitle>
 
 <div class="fh-stack">
-	@if (recipe.Id != Guid.Empty && !recipe.IsReviewed)
+	@if (_recipe.Id != Guid.Empty && !_recipe.IsReviewed)
 	{
 		<div class="recipe-pending-banner">
 			<i class="bi bi-hourglass-split" aria-hidden="true"></i>
@@ -18,16 +18,16 @@
 	}
 
 	<div class="recipe-name">
-		@if (!isEditingName)
+		@if (!_isEditingName)
 		{
-			<h1 class="fh-heading">@recipe?.Name</h1>
+			<h1 class="fh-heading">@_recipe.Name</h1>
 			<IconButton Icon="pencil" Title="@UiText.RecipeEditor.EditNameTitle" OnClick="StartEditName"/>
 		}
 		else
 		{
-			<EditForm Model="nameModel" OnValidSubmit="SaveRecipeName" class="recipe-name__form"
+			<EditForm Model="_nameModel" OnValidSubmit="SaveRecipeName" class="recipe-name__form"
 			          FormName="edit-recipe-name">
-				<InputText @bind-Value="editedName" class="form-control"
+				<InputText @bind-Value="_editedName" class="form-control"
 				           placeholder="@UiText.RecipeEditor.NamePlaceholder"/>
 				<AppButton Type="submit" Size="ButtonSize.Small" Icon="check-lg">@UiText.Common.Save</AppButton>
 				@* Nothing to fall back to while the recipe is still unsaved. *@
@@ -72,23 +72,23 @@
 						       class="form-control"
 						       type="text"
 						       placeholder="@UiText.RecipeEditor.SearchIngredientPlaceholder"
-						       @bind="ingredientSearch"
+						       @bind="_ingredientSearch"
 						       @bind:event="oninput"
-						       @onfocus="() => dropdownOpen = true"
+						       @onfocus="() => _dropdownOpen = true"
 						       @onblur="OnDropdownBlur"
 						       autocomplete="off"
 						       @onkeydown="HandleIngredientSearchKeydown"
-						       @onkeydown:preventDefault="@(ingredientSearchFocused)"/>
+						       @onkeydown:preventDefault="@(_ingredientSearchFocused)"/>
 					</div>
 
-					<EditForm Model="recipeItem" OnValidSubmit="AddOrUpdateIngredient"
+					<EditForm Model="_recipeItem" OnValidSubmit="AddOrUpdateIngredient"
 					          FormName="add-or-update-ingredient-form">
 						<div class="ingredient-dropdown">
-							<div class="ingredient-dropdown__menu dropdown-menu @(dropdownOpen ? "show" : null)">
+							<div class="ingredient-dropdown__menu dropdown-menu @(_dropdownOpen ? "show" : null)">
 								@foreach (var ingredient in FilteredIngredients)
 								{
 									<button type="button"
-									        class="dropdown-item @(recipeItem.Ingredient is not null && recipeItem.Ingredient.Name == ingredient.Name ? "active" : "")"
+									        class="dropdown-item @(_recipeItem?.Ingredient is not null && _recipeItem.Ingredient.Name == ingredient.Name ? "active" : "")"
 									        @onclick="() => SelectIngredient(ingredient)">
 										@ingredient.Name
 									</button>
@@ -100,10 +100,10 @@
 							</div>
 						</div>
 
-						<NumberField TValue="decimal?" Label="@UiText.RecipeEditor.AmountLabel" @bind-Value="amountInput"/>
+						<NumberField TValue="decimal?" Label="@UiText.RecipeEditor.AmountLabel" @bind-Value="_amountInput"/>
 
 						<SelectField TValue="IngredientAmountTypeDto" Label="@UiText.RecipeEditor.AmountTypeLabel"
-						             @bind-Value="recipeItem.IngredientAmount">
+						             @bind-Value="_recipeItem!.IngredientAmount">
 							@foreach (IngredientAmountTypeDto amountType in Enum.GetValues<IngredientAmountTypeDto>())
 							{
 								<option value="@amountType">@UiText.AmountTypes.Label(amountType)</option>
@@ -119,7 +119,7 @@
 
 			<!-- Right: current ingredients -->
 			<div class="recipe-editor__list">
-				@if (recipe?.Ingredients is { Count: > 0 } ingredientsList)
+				@if (_recipe.Ingredients is { Count: > 0 } ingredientsList)
 				{
 					<ul class="ingredient-list fh-zebra">
 						@foreach (var ingredient in ingredientsList)
@@ -164,26 +164,26 @@
 	// Safe to unwrap everywhere it's used: those paths only run in edit mode.
 	private Guid CurrentId => RecipeId ?? Guid.Empty;
 
-	private RecipeDto recipe = new();
-	private List<IngredientDto> ingredients = new();
-	private RecipeItemDto recipeItem = new();
-	private bool isEditingName = false;
-	private string ingredientSearch = string.Empty;
+	private RecipeDto _recipe = new();
+	private List<IngredientDto> _ingredients = new();
+	private RecipeItemDto? _recipeItem;
+	private bool _isEditingName;
+	private string _ingredientSearch = string.Empty;
 
 	// Scratch buffer for the name field. The live name is only committed to `recipe.Name`
 	// (and the server) on an explicit Save, so cancelling — or navigating away — never
 	// mutates the actual recipe name.
-	private string editedName = string.Empty;
+	private string _editedName = string.Empty;
 
 	// EditForm needs a model instance; the name lives in `editedName`, so this is just a handle.
-	private readonly object nameModel = new();
+	private readonly object _nameModel = new();
 
-	private IEnumerable<IngredientDto> FilteredIngredients => string.IsNullOrWhiteSpace(ingredientSearch) ? ingredients : ingredients.Where(i => i.Name.Contains(ingredientSearch, StringComparison.OrdinalIgnoreCase));
+	private IEnumerable<IngredientDto> FilteredIngredients => string.IsNullOrWhiteSpace(_ingredientSearch) ? _ingredients : _ingredients.Where(i => i.Name.Contains(_ingredientSearch, StringComparison.OrdinalIgnoreCase));
 
-	private decimal? amountInput;
-	private bool dropdownOpen = false;
-	private bool ingredientSearchFocused = false;
-	private bool initialized;
+	private decimal? _amountInput;
+	private bool _dropdownOpen;
+	private bool _ingredientSearchFocused = false;
+	private bool _initialized;
 
 	// The router only supplies route parameters that are present in the URL, so an optional
 	// one keeps its old value when the segment disappears. Without this reset, going from
@@ -202,60 +202,61 @@
 		await IngredientService.GetAllIngredientsAsync()
 			.OnSuccess((data) =>
 			{
-				ingredients = data;
+				_ingredients = data;
 				ClearForm();
 			})
 			.OnFailure();
 
-		initialized = true;
+		_initialized = true;
 	}
 
 	// Runs on first render and whenever RecipeId changes (e.g. after create navigates to the
 	// edit URL). Loads the recipe for edit mode; resets to a blank recipe for create mode.
 	protected override async Task OnParametersSetAsync()
 	{
-		if (!initialized)
+		if (!_initialized)
 			return;
 
 		if (IsNew)
 		{
-			recipe = new();
-			editedName = string.Empty;
+			_recipe = new();
+			_editedName = string.Empty;
 			// Nothing to show but the name form until there's a recipe to name.
-			isEditingName = true;
+			_isEditingName = true;
 			return;
 		}
 
-		isEditingName = false;
-		editedName = string.Empty;
+		_isEditingName = false;
+		_editedName = string.Empty;
 		await RefreshRecipeAsync();
 	}
 
 	private async Task RefreshRecipeAsync()
 	{
 		await RecipeService.GetRecipeByIdAsync(CurrentId)
-			.OnSuccess((data) => recipe = data)
+			.OnSuccess((data) => _recipe = data)
 			.OnFailure();
 
 		// A recipe you may see but not edit (someone else's, once approved) sends you back to
-		// the read-only view rather than showing a form whose every save would be refused.
-		if (recipe.Id != Guid.Empty && !await AuthStateService.CanEditContentAsync(recipe.CreatedByUserId))
+		// the read-only view rather than showing a form who's every save would be refused.
+		if (_recipe.Id != Guid.Empty && !await AuthStateService.CanEditContentAsync(_recipe.CreatedByUserId))
 		{
-			Navigation.NavigateTo($"/recipe/{recipe.Id}");
+			Navigation.NavigateTo($"/recipe/{_recipe.Id}");
 		}
 	}
 
-	private async Task AddOrUpdateIngredient()
+	private async Task AddOrUpdateIngredient(object test)
 	{
 		// The name may have been typed rather than picked out of the list, and it may not be in
 		// the catalog at all — resolving it here is what removed the separate "+" step.
-		if (!await ResolveIngredientAsync())
-			return;
+		if (!await ResolveIngredientAsync()) return;
 
-		recipeItem.RecipeId = CurrentId;
-		recipeItem.Amount = amountInput ?? 0;
+		if (_recipeItem is null) return;
 
-		await RecipeService.AddIngredient(recipeItem)
+		_recipeItem.RecipeId = CurrentId;
+		_recipeItem.Amount = _amountInput ?? 0;
+
+		await RecipeService.AddIngredient(_recipeItem)
 			.OnSuccess(message: WebConstants.Messages.Ingredient.AddedOrUpdated)
 			.OnFailure();
 
@@ -265,7 +266,7 @@
 
 	private void EditIngredient(RecipeItemDto ingredient)
 	{
-		recipeItem = new RecipeItemDto
+		_recipeItem = new RecipeItemDto
 		{
 			Id = ingredient.Id,
 			RecipeId = CurrentId,
@@ -275,8 +276,8 @@
 			IngredientAmount = ingredient.IngredientAmount,
 			ShouldBeAddedToShoppingCart = ingredient.ShouldBeAddedToShoppingCart
 		};
-		amountInput = ingredient.Amount == 0 ? null : ingredient.Amount;
-		ingredientSearch = ingredient.Ingredient.Name;
+		_amountInput = ingredient.Amount == 0 ? null : ingredient.Amount;
+		_ingredientSearch = ingredient.Ingredient.Name;
 	}
 
 	private async Task DeleteIngredient(Guid recipeItemId)
@@ -291,30 +292,22 @@
 
 	private void ClearForm()
 	{
-		ingredientSearch = string.Empty;
-		amountInput = null;
-		recipeItem = new RecipeItemDto
-		{
-			Id = Guid.NewGuid(),
-			RecipeId = CurrentId,
-			IngredientId = Guid.Empty,
-			Ingredient = null!,
-			Amount = 0,
-			IngredientAmount = 0
-		};
+		_ingredientSearch = string.Empty;
+		_amountInput = null;
+		_recipeItem = null;
 	}
 
 	private void StartEditName()
 	{
-		editedName = recipe.Name;
-		isEditingName = true;
+		_editedName = _recipe.Name;
+		_isEditingName = true;
 	}
 
 	// Saving the name is also what creates the recipe: an unsaved one has no id, and every
 	// ingredient write needs one. Both cases go through the same form.
 	private async Task SaveRecipeName()
 	{
-		if (string.IsNullOrWhiteSpace(editedName))
+		if (string.IsNullOrWhiteSpace(_editedName))
 		{
 			MessageService.ShowMessage(WebConstants.Messages.Recipe.NameRequired, isError: true);
 			return;
@@ -326,7 +319,7 @@
 			// recipe and drops the page into normal edit mode.
 			await RecipeService.AddRecipe(new CreateRecipeDto
 				{
-					Name = editedName.Trim()
+					Name = _editedName.Trim()
 				})
 				.OnSuccess((data) => Navigation.NavigateTo($"/recipes/edit/{data.Id}"), WebConstants.Messages.Recipe.Created)
 				.OnFailure();
@@ -334,11 +327,11 @@
 			return;
 		}
 
-		await RecipeService.UpdateRecipeName(CurrentId, editedName.Trim())
+		await RecipeService.UpdateRecipeName(CurrentId, _editedName.Trim())
 			.OnSuccess(message: WebConstants.Messages.Recipe.NameUpdated)
 			.OnFailure();
 
-		isEditingName = false;
+		_isEditingName = false;
 		await RefreshRecipeAsync(); // Refresh — pulls the committed name back from the server
 	}
 
@@ -350,7 +343,7 @@
 	/// </summary>
 	private async Task<bool> ResolveIngredientAsync()
 	{
-		var typed = ingredientSearch?.Trim();
+		var typed = _ingredientSearch.Trim();
 
 		if (string.IsNullOrWhiteSpace(typed))
 			return false;
@@ -362,48 +355,48 @@
 		}
 
 		var created = await IngredientService
-			.AddIngredientAsync(new CreateIngredientDto { Name = typed })
-			.OnSuccess(message: WebConstants.Messages.Ingredient.Added)
+			.AddIngredientAsync(typed)
+			.OnSuccess(SelectIngredient, WebConstants.Messages.Ingredient.Added)
 			.OnFailure();
 
 		if (!created.Success)
 			return false;
 
-		// The create endpoint answers with no body, so the catalog is re-read to pick up the
+		// The create endpoint answers with nobody, so the catalog is re-read to pick up the
 		// row (and its id / shopping-list flag) that was just written.
-		ingredients = await IngredientService.GetAllIngredientsAsync().OrDefault(ingredients);
+		_ingredients = await IngredientService.GetAllIngredientsAsync().OrDefault(_ingredients);
 
-		if (FindInCatalog(typed) is not { } fresh)
-			return false;
-
-		SelectIngredient(fresh);
-		return true;
+		return FindInCatalog(typed) is not null;
 	}
 
 	private IngredientDto? FindInCatalog(string name) =>
-		ingredients.FirstOrDefault(i => string.Equals(i.Name, name, StringComparison.OrdinalIgnoreCase));
+		_ingredients.FirstOrDefault(i => string.Equals(i.Name, name, StringComparison.OrdinalIgnoreCase));
 
 	private void SelectIngredient(IngredientDto ingredient)
 	{
-		recipeItem.IngredientId = ingredient.Id;
-		recipeItem.Ingredient = ingredient;
-		recipeItem.ShouldBeAddedToShoppingCart = ingredient.ShouldBeAddedToShoppingCart;
-		ingredientSearch = ingredient.Name;
-		dropdownOpen = false;
+		_recipeItem = new RecipeItemDto
+		{
+			IngredientId = ingredient.Id,
+			Ingredient = ingredient,
+			ShouldBeAddedToShoppingCart = ingredient.ShouldBeAddedToShoppingCart
+		};
+		
+		_ingredientSearch = ingredient.Name;
+		_dropdownOpen = false;
 	}
 
 	private async Task OnDropdownBlur()
 	{
 		// Delay to allow click event to register before closing dropdown
 		await Task.Delay(150);
-		dropdownOpen = false;
+		_dropdownOpen = false;
 	}
 
 	private void CancelEditName()
 	{
 		// Discard the scratch buffer; recipe.Name was never touched.
-		isEditingName = false;
-		editedName = string.Empty;
+		_isEditingName = false;
+		_editedName = string.Empty;
 	}
 
 	private async Task HandleIngredientSearchKeydown(KeyboardEventArgs e)
@@ -414,7 +407,7 @@
 		// Enter confirms the name — picking the catalog entry if there is one, creating it if
 		// there is not. It does not submit; amount and unit still have to be filled in.
 		await ResolveIngredientAsync();
-		dropdownOpen = false;
+		_dropdownOpen = false;
 	}
 
 }

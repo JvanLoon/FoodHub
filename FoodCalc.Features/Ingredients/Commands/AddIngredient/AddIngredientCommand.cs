@@ -8,5 +8,5 @@ namespace FoodCalc.Features.Ingredients.Commands.AddIngredient;
 /// Author of the new catalog entry. Required — an entry with no author could never be seen by
 /// anyone before approval, including whoever added it.
 /// </param>
-public record AddIngredientCommand(CreateIngredientDto Ingredient, string? CreatedByUserId = null)
+public record AddIngredientCommand(string IngredientName, string? CreatedByUserId = null)
     : IRequest<ErrorOr<IngredientDto>>;
