@@ -178,8 +178,11 @@ public class Program
         app.UseAuthentication();
         app.UseAuthorization();
 
-        // Straight after UseAuthentication, because it works off the principal that produced.
+        // Both work off the principal UseAuthentication produced, and in this order: the hint
+        // decides whether an unauthenticated request deserves a second chance, and the redirect
+        // only gives up on the ones that do not.
         app.UseSessionHint();
+        app.UseLoginRedirect();
 
         app.UseAntiforgery();
 

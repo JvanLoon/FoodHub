@@ -135,6 +135,38 @@ public static class AuthCookie
     });
 
     /// <summary>
+    /// Sends a signed-out visitor to the login form, carrying where they were going.
+    ///
+    /// Middleware rather than a check inside MainLayout, which is where this used to live. A
+    /// component's redirect runs in the circuit, which starts life *after* the page has been
+    /// served — so it raced the static login page the circuit was navigating to and the two
+    /// fought over the address bar, losing the returnUrl. Out here it is a plain 302 decided
+    /// before a circuit exists, and there is nothing to race.
+    /// </summary>
+    public static IApplicationBuilder UseLoginRedirect(this IApplicationBuilder app) => app.Use(async (http, next) =>
+    {
+        if (http.User.Identity?.IsAuthenticated != true
+            && IsDocumentRequest(http.Request)
+            && !IsPublicPath(http.Request.Path)
+
+            // The hint says a session exists and this request simply could not show it. Let the
+            // page reload itself and prove it before writing them off as signed out.
+            && !http.Items.ContainsKey(RetryFlag))
+        {
+            var wanted = http.Request.Path + http.Request.QueryString;
+            http.Response.Redirect($"/login?returnUrl={Uri.EscapeDataString(wanted)}");
+            return;
+        }
+
+        await next();
+    });
+
+    /// <summary>Reachable signed out: the two auth forms, the way back out, and the error page.</summary>
+    private static bool IsPublicPath(PathString path) =>
+        path.StartsWithSegments("/login") || path.StartsWithSegments("/register")
+        || path.StartsWithSegments("/auth") || path.StartsWithSegments("/Error");
+
+    /// <summary>
     /// A top-level page load, as opposed to the static assets, the SignalR circuit and the health
     /// probe. Only a document can reload itself, and only a document is worth spending a reload on.
     /// </summary>

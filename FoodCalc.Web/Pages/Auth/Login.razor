@@ -34,8 +34,10 @@
 		</div>
 	}
 
+	@* No <AntiforgeryToken/> here: a static-SSR EditForm emits one itself. Adding a second
+	   renders the hidden field twice, the two values post as one comma-joined string, and
+	   validation rejects the whole form with a bodyless 400. *@
 	<EditForm Model="loginModel" method="post" OnValidSubmit="HandleLogin" FormName="login-form">
-		<AntiforgeryToken/>
 		<DataAnnotationsValidator/>
 		<ValidationSummary class="mb-3"/>
 		<TextField Label="@UiText.Auth.EmailLabel" Placeholder="@UiText.Auth.EmailPlaceholder" Autocomplete="username"

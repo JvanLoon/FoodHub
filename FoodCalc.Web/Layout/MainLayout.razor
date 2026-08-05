@@ -87,28 +87,17 @@
 	private string? userEmail;
 	private bool _navOpen;
 
-	/// <summary>Where they are now, path and query, as a site-relative URL.</summary>
-	private string CurrentPath => "/" + Navigation.ToBaseRelativePath(Navigation.Uri);
-
 	private void ToggleNav() => _navOpen = !_navOpen;
 
 	private void CloseNav() => _navOpen = false;
 
+	// No signed-out check here any more. AuthCookie.UseLoginRedirect turns an unauthenticated
+	// page request into a 302 before this layout is ever built, so by the time a circuit exists
+	// the user is signed in — and the returnUrl survives, because nothing renders to race it.
 	protected override async Task OnInitializedAsync()
 	{
 		try
 		{
-			if (!await AuthStateService.IsLoggedInAsync())
-			{
-				// Nothing to sign out of — an unauthenticated request is exactly what an absent
-				// or expired cookie looks like, and the auth middleware has already dealt with
-				// it. Just send them to the form, carrying where they were trying to get to so
-				// signing in finishes the journey instead of dumping them on the home page. A
-				// shared link to a recipe survives the round trip.
-				Navigation.NavigateTo($"/login?returnUrl={Uri.EscapeDataString(CurrentPath)}");
-				return;
-			}
-
 			userEmail = await AuthStateService.GetEmailAsync();
 
 			// Every circuit starts the heartbeat, whichever way it was reached — a fresh login,
