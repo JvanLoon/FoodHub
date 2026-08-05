@@ -221,7 +221,7 @@
 
 		topIngredients = usage.Values.OrderByDescending(u => u.UsageCount)
 			.ThenBy(u => u.Name)
-			.Take(5)
+			.Take(10)
 			.ToList();
 
 		maxTopUsage = topIngredients.Count == 0 ? 0 : topIngredients.Max(t => t.UsageCount);

@@ -129,6 +129,7 @@
 	</div>
 </Modal>
 
+<div class="meal-calendar-modal">
 @* ---------- Randomize popup ---------- *@
 <Modal @bind-Visible="_randomizeModalVisible" Title="@UiText.Calendar.RandomizeTitle"
        BodyClass="fh-modal__body--allow-overflow">
@@ -145,12 +146,12 @@
 					@foreach (var ing in _wantedIngredients)
 					{
 						<span class="cal-chip">
-                        @ing
+							@ing
 							<button type="button" class="cal-chip__x" @onclick="() => RemoveIngredient(ing)"
 							        aria-label="@UiText.Calendar.RemoveRecipe">
-                            <i class="bi bi-x"></i>
-                        </button>
-                    </span>
+								<i class="bi bi-x"></i>
+							</button>
+						</span>
 					}
 				</div>
 			}
@@ -185,11 +186,10 @@
 				}
 			</div>
 		</div>
-
-		@* Recipes-per-day: wired up but intentionally hidden for now (defaults to 1). *@
-		<div class="fh-field" style="display:none;">
+		
+		<div class="fh-field">
 			<label class="fh-label">@UiText.Calendar.RecipesPerDay</label>
-			<input class="cal-input" type="number" min="1" max="20" @bind="_recipesPerDay" disabled/>
+			<input class="cal-input" type="number" min="1" max="20" @bind="_recipesPerDay" />
 		</div>
 
 		<label class="cal-check">
@@ -210,6 +210,7 @@
 		</AppButton>
 	</Footer>
 </Modal>
+</div>
 
 @code {
 	private bool _loading = true;

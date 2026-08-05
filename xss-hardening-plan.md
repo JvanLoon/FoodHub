@@ -23,8 +23,7 @@ The app is unusually well placed for a strict policy:
 * No `innerHTML` / `document.write` in your own JS.
 * No `data:` image URIs, no externally-hosted images or fonts.
 * **Exactly one inline `<script>`** — the theme block in `FoodCalc.Web/App/App.razor:8`.
-* Only two inline `style=` attributes (`Pages/Admin/Home.razor:130`,
-  `Pages/Calendar/MealCalendar.razor:190`).
+* Only one inline `style=` attribute `Pages/Calendar/MealCalendar.razor:190`.
 
 So `script-src 'self'` is achievable with one small refactor, and that is the setting that matters.
 

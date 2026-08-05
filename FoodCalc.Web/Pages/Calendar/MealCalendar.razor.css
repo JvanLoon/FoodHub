@@ -252,3 +252,7 @@
     cursor: pointer;
     color: var(--fh-text);
 }
+
+.meal-calendar-modal ::deep .fh-modal__dialog {
+    max-width: 40rem;
+}
