@@ -14,7 +14,7 @@
 	<div class="fh-stack">
 		<PageHeader Title="@(_isAdmin ? UiText.Admin.AdminHeading : UiText.Admin.ModerationHeading)"/>
 
-		<TabSet InitialTab="@_initialTab">
+		<TabSet InitialTab="@_initialTab" OnTabChanged="RememberTab">
 			<Tab Id="review" Title="@UiText.Admin.TabReview" Icon="check2-square">
 				<ReviewQueue/>
 			</Tab>
@@ -46,7 +46,8 @@
 	protected override async Task OnInitializedAsync()
 	{
 		// ?tab=<Tab.Id> lets a link elsewhere (the dashboard's ingredient card) land on the
-		// right tab. An unknown or missing value just leaves the first tab selected.
+		// right tab, and is written back by RememberTab so it also survives a reload.
+		// An unknown or missing value just leaves the first tab selected.
 		_initialTab = QueryHelpers.ParseQuery(new Uri(Navigation.Uri).Query)
 			.TryGetValue("tab", out var tab)
 			? tab.ToString()
@@ -57,5 +58,16 @@
 		try { _isAdmin = await AuthStateService.IsAdminAsync(); }
 		catch { _isAdmin = false; }
 	}
+
+	/// <summary>
+	/// Mirrors the open tab into the address bar, which is what makes F5 come back to it rather
+	/// than to Review — and makes the address worth sending to someone.
+	///
+	/// replace, so flipping through five tabs does not leave five entries of the same page in the
+	/// Back stack. This lands on the page already showing, so it re-renders without re-running
+	/// OnInitializedAsync — the tab that caused it is not read back and re-applied.
+	/// </summary>
+	private void RememberTab(string? tabId) =>
+		Navigation.NavigateTo(Navigation.GetUriWithQueryParameter("tab", tabId), replace: true);
 
 }

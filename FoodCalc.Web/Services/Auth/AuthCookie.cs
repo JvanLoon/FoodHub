@@ -163,10 +163,17 @@ public static class AuthCookie
         await next();
     });
 
-    /// <summary>Reachable signed out: the two auth forms, the way back out, and the error page.</summary>
+    /// <summary>
+    /// Reachable signed out: the two auth forms, the way back out, and the error page.
+    ///
+    /// Taken from the constants rather than spelled out again, so renaming a route cannot quietly
+    /// drop it from this list. Leaving <see cref="LogoutPath"/> off is the interesting failure:
+    /// signing out already-signed-out would bounce to the login form carrying returnUrl=/logout,
+    /// and signing in would then walk straight back out again.
+    /// </summary>
     private static bool IsPublicPath(PathString path) =>
-        path.StartsWithSegments("/login") || path.StartsWithSegments("/register")
-        || path.StartsWithSegments("/auth") || path.StartsWithSegments("/Error");
+        path.StartsWithSegments(LoginPath) || path.StartsWithSegments(LogoutPath)
+        || path.StartsWithSegments("/register") || path.StartsWithSegments("/Error");
 
     /// <summary>
     /// A top-level page load, as opposed to the static assets, the SignalR circuit and the health

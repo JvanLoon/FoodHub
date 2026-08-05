@@ -10,7 +10,7 @@
 				        role="tab"
 				        class="fh-tabset__tab @(tab == ActiveTab ? "fh-tabset__tab--active" : null)"
 				        aria-selected="@(tab == ActiveTab)"
-				        @onclick="() => Activate(tab)">
+				        @onclick="() => ActivateAsync(tab)">
 					@if (!string.IsNullOrEmpty(tab.Icon))
 					{
 						<i class="bi bi-@tab.Icon" aria-hidden="true"></i>
@@ -37,6 +37,16 @@
 	[Parameter]
 	public string? InitialTab { get; set; }
 
+	/// <summary>
+	/// Raised with the newly opened <see cref="Tab.Id"/> when the user picks a tab, so the page
+	/// can remember which one that was — see Admin.razor, which mirrors it into the URL.
+	///
+	/// The tabs do not write the URL themselves: not every tab set is worth putting in the
+	/// address bar, and only the page knows whether its is.
+	/// </summary>
+	[Parameter]
+	public EventCallback<string?> OnTabChanged { get; set; }
+
 	private readonly List<Tab> _tabs = new();
 	private bool _userPicked;
 
@@ -58,10 +68,17 @@
 		!string.IsNullOrEmpty(InitialTab) &&
 		string.Equals(tab.Id, InitialTab, StringComparison.OrdinalIgnoreCase);
 
-	private void Activate(Tab tab)
+	private async Task ActivateAsync(Tab tab)
 	{
+		// Re-clicking the open tab is not a change, and announcing it would push a pointless
+		// navigation for anyone mirroring this into the URL.
+		if (ActiveTab == tab)
+			return;
+
 		ActiveTab = tab;
 		_userPicked = true;
+
+		await OnTabChanged.InvokeAsync(tab.Id);
 	}
 
 }
