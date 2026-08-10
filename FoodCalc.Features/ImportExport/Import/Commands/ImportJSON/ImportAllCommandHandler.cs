@@ -23,17 +23,16 @@ public class ImportAllCommandHandler(
 
             await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
 
-            // Where an imported ingredient was dropped in favour of a same-named row that was
-            // already here, the id in the file no longer exists. The recipe lines still point at
-            // it, so they are redirected to the row that replaced it — without this a merge into
-            // a non-empty catalog fails on the foreign key.
-            var ingredientIdRemap = new Dictionary<Guid, Guid>();
-
             // Import Ingredients (catalog)
             foreach (var ingredientDto in data.Ingredients)
             {
-                var existingById = await context.Ingredients.SingleOrDefaultAsync(i => i.Id == ingredientDto.Id,
-                    cancellationToken);
+                var existingById = context.Ingredients.Local.SingleOrDefault(ri => ri.Id == ingredientDto.Id);
+                if (existingById != null)
+                {
+                    existingById = await context.Ingredients
+                        .SingleOrDefaultAsync(i => i.Id == ingredientDto.Id, cancellationToken);
+                }
+                
                 if (existingById != null)
                 {
                     if (existingById.Name != ingredientDto.Name)
@@ -44,14 +43,6 @@ public class ImportAllCommandHandler(
                         existingById.ShouldBeAddedToShoppingCart = ingredientDto.ShouldBeAddedToShoppingCart;
                     }
 
-                    continue;
-                }
-
-                var existingByName = await context.Ingredients.SingleOrDefaultAsync(i => i.Name == ingredientDto.Name,
-                    cancellationToken);
-                if (existingByName != null)
-                {
-                    ingredientIdRemap[ingredientDto.Id] = existingByName.Id;
                     continue;
                 }
 
@@ -73,51 +64,73 @@ public class ImportAllCommandHandler(
             // Import Recipes
             foreach (var recipeDto in data.Recipes)
             {
-                var existing = await context.Recipes.SingleOrDefaultAsync(r => r.Id == recipeDto.Id, cancellationToken);
+                var existing = context.Recipes.Local.SingleOrDefault(ri => ri.Id == recipeDto.Id);
                 if (existing != null)
                 {
-                    if (existing.Name != recipeDto.Name) { existing.Name = recipeDto.Name; }
+                    existing = await context.Recipes.SingleOrDefaultAsync(r => r.Id == recipeDto.Id, cancellationToken);
                 }
-                else
+                
+                
+                if (existing != null)
                 {
-                    context.Recipes.Add(new Recipe
+                    if (existing.Name != recipeDto.Name)
                     {
-                        Id = recipeDto.Id,
-                        Name = recipeDto.Name,
-                        CreatedByUserId = request.ImportedByUserId,
-                        // Approved on arrival — see the note on the ingredient import above.
-                        IsReviewed = true,
-                        FirstApprovedDate = DateTime.UtcNow
-                    });
+                        existing.Name = recipeDto.Name;
+                    }
                 }
+                
+                context.Recipes.Add(new Recipe
+                {
+                    Id = recipeDto.Id,
+                    Name = recipeDto.Name,
+                    CreatedByUserId = request.ImportedByUserId,
+                    // Approved on arrival — see the note on the ingredient import above.
+                    IsReviewed = true,
+                    FirstApprovedDate = DateTime.UtcNow
+                });
             }
 
             // Import RecipeItems (ingredient lines snapshotted onto the recipe)
             foreach (RecipeItemDto riDto in data.RecipeItems)
             {
-                var ingredientEntity = riDto.Ingredient.ToEntity();
-                var existingRi = await context.RecipeItems.SingleOrDefaultAsync(ri => ri.Id == riDto.Id, cancellationToken);
+                
+                
+                var existingRi = context.RecipeItems.Local.SingleOrDefault(ri => ri.Id == riDto.Id);
                 if (existingRi != null)
                 {
-                    existingRi.Ingredient = ingredientEntity;
+                    existingRi = await context.RecipeItems.SingleOrDefaultAsync(ri => ri.Id == riDto.Id, cancellationToken);
+                }
+                
+                if (existingRi != null)
+                {
+                    existingRi.Ingredient = existingRi.Ingredient;
                     existingRi.Amount = riDto.Amount;
                     existingRi.IngredientAmount = (IngredientAmountType) riDto.IngredientAmount;
                     existingRi.ShouldBeAddedToShoppingCart = riDto.ShouldBeAddedToShoppingCart;
                     continue;
                 }
-
-                context.RecipeItems.Add(new RecipeItem
+                
+                var ingredientEntity = context.Ingredients.Local.SingleOrDefault(i => i.Id == riDto.IngredientId);
+                if (ingredientEntity != null)
                 {
-                    Id = riDto.Id,
-                    RecipeId = riDto.RecipeId,
-                    Ingredient = ingredientEntity,
-                    Amount = riDto.Amount,
-                    IngredientAmount = (IngredientAmountType) riDto.IngredientAmount,
-                    ShouldBeAddedToShoppingCart = riDto.ShouldBeAddedToShoppingCart,
-                    // Reviewed, so the restored recipe does not read as wholly rewritten the
-                    // first time someone edits it.
-                    IsReviewed = true
-                });
+                    ingredientEntity = await context.Ingredients.SingleOrDefaultAsync(i => i.Id == riDto.IngredientId, cancellationToken);
+                }
+
+                if (ingredientEntity != null)
+                {
+                    context.RecipeItems.Add(new RecipeItem
+                    {
+                        Id = riDto.Id,
+                        RecipeId = riDto.RecipeId,
+                        Ingredient = ingredientEntity,
+                        Amount = riDto.Amount,
+                        IngredientAmount = (IngredientAmountType) riDto.IngredientAmount,
+                        ShouldBeAddedToShoppingCart = riDto.ShouldBeAddedToShoppingCart,
+                        // Reviewed, so the restored recipe does not read as wholly rewritten the
+                        // first time someone edits it.
+                        IsReviewed = riDto.IsReviewed
+                    });
+                }
             }
 
             // Import Users with Roles (optional)
@@ -131,20 +144,26 @@ public class ImportAllCommandHandler(
                         var user = new IdentityUser
                         {
                             Id = userDto.Id,
+                            UserName = userDto.UserName,
                             Email = userDto.Email,
-                            UserName = userDto.Email,
                             EmailConfirmed = userDto.EmailConfirmed,
-
-                            // Not restored from the file. LockoutEnabled is an invariant now —
-                            // always on, see ToggleUserEndpoint — and any export taken before
-                            // that carries false for every enabled account, so importing one
-                            // would quietly switch brute-force protection back off.
-                            LockoutEnabled = true
+                            PasswordHash = userDto.PasswordHash,
+                            SecurityStamp = userDto.SecurityStamp,
+                            ConcurrencyStamp = userDto.ConcurrencyStamp,
+                            LockoutEnd = userDto.LockoutEnd,
+                            LockoutEnabled = userDto.LockoutEnabled,
+                            AccessFailedCount = userDto.AccessFailedCount,
                         };
+
                         await userManager.CreateAsync(user);
-                        if (userDto.Roles != null)
+                        
+                        //todo make sure all roles are there. keep in mind, saftyrisk. not when u only add roles already in db
+                        if (userDto.Roles != null && userDto.Roles.Count != 0)
                         {
-                            foreach (var role in userDto.Roles) { await userManager.AddToRoleAsync(user, role); }
+                            foreach (var role in userDto.Roles)
+                            {
+                                await userManager.AddToRoleAsync(user, role);
+                            }
                         }
 
                         continue;

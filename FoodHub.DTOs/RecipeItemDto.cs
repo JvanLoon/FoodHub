@@ -8,5 +8,6 @@ public class RecipeItemDto
     public required IngredientDto Ingredient { get; set; }
     public decimal Amount { get; set; }
     public IngredientAmountTypeDto IngredientAmount { get; set; }
+    public bool IsReviewed { get; set; }
     public bool ShouldBeAddedToShoppingCart { get; set; } = true;
 }

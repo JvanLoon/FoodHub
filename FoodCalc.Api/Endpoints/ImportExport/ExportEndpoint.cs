@@ -9,6 +9,9 @@ public class ExportRequest
 {
     [BindFrom("format")]
     public string Format { get; set; } = string.Empty;
+
+    [BindFrom("includeUsers")]
+    public bool IncludeUsers { get; set; } = true;
 }
 
 /// <summary>
@@ -26,9 +29,6 @@ public class ExportFileResponse
 /// <summary>GET api/importexport/export?format= — Admin.</summary>
 public class ExportEndpoint(IMediator mediator) : Endpoint<ExportRequest, ExportFileResponse>
 {
-    // Matches the old controller's hardcoded field.
-    private const bool IncludeUsers = false;
-
     public override void Configure()
     {
         Get(ApiRoutes.ImportExport.Export);
@@ -37,7 +37,7 @@ public class ExportEndpoint(IMediator mediator) : Endpoint<ExportRequest, Export
 
     public override async Task HandleAsync(ExportRequest req, CancellationToken ct)
     {
-        var result = await mediator.Send(new ExportAllCommand(req.Format, IncludeUsers), ct);
+        var result = await mediator.Send(new ExportAllCommand(req.Format, req.IncludeUsers), ct);
 
         await result.Match(json => Send.OkAsync(new ExportFileResponse
         {

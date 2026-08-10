@@ -37,7 +37,14 @@ public class ExportAllCommandHandler(
             List<UserWithRolesDto>? usersWithRoles = null;
             if (request.includeUsers)
             {
-                var users = await context.Users.ToListAsync(cancellationToken);
+                var users = await context.Users
+                    .Where(u => !string.IsNullOrEmpty(u.UserName) 
+                                && !string.IsNullOrEmpty(u.Email) 
+                                && !string.IsNullOrEmpty(u.PasswordHash) 
+                                && !string.IsNullOrEmpty(u.SecurityStamp) 
+                                && !string.IsNullOrEmpty(u.ConcurrencyStamp))
+                    .ToListAsync(cancellationToken);
+                
                 usersWithRoles = [];
                 foreach (var user in users)
                 {
@@ -45,9 +52,15 @@ public class ExportAllCommandHandler(
                     usersWithRoles.Add(new UserWithRolesDto
                     {
                         Id = user.Id,
-                        Email = user.Email ?? "",
-                        EmailConfirmed = user.EmailConfirmed,
+                        UserName = user.UserName!,
+                        Email = user.Email!,
+                        EmailConfirmed = user.EmailConfirmed!,
+                        PasswordHash = user.PasswordHash!,
+                        SecurityStamp = user.SecurityStamp!,
+                        ConcurrencyStamp = user.ConcurrencyStamp!,
+                        LockoutEnd = user.LockoutEnd,
                         LockoutEnabled = user.LockoutEnabled,
+                        AccessFailedCount = user.AccessFailedCount,
                         Roles = roles.ToList()
                     });
                 }

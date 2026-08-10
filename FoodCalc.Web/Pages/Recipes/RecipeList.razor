@@ -213,7 +213,10 @@
 				if (ri.ShouldBeAddedToShoppingCart)
 				{
 					var key = (ri.Ingredient.Name.ToLowerInvariant(), ri.IngredientAmount);
-					if (ingredientDict.TryGetValue(key, out var existing)) { existing.Amount += ri.Amount; }
+					if (ingredientDict.TryGetValue(key, out var existing))
+					{
+						existing.Amount += ri.Amount;
+					}
 					else
 					{
 						// Clone to avoid mutating original
