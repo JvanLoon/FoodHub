@@ -19,19 +19,16 @@ public class ImportAllCommandHandler(
         try
         {
             var data = request.Data;
-            if (data == null) { return Error.Failure(description: ErrorMessages.ImportExport.NoImportData); }
+            if (data.Recipes.Count != 0 || data.Ingredients.Count != 0 || data.RecipeItems.Count != 0)
+                return Error.Failure(description: ErrorMessages.ImportExport.NoImportData);
 
             await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
 
             // Import Ingredients (catalog)
             foreach (var ingredientDto in data.Ingredients)
             {
-                var existingById = context.Ingredients.Local.SingleOrDefault(ri => ri.Id == ingredientDto.Id);
-                if (existingById != null)
-                {
-                    existingById = await context.Ingredients
-                        .SingleOrDefaultAsync(i => i.Id == ingredientDto.Id, cancellationToken);
-                }
+                var existingById = await context.Ingredients
+                    .FindAsync([ ingredientDto.Id ], cancellationToken);
                 
                 if (existingById != null)
                 {
@@ -64,12 +61,7 @@ public class ImportAllCommandHandler(
             // Import Recipes
             foreach (var recipeDto in data.Recipes)
             {
-                var existing = context.Recipes.Local.SingleOrDefault(ri => ri.Id == recipeDto.Id);
-                if (existing != null)
-                {
-                    existing = await context.Recipes.SingleOrDefaultAsync(r => r.Id == recipeDto.Id, cancellationToken);
-                }
-                
+                var existing = await context.Recipes.FindAsync([ recipeDto.Id ], cancellationToken);
                 
                 if (existing != null)
                 {
@@ -93,13 +85,7 @@ public class ImportAllCommandHandler(
             // Import RecipeItems (ingredient lines snapshotted onto the recipe)
             foreach (RecipeItemDto riDto in data.RecipeItems)
             {
-                
-                
-                var existingRi = context.RecipeItems.Local.SingleOrDefault(ri => ri.Id == riDto.Id);
-                if (existingRi != null)
-                {
-                    existingRi = await context.RecipeItems.SingleOrDefaultAsync(ri => ri.Id == riDto.Id, cancellationToken);
-                }
+                var existingRi = await context.RecipeItems.FindAsync([riDto.Id], cancellationToken);
                 
                 if (existingRi != null)
                 {
@@ -109,12 +95,8 @@ public class ImportAllCommandHandler(
                     existingRi.ShouldBeAddedToShoppingCart = riDto.ShouldBeAddedToShoppingCart;
                     continue;
                 }
-                
-                var ingredientEntity = context.Ingredients.Local.SingleOrDefault(i => i.Id == riDto.IngredientId);
-                if (ingredientEntity != null)
-                {
-                    ingredientEntity = await context.Ingredients.SingleOrDefaultAsync(i => i.Id == riDto.IngredientId, cancellationToken);
-                }
+
+                var ingredientEntity = await context.Ingredients.FindAsync([riDto.IngredientId], cancellationToken);
 
                 if (ingredientEntity != null)
                 {
@@ -157,10 +139,10 @@ public class ImportAllCommandHandler(
 
                         await userManager.CreateAsync(user);
                         
-                        //todo make sure all roles are there. keep in mind, saftyrisk. not when u only add roles already in db
-                        if (userDto.Roles != null && userDto.Roles.Count != 0)
+                        foreach (var role in userDto.Roles)
                         {
-                            foreach (var role in userDto.Roles)
+                            var dbRole = context.Roles.Any(r => !string.IsNullOrEmpty(r.NormalizedName) && r.NormalizedName.Equals(role.ToUpper()));
+                            if (dbRole)
                             {
                                 await userManager.AddToRoleAsync(user, role);
                             }
@@ -175,24 +157,20 @@ public class ImportAllCommandHandler(
                         existing.EmailConfirmed = userDto.EmailConfirmed;
                         changed = true;
                     }
-
-                    // Same for an account that already exists: the import repairs LockoutEnabled
-                    // towards the invariant rather than towards whatever the file says.
-                    if (!existing.LockoutEnabled)
+                    
+                    if (existing.LockoutEnabled != userDto.LockoutEnabled)
                     {
-                        existing.LockoutEnabled = true;
+                        existing.LockoutEnabled = userDto.LockoutEnabled;
                         changed = true;
                     }
 
                     // Sync roles
                     var existingRoles = await userManager.GetRolesAsync(existing);
-                    var importedRoles = userDto.Roles?.ToHashSet() ?? [];
+                    var importedRoles = userDto.Roles.ToHashSet();
                     var existingRolesSet = existingRoles.ToHashSet();
 
-                    var rolesToAdd = importedRoles.Except(existingRolesSet)
-                        .ToList();
-                    var rolesToRemove = existingRolesSet.Except(importedRoles)
-                        .ToList();
+                    var rolesToAdd = importedRoles.Except(existingRolesSet).ToList();
+                    var rolesToRemove = existingRolesSet.Except(importedRoles).ToList();
 
                     if (rolesToAdd.Count > 0)
                         await userManager.AddToRolesAsync(existing, rolesToAdd);
