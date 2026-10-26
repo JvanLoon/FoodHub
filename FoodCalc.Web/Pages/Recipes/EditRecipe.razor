@@ -103,7 +103,7 @@
 						<NumberField TValue="decimal?" Label="@UiText.RecipeEditor.AmountLabel" @bind-Value="_amountInput"/>
 
 						<SelectField TValue="IngredientAmountTypeDto" Label="@UiText.RecipeEditor.AmountTypeLabel"
-						             @bind-Value="_recipeItem!.IngredientAmount">
+						             @bind-Value="_recipeItem.IngredientAmount">
 							@foreach (IngredientAmountTypeDto amountType in Enum.GetValues<IngredientAmountTypeDto>())
 							{
 								<option value="@amountType">@UiText.AmountTypes.Label(amountType)</option>
@@ -166,7 +166,7 @@
 
 	private RecipeDto _recipe = new();
 	private List<IngredientDto> _ingredients = new();
-	private RecipeItemDto? _recipeItem;
+	private RecipeItemDto _recipeItem = NewRecipeItem();
 	private bool _isEditingName;
 	private string _ingredientSearch = string.Empty;
 
@@ -294,8 +294,16 @@
 	{
 		_ingredientSearch = string.Empty;
 		_amountInput = null;
-		_recipeItem = null;
+		_recipeItem = NewRecipeItem();
 	}
+
+	// Never null: the edit form binds to it on every render. Ingredient stays unset (and is
+	// null-checked where read) until one is picked from the catalog.
+	private static RecipeItemDto NewRecipeItem() => new()
+	{
+		IngredientId = Guid.Empty,
+		Ingredient = null!
+	};
 
 	private void StartEditName()
 	{
