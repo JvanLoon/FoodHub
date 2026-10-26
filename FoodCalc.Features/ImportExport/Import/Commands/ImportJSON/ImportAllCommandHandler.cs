@@ -19,7 +19,8 @@ public class ImportAllCommandHandler(
         try
         {
             var data = request.Data;
-            if (data.Recipes.Count != 0 || data.Ingredients.Count != 0 || data.RecipeItems.Count != 0)
+            if (data.Recipes.Count == 0 && data.Ingredients.Count == 0 && data.RecipeItems.Count == 0
+                && data.Users is not { Count: > 0 })
                 return Error.Failure(description: ErrorMessages.ImportExport.NoImportData);
 
             await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
