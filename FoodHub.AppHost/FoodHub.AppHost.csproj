@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <Sdk Name="Aspire.AppHost.Sdk" Version="13.4.6"/>
+    <Sdk Name="Aspire.AppHost.Sdk" Version="13.4.6" />
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
@@ -12,14 +12,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\FoodCalc.Api\FoodCalc.Api.csproj"/>
-        <ProjectReference Include="..\FoodCalc.Web\FoodCalc.Web.csproj"/>
+        <ProjectReference Include="..\FoodCalc.Api\FoodCalc.Api.csproj" />
+        <ProjectReference Include="..\FoodCalc.Web\FoodCalc.Web.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Aspire.Hosting.AppHost" Version="13.4.6"/>
-        <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.4.6"/>
-        <PackageReference Include="DotNetEnv" Version="3.2.0"/>
+        <PackageReference Include="Aspire.Hosting.AppHost" Version="13.6.5" />
+        <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.6.5" />
+        <PackageReference Include="DotNetEnv" Version="3.2.0" />
     </ItemGroup>
 
 </Project>

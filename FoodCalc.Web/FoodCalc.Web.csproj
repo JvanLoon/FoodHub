@@ -15,7 +15,7 @@
           signing key. System.IdentityModel.Tokens.Jwt stays because AuthTokenService still
           *reads* claims out of the token, which ReadJwtToken does without a signature check.
         -->
-        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.19.2" />
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.23.0" />
     </ItemGroup>
 
     <ItemGroup>
