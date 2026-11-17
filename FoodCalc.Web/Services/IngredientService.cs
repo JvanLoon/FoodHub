@@ -32,6 +32,6 @@ public class IngredientService(AuthenticatedHttpClientService httpClient)
         httpClient.DeleteAsync(ApiRoutes.Ingredient.Delete(ingredientId));
 
     public Task<ApiResult<IngredientDto>> AddIngredientAsync(string ingredientName) => 
-        httpClient.GetAsync<IngredientDto>($"{ApiRoutes.Ingredient.Create}?name={ingredientName}");
+        httpClient.PostAsync<object, IngredientDto>(ApiRoutes.Ingredient.Create, new { name = ingredientName });
         
 }

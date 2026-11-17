@@ -356,15 +356,28 @@
 		if (string.IsNullOrWhiteSpace(typed))
 			return false;
 
+		// SelectIngredient swaps in a brand-new RecipeItemDto, which would throw away what the
+		// user already entered on the current one: the unit they picked (the database rejects
+		// "None") and, when editing, the id of the line being edited.
+		var amountType = _recipeItem.IngredientAmount;
+		var lineId = _recipeItem.Id;
+
+		void SelectKeepingLine(IngredientDto ingredient)
+		{
+			SelectIngredient(ingredient);
+			_recipeItem.IngredientAmount = amountType;
+			_recipeItem.Id = lineId;
+		}
+
 		if (FindInCatalog(typed) is { } known)
 		{
-			SelectIngredient(known);
+			SelectKeepingLine(known);
 			return true;
 		}
 
 		var created = await IngredientService
 			.AddIngredientAsync(typed)
-			.OnSuccess(SelectIngredient, WebConstants.Messages.Ingredient.Added)
+			.OnSuccess(SelectKeepingLine, WebConstants.Messages.Ingredient.Added)
 			.OnFailure();
 
 		if (!created.Success)

@@ -4,7 +4,7 @@ using MediatR;
 
 namespace FoodCalc.Api.Endpoints.Ingredients;
 
-public abstract class CreateIngredientDto
+public class CreateIngredientDto
 {
     [BindFrom("name")]
     public required string Name { get; set; }
