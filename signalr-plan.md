@@ -50,7 +50,7 @@ Why not the alternatives: section 4. Safety net (slow poll + refresh on reconnec
 
 **Deployment** (`docker-compose.prod.yml`, `docker-compose.prod.quicktunnel.yml`, `deployment.md`)
 - Only `cloudflared` -> `http://web:8080`. `api` and `db` publish no ports; api CORS origin is the public hostname.
-- The stack uses Cloudflare Tunnel only (Caddy is not used; stale Caddy text in `deployment.md` was corrected).
+- The stack uses Cloudflare Tunnel only (`deployment.md` has been corrected to say so).
 - Both Program.cs files clear `KnownIPNetworks`/`KnownProxies` and use `X-Forwarded-For/Proto`; web calls
   `UseForwardedHeaders()` when `ReverseProxy:Enabled` (default on outside Development). Safe only because nothing else
   is published. A new internal `ws://api:8080` call from web needs no forwarded headers (plain internal HTTP).
@@ -391,7 +391,7 @@ Decisions made by the user (answers to the earlier open questions)
 3. **Faster "went offline on tab close":** undecided. **Ask the user at the start of Phase 2** what they want; do not assume.
 4. **Pending-count badge on the Admin nav item:** not now, maybe later. Do not build it; keep `PendingCount` in the event payload so it is cheap to add.
 5. **Test project:** allowed, but only for the SignalR work (see section 9). Tests for the rest of the app come in a different stage.
-6. **Docs:** Caddy is not used. The stack is Cloudflare Tunnel; stale Caddy text in `deployment.md` has been corrected.
+6. **Docs:** the stack is Cloudflare Tunnel; `deployment.md` has been corrected to say so.
 
 Still open
 - Section 10 questions (what a notification is): ask at the start of Phase 3.
