@@ -29,11 +29,11 @@ public class AddIngredientToRecipeCommandHandler(
             if (!request.Acting.CanEdit(recipe.CreatedByUserId))
                 return Error.Forbidden(description: ErrorMessages.Review.NotOwned(ErrorMessages.Entities.Recipe));
             
-            if (!await context.Ingredients.VisibleTo(request.Acting.UserId)
-                    .AnyAsync(i => i.Id == dto.IngredientId, cancellationToken))
-            {
+            var ingredient = await context.Ingredients.VisibleTo(request.Acting.UserId)
+                .FirstOrDefaultAsync(i => i.Id == dto.IngredientId, cancellationToken);
+
+            if (ingredient is null)
                 return Error.Validation(description: ErrorMessages.Ingredient.UnlinkedLine(dto.Ingredient.Name));
-            }
 
             var existing = await context.RecipeItems.FirstOrDefaultAsync(
                 ri => ri.Id == dto.Id && ri.RecipeId == dto.RecipeId, cancellationToken);
@@ -51,11 +51,15 @@ public class AddIngredientToRecipeCommandHandler(
                 recipe.IsReviewed = false;
 
                 await context.SaveChangesAsync(cancellationToken);
+
+                // The line's navigation isn't loaded; ToDto() reads it to build the response.
+                existing.Ingredient = ingredient;
                 return existing.ToDto();
             }
 
             RecipeItem mappedRecipeItem = dto.ToEntity();
             mappedRecipeItem.IngredientId = dto.IngredientId;
+            mappedRecipeItem.Ingredient = ingredient;
             mappedRecipeItem.IsReviewed = false;
             recipe.IsReviewed = false;
 
