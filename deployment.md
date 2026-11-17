@@ -197,8 +197,8 @@ add no security, and this fails on a developer's machine rather than in producti
 
 ## 3. Reverse-proxy readiness
 
-Behind Caddy the containers only ever speak plain HTTP; TLS terminates at the edge. Without this the app sees scheme
-`http` and generates redirects and links on the wrong origin.
+Behind the Cloudflare Tunnel the containers only ever speak plain HTTP; TLS terminates at Cloudflare's edge. Without
+this the app sees scheme `http` and generates redirects and links on the wrong origin.
 
 Both `Program.cs` files now:
 
@@ -212,18 +212,21 @@ the forwarded scheme it would attempt `ws://`
 from an `https://` page and be blocked as mixed content — the app would load and then sit there reconnecting.
 
 > **Clearing `KnownIPNetworks` means trusting whatever sets the forwarded headers.**
-> That is only safe because `docker-compose.prod.yml` publishes ports on the Caddy
-> container *alone* — `api` and `web` are unreachable from outside the docker network.
-> If you ever publish those ports directly, this becomes a header-spoofing hole.
+> That is only safe because `docker-compose.prod.yml` publishes **no ports at all** — `cloudflared` makes an
+> outbound connection to Cloudflare and traffic arrives back down it, so `api` and `web` are unreachable from outside
+> the docker network. If you ever publish those ports directly, this becomes a header-spoofing hole.
 
 ---
 
 ## 4. Production stack files
 
-| File                      | Purpose                                                                                    |
-|---------------------------|--------------------------------------------------------------------------------------------|
-| `docker-compose.prod.yml` | Caddy → web → api → db. Only Caddy publishes ports; no pgAdmin; `restart: unless-stopped`. |
-| `deploy/Caddyfile`        | TLS via Let's Encrypt, security headers, WebSocket timeouts disabled for Blazor circuits.  |
+| File                                  | Purpose                                                                                                                                  |
+|---------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------|
+| `docker-compose.prod.yml`             | Cloudflare Tunnel (`cloudflared`) → web → api → db. Nothing publishes host ports; no pgAdmin; `restart: unless-stopped`. Needs `CLOUDFLARE_TUNNEL_TOKEN` and a domain. |
+| `docker-compose.prod.quicktunnel.yml` | Same stack with an anonymous quick tunnel (random `trycloudflare.com` URL, changes on restart). For testing without a domain.           |
+
+TLS is terminated at Cloudflare's edge, so there is no reverse proxy and no certificate to renew. Cloudflare Tunnel
+carries WebSockets by default, which the Blazor circuits rely on.
 
 The existing `docker-compose.yml` is unchanged in shape and stays the local self-hosted stack.
 
@@ -288,7 +291,7 @@ These are real, and none of them block a first deployment. Listed so the decisio
 - [ ] New JWT key generated (≥32 bytes), identical in the `api` and `web` services
 - [ ] New pgAdmin password (or pgAdmin left out of the production stack entirely)
 - [ ] `.env` exists on the server and is **not** committed (`git status` is clean)
-- [ ] `PUBLIC_HOSTNAME` + `ACME_EMAIL` set
+- [ ] `PUBLIC_HOSTNAME` + `CLOUDFLARE_TUNNEL_TOKEN` set (the token is a secret; the quick-tunnel stack needs neither token nor domain, but `PUBLIC_HOSTNAME` must match its URL)
 - [ ] `BOOTSTRAP_ADMIN_*` set for the first boot only, and blanked afterwards
 - [ ] `docker compose -f docker-compose.prod.yml config` renders with no `?` errors
 - [ ] `SELECT "Email" FROM "AspNetUsers";` returns only accounts you created

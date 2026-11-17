@@ -50,7 +50,7 @@ Why not the alternatives: section 4. Safety net (slow poll + refresh on reconnec
 
 **Deployment** (`docker-compose.prod.yml`, `docker-compose.prod.quicktunnel.yml`, `deployment.md`)
 - Only `cloudflared` -> `http://web:8080`. `api` and `db` publish no ports; api CORS origin is the public hostname.
-- `deployment.md` section 4 still mentions Caddy; the compose files use Cloudflare Tunnel. Docs are stale there.
+- The stack uses Cloudflare Tunnel only (Caddy is not used; stale Caddy text in `deployment.md` was corrected).
 - Both Program.cs files clear `KnownIPNetworks`/`KnownProxies` and use `X-Forwarded-For/Proto`; web calls
   `UseForwardedHeaders()` when `ReverseProxy:Enabled` (default on outside Development). Safe only because nothing else
   is published. A new internal `ws://api:8080` call from web needs no forwarded headers (plain internal HTTP).
@@ -145,8 +145,7 @@ Trade-offs of A:
   presence "known online" set from memory to DB. Multiple web replicas are fine (each circuit has its own connection; Blazor
   already needs sticky sessions). Also fix migrations first (`deployment.md` known issue).
 - **Cloudflare Tunnel:** WebSockets are supported by default on tunnels; Blazor circuits already depend on it. The new
-  connections are internal (web->api) and do not touch Cloudflare. No change needed; the existing note in `deployment.md`
-  about WebSocket timeouts refers to Caddy and should be corrected as part of docs cleanup.
+  connections are internal (web->api) and do not touch Cloudflare. No change needed.
 - **Raspberry Pi:** an idle SignalR connection costs tens of KB plus a 15 s keep-alive ping. Limit it: only connect circuits
   that need events (Phase 1/2: Admin/Moderator; Phase 3 later: everyone). Do not start the connection for anonymous/login
   layouts. Set `ServerTimeout`/`KeepAliveInterval` defaults, `MaximumReceiveMessageSize` small, no per-event DB queries
@@ -234,12 +233,14 @@ cannot receive moderator-audience events.
    - `ReviewQueue.razor`: implements `IDisposable`; subscribes to `RealtimeClient.ReviewQueueChanged` and `Resynced`; handler does a
      debounced (250 to 500 ms, coalescing bursts) `LoadAsync()` then `InvokeAsync(StateHasChanged)`. Skip reload while `busy`
      (run it once when `busy` clears). Optional toast `UiText.Review.NewSubmission` (Dutch text in `UiText.cs`).
-   - `Admin.razor` tab header / `NavMenu.razor`: optional pending-count badge fed by `PendingCount` (small; separate follow-up).
+   - Pending-count badge on `Admin.razor` / `NavMenu.razor`: **not now** (user: maybe later). Keep `PendingCount` in the payload only.
    - `EditRecipe.razor`: subscribe to `RecipeReviewResolved` filtered by `RecipeId == _recipe.Id`; call `RefreshRecipeAsync()` so the
      "Ingediend ter goedkeuring" banner disappears on approval; on `Rejected` navigate to the recipe list with a Dutch message.
-     This requires the author's circuit to hold a connection: so Phase 1 widens `RealtimeClient.StartAsync` to **any user who is on
-     `EditRecipe`** (start on demand, ref-counted) rather than all users, to hold Pi cost down; or widen to all roles in Phase 3.
-     Decide when implementing; default: on-demand start from `EditRecipe` and the recipe list.
+     This requires the author's circuit to hold a connection. **Decision (user): do this only if it is cheap, otherwise skip it.**
+     Cheap means: `RealtimeClient.StartAsync` is started on demand (ref-counted) by `EditRecipe` only, with no change for other pages,
+     and `RecipeReviewResolved` is the only extra event. If that turns out to need more than about half a day or touches many
+     components, drop this bullet and ship the moderator side only (the author still sees the status on the next load).
+     Do not widen the connection to all users in Phase 1.
    - Fallback poll: `ReviewQueue` re-fetches every 60 s while visible (cheap `GET`; reuses existing endpoint) and on `Resynced`.
 4. Verification: section 9.
 
@@ -261,15 +262,15 @@ approving it in B clears A's banner within about 1 s.
    `PresenceWindow.Timeout` and publishes `TimedOut` for users whose last seen is older, removing them from the tracker. This is
    the only way to get an instant-ish "went offline" for closed tabs. Does not write to the DB (the DB already says "online but
    stale", which `PresenceWindow.IsOnline` treats as offline). Accepting up to 3 min + sweep interval for implicit offline is
-   inherent to the heartbeat model; optional improvement: Web's `RealtimeClient` disconnect (circuit closed) could call a hub
-   method or the existing `SignOutPresence` after a 20 to 30 s grace period to shorten this. Mark as optional, needs product
-   agreement (tab refresh must not flicker a user offline).
-3. Api: notification handler maps to `UserPresenceChangedEvent` (audience `Roles("Admin","Moderator")`). Moderators are allowed
-   the event but note the existing admin presence endpoint `GetPresenceEndpoint` policy (check it; if Admin-only, restrict the
-   audience to `role:Admin` to match what they can see on `UserList.razor`).
-4. Web: `UserList.razor` subscribes to `UserPresenceChanged` and updates the matching row's `IsOnline`/`LastSeenUtc` in place (only
-   if the user is on the current page; ignore others), then `InvokeAsync(StateHasChanged)`. Keep the existing 30 s `PollPresenceAsync`
-   as the safety net (lengthen to 60 s). Optionally toast "X is ingelogd" for admins on a dashboard.
+   inherent to the heartbeat model. **Open decision, ask the user when Phase 2 starts (do not pre-decide):** whether to shorten this
+   with a faster "went offline on tab close", e.g. `RealtimeClient` disconnect (circuit closed) calling the existing
+   `SignOutPresence` after a 20 to 30 s grace period (a tab refresh must not flicker a user offline). Present the trade-off and let
+   the user choose; skip it entirely if they have no preference.
+3. Api: notification handler maps to `UserPresenceChangedEvent` (audience `Roles("Admin","Moderator")`). **Decision (user): Admins and
+   Moderators are treated the same for now.** This matches `GetPresenceEndpoint`, which already has policy `Admin,Moderator`.
+4. Web: `UserList.razor` (the admin "Users" page) subscribes to `UserPresenceChanged` and updates the matching row's
+   `IsOnline`/`LastSeenUtc` in place (only if the user is on the current page; ignore others), then `InvokeAsync(StateHasChanged)`.
+   Keep the existing 30 s `PollPresenceAsync` as the safety net (lengthen to 60 s). No toast or dashboard widget.
 5. Edge cases: same user in two tabs (second tab is not a transition); user disabled (`ToggleUserEndpoint`) or deleted
    (`DeleteUserEndpoint`): publish `Logout`/`TimedOut` so the dot clears.
 
@@ -315,10 +316,11 @@ depend entirely on the answers. Effort cannot be estimated until then.
 
 ## 9. Testing and verification
 
-There are no test projects today. Proposed minimum (small, not blocking): add `FoodCalc.Tests` (xUnit) with
+There are no test projects today. **Decision (user): a test project may be added, but only for the SignalR work.** Tests for the rest of
+the app are a separate, later stage and must not be added here. Add `FoodCalc.Tests` (xUnit) containing only:
 - publisher mapping tests (notification -> event/audience), using a fake `IRealtimePublisher`;
 - `PresenceTracker`/sweeper transition logic with a fake clock;
-- handler tests only where they already have in-memory EF patterns (none exist; keep optional).
+- handler tests only where they already have in-memory EF patterns (none exist; keep optional and limited to SignalR-related code).
 
 Manual verification (in-app browser, two sessions). Use Aspire (`FoodHub.AppHost`) or `docker compose` locally; log in with bootstrap/seed
 accounts (do not paste credentials into chat).
@@ -357,15 +359,14 @@ implementing Phase 3 or designing any notification DTO, table or UI. Do not gues
 - **Compose (`docker-compose.prod.yml`, `docker-compose.prod.quicktunnel.yml`, `docker-compose.yml`):** none required for networking.
   `api` still publishes no ports; `web` already reaches it at `http://api:8080` via `API__BaseAddress`. Optional env: `Realtime__Enabled=true`
   (both services). Add a Docker healthcheck is out of scope.
-- **Tunnel/proxy:** no change; WebSockets are already carried for Blazor. If the project ever returns to Caddy, keep WebSocket
-  timeouts disabled (`deployment.md` section 4).
+- **Tunnel/proxy:** no change; Cloudflare Tunnel already carries WebSockets for Blazor.
 - **ForwardedHeaders:** unchanged. The new connection is internal and does not need or trust forwarded headers. Keep the existing warning:
   never publish `api` or `web` ports directly.
 - **Config:** `API:BaseAddress` is reused for the hub URL. No new secrets. If the shared-connection option E is ever adopted, a service secret
   would be added to `.env.example` and both services.
 - **Raspberry Pi:** no new containers. Expect small RAM growth per open privileged circuit; cap by connecting only roles that need
   it (Phase 0/1 decision), and confirm with `docker stats`.
-- **Docs to update with the change:** `deployment.md` (hub + WebSocket note, stale Caddy sections), `README_api.md` (hub path, events),
+- **Docs to update with the change:** `deployment.md` (hub + internal WebSocket note), `README_api.md` (hub path, events),
   `GLOSSARY.md` only if a new domain term appears (e.g. "Notification" after section 10 is answered). Consider an ADR in `docs/adr/`
   recording the section 4 decision (the folder does not exist yet).
 - **Scaling note:** single API replica. Before a second replica: split migrations out of startup, add backplane (Redis or Postgres
@@ -384,13 +385,17 @@ Risks
   leaks and "disposed circuit" exceptions.
 - Presence tracker is in memory: restart bursts and multi-instance inconsistency (documented, seeded at startup).
 
-Open questions to confirm with the user before or during Phase 1/2
-1. Should Moderators see presence events, or only Admins? (`GetPresenceEndpoint` policy decides what they may see today; verify.)
-2. Should the submitter's pages (EditRecipe, recipe list) update live (needs circuits of all users to connect on demand)? Default: yes, on demand.
-3. Is a faster "went offline on tab close" (disconnect with grace period) wanted, given a ~3.5 min worst case otherwise?
-4. Is a pending-count badge on the Admin nav item wanted (small extra)?
-5. Is adding the first test project (`FoodCalc.Tests`) acceptable?
-6. Section 10 questions, at the start of Phase 3.
+Decisions made by the user (answers to the earlier open questions)
+1. **Presence audience:** Admins and Moderators are treated the same for now. The admin "Users" page (`UserList.razor`) updates via events.
+2. **Submitter's page updates live:** only if cheap (on-demand connection from `EditRecipe` only, see Phase 1); otherwise skipped.
+3. **Faster "went offline on tab close":** undecided. **Ask the user at the start of Phase 2** what they want; do not assume.
+4. **Pending-count badge on the Admin nav item:** not now, maybe later. Do not build it; keep `PendingCount` in the event payload so it is cheap to add.
+5. **Test project:** allowed, but only for the SignalR work (see section 9). Tests for the rest of the app come in a different stage.
+6. **Docs:** Caddy is not used. The stack is Cloudflare Tunnel; stale Caddy text in `deployment.md` has been corrected.
+
+Still open
+- Section 10 questions (what a notification is): ask at the start of Phase 3.
+- Question 3 above: ask at the start of Phase 2.
 
 ## 13. Rough effort
 
